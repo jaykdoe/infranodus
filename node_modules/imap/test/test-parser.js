@@ -20,6 +20,10 @@ var CR = '\r', LF = '\n', CRLF = CR + LF;
     expected: [ 'IDLE OK IDLE terminated' ],
     what: 'Unknown line'
   },
+  { source: ['IDLE OK Idle completed (0.002 + 1.783 + 1.783 secs).', CRLF],
+    expected: [ 'IDLE OK Idle completed (0.002 + 1.783 + 1.783 secs).' ],
+    what: 'Unknown line with + char'
+  },
   { source: ['+ idling', CRLF],
     expected: [ { textCode: undefined,
                   text: 'idling'
@@ -132,6 +136,19 @@ var CR = '\r', LF = '\n', CRLF = CR + LF;
                 }
               ],
     what: 'Search'
+  },
+  { source: ['* XLIST (\\Noselect) "/" ~/Mail/foo', CRLF],
+    expected: [ { type: 'xlist',
+                  num: undefined,
+                  textCode: undefined,
+                  text: {
+                    flags: [ '\\Noselect' ],
+                    delimiter: '/',
+                    name: '~/Mail/foo'
+                  }
+                }
+              ],
+    what: 'XList'
   },
   { source: ['* LIST (\\Noselect) "/" ~/Mail/foo', CRLF],
     expected: [ { type: 'list',
@@ -452,6 +469,15 @@ var CR = '\r', LF = '\n', CRLF = CR + LF;
               ],
     what: 'QuotaRoot'
   },
+  { source: ['A1 OK', CRLF], // some servers like ppops.net sends such response
+    expected: [ { type: 'ok',
+                  tagnum: 1,
+                  textCode: undefined,
+                  text: ''
+                }
+              ],
+    what: 'Tagged OK (no text code, no text)'
+  },
 ].forEach(function(v) {
   var ss = new require('stream').Readable(), p, result = [];
   ss._read = function(){};
@@ -488,7 +514,8 @@ var CR = '\r', LF = '\n', CRLF = CR + LF;
                      )
                     );
       });
-    }
+    } else
+      stream.resume();
   });
 
   try {
@@ -499,14 +526,16 @@ var CR = '\r', LF = '\n', CRLF = CR + LF;
     console.log(makeMsg(v.what, 'JS Exception: ' + e.stack));
     return;
   }
-  assert.deepEqual(result,
-                   v.expected,
-                   makeMsg(v.what,
-                           'Result mismatch:'
-                           + '\nParsed: ' + inspect(result, false, 10)
-                           + '\nExpected: ' + inspect(v.expected, false, 10)
-                   )
-                  );
+  setImmediate(function() {
+    assert.deepEqual(result,
+                     v.expected,
+                     makeMsg(v.what,
+                             'Result mismatch:'
+                             + '\nParsed: ' + inspect(result, false, 10)
+                             + '\nExpected: ' + inspect(v.expected, false, 10)
+                     )
+                    );
+  });
 });
 
 function makeMsg(what, msg) {

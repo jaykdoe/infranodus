@@ -43,9 +43,27 @@ var fs = require('fs');
 var google = require('google');
 
 // Lemmatizer module initialization
-var Lemmer = require('node-lemmer').Lemmer;
-var lemmerEng = new Lemmer('english');
-var lemmerRus = new Lemmer('russian');
+const Morphy = require('phpmorphy').default;
+
+const lemmerEng = new Morphy('en', {
+//  nojo:                false,
+  storage:             Morphy.STORAGE_MEM,
+  predict_by_suffix:   true,
+  predict_by_db:       true,
+  graminfo_as_text:    true,
+  use_ancodes_cache:   false,
+  resolve_ancodes:     Morphy.RESOLVE_ANCODES_AS_TEXT
+});
+
+const lemmerRus = new Morphy('ru', {
+//  nojo:                false,
+  storage:             Morphy.STORAGE_MEM,
+  predict_by_suffix:   true,
+  predict_by_db:       true,
+  graminfo_as_text:    true,
+  use_ancodes_cache:   false,
+  resolve_ancodes:     Morphy.RESOLVE_ANCODES_AS_TEXT
+});
 
 // Keeping them here as they are useful libs for future use
 

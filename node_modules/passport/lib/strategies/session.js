@@ -11,9 +11,16 @@ var pause = require('pause')
  *
  * @api public
  */
-function SessionStrategy() {
+function SessionStrategy(options, deserializeUser) {
+  if (typeof options == 'function') {
+    deserializeUser = options;
+    options = undefined;
+  }
+  options = options || {};
+  
   Strategy.call(this);
   this.name = 'session';
+  this._deserializeUser = deserializeUser;
 }
 
 /**
@@ -38,26 +45,27 @@ SessionStrategy.prototype.authenticate = function(req, options) {
   if (!req._passport) { return this.error(new Error('passport.initialize() middleware not in use')); }
   options = options || {};
 
-  var self = this
-    , su = req._passport.session.user;
+  var self = this, 
+      su;
+  if (req._passport.session) {
+    su = req._passport.session.user;
+  }
+
   if (su || su === 0) {
     // NOTE: Stream pausing is desirable in the case where later middleware is
     //       listening for events emitted from request.  For discussion on the
     //       matter, refer to: https://github.com/jaredhanson/passport/pull/106
     
     var paused = options.pauseStream ? pause(req) : null;
-    req._passport.instance.deserializeUser(su, req, function(err, user) {
+    this._deserializeUser(su, req, function(err, user) {
       if (err) { return self.error(err); }
       if (!user) {
         delete req._passport.session.user;
-        self.pass();
-        if (paused) {
-          paused.resume();
-        }
-        return;
+      } else {
+        // TODO: Remove instance access
+        var property = req._passport.instance._userProperty || 'user';
+        req[property] = user;
       }
-      var property = req._passport.instance._userProperty || 'user';
-      req[property] = user;
       self.pass();
       if (paused) {
         paused.resume();

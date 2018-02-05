@@ -1,12 +1,14 @@
 /**
  * Module dependencies.
  */
-var http = require('http')
-  , req = http.IncomingMessage.prototype;
+//var http = require('http')
+//  , req = http.IncomingMessage.prototype;
 
+
+var req = exports = module.exports = {};
 
 /**
- * Intiate a login session for `user`.
+ * Initiate a login session for `user`.
  *
  * Options:
  *   - `session`  Save login state in session, defaults to _true_
@@ -45,9 +47,8 @@ req.logIn = function(user, options, done) {
     if (typeof done != 'function') { throw new Error('req#login requires a callback function'); }
     
     var self = this;
-    this._passport.instance.serializeUser(user, this, function(err, obj) {
+    this._passport.instance._sm.logIn(this, user, function(err) {
       if (err) { self[property] = null; return done(err); }
-      self._passport.session.user = obj;
       done();
     });
   } else {
@@ -68,8 +69,8 @@ req.logOut = function() {
   }
   
   this[property] = null;
-  if (this._passport && this._passport.session) {
-    delete this._passport.session.user;
+  if (this._passport) {
+    this._passport.instance._sm.logOut(this);
   }
 };
 
