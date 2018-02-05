@@ -1521,7 +1521,7 @@ exports.submit = function(req, res,  next) {
                                 if (/[а-яА-ЯЁё]/.test(searchterms[k]) == true) {
                                     var lemmaterm = lemmerRus.lemmatize(searchterms[k]);
                                     if (lemmaterm[0] != undefined) {
-                                        searchPattern = new RegExp('('+lemmaterm[0]['text'].toLowerCase()+')', 'ig');
+                                        searchPattern = new RegExp('('+lemmaterm[0].toLowerCase()+')', 'ig');
                                         searchtext = searchtext.replace(searchPattern,' ');
                                     }
                                 }
@@ -1531,7 +1531,7 @@ exports.submit = function(req, res,  next) {
                                 else {
                                     var lemmaterm = lemmerEng.lemmatize(searchterms[k]);
                                     if (lemmaterm[0] != undefined) {
-                                        searchPattern = new RegExp('('+lemmaterm[0]['text'].toLowerCase()+')', 'ig');
+                                        searchPattern = new RegExp('('+lemmaterm[0].toLowerCase()+')', 'ig');
                                         searchtext = searchtext.replace(searchPattern,' ');
                                     }
                                 }
