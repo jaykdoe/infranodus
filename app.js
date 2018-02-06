@@ -49,8 +49,8 @@ var imports = require('./routes/imports');
 
 var app = express();
 
-var appio = http.createServer(app);
-var io = require('socket.io')(appio);
+var server = http.Server(app);
+var io = require('socket.io')(server);
 
 app.set('port', process.env.PORT || 3000);
 app.set('views', __dirname + '/views');
@@ -163,7 +163,7 @@ if (process.env.ERROR_ROUTE) {
 }
 
 
-appio.listen(app.get('port'), function(){
+server.listen(app.get('port'), function(){
 
   console.log('Express server listening on port ' + app.get('port'));
 });
@@ -172,7 +172,7 @@ var chat = io.on('connection', function(socket){
     console.log('a user socket connected');
     socket.on('disconnect', function(data){
         console.log('user disconnected');
-        var room = findClientsSocket(io, data.id);
+        var room = Object.keys(io.sockets.sockets);
         // Notify the other person in the chat room
         // that his partner has left
         socket.broadcast.to(socket.room).emit('leave', {
@@ -196,8 +196,9 @@ var chat = io.on('connection', function(socket){
     });
     socket.on('login', function(data){
 
-        var room = findClientsSocket(io, data.id);
-
+        var room = Object.keys(io.sockets.sockets);
+        console.log('chat room');
+        console.log(room);
         // Only two people per room are allowed
 
         if (room.length < 2) {
@@ -233,30 +234,3 @@ var chat = io.on('connection', function(socket){
         }
     });
 });
-
-function findClientsSocket(io, roomId, namespace) {
-    var ress = [],
-        ns = io.of(namespace ||"/");    // the default namespace is "/"
-
-  if (ns) {
-        for (var id in ns.connected) {
-            if(roomId) {
-                var index = ns.connected[id].rooms.indexOf(roomId) ;
-                if(index !== -1) {
-                    ress.push(ns.connected[id]);
-                }
-            }
-            else {
-                ress.push(ns.connected[id]);
-            }
-        }
-    }
-    return ress;
-}
-
-
-
-
-
-
-

@@ -123,12 +123,12 @@
 
 
 <script src="/javascripts/ui.js"></script>
-<script src="/javascripts/socket.io.js"></script>
+<script src="/socket.io/socket.io.js"></script>
 
 <script language="javascript">
 
     // Initialize Socket.IO
-    var socket = io();
+    var socket = io.connect();
 
     function toggleios() {
         var ele = document.getElementById("ioshelp");

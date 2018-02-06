@@ -229,7 +229,7 @@
 <script src="/javascripts/jquery.highlight-4.js"></script>
 <script src="/javascripts/bundle-stemmer.js"></script>
 <script src="/javascripts/jquery.taghandler.js"></script>
-<script src="/javascripts/socket.io.js"></script>
+<script src="/socket.io/socket.io.js"></script>
 <script src="/javascripts/moment.min.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.tooltipster.min.js"></script>
 
@@ -242,7 +242,7 @@
     var urlPath = location.pathname;
 
     // Initialize Socket.IO
-    var socket = io();
+    var socket = io.connect();
 
 
 
@@ -442,6 +442,8 @@ else {
 
 collaborate_matrix[collaborate_room] = collaborate_room + collaborate_id;
 
+console.log('room id');
+console.log(collaborate_matrix[collaborate_room]);
 
 if (!collaborate_invite) {
     if (collaborate_storage) {
