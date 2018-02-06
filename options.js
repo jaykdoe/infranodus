@@ -85,7 +85,6 @@ fs.readFile( __dirname + '/public/files/stopwords_en_en.txt', function (err, dat
     if (err) {
         throw err;
     }
-
     exports.stopwords_en = data.toString().split("\n");
 
 });
@@ -97,7 +96,6 @@ fs.readFile( __dirname + '/public/files/stopwords_ru_ru.txt', function (err, dat
     if (err) {
         throw err;
     }
-
     exports.stopwords_ru = data.toString().split("\n");
 
 });
@@ -111,8 +109,8 @@ fs.readFile( __dirname + '/public/files/stopwords_fr_fr.txt', function (err, dat
     if (err) {
         throw err;
     }
-
     exports.stopwords_fr = data.toString().split("\n");
+
 
 });
 
