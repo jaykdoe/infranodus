@@ -197,8 +197,11 @@ var chat = io.on('connection', function(socket){
     socket.on('login', function(data){
 
         var room = Object.keys(io.sockets.sockets);
+
+        var room2 = Object.keys(io.sockets);
         console.log('chat room');
         console.log(room);
+        console.log(io.sockets);
         // Only two people per room are allowed
 
         if (room.length < 2) {
