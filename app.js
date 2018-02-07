@@ -168,16 +168,33 @@ server.listen(app.get('port'), function(){
   console.log('Express server listening on port ' + app.get('port'));
 });
 
-var chat = io.on('connection', function(socket){
+// could be var chat = to make it recursive
+
+io.on('connection', function(socket){
+
     console.log('a user socket connected');
+
     socket.on('disconnect', function(data){
+
         console.log('user disconnected');
-        var room = Object.keys(io.sockets.sockets);
+
+        // let's count how many people are left in a room
+        var room = io.sockets.adapter.rooms[socket.room];
+        var people_remaining = 1;
+
+        // TODO that shouldn't be called if not needed
+        if (room != undefined) {
+          people_remaining = room.length;
+        }
+
+        console.log('users left');
+        console.log(room);
+        console.log(people_remaining);
         // Notify the other person in the chat room
         // that his partner has left
         socket.broadcast.to(socket.room).emit('leave', {
             boolean: true,
-            people: room.length
+            people: people_remaining
         });
 
     });
@@ -196,44 +213,21 @@ var chat = io.on('connection', function(socket){
     });
     socket.on('login', function(data){
 
-        var room = Object.keys(io.sockets.sockets);
-
-        var room2 = Object.keys(io.sockets);
-        console.log('chat room');
-        console.log(room);
-        console.log(io.sockets);
-        // Only two people per room are allowed
-
-        if (room.length < 2) {
-
             // Use the socket object to store data. Each client gets
             // their own unique socket object
-
             socket.username = data.user;
             socket.room = data.id;
 
             // Add the client to the room
             socket.join(data.id);
 
-            if (room.length == 1) {
+            // Send the startChat event to all the people in the
+            // room, along with a list of people that are in it.
 
-                var usernames = [];
+            socket.to(data.id).emit('startChat', {
+                boolean: true,
+                id: data.id
+            });
 
-                usernames.push(room[0].username);
-                usernames.push(socket.username);
-
-                // Send the startChat event to all the people in the
-                // room, along with a list of people that are in it.
-
-                chat.in(data.id).emit('startChat', {
-                    boolean: true,
-                    id: data.id,
-                    users: usernames,
-                });
-            }
-        }
-        else {
-            socket.emit('tooMany', {boolean: true, username: data.user});
-        }
     });
 });

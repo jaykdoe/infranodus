@@ -490,16 +490,18 @@ if (!collaborate_invite) {
     socket.on('leave', function(msg){
         console.log('partner left');
         console.log(msg.people);
-        $('#collaborate-link').removeClass('is-collab');
-        var collab_content = $('#collaborate-link').tooltipster('content');
-        $('#collaborate-link').tooltipster('content', 'Collaboration is OFF');
-        $('#collaborate-link').tooltipster('show');
-        setTimeout(function() {
-            $('#collaborate-link').tooltipster('hide');
-            setTimeout(function() {
-                $('#collaborate-link').tooltipster('content', collab_content);
-            }, 1000);
-        }, 2000);
+        if (msg.people < 2) {
+          $('#collaborate-link').removeClass('is-collab');
+          var collab_content = $('#collaborate-link').tooltipster('content');
+          $('#collaborate-link').tooltipster('content', 'Collaboration is OFF');
+          $('#collaborate-link').tooltipster('show');
+          setTimeout(function() {
+              $('#collaborate-link').tooltipster('hide');
+              setTimeout(function() {
+                  $('#collaborate-link').tooltipster('content', collab_content);
+              }, 1000);
+          }, 2000);
+        }
     });
 
     socket.on('tooMany', function(data){
