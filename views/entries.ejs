@@ -1561,10 +1561,30 @@ sigma.parsers.json(
                         recognition.lang = 'ru';
                         localStorage.setItem('language', 'ru');
                     }
+                    else if (language == 'fr' || language == 'french') {
+                        recognition.lang = 'fr';
+                        localStorage.setItem('language', 'fr');
+                    }
+                    else if (language == 'de' || language == 'german') {
+                        recognition.lang = 'de';
+                        localStorage.setItem('language', 'de');
+                    }
 
                     if (localStorage.getItem('language') == 'ru') {
                         recognition.lang = 'ru';
                         localStorage.setItem('language', 'ru');
+                    }
+                    else if (localStorage.getItem('language') == 'en') {
+                        recognition.lang = 'en';
+                        localStorage.setItem('language', 'en');
+                    }
+                    else if (localStorage.getItem('language') == 'fr') {
+                        recognition.lang = 'fr';
+                        localStorage.setItem('language', 'fr');
+                    }
+                    else if (localStorage.getItem('language') == 'de') {
+                        recognition.lang = 'de';
+                        localStorage.setItem('language', 'de');
                     }
 
                     // Kick off the Speech to Text recognition process
