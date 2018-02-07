@@ -28,11 +28,23 @@
 
 
                 <% include messages %>
-
+                <% console.log(user) %>
                 <form action='/settings' method='post' class="pure-form pure-form-stacked">
 
                     <legend>settings for user <i><%= user.name %></i></legend>
                     <br>
+
+                    Voice to Text Input Language (Chrome Only)
+                    <label for="inlanguage" class="pure-input">
+                      <select id="inlanguage" name="inlanguage">
+                      <option value="en" <% if (user.inlanguage=='en' || user.inlanguage == undefined) { %> selected <% } %>>English</option>
+                      <option value="ru" <% if (user.inlanguage=='ru') { %> selected <% } %>>Russian</option>
+                      <option value="fr" <% if (user.inlanguage=='fr') { %> selected <% } %>>French</option>
+                      <option value="de" <% if (user.inlanguage=='de') { %> selected <% } %>>German</option>
+                      </select>
+                    </label>
+                    <br>
+
                     Words connect into graph, when they are
                     <label for="wordscan-edit-1" class="pure-radio">
                         <input id="wordscan-edit-1" type="radio" name="fullscan" value="0" <% if (user.fullscan=='0') { %> checked <% } %>>

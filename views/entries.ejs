@@ -431,6 +431,8 @@ var collaborate_html = '';
 
 var collaborate_storage = JSON.parse(localStorage.getItem("collaborate"));
 
+var inlanguage = '<%= user.inlanguage %>';
+
 // If the user opened a URL with collaborate=xxxxxx then they join the room that's the "url_path/xxxxxx"
 if (collaborate_invite) {
     collaborate_id = collaborate_invite;
@@ -1550,10 +1552,17 @@ sigma.parsers.json(
                     // Do we require interim results in addition to the final results?
                     recognition.interimResults = true;
 
-                    // We speak The US English here
-                    recognition.lang = 'en-US';
+                    // Check if the user has a preferred language settings
 
-                    if (language == 'en' || language == 'en-US') {
+                    if (inlanguage != undefined) {
+                        recognition.lang = inlanguage;
+                    }
+                    else {
+                        // We speak The US English here
+                        recognition.lang = 'en-US';
+                    }
+
+                    if (language == 'en' || language == 'en-US' || language == 'english') {
                         localStorage.setItem('language', 'en');
                     }
 
@@ -1570,22 +1579,22 @@ sigma.parsers.json(
                         localStorage.setItem('language', 'de');
                     }
 
-                    if (localStorage.getItem('language') == 'ru') {
-                        recognition.lang = 'ru';
-                        localStorage.setItem('language', 'ru');
-                    }
-                    else if (localStorage.getItem('language') == 'en') {
-                        recognition.lang = 'en';
-                        localStorage.setItem('language', 'en');
-                    }
-                    else if (localStorage.getItem('language') == 'fr') {
-                        recognition.lang = 'fr';
-                        localStorage.setItem('language', 'fr');
-                    }
-                    else if (localStorage.getItem('language') == 'de') {
-                        recognition.lang = 'de';
-                        localStorage.setItem('language', 'de');
-                    }
+                    // if (localStorage.getItem('language') == 'ru') {
+                    //     recognition.lang = 'ru';
+                    //     localStorage.setItem('language', 'ru');
+                    // }
+                    // else if (localStorage.getItem('language') == 'en') {
+                    //     recognition.lang = 'en';
+                    //     localStorage.setItem('language', 'en');
+                    // }
+                    // else if (localStorage.getItem('language') == 'fr') {
+                    //     recognition.lang = 'fr';
+                    //     localStorage.setItem('language', 'fr');
+                    // }
+                    // else if (localStorage.getItem('language') == 'de') {
+                    //     recognition.lang = 'de';
+                    //     localStorage.setItem('language', 'de');
+                    // }
 
                     // Kick off the Speech to Text recognition process
                     recognition.start();

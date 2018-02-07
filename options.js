@@ -35,7 +35,10 @@ exports.settings = {
     max_hashtags: 100,
 
     // Max nodes to show in a graph
-    max_nodes: 150
+    max_nodes: 150,
+
+    // Default voice to text input Language
+    inlanguage: "en"
 
 
 }
