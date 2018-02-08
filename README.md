@@ -1,6 +1,8 @@
-##InfraNodus is a web / mobile interface to Neo4J made using Node.Js and Sigma.Js.
+## InfraNodus a text-to-network visualization system, based on Neo4J, Node.Js and Sigma.Js.
 
-#### Keep track of all the connections using this simple tool that converts natural language into graph (English, Russian and other languages are supported).
+#### Keep track of all the connections using this simple tool that converts natural language into graph (English, Russian, French, German are supported, other languages — limited support).
+
+#### Also use InfraNodus as an interface to your Neo4J database to quickly try out some basic graph constructs using an easy input procedure via natural language, voice-to-text and #hashtags
 
 =================
 
@@ -8,12 +10,12 @@
 
 =================
 
-#### Update! You can now visualize your notes (Evernote and Gmail import) or tweets and see how they all connect in a graph.
+#### Works on mobile and desktop. Voice-to-text (EN, RU, FR, DE) is available.
 
 
 [Watch a Video Demo](https://vimeo.com/89807920) - a 2-minute introduction
 
-[Try it Online](http://infranodus.com) - request invitation code through [Nodus Labs](http://noduslabs.com/contact/)
+[Try it Online](http://infranodus.com) - request invitation code through [Nodus Labs](http://noduslabs.com/infranodus/)
 
 
 =================
@@ -56,27 +58,22 @@ InfraNodus is built on
 =================
 
 
-###Installation Guide
+### Installation Guide
 To use this software you should install Neo4J 2.0 on your local computer.
 To install Neo4J on a Mac use homebrew (see [Neo4J instructions here](http://www.neo4j.org/download)).
 For settings, check out [How to Set Up Neo4J for InfraNodus](https://github.com/noduslabs/infranodus/wiki/Neo4J-Database-Setup).
 You may also find [other wiki pages](https://github.com/noduslabs/infranodus/wiki/_pages) interesting.
 
-You will also need to have npm Node.Js package manager on your computer and run
-`npm install` 
-in node_modules folder of the project to install all the dependencies.
-
-You might need to manually install ejs rending Node.Js module
-`npm install ejs`
-
-You might also need to manually `npm build node-lemmer`
+You will also need to have npm Node.Js package manager installed on your computer. After you install InfraNodus, run
+`npm install`
+in the main folder the project to install all the dependencies into `node_modules` folder.
 
 Check out the config.json.sample file and edit it to add your own Evernote and Twitter API credentials. Then rename it to config.json.
 
 =================
 
 
-###Data Model
+### Data Model
 
 The general rationale for the data model used in InfraNodus is outlined in
 * [Cognitive Network Protocol](http://noduslabs.com/research/cognitive-network-protocol/) article (more specific)
@@ -102,7 +99,7 @@ The current data model description utilized in InfraNodus app is available in ht
 =================
 
 
-###Mobile Interface
+### Mobile Interface
 
 InfraNodus can also be used on a mobile.
 
@@ -113,21 +110,19 @@ InfraNodus can also be used on a mobile.
 =================
 
 
-####MIT License####
+### MIT License
 
 This open source, free software is available under MIT license.
 It is provided as is, with no guarantees and no liabilities.
 You can re-use it as long as you keep this notice inside the code
 
-**You are very welcome to join the project!**
+** You are very welcome to join the project! **
 
 Created by [Nodus Labs](http://www.noduslabs.com), conceptualized via [Polysingularity](http://polysingularity.com), inspired from [ThisIsLike.Com](http://thisislike.com), and [KnowNodes (now Rhizi)](http://rhizi.org) co-developed at [Center for Interdisciplinary Research](http://cri-paris.org). 
 
 Written by [Dmitry Paranyushkin](http://github.com/deemeetree) | [Nodus Labs](http://www.noduslabs.com) and hopefully you also!
 (http://www.noduslabs.com) | info AT noduslabs DOT com
- 
+
 In some parts the code from the book ["Node.js in Action"](http://www.manning.com/cantelon/) is used (highly recommended, btw!)
 (c) 2014 Manning Publications Co.
 Any source code files provided as a supplement to the book are freely available to the public for download. Reuse of the code is permitted, in whole or in part, including the creation of derivative works, provided that you acknowledge that you are using it and identify the source: title, publisher and year.*
-
-
