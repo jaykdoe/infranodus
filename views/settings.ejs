@@ -106,6 +106,13 @@
                     </label>
                     <br>
 
+                    Custom stopwords to add to the default list
+                    <label for="stopwords" class="pure-input">
+                        <textarea id="stopwords" name="stopwords" rows="4" cols="20"><% if (user.stopwords.length > 0) { %><%= user.stopwords %><% }%></textarea>
+                    </label>
+
+                    <br>
+
                     <button type='submit' class="pure-button pure-button-primary">save settings</button>
 
                 </form>
