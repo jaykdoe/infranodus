@@ -595,8 +595,7 @@ function submitFormProcess() {
                         $('#statement').removeClass('loading');
                         $('#submitbutton').removeAttr('disabled');
                         socket.emit('chat message', {postedby: postedby, entryuid: JSON.parse(res.entryuid).data, entrytext: res.entrytext, graph: res.graph});
-                        // This function will see what it has to say
-                        infraTalk(5000);
+
                     }
                     else if (res.errormsg) {
                         $('#statement').removeClass('loading');
@@ -1853,7 +1852,7 @@ sigma.parsers.json(
 
 
 
-        infraTalk();
+
         <% } %>
 
 
@@ -2344,45 +2343,6 @@ sigma.parsers.json(
 
 
     });
-    }
-
-    // Initial conversation with the user - HELP of a sorts
-
-    function infraTalk (timer) {
-        if (localStorage.getItem('disablehelp') != 1) {
-        if (!timer) {
-            var timer = 3000;
-        }
-        var utterance = '';
-        var vocabulary = [];
-
-        if (!current_context) {
-            vocabulary = [
-                "Let's start from a clear page... What are you interested in thinking about?",
-                "Can you say something else about it?"
-            ];
-        }
-        else {
-            vocabulary = [
-                "To start, write your ideas, import data, or invite somebody to collaborate using the icon below..."
-            ];
-            timer = 10000;
-        }
-
-        var visibleentries_current = $(".entry:visible").length;
-
-        if (!visibleentries_current || visibleentries_current == null) {
-            visibleentries_current = 0;
-        }
-        var pose = visibleentries_current;
-        utterance = vocabulary[pose];
-        if (utterance) {
-            setTimeout(function() {
-                socket.emit('chat message', {mute: 1, postedby: 'infratalk', entryuid: '', entrytext: utterance, graph: '', help: 1});
-            }, timer);
-        }
-        }
-
     }
 
 
@@ -2958,7 +2918,7 @@ sigma.parsers.json(
         }
 
         <% if (!perceivername) { %>
-            addNewContext = '<li id="addNewContext" class="menu-item-divided"><a id="addcontextbutton" href="javascript:">+</a>&nbsp;<form action="/post" method="GET" class="pure-form" id="addcontextinput"><input type="text" id="addcontextname" size="7" class="pure-input"></form></li><li class="menu-item-divided">&nbsp;<a href="javascript:"></a></li>';
+            addNewContext = '<li id="addNewContext" class="menu-item-divided"><a id="addcontextbutton" href="javascript:">+ add new</a>&nbsp;<form action="/post" method="GET" class="pure-form" id="addcontextinput"><input type="text" id="addcontextname" size="7" class="pure-input"></form></li><li class="menu-item-divided">&nbsp;<a href="javascript:"></a></li>';
         <% } else { %>
             addNewContext = '<li class="menu-item-divided">&nbsp;<a href="javascript:"></a></li>';
 

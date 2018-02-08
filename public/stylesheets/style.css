@@ -523,7 +523,7 @@ a:hover.app-more-link {
 #addcontextinput {
     visibility: hidden;
     z-index:99;
-    margin: -20px 0px 0px 30px !important;
+    margin: -20px 0px 0px 10px !important;
 
 }
 
