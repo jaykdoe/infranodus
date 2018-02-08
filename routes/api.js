@@ -120,6 +120,12 @@ exports.nodes = function(req, res, next){
         if (req.query.gexf) {
             res.render('entries/nodes', { graph: graph });
         }
+        else if (req.query.csv) {
+            res.render('entries/csv', { graph: graph });
+        }
+        else if (req.query.csvmatrix) {
+            res.render('entries/csvmatrix', { graph: graph });
+        }
         else {
             res.format({
                 json: function(){
