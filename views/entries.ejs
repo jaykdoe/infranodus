@@ -1478,30 +1478,7 @@ sigma.parsers.json(
                     graph_share_url = graph_share_url + "/" + current_context;
                 }
 
-                var collab_invite = '<a href="mailto:chat@infranodus.com?subject=Chat%20Now&body=http://' + graph_share_url + '/edit?collaborate=' + collaborate_id + '">Chat Now!</a><br>';
-
-                var times_seen = localStorage.getItem('TooltipSeen');
-
-                if (times_seen >= 1) {
-                    localStorage.setItem('TooltipSeen', parseInt(times_seen) + 1);
-                }
-                else {
-                    localStorage.setItem('TooltipSeen', 1);
-                }
-
-                if (times_seen < 4) {
-                    $('#collaborate-link').tooltipster('content', $(collab_invite));
-                    $('#collaborate-link').tooltipster('show');
-                    setTimeout(function() {
-                        $('#collaborate-link').tooltipster('hide');
-                        setTimeout(function() {
-                            $('#collaborate-link').tooltipster('content', collab_content);
-                        }, 1000);
-                    }, 2000);
-                }
-                else if (times_seen > 15) {
-                    localStorage.setItem('TooltipSeen', 1);
-                }
+              
             }
 
         // START Speech Recognition Module only for Chrome

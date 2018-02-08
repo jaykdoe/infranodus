@@ -109,7 +109,7 @@
                     Custom stopwords to add to the default list (<a href="/files/stopwords_en_en.txt">en</a>, <a href="/files/stopwords_de_de.txt">de</a>, <a href="/files/stopwords_fr_fr.txt">fr</a>, <a href="/files/stopwords_es_es.txt">es</a>)
                     (example: "alt, don", to exclude, use a "-", e.g. "-kind, -and")
                     <label for="stopwords" class="pure-input">
-                        <textarea id="stopwords" name="stopwords" rows="4" cols="20"><% if (user.stopwords.length > 0) { %><%= user.stopwords %><% }%></textarea>
+                        <textarea id="stopwords" name="stopwords" rows="4" cols="20"><% if (user.stopwords != undefined && user.stopwords.length > 0) { %><%= user.stopwords %><% }%></textarea>
                     </label>
 
                     <br>
