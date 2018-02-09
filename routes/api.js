@@ -126,6 +126,9 @@ exports.nodes = function(req, res, next){
         else if (req.query.csvmatrix) {
             res.render('entries/csvmatrix', { graph: graph });
         }
+        else if (req.query.csvdata) {
+            res.render('entries/csvdata', { graph: graph });
+        }
         else {
             res.format({
                 json: function(){
