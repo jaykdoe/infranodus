@@ -161,7 +161,7 @@ exports.submit = function(req, res, next){
             if (req.onlymentions) {
                 hashtags = '';
             }
-
+            
             var mentions = validate.getMentions(statement);
 
             if (req.excludementions) {
