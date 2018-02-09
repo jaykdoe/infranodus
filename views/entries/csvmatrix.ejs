@@ -1,0 +1,3 @@
+<% graph.nodes.forEach(function(node){ %>;<%= node.label %><% }) %>
+<% var match = 0; var counter = 0; for (var i = 0; i < graph.nodes.length; i++) { %><%= graph.nodes[i].label %>;<% for (var j = 0; j < graph.nodes.length; j++) { for (var k = 0; k < graph.edges.length; k++) { %><% if ((graph.edges[k].source == graph.nodes[i].id && graph.edges[k].target == graph.nodes[j].id) || (graph.edges[k].source == graph.nodes[j].id && graph.edges[k].target == graph.nodes[i].id)) { if (match == 0) {  %>1;<% } match = 1;  } if ((k == graph.edges.length - 1) && (match == 0)) { %>0;<% } else if ((k == graph.edges.length - 1) && (match == 1)) { match = 0; } }  } %>
+<% }%>
