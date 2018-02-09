@@ -431,7 +431,9 @@ var collaborate_html = '';
 
 var collaborate_storage = JSON.parse(localStorage.getItem("collaborate"));
 
+<% if (locals.user) { %>
 var inlanguage = '<%= user.inlanguage %>';
+<% } %>
 
 // If the user opened a URL with collaborate=xxxxxx then they join the room that's the "url_path/xxxxxx"
 if (collaborate_invite) {
@@ -2950,7 +2952,7 @@ sigma.parsers.json(
                         '<li class="menu-item-small"><a href="/logout">logout</a></li>' +
                         '<li class="menu-item-small"><a href="/settings">settings</a></li>' +
                         '<li class="menu-item-small"><a href="/import">import</a></li>' +
-                        '<li class="menu-item-small"><a href="/api/public/nodes/<%= perceivername %>/<%= context %>" target="_blank">export</a> <a href="/api/public/nodes/<%= perceivername %>/<%= context %>?gexf=1" target="_blank">gexf</a> <a href="/api/public/nodes/<%= perceivername %>/<%= context %>?csv=1" target="_blank">csv</a></li>' +
+                        '<li class="menu-item-small"><a href="/api/public/nodes/<%= perceivername %>/<%= context %>" target="_blank">export</a> <a href="/api/public/nodes/<%= perceivername %>/<%= context %>?gexf=1" target="_blank">gexf</a> <a href="/api/public/nodes/<%= perceivername %>/<%= context %>?csv=1" target="_blank">csv</a> <a href="/api/public/nodes/<%= perceivername %>/<%= context %>?csvdata=1" target="_blank">csv matrix</a></li>' +
                         '<li class="menu-item-small"><a href="http://noduslabs.com/infranodus/" target="_blank">about</a></li>' +
                         '<li class="menu-item-small"><a href="http://noduslabs.com/contact/" target="_blank">contact</a></li>' +
                         '<li class="menu-item-small"><a href="http://github.com/noduslabs/infranodus" target="_blank">help &amp; github</a></li>';
@@ -2965,7 +2967,7 @@ sigma.parsers.json(
                         '<li class="menu-item-small">&nbsp;</li>' +
                         '<li class="menu-item-small"><a href="/settings">settings</a></li>' +
                         '<li class="menu-item-small"><a href="/import">import</a></li>' +
-                        '<li class="menu-item-small"><a href="/api/user/nodes/<%= context %>" target="_blank">export</a> <a href="/api/user/nodes/<%= context %>?gexf=1" target="_blank">gexf</a> <a href="/api/user/nodes/<%= context %>?csv=1" target="_blank">csv</a></li>' +
+                        '<li class="menu-item-small"><a href="/api/user/nodes/<%= context %>" target="_blank">export</a> <a href="/api/user/nodes/<%= context %>?gexf=1" target="_blank">gexf</a> <a href="/api/user/nodes/<%= context %>?csv=1" target="_blank">csv</a> <a href="/api/user/nodes/<%= context %>?csvdata=1" target="_blank">csv matrix</a></li>' +
                         '<li class="menu-item-small"><a href="http://noduslabs.com/infranodus/" target="_blank">about</a></li>' +
                         '<li class="menu-item-small"><a href="http://noduslabs.com/contact/" target="_blank">contact</a></li>' +
                         '<li class="menu-item-small"><a href="http://github.com/noduslabs/infranodus" target="_blank">help &amp; github</a></li>';
@@ -2979,7 +2981,7 @@ sigma.parsers.json(
                         '<li class="menu-item-small"><a href="/login">login</a></li>' +
                         '<li class="menu-item-small"><a href="/signup">signup</a></li>' +
                         '<li class="menu-item-small">&nbsp;</li>' +
-                        '<li class="menu-item-small"><a href="/api/public/nodes/<%= perceivername %>/<%= context %>" target="_blank">export</a> <a href="/api/public/nodes/<%= perceivername %>/<%= context %>?gexf=1" target="_blank">gexf</a> <a href="/api/public/nodes/<%= perceivername %>/<%= context %>?csv=1" target="_blank">csv</a></li>' +
+                        '<li class="menu-item-small"><a href="/api/public/nodes/<%= perceivername %>/<%= context %>" target="_blank">export</a> <a href="/api/public/nodes/<%= perceivername %>/<%= context %>?gexf=1" target="_blank">gexf</a> <a href="/api/public/nodes/<%= perceivername %>/<%= context %>?csv=1" target="_blank">csv</a> <a href="/api/public/nodes/<%= perceivername %>/<%= context %>?csvdata=1" target="_blank">csv matrix</a></li>' +
                         '<li class="menu-item-small"><a href="http://noduslabs.com/infranodus/" target="_blank">about</a></li>' +
                         '<li class="menu-item-small"><a href="/#features">demo</a></li>' +
                         '<li class="menu-item-small"><a href="/#usecases">case studies</a></li>' +
@@ -2994,7 +2996,7 @@ sigma.parsers.json(
                     '<li class="menu-item-small"><a href="/logout">logout</a></li>' +
                     '<li class="menu-item-small"><a href="/settings">settings</a></li>' +
                     '<li class="menu-item-small"><a href="/import">import</a></li>' +
-                    '<li class="menu-item-small"><a href="/api/user/nodes/<%= context %>" target="_blank">export</a> <a href="/api/user/nodes/<%= context %>?gexf=1" target="_blank">gexf</a> <a href="/api/user/nodes/<%= context %>?csv=1" target="_blank">csv</a></li>' +
+                    '<li class="menu-item-small"><a href="/api/user/nodes/<%= context %>" target="_blank">export</a> <a href="/api/user/nodes/<%= context %>?gexf=1" target="_blank">gexf</a> <a href="/api/user/nodes/<%= context %>?csv=1" target="_blank">csv</a> <a href="/api/user/nodes/<%= context %>?csvdata=1" target="_blank">csv matrix</a></li>' +
                     '<li class="menu-item-small"><a href="http://noduslabs.com/cases/infranodus-the-network-thinking-app/" target="_blank">demo</a></li>' +
                     '<li class="menu-item-small"><a href="http://noduslabs.com/tag/infranodus/" target="_blank">case studies</a></li>' +
                     '<li class="menu-item-small"><a href="http://noduslabs.com/contact/" target="_blank">contact</a></li>' +
