@@ -3,5 +3,4 @@
 
 
 
-MATCH (u:User{uid:"a5ecb670-962f-11e3-8b8e-abca0f9fdedd"}), (c1:Concept), (c2:Concept), c1-[:BY]->u, c2-[:BY]->u, c1-[rel:TO]->c2 RETURN collect(rel);
-
+MATCH (u:User{uid:"a5ecb670-962f-11e3-8b8e-abca0f9fdedd"}), (c1:Concept), (c2:Concept), (c1)-[:BY]->(u), (c2)-[:BY]->(u), (c1)-[rel:TO]->(c2) RETURN collect(rel);
