@@ -47,7 +47,7 @@ The basic ideas behind InfraNodus are:
 InfraNodus is built on
 
 * [Sigma.Js](http://github.com/jacomyal/sigma.js) for graph visualization;
-* [Neo4J](http://neo4j.org) for graph database storage (TODO: add support for OrientDB and Titanium);
+* [Neo4J](http://neo4j.org) ver 3.x for graph database storage (TODO: add support for OrientDB and Titanium);
 * Node.Js
 * Express Node.Js library;
 * [Node-Neo4J layer](http://github.com/philippkueng/node-neo4j);
@@ -59,12 +59,12 @@ InfraNodus is built on
 
 
 ### Installation Guide
-To use this software you should install Neo4J 2.0 on your local computer.
+To use this software you should install Neo4J 3.0 on your local computer.
 To install Neo4J on a Mac use homebrew (see [Neo4J instructions here](http://www.neo4j.org/download)).
 For settings, check out [How to Set Up Neo4J for InfraNodus](https://github.com/noduslabs/infranodus/wiki/Neo4J-Database-Setup).
-You may also find [other wiki pages](https://github.com/noduslabs/infranodus/wiki/_pages) interesting.
+You may also find [other wiki pages](https://github.com/noduslabs/infranodus/wiki/_pages) interesting, especially [Neo4J installation guide](https://github.com/noduslabs/infranodus/wiki/Upgrading-Your-Neo4J-Database-from-2.x-to-3.x) – the section on setting up indexes and installing APOC plugin.
 
-You will also need to have npm Node.Js package manager installed on your computer. After you install InfraNodus, run
+Git clone this project into a folder, then you will also need to have npm Node.Js package manager installed on your computer. After you install InfraNodus, run
 `npm install`
 in the main folder the project to install all the dependencies into `node_modules` folder.
 
@@ -118,7 +118,9 @@ You can re-use it as long as you keep this notice inside the code
 
 ** You are very welcome to join the project! **
 
-Created by [Nodus Labs](http://www.noduslabs.com), conceptualized via [Polysingularity](http://polysingularity.com), inspired from [ThisIsLike.Com](http://thisislike.com), and [KnowNodes (now Rhizi)](http://rhizi.org) co-developed at [Center for Interdisciplinary Research](http://cri-paris.org). 
+Created by [Nodus Labs](http://www.noduslabs.com), conceptualized via [Polysingularity](http://polysingularity.com), inspired from [ThisIsLike.Com](http://thisislike.com), and [KnowNodes (now Rhizi)](http://rhizi.org) co-developed at [Center for Interdisciplinary Research](http://cri-paris.org).
+
+This project would not be possible without the help from StackOverflow community. Thank you so much!
 
 Written by [Dmitry Paranyushkin](http://github.com/deemeetree) | [Nodus Labs](http://www.noduslabs.com) and hopefully you also!
 (http://www.noduslabs.com) | info AT noduslabs DOT com
