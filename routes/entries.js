@@ -136,12 +136,10 @@ exports.submit = function(req, res, next){
 
     // Split statements into the shorter ones
     var splitStatements = validate.splitStatement(fullstatement, max_length);
-
     // Add each statement into the database, create a graph from Each
     // TODO make them organize into the right border
 
     splitStatements.forEach(function(statement) {
-
     // A series of checks before the statement is submitted
     async.waterfall([
         function(callback){
@@ -216,6 +214,13 @@ exports.submit = function(req, res, next){
             // Then we ascribe the data that the Entry object needs in order to survive
             // We create various fields and values for that object and initialize it
 
+            // What is the position of this particular statement in the total order of statements?
+            var staPosition = splitStatements.indexOf(statement);
+
+            // Let's create a new timestamp which organizes our statements in the right order
+            var newtimestamp = timestamp + staPosition * 2;
+
+            // Add new entry 
             var entry = new Entry({
                 "by_uid": res.locals.user.uid,
                 "by_id": res.locals.user.uid,
@@ -225,7 +230,7 @@ exports.submit = function(req, res, next){
                 "mentions": mentions,
                 "text": statement,
                 "fullscan": res.locals.user.fullscan,
-                "timestamp": timestamp
+                "timestamp": newtimestamp
 
             });
             callback(null, entry);
