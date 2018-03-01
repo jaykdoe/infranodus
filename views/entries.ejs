@@ -596,7 +596,20 @@ function submitFormProcess() {
                         $("#statement").val('');
                         $('#statement').removeClass('loading');
                         $('#submitbutton').removeAttr('disabled');
-                        socket.emit('chat message', {postedby: postedby, entryuid: JSON.parse(res.entryuid).data, entrytext: res.entrytext, graph: res.graph});
+                        // TODO make a better fix for temporary graph
+                        if (res.entryuid == 'multiple') {
+                            socket.emit('chat message', {postedby: postedby, entryuid: 'multiplesocket', entrytext: res.entrycontent, graph: res.graph});
+                            if (res.successmsg) {
+                              $("#warnings").append('<p class="warning">Please, reload the page after a few seconds to see the graph.</p>');
+                              $("#warnings").slideDown('slow');
+                            }
+                            setTimeout(function() {
+                                location.reload();
+                            },3000);
+                        }
+                        else {
+                            socket.emit('chat message', {postedby: postedby, entryuid: JSON.parse(res.entryuid).data, entrytext: res.entrytext, graph: res.graph});
+                        }
 
                     }
                     else if (res.errormsg) {
@@ -1194,7 +1207,16 @@ sigma.parsers.json(
                                     //3. Receive the server response, no need to emit an event
                                     if (res.entryuid) {
                                         //4. Show the updated text
-                                        console.log('submitted externally');
+
+                                        if (res.entryuid == 'multiple') {
+                                          if (res.successmsg) {
+                                            $("#warnings").append('<p class="warning">Your collaborator submitted a long text. Please, reload the page to see the graph.</p>');
+                                            $("#warnings").slideDown('slow');
+                                          }
+                                          setTimeout(function() {
+                                              location.reload();
+                                          },3000);
+                                        }
                                     }
                                     else if (res.errormsg) {
                                         alert(res.errormsg);

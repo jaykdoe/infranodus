@@ -26,7 +26,7 @@ exports.settings = {
     max_contexts: 5,
 
     // Max length of a statement text
-    max_text_length: 4500,
+    max_text_length: 140,
 
     // Min length of a statement text
     min_text_length: 4,

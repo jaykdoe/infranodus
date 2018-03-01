@@ -114,7 +114,7 @@ exports.form = function(req, res){
 exports.submit = function(req, res, next){
 
     // Retrieve the statement
-    var statement = req.body.entry.body;
+    var fullstatement = req.body.entry.body;
 
     // Retrieve the context where user was in when submitting the statement
     var default_context = req.body.context;
@@ -133,6 +133,14 @@ exports.submit = function(req, res, next){
     if (req.body.timestamp) {
         timestamp = req.body.timestamp;
     }
+
+    // Split statements into the shorter ones
+    var splitStatements = validate.splitStatement(fullstatement, max_length);
+
+    // Add each statement into the database, create a graph from Each
+    // TODO make them organize into the right border
+
+    splitStatements.forEach(function(statement) {
 
     // A series of checks before the statement is submitted
     async.waterfall([
@@ -161,7 +169,7 @@ exports.submit = function(req, res, next){
             if (req.onlymentions) {
                 hashtags = '';
             }
-            
+
             var mentions = validate.getMentions(statement);
 
             if (req.excludementions) {
@@ -249,6 +257,8 @@ exports.submit = function(req, res, next){
                 }
                 else if (req.internal) {
                     //next();
+                    console.log("internal req");
+
                 }
                 else {
                     if (req.body.delete == 'delete' || req.body.btnSubmit == 'edit' || req.body.delete == 'delete context') {
@@ -266,21 +276,34 @@ exports.submit = function(req, res, next){
 
                         // TODO find a better way of dealing with Edit and Delete
 
-                    var receiver = res.locals.user.uid;
-                    var perceiver = res.locals.user.uid;
-                    var showcontexts = req.query.showcontexts;
-                    var fullview = res.locals.user.fullview;
-                    var contexts = [];
 
-                    contexts.push(default_context);
 
-                    Entry.getNodes(receiver, perceiver, contexts, fullview, showcontexts, res, req, function(err, graph){
-                        if (err) return next(err);
 
-                        // Change the result we obtained into a nice json we need
-                        res.send({entryuid: answer, entrytext: statement, graph: graph});
+                      // The statement fit within our maxlength limits and is only one
+                      if ((splitStatements.length == 1)) {
+                        var receiver = res.locals.user.uid;
+                        var perceiver = res.locals.user.uid;
+                        var showcontexts = req.query.showcontexts;
+                        var fullview = res.locals.user.fullview;
+                        var contexts = [];
+                        contexts.push(default_context);
+                        Entry.getNodes(receiver, perceiver, contexts, fullview, showcontexts, res, req, function(err, graph){
+                            if (err) return next(err);
 
-                    });
+                            // Change the result we obtained into a nice json we need
+                            res.send({entryuid: answer, entrytext: statement, graph: graph});
+
+                        });
+
+                      }
+
+                      // The statement consists of several statements
+
+                      else if (statement == splitStatements[splitStatements.length - 1]) {
+                        res.send({entryuid: 'multiple', entrycontent: fullstatement, successmsg: 'Please, reload this page after a few seconds to see the full graph.'});
+                      }
+
+
 
                     }
 
@@ -289,7 +312,11 @@ exports.submit = function(req, res, next){
                 }
             });
         }
-    });
+        // end of Waterfall is below
 
+
+    });
+    // end of forEach statement is below
+  });
 
 };
