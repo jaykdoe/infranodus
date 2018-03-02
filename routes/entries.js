@@ -135,9 +135,17 @@ exports.submit = function(req, res, next){
     }
 
     // Split statements into the shorter ones
+    // TODO make it so that we can also receive an array of statements and treat them like splitStatement
     var splitStatements = validate.splitStatement(fullstatement, max_length);
-    // Add each statement into the database, create a graph from Each
-    // TODO make them organize into the right border
+
+    var totalcount = splitStatements.length;
+
+    // TODO move to settings
+    var maxtransactions = 2;
+
+    var requestiterations = 0;
+
+    var cypherQueries = [];
 
     // A series of checks before the statement is submitted
     async.waterfall([
@@ -154,16 +162,16 @@ exports.submit = function(req, res, next){
                   callback('Try to make it less than ' + max_length + ' characters, please...');
               }
               else {
-                  var newtimestamp = timestamp + k * 2;
-                  callback(null, splitStatements[k], newtimestamp);
+                  var count = k;
+                  callback(null, splitStatements[k], count);
               }
             }
         },
-        function(statement, newtimestamp, callback){
+        function(statement, count, callback){
             statement = validate.sanitize(statement);
-            callback(null, statement, newtimestamp);
+            callback(null, statement, count);
         },
-        function(statement, newtimestamp, callback){
+        function(statement, count, callback){
 
             var hashtags = validate.getHashtags(statement, res);
 
@@ -187,15 +195,15 @@ exports.submit = function(req, res, next){
                         callback('Please, try to use less than ' + maxhash + ' #hashtags');
                     }
                     else {
-                        callback(null, statement, hashtags, mentions, newtimestamp);
+                        callback(null, statement, hashtags, mentions, count);
                     }
                 }
                 else {
-                    callback(null, statement, hashtags, mentions, newtimestamp);
+                    callback(null, statement, hashtags, mentions, count);
                 }
             }
         },
-        function(statement, hashtags, mentions, newtimestamp, callback){
+        function(statement, hashtags, mentions, count, callback){
 
             // Put all the contexts that came with the statement into a new variable
 
@@ -205,7 +213,7 @@ exports.submit = function(req, res, next){
                 for (var i = 0; i < contextids.length; i++) {
                         contexts.push(contextids[i]);
                 }
-                callback(null, statement, hashtags, contexts, mentions, newtimestamp);
+                callback(null, statement, hashtags, contexts, mentions, count);
             }
             else {
                 callback('Please, select a context for this statement');
@@ -213,11 +221,11 @@ exports.submit = function(req, res, next){
 
 
         },
-        function(statement, hashtags, contexts, mentions, newtimestamp, callback){
+        function(statement, hashtags, contexts, mentions, count, callback){
             // Then we ascribe the data that the Entry object needs in order to survive
             // We create various fields and values for that object and initialize it
 
-            console.log("count timestamp " + newtimestamp + " " + timestamp + statement);
+            var newtimestamp = timestamp + count * 2;
 
             // Add new entry
             var entry = new Entry({
@@ -232,9 +240,11 @@ exports.submit = function(req, res, next){
                 "timestamp": newtimestamp
 
             });
-            callback(null, entry, statement);
+
+
+            callback(null, entry, statement, count);
         }
-    ], function (err, entry, statement) {
+    ], function (err, entry, statement, count) {
 
         if (err) {
 
@@ -247,6 +257,10 @@ exports.submit = function(req, res, next){
 
         }
         else {
+            // TODO make it so that there's a different procedure to save statements if there's many of them
+            // each gets broken into parts, each part is executed in a transaction, option - all in transaction only some
+
+            if (totalcount == 1) {
             entry.save(function(err, answer) {
                 if (err) {
                     if (req.internal) {
@@ -315,6 +329,79 @@ exports.submit = function(req, res, next){
 
                 }
             });
+            }
+            else {
+
+              entry.savetrans(function(cypherQuery) {
+
+
+                         cypherQueries.push(cypherQuery);
+
+                         // TODO maxtransactions
+
+                         if ((cypherQueries.length == totalcount) || ((totalcount > maxtransactions) && (cypherQueries.length == (maxtransactions * (requestiterations + 1))))) {
+
+                           var transactionQueries = [];
+                           // by default we limit the number of Neo4J transactions by the total number of statements
+                           var cycleLimit = totalcount;
+                           // by default we start from 0
+                           var cycleStart = 0;
+
+                           // if the total number of statements is higher than max transactions
+                           if (totalcount > maxtransactions) {
+                             // we start from 0 if it's the first time we here, otherwise from where we left off last time
+                              cycleStart = maxtransactions * requestiterations;
+                            // we end at + maxtransactions
+                              cycleLimit = maxtransactions * (requestiterations + 1);
+                              if (cycleLimit > totalcount) { cycleLimit = totalcount; }
+                            // we count how many iterations we made (global parameter)
+                              requestiterations = requestiterations + 1;
+                           }
+
+                           for (t = cycleStart; t < cycleLimit; t++) {
+                              transactionQueries.push({'statement': cypherQueries[t], 'resultDataContents': [ 'row', 'graph' ]});
+                           }
+
+                           dbneo.beginAndCommitTransaction({
+                               statements : transactionQueries
+                           }, function(err, cypherAnswer){
+
+                             if (err) {
+                                 if (req.internal) {
+
+                                 }
+                                 else {
+                                     return next(err);
+                                 }
+                             }
+                             if (req.remoteUser) {
+                                 res.json({message: 'Entry added.'});
+                             }
+                             else if (req.internal) {
+                                 //next();
+                                 console.log("internal req");
+
+                             }
+                             else {
+                                    console.log("cypher answer");
+                                    console.log(cypherAnswer);
+                                     res.send({entryuid: 'multiple', entrycontent: fullstatement, successmsg: 'Please, reload this page after a few seconds to see the full graph.'});
+
+                             }
+
+
+
+                           });
+
+                         }
+
+
+              });
+
+            }
+
+
+
         }
         // end of Waterfall is below
 
