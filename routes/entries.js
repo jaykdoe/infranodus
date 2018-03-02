@@ -139,28 +139,31 @@ exports.submit = function(req, res, next){
     // Add each statement into the database, create a graph from Each
     // TODO make them organize into the right border
 
-    splitStatements.forEach(function(statement) {
     // A series of checks before the statement is submitted
     async.waterfall([
         function(callback){
-            if (!statement) {
-                callback('Please, enter a statement');
-            }
-            else if (statement.length <= min_length) {
-                callback('A statement must have more than ' + min_length + ' characters');
-            }
-            else if (statement.length > max_length) {
-                callback('Try to make it less than ' + max_length + ' characters, please...');
-            }
-            else {
-                callback(null, statement);
+            // Perform async Waterfall for as many times as there are statements
+            for (k=0; k < splitStatements.length;k++) {
+              if (!splitStatements[k]) {
+                  callback('Please, enter a statement');
+              }
+              else if (splitStatements[k].length <= min_length) {
+                  callback('A statement must have more than ' + min_length + ' characters');
+              }
+              else if (splitStatements[k].length > max_length) {
+                  callback('Try to make it less than ' + max_length + ' characters, please...');
+              }
+              else {
+                  var newtimestamp = timestamp + k * 2;
+                  callback(null, splitStatements[k], newtimestamp);
+              }
             }
         },
-        function(statement, callback){
+        function(statement, newtimestamp, callback){
             statement = validate.sanitize(statement);
-            callback(null, statement);
+            callback(null, statement, newtimestamp);
         },
-        function(statement, callback){
+        function(statement, newtimestamp, callback){
 
             var hashtags = validate.getHashtags(statement, res);
 
@@ -184,15 +187,15 @@ exports.submit = function(req, res, next){
                         callback('Please, try to use less than ' + maxhash + ' #hashtags');
                     }
                     else {
-                        callback(null, statement, hashtags, mentions);
+                        callback(null, statement, hashtags, mentions, newtimestamp);
                     }
                 }
                 else {
-                    callback(null, statement, hashtags, mentions);
+                    callback(null, statement, hashtags, mentions, newtimestamp);
                 }
             }
         },
-        function(statement, hashtags, mentions, callback){
+        function(statement, hashtags, mentions, newtimestamp, callback){
 
             // Put all the contexts that came with the statement into a new variable
 
@@ -202,7 +205,7 @@ exports.submit = function(req, res, next){
                 for (var i = 0; i < contextids.length; i++) {
                         contexts.push(contextids[i]);
                 }
-                callback(null, statement, hashtags, contexts, mentions);
+                callback(null, statement, hashtags, contexts, mentions, newtimestamp);
             }
             else {
                 callback('Please, select a context for this statement');
@@ -210,17 +213,13 @@ exports.submit = function(req, res, next){
 
 
         },
-        function(statement, hashtags, contexts, mentions, callback){
+        function(statement, hashtags, contexts, mentions, newtimestamp, callback){
             // Then we ascribe the data that the Entry object needs in order to survive
             // We create various fields and values for that object and initialize it
 
-            // What is the position of this particular statement in the total order of statements?
-            var staPosition = splitStatements.indexOf(statement);
+            console.log("count timestamp " + newtimestamp + " " + timestamp + statement);
 
-            // Let's create a new timestamp which organizes our statements in the right order
-            var newtimestamp = timestamp + staPosition * 2;
-
-            // Add new entry 
+            // Add new entry
             var entry = new Entry({
                 "by_uid": res.locals.user.uid,
                 "by_id": res.locals.user.uid,
@@ -233,9 +232,9 @@ exports.submit = function(req, res, next){
                 "timestamp": newtimestamp
 
             });
-            callback(null, entry);
+            callback(null, entry, statement);
         }
-    ], function (err, entry) {
+    ], function (err, entry, statement) {
 
         if (err) {
 
@@ -321,7 +320,6 @@ exports.submit = function(req, res, next){
 
 
     });
-    // end of forEach statement is below
-  });
+
 
 };
