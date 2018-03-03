@@ -1,3 +1,5 @@
 .DS_Store
 .idea/
 config.json
+views/statsabove.ejs
+views/statsbelow.ejs
