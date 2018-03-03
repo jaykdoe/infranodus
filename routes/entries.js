@@ -134,6 +134,7 @@ exports.submit = function(req, res, next){
         timestamp = req.body.timestamp;
     }
 
+
     // Split statements into the shorter ones
     // TODO make it so that we can also receive an array of statements and treat them like splitStatement
     var splitStatements = validate.splitStatement(fullstatement, max_length);
@@ -226,6 +227,7 @@ exports.submit = function(req, res, next){
             // We create various fields and values for that object and initialize it
 
             var newtimestamp = timestamp + count * 2;
+
 
             // Add new entry
             var entry = new Entry({

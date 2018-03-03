@@ -65,6 +65,8 @@ const lemmerRus = new Morphy('ru', {
   resolve_ancodes:     Morphy.RESOLVE_ANCODES_AS_TEXT
 });
 
+
+
 // Keeping them here as they are useful libs for future use
 
 //var iconv = require('iconv-lite'); // converting encodings
@@ -1486,7 +1488,7 @@ exports.submit = function(req, res,  next) {
                 };
 
 
-                google(searchString, function(err, next, links){
+                google(searchString, function(err, resp){
 
                     if (err)    {
                         console.log(err);
@@ -1494,18 +1496,19 @@ exports.submit = function(req, res,  next) {
                         res.redirect('back');
                     }
 
-                    for (var i = 0; i < links.length; ++i) {
+                    for (var i = 0; i < resp.links.length; ++i) {
 
                         var searchtext = '';
 
                         // We don't show titles because otherwise there's overload of search terms in the graph
-                        // searchtext = links[i].title;
+                        // searchtext = resp.links[i].title;
 
-                        searchtext += links[i].description;
-                        searchtext += ' ' + links[i].link;
+                        searchtext += resp.links[i].description;
+                        searchtext += ' ' + resp.links[i].href;
                         searchtext = searchtext.replace(/(0?[1-9]|[12][0-9]|3[01])\s{1}(Jan|Feb|Mar|Apr|May|Jun|Jul|Apr|Sep|Oct|Nov|Dec)\s{1}\d{4}/g, '');
 
                         if (excludesearchquery) {
+
                             var searchterms = searchString.split(" ");
 
                             for (var k = 0; k < searchterms.length; k++) {
@@ -1549,7 +1552,7 @@ exports.submit = function(req, res,  next) {
                     // Pager for Google results
                     if (nextCounter < 4) {
                         nextCounter += 1;
-                        if (next) next();
+                        if (resp.next) resp.next();
                         if (nextCounter == 1) {
                             setTimeout(function(){
                                 if (!append_url) {
