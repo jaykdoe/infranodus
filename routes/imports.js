@@ -584,7 +584,7 @@ exports.submit = function(req, res,  next) {
                             var req = {
                                 body:  {
                                     entry: {
-                                        body: ''
+                                        body: []
                                     },
                                     context: default_context
                                 },
@@ -592,20 +592,19 @@ exports.submit = function(req, res,  next) {
                                 contextids: contexts,
                                 onlymentions: onlymentions,
                                 excludementions: excludementions,
-                                internal: 1
+                                internal: 1,
+                                multiple: 1
                             };
-
-                            console.log('requestobject');
-                            console.log(req);
 
 
                             for (var key in statements) {
                                 if (statements.hasOwnProperty(key)) {
-                                    req.body.entry.body = statements[key];
-                                    entries.submit(req, res);
+                                    req.body.entry.body[key] = statements[key];
                                 }
-
                             }
+                            console.log(req);
+                            console.log("requestbody");
+                            entries.submit(req, res);
 
                             // Move on to the next one
 

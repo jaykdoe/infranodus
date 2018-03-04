@@ -113,9 +113,6 @@ exports.form = function(req, res){
 
 exports.submit = function(req, res, next){
 
-    // Retrieve the statement
-    var fullstatement = req.body.entry.body;
-
     // Retrieve the context where user was in when submitting the statement
     var default_context = req.body.context;
 
@@ -135,9 +132,22 @@ exports.submit = function(req, res, next){
     }
 
 
-    // Split statements into the shorter ones
-    // TODO make it so that we can also receive an array of statements and treat them like splitStatement
-    var splitStatements = validate.splitStatement(fullstatement, max_length);
+    var splitStatements = [];
+    var fullstatement = '';
+
+    // Retrieve the statement
+    if (req.multiple) {
+      for (var key in req.body.entry.body) {
+          if (req.body.entry.body.hasOwnProperty(key)) {
+              splitStatements.push(req.body.entry.body[key]);
+          }
+      }
+    }
+    else {
+      fullstatement = req.body.entry.body;
+      // Split statements into the shorter ones
+      splitStatements = validate.splitStatement(fullstatement, max_length);
+    }
 
     var totalcount = splitStatements.length;
 
@@ -340,7 +350,7 @@ exports.submit = function(req, res, next){
                          cypherQueries.push(cypherQuery);
 
                          // We have constructed the queries and now we have either the max number of them or their total number is reached - launch the searchQuery
-                         
+
                          if ((cypherQueries.length == totalcount) || ((totalcount > maxtransactions) && (cypherQueries.length == (maxtransactions * (requestiterations + 1))))) {
 
                            var transactionQueries = [];
