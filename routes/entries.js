@@ -339,8 +339,8 @@ exports.submit = function(req, res, next){
 
                          cypherQueries.push(cypherQuery);
 
-                         // TODO maxtransactions
-
+                         // We have constructed the queries and now we have either the max number of them or their total number is reached - launch the searchQuery
+                         
                          if ((cypherQueries.length == totalcount) || ((totalcount > maxtransactions) && (cypherQueries.length == (maxtransactions * (requestiterations + 1))))) {
 
                            var transactionQueries = [];
@@ -385,7 +385,7 @@ exports.submit = function(req, res, next){
 
                              }
                              else {
-                                  
+
                                     res.send({entryuid: 'multiple', entrycontent: fullstatement, successmsg: 'Please, reload this page after a few seconds to see the full graph.'});
 
                              }
