@@ -66,6 +66,11 @@ if (fs.existsSync(configPath)) {
                         ":" + parsed['neo4j']['password'] +
                         "@" + parsed['neo4j']['host'];
 
+    exports.neo4jhost = "bolt://localhost";
+
+    exports.neo4juser = parsed['neo4j']['username'];
+    exports.neo4jpass = parsed['neo4j']['password'];
+
     exports.invite = parsed['secrets']['invitation'];
 
     exports.default_user = parsed['infranodus']['default_user'];
@@ -78,6 +83,7 @@ else {
     console.log("Neo4J config file doesn't exist. Using default settings.");
 
     exports.neo4jlink = "http://localhost:7474";
+
     exports.invite = '';
 }
 

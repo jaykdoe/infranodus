@@ -19,6 +19,9 @@ var validate = require('../lib/middleware/validate');
 var options = require('../options');
 var async = require('async');
 
+var neo4jnew = require('neo4j-driver').v1;
+
+
 
 exports.list = function(req, res, next){
 
@@ -159,6 +162,10 @@ exports.submit = function(req, res, next){
     var requestiterations = 0;
 
     var cypherQueries = [];
+
+
+    var neo4jdriver = neo4jnew.driver(options.neo4jhost, neo4jnew.auth.basic(options.neo4juser, options.neo4jpass));
+
 
     // A series of checks before the statement is submitted
     async.waterfall([
@@ -302,83 +309,114 @@ exports.submit = function(req, res, next){
                               transactionQueries.push({'statement': cypherQueries[t], 'resultDataContents': [ 'row', 'graph' ]});
                            }
 
-                           dbneo.beginAndCommitTransaction({
-                               statements : transactionQueries
-                           }, function(err, cypherAnswer){
-
-                             // TODO more elegant with cypherAnswer here
-                             // ATM this is just for the case when only 1 statement is processed to load it after
-                             // TODO could be used for many
-                             var firstanswer = {
-                                            data: cypherAnswer.results[0].data[0].row
-                            }
-
-
-                            var jsonfirstanswer = JSON.stringify(firstanswer);
-
-                             if (err) {
-                                 if (req.internal) {
-
-                                 }
-                                 else {
-                                     return next(err);
-                                 }
-                             }
-                             if (req.remoteUser) {
-                                 res.json({message: 'Entry added.'});
-                             }
-                             else if (req.internal) {
-                                 //next();
-                                 console.log("internal req");
-
-                             }
-                             else {
-
-                               if (req.body.delete == 'delete' || req.body.btnSubmit == 'edit' || req.body.delete == 'delete context') {
-                                   if (default_context == 'undefined' || typeof default_context === 'undefined' || default_context == '') {
-                                    res.redirect('/' + res.locals.user.name + '/edit');
-                                    }
-                                    else {
-                                    res.redirect(res.locals.user.name + '/' + default_context + '/edit');
-
-                                    }
-
-
-                               }
-                               else {
-
-
-                                 // The statement fit within our maxlength limits and is only one
-                                 if ((splitStatements.length == 1)) {
-
-                                   var receiver = res.locals.user.uid;
-                                   var perceiver = res.locals.user.uid;
-                                   var showcontexts = req.query.showcontexts;
-                                   var fullview = res.locals.user.fullview;
-                                   var contexts = [];
-                                   contexts.push(default_context);
-                                   Entry.getNodes(receiver, perceiver, contexts, fullview, showcontexts, res, req, function(err, graph){
-                                       if (err) return next(err);
-                                       // Change the result we obtained into a nice json we need
-                                       res.send({entryuid: jsonfirstanswer, entrytext: statement, graph: graph});
-
-                                   });
-
-                                 }
-
-                                 // The statement consists of several statements
-
-                                 else if (statement == splitStatements[splitStatements.length - 1]) {
-                                   res.send({entryuid: 'multiple', entrycontent: fullstatement, successmsg: 'Please, reload this page after a few seconds to see the full graph.'});
-                                 }
-
-
-                               }
-                             }
 
 
 
-                           });
+
+                           var session = neo4jdriver.session();
+
+                           var firstanswer = {
+                                          data: []
+                           }
+                           var jsonfirstanswer = '';
+
+
+
+for (var key in transactionQueries) {
+  console.log("cypherasks");
+  console.log(transactionQueries[key].statement);
+session
+   .run(transactionQueries[key].statement)
+   .then(function (result) {
+    result.records.forEach(function (record) {
+      console.log("operation complete");
+      console.log(record.get('s.uid'));
+      firstanswer.data = record.get('s.uid');
+      jsonfirstanswer = JSON.stringify(firstanswer);
+    });
+    if (req.remoteUser) {
+        res.json({message: 'Entry added.'});
+    }
+    else if (req.internal) {
+        //next();
+        console.log("internal req");
+
+    }
+    else {
+
+      if (req.body.delete == 'delete' || req.body.btnSubmit == 'edit' || req.body.delete == 'delete context') {
+          if (default_context == 'undefined' || typeof default_context === 'undefined' || default_context == '') {
+           res.redirect('/' + res.locals.user.name + '/edit');
+           }
+           else {
+           res.redirect(res.locals.user.name + '/' + default_context + '/edit');
+
+           }
+
+
+      }
+      else {
+
+
+        // The statement fit within our maxlength limits and is only one
+        if ((splitStatements.length == 1)) {
+
+          var receiver = res.locals.user.uid;
+          var perceiver = res.locals.user.uid;
+          var showcontexts = req.query.showcontexts;
+          var fullview = res.locals.user.fullview;
+          var contexts = [];
+          contexts.push(default_context);
+          Entry.getNodes(receiver, perceiver, contexts, fullview, showcontexts, res, req, function(err, graph){
+              if (err) return next(err);
+              // Change the result we obtained into a nice json we need
+              session.close();
+              neo4jdriver.close();
+              res.send({entryuid: jsonfirstanswer, entrytext: statement, graph: graph});
+
+          });
+
+
+
+        }
+
+        // The statement consists of several statements
+
+        else if (statement == splitStatements[splitStatements.length - 1]) {
+          console.log("reached the end");
+          session.close();
+          neo4jdriver.close();
+          res.send({entryuid: 'multiple', entrycontent: fullstatement, successmsg: 'Please, reload this page after a few seconds to see the full graph.'});
+        }
+
+
+      }
+    }
+  })
+  .catch(function (error) {
+
+
+
+       if (req.internal) {
+
+       }
+       else {
+           return next(error);
+       }
+       console.log(error);
+
+
+   });
+}
+
+
+
+
+
+
+
+
+
 
                          }
 
