@@ -305,7 +305,9 @@ exports.submit = function(req, res, next){
                            dbneo.beginAndCommitTransaction({
                                statements : transactionQueries
                            }, function(err, cypherAnswer){
-
+                             console.log('cypheranswer3');
+                             console.log(cypherAnswer.results[0].data);
+                             console.log(cypherAnswer.results[0].data[0].row[0]);
                              if (err) {
                                  if (req.internal) {
 
@@ -323,6 +325,7 @@ exports.submit = function(req, res, next){
 
                              }
                              else {
+                               console.log("showgraph1");
                                if (req.body.delete == 'delete' || req.body.btnSubmit == 'edit' || req.body.delete == 'delete context') {
                                    if (default_context == 'undefined' || typeof default_context === 'undefined' || default_context == '') {
                                     res.redirect('/' + res.locals.user.name + '/edit');
@@ -335,10 +338,11 @@ exports.submit = function(req, res, next){
 
                                }
                                else {
-
+                                console.log("showgraph2");
 
                                  // The statement fit within our maxlength limits and is only one
                                  if ((splitStatements.length == 1)) {
+                                   console.log("showgraph3");
                                    var receiver = res.locals.user.uid;
                                    var perceiver = res.locals.user.uid;
                                    var showcontexts = req.query.showcontexts;
@@ -347,9 +351,11 @@ exports.submit = function(req, res, next){
                                    contexts.push(default_context);
                                    Entry.getNodes(receiver, perceiver, contexts, fullview, showcontexts, res, req, function(err, graph){
                                        if (err) return next(err);
-
+                                      console.log('showgraph4')
+                                      console.log(statement);
+                                       console.log(graph);
                                        // Change the result we obtained into a nice json we need
-                                       res.send({entryuid: answer, entrytext: statement, graph: graph});
+                                       res.send({entryuid: cypherAnswer.results[0].data[0].row, entrytext: statement, graph: graph});
 
                                    });
 
