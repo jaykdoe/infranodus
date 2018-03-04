@@ -311,6 +311,8 @@ exports.submit = function(req, res, next){
                             if (err) return next(err);
 
                             // Change the result we obtained into a nice json we need
+                            console.log("cypheranswer666");
+                            console.log(answer);
                             res.send({entryuid: answer, entrytext: statement, graph: graph});
 
                         });
@@ -340,7 +342,7 @@ exports.submit = function(req, res, next){
                          cypherQueries.push(cypherQuery);
 
                          // We have constructed the queries and now we have either the max number of them or their total number is reached - launch the searchQuery
-                         
+
                          if ((cypherQueries.length == totalcount) || ((totalcount > maxtransactions) && (cypherQueries.length == (maxtransactions * (requestiterations + 1))))) {
 
                            var transactionQueries = [];
