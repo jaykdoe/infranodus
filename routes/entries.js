@@ -113,9 +113,6 @@ exports.form = function(req, res){
 
 exports.submit = function(req, res, next){
 
-    // Retrieve the statement
-    var fullstatement = req.body.entry.body;
-
     // Retrieve the context where user was in when submitting the statement
     var default_context = req.body.context;
 
@@ -135,9 +132,24 @@ exports.submit = function(req, res, next){
     }
 
 
-    // Split statements into the shorter ones
-    // TODO make it so that we can also receive an array of statements and treat them like splitStatement
-    var splitStatements = validate.splitStatement(fullstatement, max_length);
+    var splitStatements = [];
+    var fullstatement = '';
+
+    // Retrieve the statement
+    // Is the body of the statement an Array (usually sent from import)
+    if (req.multiple) {
+      for (var key in req.body.entry.body) {
+          if (req.body.entry.body.hasOwnProperty(key)) {
+                splitStatements.push(req.body.entry.body[key]);
+          }
+      }
+    }
+    // Not an array?
+    else {
+      fullstatement = req.body.entry.body;
+      // Split statements into the shorter ones
+      splitStatements = validate.splitStatement(fullstatement, max_length);
+    }
 
     var totalcount = splitStatements.length;
 
@@ -259,82 +271,6 @@ exports.submit = function(req, res, next){
 
         }
         else {
-            // TODO make it so that there's a different procedure to save statements if there's many of them
-            // each gets broken into parts, each part is executed in a transaction, option - all in transaction only some
-
-            if (totalcount == 1) {
-            entry.save(function(err, answer) {
-                if (err) {
-                    if (req.internal) {
-
-                    }
-                    else {
-                        return next(err);
-                    }
-                }
-                if (req.remoteUser) {
-                    res.json({message: 'Entry added.'});
-                }
-                else if (req.internal) {
-                    //next();
-                    console.log("internal req");
-
-                }
-                else {
-                    if (req.body.delete == 'delete' || req.body.btnSubmit == 'edit' || req.body.delete == 'delete context') {
-                        if (default_context == 'undefined' || typeof default_context === 'undefined' || default_context == '') {
-                         res.redirect('/' + res.locals.user.name + '/edit');
-                         }
-                         else {
-                         res.redirect(res.locals.user.name + '/' + default_context + '/edit');
-
-                         }
-
-
-                    }
-                    else {
-
-                        // TODO find a better way of dealing with Edit and Delete
-
-
-
-
-                      // The statement fit within our maxlength limits and is only one
-                      if ((splitStatements.length == 1)) {
-                        var receiver = res.locals.user.uid;
-                        var perceiver = res.locals.user.uid;
-                        var showcontexts = req.query.showcontexts;
-                        var fullview = res.locals.user.fullview;
-                        var contexts = [];
-                        contexts.push(default_context);
-                        Entry.getNodes(receiver, perceiver, contexts, fullview, showcontexts, res, req, function(err, graph){
-                            if (err) return next(err);
-
-                            // Change the result we obtained into a nice json we need
-                            console.log("cypheranswer666");
-                            console.log(answer);
-                            res.send({entryuid: answer, entrytext: statement, graph: graph});
-
-                        });
-
-                      }
-
-                      // The statement consists of several statements
-
-                      else if (statement == splitStatements[splitStatements.length - 1]) {
-                        res.send({entryuid: 'multiple', entrycontent: fullstatement, successmsg: 'Please, reload this page after a few seconds to see the full graph.'});
-                      }
-
-
-
-                    }
-
-
-
-                }
-            });
-            }
-            else {
 
               entry.savetrans(function(cypherQuery) {
 
@@ -370,6 +306,16 @@ exports.submit = function(req, res, next){
                                statements : transactionQueries
                            }, function(err, cypherAnswer){
 
+                             // TODO more elegant with cypherAnswer here
+                             // ATM this is just for the case when only 1 statement is processed to load it after
+                             // TODO could be used for many
+                             var firstanswer = {
+                                            data: cypherAnswer.results[0].data[0].row
+                            }
+
+
+                            var jsonfirstanswer = JSON.stringify(firstanswer);
+
                              if (err) {
                                  if (req.internal) {
 
@@ -388,8 +334,46 @@ exports.submit = function(req, res, next){
                              }
                              else {
 
-                                    res.send({entryuid: 'multiple', entrycontent: fullstatement, successmsg: 'Please, reload this page after a few seconds to see the full graph.'});
+                               if (req.body.delete == 'delete' || req.body.btnSubmit == 'edit' || req.body.delete == 'delete context') {
+                                   if (default_context == 'undefined' || typeof default_context === 'undefined' || default_context == '') {
+                                    res.redirect('/' + res.locals.user.name + '/edit');
+                                    }
+                                    else {
+                                    res.redirect(res.locals.user.name + '/' + default_context + '/edit');
 
+                                    }
+
+
+                               }
+                               else {
+
+
+                                 // The statement fit within our maxlength limits and is only one
+                                 if ((splitStatements.length == 1)) {
+
+                                   var receiver = res.locals.user.uid;
+                                   var perceiver = res.locals.user.uid;
+                                   var showcontexts = req.query.showcontexts;
+                                   var fullview = res.locals.user.fullview;
+                                   var contexts = [];
+                                   contexts.push(default_context);
+                                   Entry.getNodes(receiver, perceiver, contexts, fullview, showcontexts, res, req, function(err, graph){
+                                       if (err) return next(err);
+                                       // Change the result we obtained into a nice json we need
+                                       res.send({entryuid: jsonfirstanswer, entrytext: statement, graph: graph});
+
+                                   });
+
+                                 }
+
+                                 // The statement consists of several statements
+
+                                 else if (statement == splitStatements[splitStatements.length - 1]) {
+                                   res.send({entryuid: 'multiple', entrycontent: fullstatement, successmsg: 'Please, reload this page after a few seconds to see the full graph.'});
+                                 }
+
+
+                               }
                              }
 
 
@@ -401,7 +385,7 @@ exports.submit = function(req, res, next){
 
               });
 
-            }
+
 
 
 

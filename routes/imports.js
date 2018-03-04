@@ -444,26 +444,28 @@ exports.submit = function(req, res,  next) {
                             var req = {
                                 body:  {
                                     entry: {
-                                        body: ''
+                                        body: []
                                     },
                                     context: default_context
                                 },
 
                                 contextids: contexts,
-                                internal: 1
+                                internal: 1,
+                                multiple: 1
                             };
 
-                            console.log('requestobject');
-                            console.log(req);
+
+
+
 
 
                             for (var key in statements) {
                                 if (statements.hasOwnProperty(key)) {
-                                    req.body.entry.body = statements[key];
-                                    entries.submit(req, res);
+                                    req.body.entry.body[key] = statements[key];
                                 }
-
                             }
+
+                            entries.submit(req, res);
 
                             // Move on to the next one
 
@@ -584,7 +586,7 @@ exports.submit = function(req, res,  next) {
                             var req = {
                                 body:  {
                                     entry: {
-                                        body: ''
+                                        body: []
                                     },
                                     context: default_context
                                 },
@@ -592,20 +594,18 @@ exports.submit = function(req, res,  next) {
                                 contextids: contexts,
                                 onlymentions: onlymentions,
                                 excludementions: excludementions,
-                                internal: 1
+                                internal: 1,
+                                multiple: 1
                             };
-
-                            console.log('requestobject');
-                            console.log(req);
 
 
                             for (var key in statements) {
                                 if (statements.hasOwnProperty(key)) {
-                                    req.body.entry.body = statements[key];
-                                    entries.submit(req, res);
+                                    req.body.entry.body[key] = statements[key];
                                 }
-
                             }
+
+                            entries.submit(req, res);
 
                             // Move on to the next one
 
@@ -1029,23 +1029,26 @@ exports.submit = function(req, res,  next) {
                             var req = {
                                 body:  {
                                     entry: {
-                                        body: ''
+                                        body: []
                                     },
                                     context: default_context
                                 },
 
                                 contextids: contexts,
-                                internal: 1
+                                internal: 1,
+                                multiple: 1
                             };
+
+
 
 
                             for (var key in statements) {
                                 if (statements.hasOwnProperty(key)) {
-                                    req.body.entry.body = statements[key];
-                                    entries.submit(req, res);
+                                    req.body.entry.body[key] = statements[key];
                                 }
-
                             }
+
+                            entries.submit(req, res);
 
                             // Move on to the next one
 
@@ -1478,16 +1481,19 @@ exports.submit = function(req, res,  next) {
                 var req = {
                     body:  {
                         entry: {
-                            body: ''
+                            body: []
                         },
                         context: default_context
                     },
 
                     contextids: contexts,
-                    internal: 1
+                    internal: 1,
+                    multiple: 1
+
                 };
 
-
+                // TODO to get also page titles
+                
                 google(searchString, function(err, resp){
 
                     if (err)    {
@@ -1544,10 +1550,12 @@ exports.submit = function(req, res,  next) {
                             }
                         }
 
-                        req.body.entry.body = searchtext;
-                        entries.submit(req, res);
+                        req.body.entry.body[i] = searchtext;
+
 
                     }
+
+                    entries.submit(req, res);
 
                     // Pager for Google results
                     if (nextCounter < 4) {
