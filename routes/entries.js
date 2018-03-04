@@ -142,7 +142,7 @@ exports.submit = function(req, res, next){
     var totalcount = splitStatements.length;
 
     // TODO move to settings
-    var maxtransactions = 2;
+    var maxtransactions = 1;
 
     var requestiterations = 0;
 
@@ -385,9 +385,8 @@ exports.submit = function(req, res, next){
 
                              }
                              else {
-                                    console.log("cypher answer");
-                                    console.log(cypherAnswer);
-                                     res.send({entryuid: 'multiple', entrycontent: fullstatement, successmsg: 'Please, reload this page after a few seconds to see the full graph.'});
+                                  
+                                    res.send({entryuid: 'multiple', entrycontent: fullstatement, successmsg: 'Please, reload this page after a few seconds to see the full graph.'});
 
                              }
 
