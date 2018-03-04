@@ -608,6 +608,7 @@ function submitFormProcess() {
                             },3000);
                         }
                         else {
+                          
                             socket.emit('chat message', {postedby: postedby, entryuid: JSON.parse(res.entryuid).data, entrytext: res.entrytext, graph: res.graph});
                         }
 

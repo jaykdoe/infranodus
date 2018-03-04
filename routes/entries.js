@@ -309,9 +309,11 @@ exports.submit = function(req, res, next){
                              // TODO more elegant with cypherAnswer here
                              // ATM this is just for the case when only 1 statement is processed to load it after
                              // TODO could be used for many
-                             var firstanswer = [
-                                          {data: cypherAnswer.results[0].data[0].row}
-                             ];
+                             var firstanswer = {
+                                            data: cypherAnswer.results[0].data[0].row
+                            }
+
+
                             var jsonfirstanswer = JSON.stringify(firstanswer);
 
                              if (err) {
@@ -357,10 +359,6 @@ exports.submit = function(req, res, next){
                                    contexts.push(default_context);
                                    Entry.getNodes(receiver, perceiver, contexts, fullview, showcontexts, res, req, function(err, graph){
                                        if (err) return next(err);
-                                       console.log("graphdisplay");
-                                       console.log(graph);
-                                       console.log(statement);
-                                       console.log(jsonfirstanswer);
                                        // Change the result we obtained into a nice json we need
                                        res.send({entryuid: jsonfirstanswer, entrytext: statement, graph: graph});
 
