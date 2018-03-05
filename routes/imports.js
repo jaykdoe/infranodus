@@ -469,7 +469,7 @@ exports.submit = function(req, res,  next) {
 
                             // Move on to the next one
 
-                            res.redirect(res.locals.user.name + '/' + default_context + '/edit');
+                          //  res.redirect(res.locals.user.name + '/' + default_context + '/edit');
                         }
 
 
@@ -609,7 +609,7 @@ exports.submit = function(req, res,  next) {
 
                             // Move on to the next one
 
-                            res.redirect(res.locals.user.name + '/' + default_context + '/edit');
+                          //  res.redirect(res.locals.user.name + '/' + default_context + '/edit');
                         }
 
 
@@ -1052,7 +1052,7 @@ exports.submit = function(req, res,  next) {
 
                             // Move on to the next one
 
-                            res.redirect(res.locals.user.name + '/' + default_context + '/edit');
+                          //  res.redirect(res.locals.user.name + '/' + default_context + '/edit');
                         }
 
                     });
@@ -1493,7 +1493,7 @@ exports.submit = function(req, res,  next) {
                 };
 
                 // TODO to get also page titles
-                
+
                 google(searchString, function(err, resp){
 
                     if (err)    {
@@ -1557,23 +1557,7 @@ exports.submit = function(req, res,  next) {
 
                     entries.submit(req, res);
 
-                    // Pager for Google results
-                    if (nextCounter < 4) {
-                        nextCounter += 1;
-                        if (resp.next) resp.next();
-                        if (nextCounter == 1) {
-                            setTimeout(function(){
-                                if (!append_url) {
-                                    res.error('Loading... You might want to reload the page in a few seconds to see more results.')
-                                    res.redirect(res.locals.user.name + '/' + default_context + '/edit');
-                                } else {
-                                    res.redirect(res.locals.user.name + '/' + default_context + '/edit' + append_url);
-                                }
-
-                            },2000);
-
-                        }
-                    }
+                    
 
                 });
 
