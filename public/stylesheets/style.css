@@ -358,7 +358,6 @@ a:hover.app-more-link {
 }
 
 
-
 .hide-entries {
    display: none!important;
 }
@@ -548,6 +547,57 @@ a:hover.app-more-link {
 #finds-content {
     pointer-events: auto!important;
     position: relative!important;
+}
+
+
+#welcomemessage {
+    position: relative;
+    top: 5px;
+    left: 14px;
+    bottom: 0;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0);
+    max-width: 340px;
+    padding-left: 50px;
+    margin-bottom: 20px;
+    z-index: 1;
+/*    pointer-events: none;*/
+}
+
+#maincontent {
+    position: relative;
+    top: 0;
+    bottom: 0;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0);
+    max-width: 700px;
+    padding-left: 50px;
+    z-index: 1;
+/*    pointer-events: none;*/
+}
+
+.appbox {
+    position: relative;
+    display:flex;
+    align-items:center;
+    background-color: rgba(215, 215, 215, 0.6);
+    width: 120px;
+    height: 120px;
+    border-radius: 8px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    padding-left: 15px;
+    padding-right: 15px;
+    margin-right: 25px;
+    margin-bottom: 25px;
+    float: left;
+    text-decoration: none!important;
+    color: #555555;!important
+}
+.appbox:hover {
+
+      color: #00B7FF;
+
 }
 
 

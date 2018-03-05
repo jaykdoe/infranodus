@@ -139,6 +139,8 @@ app.get('/settings', pass.ensureAuthenticated, settings.render);
 app.post('/settings', pass.ensureAuthenticated, settings.modify);
 app.get('/import', pass.ensureAuthenticated, imports.render);
 app.get('/google', pass.ensureAuthenticated, imports.renderGoogle);
+app.get('/apps', pass.ensureAuthenticated, imports.renderApps);
+app.get('/twitter', pass.ensureAuthenticated, imports.renderTwitter);
 app.post('/import', pass.ensureAuthenticated, imports.submit);
 
 app.get('/evernote_oauth', oauths.oauth);

@@ -148,6 +148,18 @@ exports.renderGoogle = function(req, res) {
 
 };
 
+exports.renderApps = function(req, res) {
+
+        res.render('apps', { title: 'InfraNodus: Visualize any Text as a Network', evernote: '', context: req.query.context, notebooks: '', fornode: req.query.fornode });
+
+};
+
+exports.renderTwitter = function(req, res) {
+
+        res.render('twitter', { title: 'InfraNodus: Twitter Text Network Visualization', evernote: '', context: req.query.context, notebooks: '', fornode: req.query.fornode });
+
+};
+
 
 // POST request to the settings page (change settings)
 
@@ -1557,7 +1569,7 @@ exports.submit = function(req, res,  next) {
 
                     entries.submit(req, res);
 
-                    
+
 
                 });
 

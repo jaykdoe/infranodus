@@ -45,7 +45,8 @@ exports.submit = function(req, res, next){
                 return res.redirect(_redirect);
             }
             else {
-                return res.redirect('/' + user.name +'/edit');
+                return res.redirect('apps');
+                // return res.redirect('/' + user.name +'/edit');
             }
         });
     })(req, res, next);
