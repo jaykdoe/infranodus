@@ -163,6 +163,8 @@ exports.submit = function(req, res, next){
 
     var cypherQueries = [];
 
+    var neo4jtimes = 0;
+
 
     var neo4jdriver = neo4jnew.driver(options.neo4jhost, neo4jnew.auth.basic(options.neo4juser, options.neo4jpass));
 
@@ -309,122 +311,102 @@ exports.submit = function(req, res, next){
                               transactionQueries.push({'statement': cypherQueries[t], 'resultDataContents': [ 'row', 'graph' ]});
                            }
 
-
-
-
-
-                           var session = neo4jdriver.session();
-
                            var firstanswer = {
                                           data: []
                            }
                            var jsonfirstanswer = '';
 
 
+                        for (var key in transactionQueries) {
 
-for (var key in transactionQueries) {
-  console.log("cypherasks");
-  console.log(transactionQueries[key].statement);
-session
-   .run(transactionQueries[key].statement)
-   .then(function (result) {
-    result.records.forEach(function (record) {
-      console.log("operation complete");
-      console.log(record.get('s.uid'));
-      firstanswer.data = record.get('s.uid');
-      jsonfirstanswer = JSON.stringify(firstanswer);
-    });
-    if (req.remoteUser) {
-        res.json({message: 'Entry added.'});
-    }
-    else if (req.internal) {
-        //next();
-        console.log("internal req");
+                          var session = neo4jdriver.session();
+                        session
+                           .run(transactionQueries[key].statement)
+                           .then(function (result) {
+                            result.records.forEach(function (record) {
+                              firstanswer.data = record.get('s.uid');
+                              jsonfirstanswer = JSON.stringify(firstanswer);
+                            });
+                            neo4jtimes = neo4jtimes + 1;
+                            session.close();
+                            if (req.remoteUser) {
+                                res.json({message: 'Entry added.'});
+                            }
+                            else if (req.internal) {
+                                //next();
+                                console.log("internal req");
 
-    }
-    else {
+                            }
+                            else {
 
-      if (req.body.delete == 'delete' || req.body.btnSubmit == 'edit' || req.body.delete == 'delete context') {
-          if (default_context == 'undefined' || typeof default_context === 'undefined' || default_context == '') {
-           res.redirect('/' + res.locals.user.name + '/edit');
-           }
-           else {
-           res.redirect(res.locals.user.name + '/' + default_context + '/edit');
+                              if (req.body.delete == 'delete' || req.body.btnSubmit == 'edit' || req.body.delete == 'delete context') {
+                                  if (default_context == 'undefined' || typeof default_context === 'undefined' || default_context == '') {
+                                   res.redirect('/' + res.locals.user.name + '/edit');
+                                   }
+                                   else {
+                                   res.redirect(res.locals.user.name + '/' + default_context + '/edit');
 
-           }
-
-
-      }
-      else {
+                                   }
 
 
-        // The statement fit within our maxlength limits and is only one
-        if ((splitStatements.length == 1)) {
-
-          var receiver = res.locals.user.uid;
-          var perceiver = res.locals.user.uid;
-          var showcontexts = req.query.showcontexts;
-          var fullview = res.locals.user.fullview;
-          var contexts = [];
-          contexts.push(default_context);
-          Entry.getNodes(receiver, perceiver, contexts, fullview, showcontexts, res, req, function(err, graph){
-              if (err) return next(err);
-              // Change the result we obtained into a nice json we need
-              session.close();
-              neo4jdriver.close();
-              res.send({entryuid: jsonfirstanswer, entrytext: statement, graph: graph});
-
-          });
+                              }
+                              else {
 
 
+                                // The statement fit within our maxlength limits and is only one
+                                if ((splitStatements.length == 1)) {
 
-        }
+                                  var receiver = res.locals.user.uid;
+                                  var perceiver = res.locals.user.uid;
+                                  var showcontexts = req.query.showcontexts;
+                                  var fullview = res.locals.user.fullview;
+                                  var contexts = [];
+                                  contexts.push(default_context);
+                                  Entry.getNodes(receiver, perceiver, contexts, fullview, showcontexts, res, req, function(err, graph){
+                                      if (err) return next(err);
+                                      // Change the result we obtained into a nice json we need
 
-        // The statement consists of several statements
+                                      neo4jdriver.close();
+                                      res.send({entryuid: jsonfirstanswer, entrytext: statement, graph: graph});
 
-        else if (statement == splitStatements[splitStatements.length - 1]) {
-          console.log("reached the end");
-          session.close();
-          neo4jdriver.close();
-          res.send({entryuid: 'multiple', entrycontent: fullstatement, successmsg: 'Please, reload this page after a few seconds to see the full graph.'});
-        }
-
-
-      }
-    }
-  })
-  .catch(function (error) {
-
-
-
-       if (req.internal) {
-
-       }
-       else {
-           return next(error);
-       }
-       console.log(error);
+                                  });
 
 
-   });
-}
+                                }
+
+                                // The statement consists of several statements and we completed all the iterations.
+
+                                else if (neo4jtimes == totalcount) {
+                                  console.log("reached the end");
+
+                                  neo4jdriver.close();
+                                  res.send({entryuid: 'multiple', entrycontent: fullstatement, successmsg: 'Please, reload this page after a few seconds to see the full graph.'});
+                                }
 
 
+                              }
+                            }
+                          })
+                          .catch(function (error) {
+
+                               if (req.internal) {
+
+                               }
+                               else {
+                                   return next(error);
+                               }
+                               console.log(error);
 
 
+                           });
+                           // End of FOR cycle
+                        }
 
-
-
-
-
-
+                        // End of IF condition
                          }
 
-
+                         // savetrans ends here
               });
-
-
-
 
 
         }
