@@ -39,6 +39,7 @@
                 Type in your search query, and we will show you which words are the most related to your query, so you can continue your search in a more informed way.
 
                 <br>&nbsp;<br>
+                <% include messages %>
 
                 <label for="extractfilter" class="pure-checkbox">
                     <input id="extractfilter" type="checkbox" name="excludesearchquery" value="1" checked> exclude search terms from the graph<br>
@@ -96,6 +97,12 @@
     ;(function(){
 
         var cleared_to_submit = 0;
+
+        if (res.errormsg) {
+            $('#statement').removeClass('loading');
+            $('#submitbutton').removeAttr('disabled');
+            alert(res.errormsg);
+        }
 
         $('form#submitform').submit(function(event){
 

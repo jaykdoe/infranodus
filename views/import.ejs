@@ -287,6 +287,11 @@
 
 <script>
     ;(function(){
+      if (res.errormsg) {
+          $('#statement').removeClass('loading');
+          $('#submitbutton').removeAttr('disabled');
+          alert(res.errormsg);
+      }
 
             <% if (context && fornode) { %>
             $("#source1").prop("checked", false);

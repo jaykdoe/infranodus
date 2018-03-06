@@ -126,8 +126,11 @@ exports.submit = function(req, res, next){
 
     // Some parameter settings
     var max_length = options.settings.max_text_length;
+    var max_total_length = options.settings.max_total_text_length;
     var min_length = options.settings.min_text_length;
     var maxhash = options.settings.max_hashtags;
+
+    var currenttextlength = 0;
 
     // Generate new timestamp and multiply it by 10000 to be able to track the sequence the nodes were created in
     var timestamp = new Date().getTime() * 10000;
@@ -146,12 +149,17 @@ exports.submit = function(req, res, next){
       for (var key in req.body.entry.body) {
           if (req.body.entry.body.hasOwnProperty(key)) {
                 splitStatements.push(req.body.entry.body[key]);
+                // Let's count how many symbols the whole set has
+                currenttextlength += req.body.entry.body[key].length;
           }
       }
     }
     // Not an array?
     else {
+      // What's the text submitted?
       fullstatement = req.body.entry.body;
+      // How long is the text?
+      currenttextlength = fullstatement.length;
       // Split statements into the shorter ones
       splitStatements = validate.splitStatement(fullstatement, max_length);
     }
@@ -168,6 +176,8 @@ exports.submit = function(req, res, next){
     var neo4jtimes = 0;
 
 
+
+
     var neo4jdriver = neo4jnew.driver(options.neo4jhost, neo4jnew.auth.basic(options.neo4juser, options.neo4jpass));
 
 
@@ -175,20 +185,27 @@ exports.submit = function(req, res, next){
     async.waterfall([
         function(callback){
             // Perform async Waterfall for as many times as there are statements
-            for (k=0; k < splitStatements.length;k++) {
-              if (!splitStatements[k]) {
-                  callback('Please, enter a statement');
-              }
-              else if (splitStatements[k].length <= min_length) {
-                  callback('A statement must have more than ' + min_length + ' characters');
-              }
-              else if (splitStatements[k].length > max_length) {
-                  callback('Try to make it less than ' + max_length + ' characters, please...');
-              }
-              else {
-                  var count = k;
-                  callback(null, splitStatements[k], count);
-              }
+            if (currenttextlength > max_total_length) {
+
+                  callback('The text you entered was more than ' + max_total_length + ' characters, please, cut it or contact us to process it.');
+
+            }
+            else {
+                for (k=0; k < splitStatements.length;k++) {
+                  if (!splitStatements[k] && currenttextlength == 0) {
+                      callback('Please, enter a statement');
+                  }
+                  else if (splitStatements[k].length <= min_length && currenttextlength <= min_length) {
+                      callback('A statement must have more than ' + min_length + ' characters');
+                  }
+                  else if (splitStatements[k].length > max_length) {
+                      callback('Try to make it less than ' + max_length + ' characters, please...');
+                  }
+                  else {
+                      var count = k;
+                      callback(null, splitStatements[k], count);
+                  }
+                }
             }
         },
         function(statement, count, callback){
@@ -273,12 +290,22 @@ exports.submit = function(req, res, next){
 
         if (err) {
 
+            console.log("errordetected")
             console.log(err);
 
             if (!req.internal) {
                 res.send({errormsg: err});
                // res.redirect('back');
             }
+            else {
+
+              res.send({errormsg: err});
+              // res.redirect('back');
+
+
+            }
+
+
 
         }
         else {
@@ -331,6 +358,7 @@ exports.submit = function(req, res, next){
                             });
                             neo4jtimes = neo4jtimes + 1;
                             session.close();
+
                             if (req.remoteUser) {
                                 res.json({message: 'Entry added.'});
                             }
@@ -388,6 +416,8 @@ exports.submit = function(req, res, next){
                                   neo4jdriver.close();
                                   res.send({entryuid: 'multiple', entrycontent: fullstatement, successmsg: 'Please, reload this page after a few seconds to see the full graph.'});
                                 }
+
+
 
 
                               }
