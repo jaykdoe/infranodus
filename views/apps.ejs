@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/jquery.textcomplete.css' />
+    <link rel="stylesheet" href="/stylesheets/side-menu.css">
+    <link rel="stylesheet" href="/stylesheets/jquery-ui.min.css">
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+
+
+
+</head>
+<body>
+<% include statsabove %>
+<div id="layout">
+    <!-- Menu toggle -->
+    <a href="#menu" id="menuLink" class="menu-link">
+        <!-- Hamburger icon -->
+        <span></span>
+    </a>
+
+    <% include menu %>
+
+
+
+
+    <div id='content'>
+
+        <div id='welcomemessage'>
+            Welcome to InfraNodus, <%= user.name %>. Using this platform you can convert any text into network. Try out our apps to see how it works:
+
+        </div>
+
+        <div id='maincontent'>
+          <!-- TODO: add the automatic date generation to every News/Twitter/Google/Context link-->
+          <!-- TODO: add import to the menu -->
+          <!-- TODO: add automatic checklist (from settings) which would direct the user to their context lists instead -->
+          <!-- TODO: add Apps to the menu -->
+          <!-- TODO: add helpers -->
+          <!-- TODO: add disabled on Google articles -->
+          <a href="/<%= user.name %>/edit" id="newlist"><div class="appbox">Make a new list of notes and visualise them.</div></a>
+          <a href="/<%= user.name %>/edit"><div class="appbox">See all your existing lists and ideas.</div></a>
+          <div class="appbox">See the main topics in the news today.</div>
+          <a href="/twitter?fornode=dataviz&context=twitter" id="twitter"><div class="appbox">What’s tweeted about #dataviz right now.</div></a>
+          <a href="/<%= user.name %>/edit" id="tldr"><div class="appbox">TL;DR — get an overview of any long text!</div></a>
+          <a href="/google?fornode=text+visualization&context=google" id="google"><div class="appbox">What Google shows for “SEO” term.</div></a>
+          <a href="/<%= user.name %>/edit" id="speech"><div class="appbox">Dictaphone: speech to network. </div></a>
+
+
+
+
+        </div>
+
+        <div id="graph-container"></div>
+
+
+    </div>
+
+
+
+
+</div>
+
+
+<script src="/javascripts/jquery.min.js"></script>
+<script src="/javascripts/jquery-ui.min.js"></script>
+<script src="/javascripts/string.min.js"></script>
+<script src="/javascripts/underscore-min.js"></script>
+<script src="/javascripts/jquery.textcomplete.js"></script>
+<script src='/javascripts/jquery.autosize.js'></script>
+<script src="/javascripts/ui.js"></script>
+<script src="/javascripts/jquery.mobile-events.min.js"></script>
+
+
+<script>
+    ;(function(){
+
+        var cleared_to_submit = 0;
+
+        $('form#submitform').submit(function(event){
+
+            if(cleared_to_submit){
+                cleared_to_submit = 0;
+                return;
+
+            }else{
+
+                event.preventDefault();
+
+                $(this).find('input[type=submit]').attr('disabled', 'disabled');
+
+                if ($("#extractfilter").prop("checked")) {
+                    var current_query = $("#search").val();
+                    $("#go_next_add").val(current_query);
+                }
+
+                cleared_to_submit = 1;
+
+                $('form')[0].submit();  //resubmit form
+
+            }
+
+        });
+
+
+      document.getElementById("twitter").href += new Date().toISOString().slice(2,10).replace(/-/g,"");
+      document.getElementById("google").href += new Date().toISOString().slice(2,10).replace(/-/g,"");
+      document.getElementById("newlist").href = "/<%= user.name %>/" + new Date().toISOString().slice(2,16).replace(/-/g,"").replace(/:/g,"") + "/edit";
+      document.getElementById("speech").href = "/<%= user.name %>/" + new Date().toISOString().slice(2,16).replace(/-/g,"").replace(/:/g,"") + "/edit?speech=1";
+      document.getElementById("tldr").href = "/<%= user.name %>/tldr" + new Date().toISOString().slice(2,10).replace(/-/g,"").replace(/:/g,"") + "/edit";
+
+
+
+    })();
+</script>
+
+
+
+
+<% include statsbelow %>
+</body>
+</html>
