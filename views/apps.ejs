@@ -34,22 +34,29 @@
         </div>
 
         <div id='maincontent'>
-          <!-- TODO: add the automatic date generation to every News/Twitter/Google/Context link-->
-          <!-- TODO: add import to the menu -->
-          <!-- TODO: add automatic checklist (from settings) which would direct the user to their context lists instead -->
           <!-- TODO: add Apps to the menu -->
-          <!-- TODO: add helpers -->
-          <!-- TODO: add disabled on Google articles -->
           <a href="/<%= user.name %>/edit" id="newlist"><div class="appbox">Make a new list of notes and visualise them.</div></a>
           <a href="/<%= user.name %>/edit"><div class="appbox">See all your existing lists and ideas.</div></a>
-          <div class="appbox">See the main topics in the news today.</div>
           <a href="/twitter?fornode=dataviz&context=twitter" id="twitter"><div class="appbox">What’s tweeted about #dataviz right now.</div></a>
           <a href="/<%= user.name %>/edit" id="tldr"><div class="appbox">TL;DR — get an overview of any long text!</div></a>
           <a href="/google?fornode=text+visualization&context=google" id="google"><div class="appbox">What Google shows for “SEO” term.</div></a>
           <a href="/<%= user.name %>/edit" id="speech"><div class="appbox">Dictaphone: speech to network. </div></a>
+          <a href="/import"><div class="appbox">Check out advanced Import options</div></a>
 
+          <div class="teaser">
+            <br>
+            Follow our interactive tutorial to start creating your own graphs:
+          </div>
+          <a href="/<%= user.name %>/edit" id="start" class="bigbutton">Start Step-by-Step Tutorial</a>
 
-
+          <div class="teaser">
+            <br>
+            You are also welcome to <a href="https://noduslabs.com/tag/infranodus/" target="_blank">read the tutorials</a> and
+            post your questions, problems, and feature requests on <a href="https://github.com/noduslabs/infranodus/issues" target="_blank">GitHub</a>.
+            <br>&nbsp;<br>&nbsp;<br>
+          &nbsp;
+            <br>&nbsp;<br>&nbsp;<br>
+          </div>
 
         </div>
 
@@ -109,7 +116,8 @@
       document.getElementById("google").href += new Date().toISOString().slice(2,10).replace(/-/g,"");
       document.getElementById("newlist").href = "/<%= user.name %>/" + new Date().toISOString().slice(2,16).replace(/-/g,"").replace(/:/g,"") + "/edit?walkthrough=newcontext";
       document.getElementById("speech").href = "/<%= user.name %>/" + new Date().toISOString().slice(2,16).replace(/-/g,"").replace(/:/g,"") + "/edit?speech=1&walkthrough=mic";
-      document.getElementById("tldr").href = "/<%= user.name %>/tldr" + new Date().toISOString().slice(2,10).replace(/-/g,"").replace(/:/g,"") + "/edit";
+      document.getElementById("tldr").href = "/<%= user.name %>/tldr" + new Date().toISOString().slice(2,10).replace(/-/g,"").replace(/:/g,"") + "/edit?walkthrough=tldr";
+      document.getElementById("start").href = "/<%= user.name %>/" + new Date().toISOString().slice(2,16).replace(/-/g,"").replace(/:/g,"") + "/edit?walkthrough=default";
 
 
 

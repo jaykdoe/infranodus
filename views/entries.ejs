@@ -38,7 +38,7 @@
             <% if (perceivername) { %>
             <a class="pure-menu-heading" href="/<%= perceivername %>"><%= perceivername %></a>
             <% } else { %>
-            <a class="pure-menu-heading" href="/<%= user.name %>/edit"><%= user.name %></a>
+            <a class="pure-menu-heading" href="/apps"><%= user.name %></a>
             <% } %>
                 <br>
                 <ul id="contexts" class="contexts">
@@ -199,7 +199,7 @@
                 </a>
         <div id="controls">
                 <div id="graph-reload">
-                <a href="javascript:" id="go_next"><img src="/images/eyezoom.png"  title="choose a few nodes from the graph and click this button to find out more" vspace="0" border="0"></a><br><a href="javascript:location.reload();"><img src="/images/reload.png" title="clear and reload graph" vspace="6" border="0"></a><br><a href="javascript:" id="improve-layout"><img src="/images/diamond.png" title="improve graph layout" vspace="3" border="0"></a><br><a href="javascript:" id="walkthrough"><img src="/images/question.png" title="show tutorial" vspace="3" border="0"></a>
+                <a href="javascript:" id="go_next"><img src="/images/eyezoom.png"  title="choose a few nodes from the graph and click this button to find out more" vspace="0" border="0"></a><br><a href="javascript:location.reload();" id="reloadbutton"><img src="/images/reload.png" title="clear and reload graph" vspace="6" border="0"></a><br><a href="javascript:" id="improve-layout"><img src="/images/diamond.png" title="improve graph layout" vspace="3" border="0"></a><br><a href="javascript:" id="walkthrough"><img src="/images/question.png" title="show tutorial" vspace="3" border="0"></a>
 
         </div>
 
@@ -306,8 +306,6 @@
     var speech = getUrlVars()["speech"];
 
     var walkthrough = getUrlVars()["walkthrough"];
-
-    var tutorial = getUrlVars()["tutorial"];
 
     if (go_next_url) {
         if ((go_next_url.substr(go_next_url.length - 1) == 's' || go_next_url.substr(go_next_url.length - 6) == 'search' || go_next_url.substr(go_next_url.length - 5) == 'query')) {
@@ -1772,13 +1770,29 @@ sigma.parsers.json(
                   {
                     element: "#menuLink",
                     title: "Context Menu",
-                    content: "You can navigate using this menu here. Choose another list, add a new one, or see all of them at once."
+                    content: "You can navigate using this menu here. Choose another list, add a new one, or see all of them at once.",
+                    onShow: function (tour) {
+                        $('#menuLink').click();
+                    }
                   },
                   {
                     element: "#chat-link",
                     placement: "left",
                     title: "Hide/Show Statements",
                     content: "You can use this button to hide / show statements, so you can clearly see the graph."
+                  },
+                  {
+                    element: "#walkthrough",
+                    placement: "left",
+                    title: "This Tutorial",
+                    content: "If, at any point, you want to see this tutorial again, click here."
+                  },
+                  {
+                    element: "#microphone-link",
+                    orphan: true,
+                    placement: "left",
+                    title: "Voice to Text Input",
+                    content: "If you use Chrome browser, you can also turn on Voice to Text input. Great for interviews and when you're lazy to type. English, French, German and Russian."
                   },
                   {
                     element: "#graph-container",
@@ -1788,20 +1802,54 @@ sigma.parsers.json(
                   },
                   {
                     element: "#graph-container",
-                    placement: "left",
+                    placement: "bottom",
                     title: "Discover New Ideas",
                     content: "You can also discover new ideas if you look for the gaps inside the graph."
                   },
                   {
                     element: "#go_next",
                     placement: "left",
-                    title: "Search Web",
+                    title: "Search the Web",
                     content: "Once you select a few nodes in the graph, you can click this to search them on the web."
                   },
                   {
                     element: "#collaborate-link",
                     title: "Collaborate",
                     content: "You can make your graph public or invite somebody to collaborate. Click on these buttons to learn more."
+                  },
+                  {
+                    element: "#settingspane",
+                    title: "Settings Pane",
+                    content: "Here you can log out, adjust the settings, and export your graph in any format for further visualization using Gephi or any other software."
+                  },
+                  {
+                    element: "#addNewContext",
+                    title: "Add a New List",
+                    content: "You can add a new list here (click, type in the new name and click Enter to save)."
+                  },
+                  {
+                    element: "#improve-layout",
+                    title: "Improve Graph Layout",
+                    placement: "left",
+                    content: "You can use this button to improve the graph's layout."
+                  },
+                  {
+                    element: "#graph-tools",
+                    placement: "left",
+                    title: "Zoom In / Zoom Out",
+                    content: "Use these buttons to zoom in and zoom out (or scroll your trackpad or pinch your iPad/iPhone)"
+                  },
+                  {
+                    element: "#reloadbutton",
+                    placement: "left",
+                    title: "Reload Graph",
+                    content: "If, at any point, something goes wrong, you can always click this to reload the graph."
+                  },
+                  {
+                    element: "#walkthrough",
+                    placement: "left",
+                    title: "Interactive Help",
+                    content: "When you want to see this guide again, click here."
                   }
 
                 ]});
@@ -1810,6 +1858,57 @@ sigma.parsers.json(
                 if (walkthrough == 'newcontext') {
                   tour._options.storage = window.localStorage;
                 }
+
+                if (walkthrough == 'tldr') {
+                  console.log(tour._options.steps);
+                  tour._options.steps = [
+                    {
+                    element: "#entryform",
+                    placement: "right",
+                    title: "Visualizing a Long Text",
+                    content: "If you would like to visualize a long text, copy and paste it here and click Save. You will probably need to wait for about 20-60 seconds. If nothign happens, you can try to reload the page after. We currently can handle about 150K max.",
+                  },
+                  {
+                  element: "#graph-container",
+                  placement: "bottom",
+                  title: "Navigate the Graph",
+                  content: "You will then see a graph representation of this text. The most prominent topics will be shown as bigger nodes in the graph, those words, which are used in the same context will be closer to each other.",
+                  },
+                  {
+                  element: "#graph-container",
+                  placement: "top",
+                  title: "Search through Text",
+                  content: "You can then click on the nodes in the graph to find the parts of the text that you find interesting.",
+                  },
+                  {
+                  element: "#graph-container",
+                  placement: "left",
+                  title: "Discover New Ideas",
+                  content: "The gaps in the graph will show you where you could do more research or what questions to ask.",
+                  },
+                  {
+                  element: "#graph-container",
+                  placement: "left",
+                  title: "Discover New Ideas",
+                  content: "The gaps in the graph will show you where you could do more research or what questions to ask.",
+                  },
+                  {
+                    element: "#menuLink",
+                    title: "Context Menu",
+                    content: "You will be able to later find your text here.",
+                    onShow: function (tour) {
+                        $('#menuLink').click();
+                    }
+                  },
+                  {
+                    element: "#walkthrough",
+                    placement: "left",
+                    title: "Detailed Tutorial",
+                    content: "If, at any point, you want to see a more detailed Tutorial, click here."
+                  }
+                  ]
+                }
+
 
                 // Initialize the tour
                 tour.init();
@@ -1821,7 +1920,7 @@ sigma.parsers.json(
 
 
 
-              if (walkthrough == 'default' || walkthrough == 'newcontext') {
+              if (walkthrough == 'default' || walkthrough == 'newcontext' || walkthrough == "tldr") {
 
                 initializeWalkthrough();
 
@@ -3179,7 +3278,7 @@ sigma.parsers.json(
 
             auxLinks = '<br>' +
                     '<li class="menu-item-small"><a href="/logout">logout</a></li>' +
-                    '<li class="menu-item-small"><a href="/settings">settings</a></li>' +
+                    '<li class="menu-item-small" id="settingspane"><a href="/settings">settings</a></li>' +
                     '<li class="menu-item-small"><a href="/import">import</a></li>' +
                     '<li class="menu-item-small"><a href="/api/user/nodes/<%= context %>" target="_blank">export</a> <a href="/api/user/nodes/<%= context %>?gexf=1" target="_blank">gexf</a> <a href="/api/user/nodes/<%= context %>?csv=1" target="_blank">csv</a> <a href="/api/user/nodes/<%= context %>?csvdata=1" target="_blank">csv matrix</a></li>' +
                     '<li class="menu-item-small"><a href="http://noduslabs.com/cases/infranodus-the-network-thinking-app/" target="_blank">demo</a></li>' +
