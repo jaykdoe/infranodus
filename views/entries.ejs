@@ -13,6 +13,7 @@
     <script src="/javascripts/jquery.content-panel-switcher.js"></script>
     <link rel="stylesheet" type="text/css" href="/stylesheets/tooltipster.css" />
     <link rel="stylesheet" type="text/css" href="/stylesheets/tooltipster-noir.css" />
+    <% if (speech) { %>  <script src="/javascripts/talkify.min.js"></script><%  } %>
 
 
 
@@ -296,6 +297,8 @@
     var language = getUrlVars()["language"];
 
     var mute = getUrlVars()["mute"];
+
+    var speech = getUrlVars()["speech"];
 
     if (go_next_url) {
         if ((go_next_url.substr(go_next_url.length - 1) == 's' || go_next_url.substr(go_next_url.length - 6) == 'search' || go_next_url.substr(go_next_url.length - 5) == 'query')) {
@@ -1518,6 +1521,15 @@ sigma.parsers.json(
                 activateVoiceInput();
             }
 
+            if (speech) {
+              $('#microphone-link').toggleClass('microphone-on', 'add');
+              activateVoiceInput();
+              setTimeout(function() {
+                var player = new talkify.Html5Player(); //or new talkify.Html5Player()
+                player.playText('Please speak into your microphone and every word you say, will be visualized in a network...');
+              },1000);
+            }
+
             $("#microphone-link").click(function(e) {
 
                 e.preventDefault();
@@ -1534,6 +1546,8 @@ sigma.parsers.json(
                 }
 
             });
+
+
 
         }
 
@@ -1659,7 +1673,7 @@ sigma.parsers.json(
                     recognition.onend = function(){
 
                         console.log("onend");
-                        if (localStorage.getItem('microphone') == 1) {
+                        if (localStorage.getItem('microphone') == 1 || speech == 1) {
                             recognition.start();
                         }
 
