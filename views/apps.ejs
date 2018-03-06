@@ -108,7 +108,7 @@
       document.getElementById("twitter").href += new Date().toISOString().slice(2,10).replace(/-/g,"");
       document.getElementById("google").href += new Date().toISOString().slice(2,10).replace(/-/g,"");
       document.getElementById("newlist").href = "/<%= user.name %>/" + new Date().toISOString().slice(2,16).replace(/-/g,"").replace(/:/g,"") + "/edit";
-      document.getElementById("speech").href = "/<%= user.name %>/" + new Date().toISOString().slice(2,16).replace(/-/g,"").replace(/:/g,"") + "/edit?speech=1";
+      document.getElementById("speech").href = "/<%= user.name %>/" + new Date().toISOString().slice(2,16).replace(/-/g,"").replace(/:/g,"") + "/edit?speech=1&walkthrough=1";
       document.getElementById("tldr").href = "/<%= user.name %>/tldr" + new Date().toISOString().slice(2,10).replace(/-/g,"").replace(/:/g,"") + "/edit";
 
 

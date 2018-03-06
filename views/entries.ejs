@@ -4,6 +4,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimal-ui">
     <title><%= title %></title>
+    <script src="/javascripts/jquery.min.js"></script>
     <link rel='stylesheet' href='/stylesheets/jquery.textcomplete.css' />
     <link rel="stylesheet" href="/stylesheets/side-menu.css">
     <link rel="stylesheet" href="/stylesheets/jquery-ui.min.css">
@@ -13,7 +14,13 @@
     <script src="/javascripts/jquery.content-panel-switcher.js"></script>
     <link rel="stylesheet" type="text/css" href="/stylesheets/tooltipster.css" />
     <link rel="stylesheet" type="text/css" href="/stylesheets/tooltipster-noir.css" />
-    <% if (speech) { %>  <script src="/javascripts/talkify.min.js"></script><%  } %>
+    <% if (speech) { %>
+    <script src="/javascripts/talkify.min.js"></script>
+    <%  } %>
+    <% if (walkthrough) { %>
+    <link rel="stylesheet" href="/stylesheets/bootstrap-tour-standalone.min.css" />
+    <script src="/javascripts/bootstrap-tour-standalone.min.js"></script>
+    <%  } %>
 
 
 
@@ -219,7 +226,6 @@
 <script src="/javascripts/sigma/plugins/sigma.parsers.json.min.js"></script>
 <script src="/javascripts/sigma/plugins/sigma.layout.forceAtlas2.js"></script>
 <script src="/javascripts/sigma/plugins/sigma.plugins.animate.min.js"></script>
-<script src="/javascripts/jquery.min.js"></script>
 <script src="/javascripts/jquery-ui.min.js"></script>
 <script src="/javascripts/string.min.js"></script>
 <script src="/javascripts/underscore-min.js"></script>
@@ -299,6 +305,8 @@
     var mute = getUrlVars()["mute"];
 
     var speech = getUrlVars()["speech"];
+
+    var walkthrough = getUrlVars()["walkthrough"];
 
     if (go_next_url) {
         if ((go_next_url.substr(go_next_url.length - 1) == 's' || go_next_url.substr(go_next_url.length - 6) == 'search' || go_next_url.substr(go_next_url.length - 5) == 'query')) {
@@ -1523,11 +1531,50 @@ sigma.parsers.json(
 
             if (speech) {
               $('#microphone-link').toggleClass('microphone-on', 'add');
+
               activateVoiceInput();
-              setTimeout(function() {
-                var player = new talkify.Html5Player(); //or new talkify.Html5Player()
-                player.playText('Please speak into your microphone and every word you say, will be visualized in a network...');
-              },1000);
+
+              if (walkthrough) {
+              // Instance the tour
+                var tour = new Tour({
+                  storage: false,
+                  steps: [
+                  {
+                    element: "#microphone-link",
+                    placement: "left",
+                    title: "Turn on Your Microphone",
+                    content: "When it's blue, it's on. Make sure you also have the sound and microphone turned on in your computer.",
+                    onNext: function (tour) {
+                      setTimeout(function() {
+                        var player = new talkify.Html5Player(); //or new talkify.Html5Player()
+                        player.playText('Please speak into your microphone and every word you say, will be visualized in a network.');
+                      },1000);
+                    }
+                  },
+                  {
+                    element: "#entryform",
+                    title: "Continue Talking...",
+                    content: "As you speak, the words will appear here. Please, speak clearly and make breaks between sentences."
+                  },
+                  {
+                    element: ".entry",
+                    title: "Edit the Statements",
+                    content: "You will see visualization on the right. To delete a statement, double-click it."
+                  },
+                  {
+                    element: "#deletebutton",
+                    title: "Delete Statements",
+                    content: "If you double-clicked the statement, it appears here. Then simply click the Delete icon and it will be removed."
+                  }
+                ]});
+
+                // Initialize the tour
+                tour.init();
+
+                // Start the tour
+                tour.start();
+              }
+
             }
 
             $("#microphone-link").click(function(e) {

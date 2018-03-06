@@ -106,7 +106,8 @@ exports.list = function(req, res, next){
             maxnodes: req.query.maxnodes,
             url: req.query.url,
             urltitle: req.query.urltitle,
-            speech: req.query.speech
+            speech: req.query.speech,
+            walkthrough: req.query.walkthrough
         });
     });
 };
