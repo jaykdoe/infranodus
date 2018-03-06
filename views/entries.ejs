@@ -17,10 +17,9 @@
     <% if (speech) { %>
     <script src="/javascripts/talkify.min.js"></script>
     <%  } %>
-    <% if (walkthrough) { %>
     <link rel="stylesheet" href="/stylesheets/bootstrap-tour-standalone.min.css" />
     <script src="/javascripts/bootstrap-tour-standalone.min.js"></script>
-    <%  } %>
+
 
 
 
@@ -200,7 +199,7 @@
                 </a>
         <div id="controls">
                 <div id="graph-reload">
-                <a href="javascript:" id="go_next"><img src="/images/eyezoom.png"  title="choose a few nodes from the graph and click this button to find out more" vspace="0" border="0"></a><br><a href="javascript:location.reload();"><img src="/images/reload.png" title="clear and reload graph" vspace="6" border="0"></a><br><a href="javascript:" id="improve-layout"><img src="/images/diamond.png" title="improve graph layout" vspace="3" border="0"></a>
+                <a href="javascript:" id="go_next"><img src="/images/eyezoom.png"  title="choose a few nodes from the graph and click this button to find out more" vspace="0" border="0"></a><br><a href="javascript:location.reload();"><img src="/images/reload.png" title="clear and reload graph" vspace="6" border="0"></a><br><a href="javascript:" id="improve-layout"><img src="/images/diamond.png" title="improve graph layout" vspace="3" border="0"></a><br><a href="javascript:" id="walkthrough"><img src="/images/question.png" title="show tutorial" vspace="3" border="0"></a>
 
         </div>
 
@@ -307,6 +306,8 @@
     var speech = getUrlVars()["speech"];
 
     var walkthrough = getUrlVars()["walkthrough"];
+
+    var tutorial = getUrlVars()["tutorial"];
 
     if (go_next_url) {
         if ((go_next_url.substr(go_next_url.length - 1) == 's' || go_next_url.substr(go_next_url.length - 6) == 'search' || go_next_url.substr(go_next_url.length - 5) == 'query')) {
@@ -1534,8 +1535,8 @@ sigma.parsers.json(
 
               activateVoiceInput();
 
-              if (walkthrough) {
-              // Instance the tour
+              if (walkthrough == "mic") {
+              // Instance the walkthrough tour
                 var tour = new Tour({
                   storage: false,
                   steps: [
@@ -1562,9 +1563,9 @@ sigma.parsers.json(
                     content: "You will see visualization on the right. To delete a statement, double-click it."
                   },
                   {
-                    element: "#deletebutton",
+                    element: "#statement",
                     title: "Delete Statements",
-                    content: "If you double-clicked the statement, it appears here. Then simply click the Delete icon and it will be removed."
+                    content: "If you double-clicked the statement, it appears here. Then simply click the Delete icon below the statement and it will be removed."
                   }
                 ]});
 
@@ -1734,6 +1735,106 @@ sigma.parsers.json(
             // END Speech recognition module
 
 
+            // BEGIN WALKTHROUGH Module
+
+            // Basic tutorial
+            function initializeWalkthrough () {
+              // Instance the tour
+                var tour = new Tour({
+                  storage: false,
+                  steps: [
+                  {
+                    element: "#entryform",
+                    placement: "right",
+                    title: "Welcome to InfraNodus",
+                    content: "You can start typing your ideas and notes here. Press Enter or Save to submit. They will be visualized as a graph.",
+                    onNext: function (tour) {
+                        $('#statement').val('Every word you type is a node in a graph. When the words cooccur together, they are connected.');
+                    }
+                  },
+                  {
+                    element: "#statement",
+                    title: "Add a Statement...",
+                    content: "You can add this statement or edit and add your own. Then press the SAVE button..."
+                  },
+                  {
+                    element: ".entry:first",
+                    orphan: true,
+                    placement: "auto",
+                    title: "See the Statements",
+                    content: "You will then see this statement appear here. To edit it, double-click it."
+                  },
+                  {
+                    element: "#statement",
+                    title: "Delete Statements",
+                    content: "If you double-clicked the statement, it appears here. Then simply click the Delete icon below the statement and it will be removed. You can also Edit and click Edit. Or Cancel."
+                  },
+                  {
+                    element: "#menuLink",
+                    title: "Context Menu",
+                    content: "You can navigate using this menu here. Choose another list, add a new one, or see all of them at once."
+                  },
+                  {
+                    element: "#chat-link",
+                    placement: "left",
+                    title: "Hide/Show Statements",
+                    content: "You can use this button to hide / show statements, so you can clearly see the graph."
+                  },
+                  {
+                    element: "#graph-container",
+                    placement: "top",
+                    title: "Use the Graph",
+                    content: "You can click on the nodes on the graph to see what they're connected to and to filter the statements, which contain them."
+                  },
+                  {
+                    element: "#graph-container",
+                    placement: "left",
+                    title: "Discover New Ideas",
+                    content: "You can also discover new ideas if you look for the gaps inside the graph."
+                  },
+                  {
+                    element: "#go_next",
+                    placement: "left",
+                    title: "Search Web",
+                    content: "Once you select a few nodes in the graph, you can click this to search them on the web."
+                  },
+                  {
+                    element: "#collaborate-link",
+                    title: "Collaborate",
+                    content: "You can make your graph public or invite somebody to collaborate. Click on these buttons to learn more."
+                  }
+
+                ]});
+
+                // New context tutorial? Do not show it if it's been shown before
+                if (walkthrough == 'newcontext') {
+                  tour._options.storage = window.localStorage;
+                }
+
+                // Initialize the tour
+                tour.init();
+
+                // Start the tour
+                tour.start();
+
+              }
+
+
+
+              if (walkthrough == 'default' || walkthrough == 'newcontext') {
+
+                initializeWalkthrough();
+
+              }
+
+              $("#walkthrough").click(function(e) {
+                  e.preventDefault();
+                  initializeWalkthrough();
+              });
+
+
+
+            // IMPORTANT NOTE this is the end of the cycle that shows only to editor
          <% } %>
 
 

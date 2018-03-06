@@ -339,7 +339,7 @@ small screens.
     display: none;
     opacity: 0.5;
     position: fixed;
-    top: 240px;
+    top: 275px;
     font-size: 8px; /* change this value to increase/decrease button size */
     width: 2em;
     height: 25px;
@@ -366,7 +366,7 @@ small screens.
 #graph-tools {
     position: fixed;
     display: none;
-    top: 168px;
+    top: 205px;
     text-align: right;
     right: -2px; /* "#menu width" */
     height: 80px;
