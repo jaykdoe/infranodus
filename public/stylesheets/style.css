@@ -557,7 +557,7 @@ a:hover.app-more-link {
     bottom: 0;
     height: 100%;
     background-color: rgba(255, 255, 255, 0);
-    max-width: 340px;
+    max-width: 275px;
     padding-left: 50px;
     margin-bottom: 20px;
     z-index: 1;
@@ -581,15 +581,15 @@ a:hover.app-more-link {
     display:flex;
     align-items:center;
     background-color: rgba(215, 215, 215, 0.6);
-    width: 120px;
-    height: 120px;
+    width: 115px;
+    height: 115px;
     border-radius: 8px;
     padding-top: 15px;
     padding-bottom: 15px;
     padding-left: 15px;
     padding-right: 15px;
-    margin-right: 25px;
-    margin-bottom: 25px;
+    margin-right: 20px;
+    margin-bottom: 20px;
     float: left;
     text-decoration: none!important;
     color: #555555;!important
@@ -605,7 +605,7 @@ a:hover.app-more-link {
 .teaser {
   position: relative;
   padding-left: 14px;
-  max-width: 340px;
+  max-width: 275px;
   clear: both;
 }
 .bigbutton {
