@@ -26,10 +26,10 @@ exports.settings = {
     max_contexts: 5,
 
     // Max length of a statement text in Bytes
-    max_text_length: 500,
+    max_text_length: 400,
 
     // Max length of the total text length in Bytes
-    max_total_text_length: 150000,
+    max_total_text_length: 90000,
 
     // Min length of a statement text
     min_text_length: 4,
