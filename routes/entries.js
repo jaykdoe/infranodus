@@ -364,7 +364,7 @@ exports.submit = function(req, res, next){
                             }
                             else if (req.internal) {
                                 //next();
-                                console.log("internal req");
+                                // console.log("internal req");
                                 if (neo4jtimes == totalcount) {
                                     neo4jdriver.close();
                                     res.redirect(res.locals.user.name + '/' + default_context + '/edit');

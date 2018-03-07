@@ -1855,12 +1855,12 @@ sigma.parsers.json(
                 ]});
 
                 // New context tutorial? Do not show it if it's been shown before
-                if (walkthrough == 'newcontext') {
+                if (walkthrough == 'newcontext' || walkthrough == 'tldr') {
                   tour._options.storage = window.localStorage;
                 }
 
                 if (walkthrough == 'tldr') {
-                  console.log(tour._options.steps);
+                //  console.log(tour._options.steps);
                   tour._options.steps = [
                     {
                     element: "#entryform",
