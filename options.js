@@ -69,7 +69,7 @@ if (fs.existsSync(configPath)) {
                         ":" + parsed['neo4j']['password'] +
                         "@" + parsed['neo4j']['host'];
 
-    exports.neo4jhost = "bolt://localhost";
+    exports.neo4jhost = "bolt://" + parsed['neo4j']['bolt'];
 
     exports.neo4juser = parsed['neo4j']['username'];
     exports.neo4jpass = parsed['neo4j']['password'];

@@ -1,6 +1,7 @@
 {
     "neo4j":  {
         "host": "localhost:7474",
+        "bolt": "localhost"
         "username": "username",
         "password": "password"
     },
