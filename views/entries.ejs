@@ -199,7 +199,7 @@
                 </a>
         <div id="controls">
                 <div id="graph-reload">
-                <a href="javascript:" id="go_next"><img src="/images/eyezoom.png"  title="choose a few nodes from the graph and click this button to find out more" vspace="0" border="0"></a><br><a href="javascript:location.reload();" id="reloadbutton"><img src="/images/reload.png" title="clear and reload graph" vspace="6" border="0"></a><br><a href="javascript:" id="improve-layout"><img src="/images/diamond.png" title="improve graph layout" vspace="3" border="0"></a><br><a href="javascript:" id="walkthrough"><img src="/images/question.png" title="show tutorial" vspace="3" border="0"></a>
+                <a href="javascript:" id="go_next"><img src="/images/eyezoom.png"  title="choose a few nodes from the graph and click this button to find out more" vspace="0" border="0"></a><br><a href="javascript:location.reload();" id="reloadbutton"><img src="/images/reload.png" title="clear and reload graph" vspace="6" border="0"></a><br><a href="javascript:" id="improve-layout"></a><br><a href="javascript:" id="walkthrough"><img src="/images/question.png" title="show tutorial" vspace="3" border="0"></a>
 
         </div>
 
@@ -1140,16 +1140,17 @@ sigma.parsers.json(
             });
 
             $("#improve-layout").on('click', function(e) {
-
                 if (sigma.isForceAtlas2Running()) {
                     sigma.stopForceAtlas2();
                     sigma.killForceAtlas2();
+                    $('#improve-layout').removeClass('layout-on');
                 }
                 else {
                   // sigma.configForceAtlas2({scalingRatio: 0.1});
                   sigma.startForceAtlas2(forceatlas_options);
-                }
+                  $('#improve-layout').addClass('layout-on');
 
+                }
 
 
             });
