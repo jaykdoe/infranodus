@@ -46,13 +46,26 @@ exports.entries = function(req, res, next){
 
         if (err) return next(err);
 
-        res.format({
-            json: function(){
-                res.send(entries);
-            }
+        if (req.query.textonly) {
+          var response = '';
+          for (var key in entries) {
+            response += entries[key].text + '\r\n\r\n';
+          }
+          res.format({
+             json: function(){
+                  res.send(response);
+              }
+            });
+        }
+        else {
+          res.format({
+              json: function(){
+                  res.send(entries);
+              }
 
 
-        });
+          });
+        }
     });
 };
 
