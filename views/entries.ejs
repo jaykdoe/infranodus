@@ -223,8 +223,9 @@
 
 <script src="/javascripts/sigma/sigma.min.js"></script>
 <script src="/javascripts/sigma/plugins/sigma.parsers.json.min.js"></script>
-<script src="/javascripts/sigma/plugins/sigma.layout.forceAtlas2.js"></script>
+<script src="/javascripts/sigma/plugins/sigma.layout.forceAtlas2.min.js"></script>
 <script src="/javascripts/sigma/plugins/sigma.plugins.animate.min.js"></script>
+<script src="/javascripts/sigma/plugins/sigma.plugins.dragNodes.min.js"></script>
 <script src="/javascripts/jquery-ui.min.js"></script>
 <script src="/javascripts/string.min.js"></script>
 <script src="/javascripts/underscore-min.js"></script>
@@ -440,6 +441,10 @@ var collaborate_message = '';
 var collaborate_html = '';
 
 var collaborate_storage = JSON.parse(localStorage.getItem("collaborate"));
+
+var sigma_dragged = 0;
+
+var forceatlas_options = {startingIterations: 100, scalingRatio: 0.1, slowDown: 300, strongGravityMode: true};
 
 <% if (locals.user) { %>
 var inlanguage = '<%= user.inlanguage %>';
@@ -727,6 +732,8 @@ sigma.classes.graph.addMethod('neighbors', function(nodeId) {
 
 // Initialize JSON parser for SIGMA visualization
 
+
+
 sigma.parsers.json(
         jsonpath,
         {
@@ -986,13 +993,21 @@ sigma.parsers.json(
 
             // Do ForceAtlasLayout
 
-            sigma.startForceAtlas2();
+
+            sigma.startForceAtlas2(forceatlas_options);
 
             // Don't run it forever not to overheat :)
 
             setTimeout(function() {
                 sigma.stopForceAtlas2();
+                sigma.killForceAtlas2();
             },timeout);
+
+
+            // Drag nodes
+
+            dragNodes();
+
 
             // When a node is clicked, we check for each node
             // if it is a neighbor of the clicked one. If not,
@@ -1000,6 +1015,9 @@ sigma.parsers.json(
             // original color.
             // We do the same for the edges, and we only keep
             // edges that have both extremities colored.
+
+
+
 
             sigma.bind('clickNode', function(e) {
 
@@ -1077,6 +1095,8 @@ sigma.parsers.json(
 
                 }
 
+
+
             });
 
 
@@ -1097,6 +1117,8 @@ sigma.parsers.json(
                 }
                 sigma.refresh();
             });
+
+
 
             // Zoom Graph Control
 
@@ -1119,14 +1141,16 @@ sigma.parsers.json(
 
             $("#improve-layout").on('click', function(e) {
 
-                sigma.startForceAtlas2();
-
-                // Don't run it forever not to overheat :)
-
-                setTimeout(function() {
-
+                if (sigma.isForceAtlas2Running()) {
                     sigma.stopForceAtlas2();
-                }, 3000);
+                    sigma.killForceAtlas2();
+                }
+                else {
+                  // sigma.configForceAtlas2({scalingRatio: 0.1});
+                  sigma.startForceAtlas2(forceatlas_options);
+                }
+
+
 
             });
 
@@ -1341,13 +1365,14 @@ sigma.parsers.json(
 
                     sigma.refresh();
 
-                    sigma.startForceAtlas2();
+                    sigma.startForceAtlas2(forceatlas_options);
 
                     // Don't run it forever not to overheat :)
 
                     setTimeout(function() {
 
                         sigma.stopForceAtlas2();
+                        sigma.killForceAtlas2();
 
                     }, 3000);
 
@@ -1402,13 +1427,14 @@ sigma.parsers.json(
 
                 sigma.refresh();
 
-                sigma.startForceAtlas2();
+                sigma.startForceAtlas2(forceatlas_options);
 
                 // Don't run it forever not to overheat :)
 
                 setTimeout(function() {
 
                     sigma.stopForceAtlas2();
+                    sigma.killForceAtlas2();
 
                 }, 3000);
 
@@ -2232,6 +2258,23 @@ sigma.parsers.json(
 
     });*/
 
+
+    function dragNodes () {
+      var dragListener = sigma.plugins.dragNodes(sigma.instances(0), sigma.instances(0).renderers[0]);
+      dragListener.bind('startdrag', function(event) {
+
+      });
+      dragListener.bind('drag', function(event) {
+        sigma_dragged = 1;
+
+      });
+      dragListener.bind('drop', function(event) {
+
+      });
+      dragListener.bind('dragend', function(event) {
+
+      });
+    }
 
 
     function entryClick () {
