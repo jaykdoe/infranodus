@@ -1021,7 +1021,7 @@ sigma.parsers.json(
 
 
             sigma.bind('clickNode', function(e) {
-
+              if (!sigma_dragged) {
                 // A node was clicked, so we assume there was a meaningful graph interaction
                 graphInteraction = 1;
 
@@ -1096,6 +1096,8 @@ sigma.parsers.json(
 
                 }
 
+              }
+              sigma_dragged = 0;
 
 
             });
@@ -2268,11 +2270,36 @@ sigma.parsers.json(
       });
       dragListener.bind('drag', function(event) {
         sigma_dragged = 1;
+        if (sigma.instances(0).isForceAtlas2Running()) {
+
+          sigma.instances(0).stopForceAtlas2();
+          sigma.instances(0).killForceAtlas2();
+        }
+
 
       });
       dragListener.bind('drop', function(event) {
 
-      });
+
+        // sigma.instances(0).refresh();
+
+        var new_forceatlas_options = forceatlas_options;
+
+        new_forceatlas_options.slowDown = 1000;
+        new_forceatlas_options.startingIterations = 0;
+
+        sigma.instances(0).startForceAtlas2(new_forceatlas_options);
+
+        // Don't run it forever not to overheat :)
+
+        setTimeout(function() {
+
+            sigma.instances(0).stopForceAtlas2();
+            sigma.instances(0).killForceAtlas2();
+
+        }, 10000);
+
+     });
       dragListener.bind('dragend', function(event) {
 
       });
@@ -3806,43 +3833,7 @@ sigma.parsers.json(
     }
 
 
-    // LiveChat functionality
 
-    if (window.addEventListener) {
-        window.addEventListener("message", function (event) {
-            if (event.data != null || event.data != "") {
-
-                var message_array = event.data.split("%3B");
-
-                if (message_array[0] == 'message_received' || message_array[0] == 'message_sent') {
-
-                    var message_clean = decodeURIComponent(message_array[1].replace(/%25/g,'%'));
-
-                    var urlRegex =/((\#\#\#))/ig;
-
-                    var infraExtract = urlRegex.exec(message_clean);
-
-                    // message_clean !== 'So, shall we begin our conversation?' && message_clean !== 'So, shall we continue our conversation?' &&
-
-                   if (infraExtract == null && current_context.substr(0,1) == '_') {
-                        if (message_clean.length > 4) {
-                            $('#statement').text(message_clean);
-                            $('#submitbutton').trigger('click');
-                        }
-                    }
-
-                }
-
-
-            }
-        });
-    }
-    else {
-        window.attachEvent("onmessage", function (event) {
-            if (event.data != null || event.data != "") {
-            }
-        });
-    }
 
 
 
