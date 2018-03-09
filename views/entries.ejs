@@ -444,7 +444,8 @@ var collaborate_storage = JSON.parse(localStorage.getItem("collaborate"));
 
 var sigma_dragged = 0;
 
-var forceatlas_options = {startingIterations: 100, scalingRatio: 0.1, slowDown: 300, strongGravityMode: true};
+// TODO for desktop browses that support webwork (not iphone): webworker: true, slowdown: 300
+var forceatlas_options = {worker: false, startingIterations: 100, scalingRatio: 0.1, slowDown: 100, strongGravityMode: true};
 
 <% if (locals.user) { %>
 var inlanguage = '<%= user.inlanguage %>';
