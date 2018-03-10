@@ -475,7 +475,9 @@ Hides the menu at `48em`, but modify this based on your app's needs.
         max-width: 320px;
     }
     #analytics {
-      display:none;
+
+    z-index: -0!important;  
+
     }
 
     #chat-link {
