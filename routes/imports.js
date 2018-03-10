@@ -1241,8 +1241,10 @@ exports.submit = function(req, res,  next) {
 
         console.log(req.files);
 
+        var process_type = 'classes';
+
         // Is the file uploaded and is it a text / html one?
-        if (req.files && req.files.uploadedFile.type == 'text/html') {
+        if (req.files && (req.files.uploadedFile.type == 'text/html' || req.files.uploadedFile.type == 'text/plain') ) {
 
             // Import parameters
             var titlefield = '';
@@ -1334,6 +1336,11 @@ exports.submit = function(req, res,  next) {
                         if ($(processfield).length) {
                             callback(null,contexts);
                         }
+                        // TODO or PDF
+                        else if (req.files.uploadedFile.type == 'text/plain') {
+                          process_type = 'book';
+                          callback(null,contexts);
+                        }
 
                         else {
                             err = 'Sorry, but InfraNodus does not recognize this kind of content yet. Add a feature request on our GitHub and we will look into it.';
@@ -1358,6 +1365,8 @@ exports.submit = function(req, res,  next) {
 
                         var numHighlights = 0;
 
+                        if (process_type != 'book') {
+                          console.log("Processing file by classes");
                         for (var i = 0; i < books.length; i++) {
 
                             var current_book = books[i];
@@ -1408,6 +1417,30 @@ exports.submit = function(req, res,  next) {
 
 
                         }
+                        }
+                        else {
+                          console.log("Processing file as a whole");
+                            var bookname = '';
+                            bookname = importContext;
+
+                            var currentcontext = S(bookname).dasherize().chompLeft('-').camelize().s.replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+                                currentcontext = currentcontext.replace(/[^\w]/gi, '');
+                                currentcontext = currentcontext.substr(0,12);
+
+                                // Check the corresponding context ID for the book name
+                                var addingcontexts = [];
+
+                                for (var j = 0; j < contexts.length; j++) {
+                                     if (contexts[j].name == currentcontext) {
+                                          addingcontexts.push(contexts[j]);
+                                     }
+                                }
+
+                                saveFileAtOnce(filecontents, addingcontexts);
+
+
+
+                        }
 
                         function saveHighlight(highlight, contexts) {
 
@@ -1432,6 +1465,31 @@ exports.submit = function(req, res,  next) {
 
 
                         }
+
+                        function saveFileAtOnce(fullfiletext, contexts) {
+
+
+
+                                // and finally create an object to send this entry with the right context
+
+                                var req = {
+                                    body:  {
+                                        entry: {
+                                            body: fullfiletext
+                                        },
+                                        context: ''
+                                    },
+
+                                    contextids: contexts
+                                };
+
+
+                               entries.submit(req,res);
+
+
+                        }
+
+
 
                         // Move on to the next one
                         res.error('Importing the content... Please, reload this page in 30 seconds...');
