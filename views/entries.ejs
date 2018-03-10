@@ -2401,7 +2401,8 @@ sigma.parsers.json(
          analytics = analytics.slice(0, -10);
          analytics += ''
 
-         $('#analytics').html(analytics)
+         $('#analytics').html(analytics);
+         $("#statement").attr("placeholder", analytics.replace(/<br ?\/?>/g, "") + "?").val("").focus().blur();
 
 
 
