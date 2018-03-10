@@ -228,7 +228,6 @@
 <script src="/javascripts/sigma/plugins/sigma.plugins.dragNodes.min.js"></script>
 <script src="/javascripts/sigma/plugins/jLouvain.js"></script>
 <script src="/javascripts/sigma/plugins/distinct-colors.min.js"></script>
-<script src="/javascripts/sigma/plugins/randomColor.min.js"></script>
 <script src="/javascripts/jquery-ui.min.js"></script>
 <script src="/javascripts/string.min.js"></script>
 <script src="/javascripts/underscore-min.js"></script>
@@ -2333,7 +2332,7 @@ sigma.parsers.json(
       var community_assignment_result = community();
       var node_ids = Object.keys(community_assignment_result);
 
-      console.log('Resulting Community Data', community_assignment_result);
+      // console.log('Resulting Community Data', community_assignment_result);
 
       var max_community_number = 0;
 
@@ -2342,10 +2341,16 @@ sigma.parsers.json(
         max_community_number = max_community_number < community_assignment_result[n.id] ? community_assignment_result[n.id]: max_community_number;
       });
 
-      console.log(max_community_number);
+    //  console.log(max_community_number);
 
-      var palette = new DistinctColors({count: max_community_number + 1, lightMin: 70, chromaMin: 60, samples: 100});
+    // nice color palette
+    //  var palette = new DistinctColors({count: max_community_number + 1, lightMin: 70, chromaMin: 60, samples: 100});
 
+    // good chromo
+    //  var palette = new DistinctColors({count: max_community_number + 1, lightMin: 8, lightMax: 100, chromaMin: 4, chromaMax: 7});
+
+    // subdued chromo
+      var palette = new DistinctColors({count: max_community_number + 1, lightMin: 40, lightMax: 60, chromaMin: 0, chromaMax: 5});
 
       sigma.instances(0).graph.nodes().forEach(function(n) {
         n.originalColor = rgbToHex(palette[n.community]._rgb[0],palette[n.community]._rgb[1],palette[n.community]._rgb[2]);
