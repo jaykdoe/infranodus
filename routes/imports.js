@@ -42,6 +42,17 @@ var fs = require('fs');
 
 var google = require('google');
 
+// This is for PDF reader
+global.navigator = {
+  userAgent: 'node',
+}
+
+window.navigator = {
+  userAgent: 'node',
+}
+
+var pdfreader = require('pdfreader');
+
 // Lemmatizer module initialization
 const Morphy = require('phpmorphy').default;
 
@@ -1241,10 +1252,12 @@ exports.submit = function(req, res,  next) {
 
         console.log(req.files);
 
+        console.log(req.files.uploadedFile.type);
+
         var process_type = 'classes';
 
         // Is the file uploaded and is it a text / html one?
-        if (req.files && (req.files.uploadedFile.type == 'text/html' || req.files.uploadedFile.type == 'text/plain') ) {
+        if (req.files && (req.files.uploadedFile.type == 'text/html' || req.files.uploadedFile.type == 'text/plain' || req.files.uploadedFile.type == 'application/pdf') ) {
 
             // Import parameters
             var titlefield = '';
@@ -1261,15 +1274,26 @@ exports.submit = function(req, res,  next) {
                 processfield = '.' + req.body.processfield;
             }
 
+            var filecontents = ''
             // Read that file
+
+
+
             fs.readFile(req.files.uploadedFile.path, function (err, data) {
                 if (err) throw err;
 
-                // data will contain your file contents
-                var filecontents = data.toString('utf8');
+                if ( req.files.uploadedFile.type != 'application/pdf') {
+                  filecontents = data.toString('utf8');
+               }
+               else {
+                  filecontents = data;
+               }
+
+
 
                 // Load DIVs in the file contents
                 var $ = cheerio.load(filecontents);
+
 
                 // Now step by step...
                 async.waterfall([
@@ -1283,6 +1307,7 @@ exports.submit = function(req, res,  next) {
 
                         if (titlefield && $(titlefield).length) {
                             $(titlefield).each(function (index) {
+
 
                                 // Get the book names
                                 var bookname = $(this).text();
@@ -1337,8 +1362,9 @@ exports.submit = function(req, res,  next) {
                             callback(null,contexts);
                         }
                         // TODO or PDF
-                        else if (req.files.uploadedFile.type == 'text/plain') {
+                        else if (req.files.uploadedFile.type == 'text/plain' || req.files.uploadedFile.type == 'application/pdf') {
                           process_type = 'book';
+                          console.log('processing book');
                           callback(null,contexts);
                         }
 
@@ -1361,12 +1387,15 @@ exports.submit = function(req, res,  next) {
                     else {
 
                         // Separate Amazon highlights file into blocks by the books
-                        var books = filecontents.split("bookMain yourHighlightsHeader");
 
-                        var numHighlights = 0;
 
                         if (process_type != 'book') {
+
                           console.log("Processing file by classes");
+                          var books = filecontents.split("bookMain yourHighlightsHeader");
+
+                          var numHighlights = 0;
+
                         for (var i = 0; i < books.length; i++) {
 
                             var current_book = books[i];
@@ -1418,7 +1447,11 @@ exports.submit = function(req, res,  next) {
 
                         }
                         }
+                        // if it's a book
                         else {
+
+
+
                           console.log("Processing file as a whole");
                             var bookname = '';
                             bookname = importContext;
@@ -1436,7 +1469,33 @@ exports.submit = function(req, res,  next) {
                                      }
                                 }
 
-                                saveFileAtOnce(filecontents, addingcontexts);
+                                if (req.files.uploadedFile.type == 'application/pdf') {
+                                  //PDF cases
+                                  var PDFtextfull = '';
+                                  new pdfreader.PdfReader().parseBuffer(filecontents, function(err, item){
+                                    if (err)
+                                      callback(err);
+                                    else if (!item) {
+
+                                      saveFileAtOnce(PDFtextfull, addingcontexts);
+
+                                      callback();
+
+                                      }
+                                    else if (item.text) {
+                                      PDFtextfull += item.text + ' \r\n';
+
+                                      }
+                                  });
+
+                                }
+                                else {
+
+                                  saveFileAtOnce(filecontents, addingcontexts);
+
+                                  }
+
+
 
 
 
@@ -1457,7 +1516,7 @@ exports.submit = function(req, res,  next) {
                                     },
 
                                     contextids: contexts,
-                                    internal: 1
+                                    internal: 1,
                                 };
 
 
@@ -1488,6 +1547,8 @@ exports.submit = function(req, res,  next) {
 
 
                         }
+
+
 
 
 

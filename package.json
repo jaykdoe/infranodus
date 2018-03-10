@@ -23,6 +23,7 @@
     "node-uuid": "^1.4.8",
     "passport": "^0.4.0",
     "passport-local": "^1.0.0",
+    "pdfreader": "^0.2.4",
     "phantom": "^4.0.12",
     "phpmorphy": "^2.0.13",
     "send": "^0.16.2",

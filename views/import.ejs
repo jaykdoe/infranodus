@@ -113,12 +113,7 @@
 
                 </div>
 
-                <div id="googlesearch">
-                    <label for="extractfilter" class="pure-checkbox">
-                        <input id="extractfilter" type="checkbox" name="excludesearchquery" value="1" checked> exclude search terms from the graph<br>
-                    </label>
-                    <br><br>
-                </div>
+            
 
 
                 <div id="searchtermbox">
@@ -152,7 +147,7 @@
                     <input type="file" name="uploadedFile" />
 <br>&nbsp;<br>
                     <label for="file1" class="pure-radio">
-                        <input id="file1" type="radio" name="filetype" value="amazon" checked>
+                        <input id="file1" type="radio" name="filetype" value="amazon">
                         import Amazon Kindle Highlights (<a href="/images/amazon-import.jpg" target="_blank">help</a>)
                     </label>
 
@@ -162,24 +157,23 @@
                     </label>
 
                     <label for="file3" class="pure-radio">
-                        <input id="file3" type="radio" name="filetype" value="other">
-                        other filetype
+                        <input id="file3" type="radio" name="filetype" value="other" checked>
+                        other filetype: PDF, TXT
+                        <br>max 90Kb of text,<a href="https://noduslabs.com/contact/">contact us</a> for longer)
                     </label>
                     <br>
-                    <label for="titlefield" class="pure-radio">
+                    <label for="titlefield" class="pure-radio" id="titlefieldcaption">
                         Separate into contexts based on html class<br>
                         or leave empty to import everything in one.
-                        <input type="text" name="titlefield" id="titlefield" readonly="true" value="title"/>
+                        <input type="text" name="titlefield" id="titlefield" readonly="false" value=""/>
                     </label>
                     <br>
-                    <label for="processfield" class="pure-radio">
+                    <label for="processfield" class="pure-radio" id="processfieldcaption">
                         Statements to import are in the class
-                        <input type="text" name="processfield" id="processfield" readonly="true" value="highlight"/>
+                        <input type="text" name="processfield" id="processfield" readonly="false" value=""/>
                     </label>
 
                 </div>
-
-
 
                 <div id="limitgkg" style="display: none">
                     <br>
@@ -313,6 +307,10 @@
             var filebox = $("#filebox");
             $("#googlesearch").hide();
 
+            $("#processfield").hide();
+            $("#processfieldcaption").hide();
+            $("#titlefield").hide();
+            $("#titlefieldcaption").hide();
 
         radioButtons.change(function () {
                 if( $(this).val() === "email" ) { // this time, we do need to check the value
@@ -335,6 +333,7 @@
                     $("#extracttwitter").hide();
                     $("#importsettings").hide();
                     $("#googlesearch").hide();
+                      $("#emailbox").hide();
 
                 }
                 else if ($(this).val() === "evernote") {
@@ -409,25 +408,37 @@
         // Later we can add more functions here
         radioButtons3.change(function () {
             if ($(this).val() === "zettel") {
+              $("#processfield").show();
+              $("#titlefield").show();
+              $("#processfieldcaption").show();
+
+              $("#titlefieldcaption").show();
                 $("#processfield").val('zettelcontent');
                 $("#titlefield").val('');
-                $("#processfield").prop("readonly",true);
-                $("#titlefield").prop("readonly",true);
+
             }
             else if ($(this).val() === "amazon")
             {
+              $("#processfield").show();
+              $("#titlefield").show();
+              $("#processfieldcaption").show();
+
+              $("#titlefieldcaption").show();
                 $("#processfield").val('highlight');
                 $("#titlefield").val('title');
-                $("#processfield").prop("readonly",true);
-                $("#titlefield").prop("readonly",true);
+
 
             }
             else if ($(this).val() === "other")
             {
+              $("#processfield").hide();
+              $("#titlefield").hide();
+              $("#processfieldcaption").hide();
+
+              $("#titlefieldcaption").hide();
                 $("#processfield").val('');
                 $("#titlefield").val('');
-                $("#processfield").prop("readonly",false);
-                $("#titlefield").prop("readonly",false);
+
             }
         });
 
