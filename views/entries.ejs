@@ -1378,6 +1378,8 @@ sigma.parsers.json(
 
                     sigma.startForceAtlas2(forceatlas_options);
 
+                    communityDetect();
+
                     // Don't run it forever not to overheat :)
 
                     setTimeout(function() {
@@ -2327,7 +2329,7 @@ sigma.parsers.json(
       sigma.instances(0).graph.edges().forEach(function(e) {
           edge_data.push({source: e.source, target: e.target});
       });
-
+      if (node_data.length > 0 && edge_data.length > 0) {
       var community = jLouvain().nodes(node_data).edges(edge_data);
 
       var community_assignment_result = community();
@@ -2365,31 +2367,42 @@ sigma.parsers.json(
          }
 
          topp_communities = _.sortBy(topp_communities,'length').reverse();
-         console.log(topp_communities);
+      //   console.log(topp_communities);
 
-         var advice_iterations = 3;
+
+         var advice_iterations = 2;
          if (topp_communities.length < advice_iterations) {
            advice_iterations = topp_communities.length;
          }
 
          topp_communities = _.first(topp_communities,advice_iterations);
 
+         var toppp_communities = [];
          for (var j = 0; j < topp_communities.length; j++) {
-           topp_communities[j] = _.first(_.sortBy(topp_communities[j].nodes,'degree').reverse(),advice_iterations);
+           topp_communities[j].nodes = _.first(_.sortBy(topp_communities[j].nodes,'degree').reverse(),3);
          }
-         console.log(topp_communities);
 
-         var analytics = 'main topics in text<br>';
+      //   console.log(topp_communities);
+
+         var top_nodes = [];
+
+
+         var analytics = 'next idea tip: what is the relation between "';
          for (var j = 0; j < topp_communities.length; j++) {
-            analytics += '' + (j+1) + ': ';
-            for (var n = 0; n < topp_communities[j].length; n++) {
-                analytics += topp_communities[j][n].name +' - '
+
+            for (var n = 0; n < topp_communities[j].nodes.length; n++) {
+                analytics += topp_communities[j].nodes[n].name +'-'
+                top_nodes.push(topp_communities[j].nodes[n].name);
             }
-            analytics = analytics.slice(0, -3);
-            analytics += '<br>'
+            analytics = analytics.slice(0, -1);
+            analytics += '"<br> and "'
          }
+
+         analytics = analytics.slice(0, -10);
+         analytics += ''
 
          $('#analytics').html(analytics)
+
 
 
 
@@ -2400,18 +2413,47 @@ sigma.parsers.json(
     //  var palette = new DistinctColors({count: max_community_number + 1, lightMin: 8, lightMax: 100, chromaMin: 4, chromaMax: 7});
 
     // subdued chromo
-      var palette = new DistinctColors({count: max_community_number + 1, lightMin: 40, lightMax: 60, chromaMin: 0, chromaMax: 4});
+      var palette = new DistinctColors({count: max_community_number + 1, lightMin: 40, lightMax: 60, chromaMin: 2, chromaMax: 8});
 
 
+      var s_x = 0;
+      var s_y = 0;
+      var e_x = 0;
+      var e_y = 0;
+
+
+    //  console.log(sigma.instances(0).graph.nodes()[54]);
       sigma.instances(0).graph.nodes().forEach(function(n) {
+        if (top_nodes.indexOf(n.originalLabel) != -1) {
+          if (n.community == topp_communities[0].id) {
+          //  console.log(n.originalLabel + ' ' + n.x);
+              s_x += n.x;
+              s_y += n.y;
+            //  console.log(s_x)
+          }
 
+          if (n.community == topp_communities[1].id) {
+            e_x += n.x;
+            e_y += n.y;
+
+
+          }
+        }
         n.originalColor = rgbToHex(palette[n.community]._rgb[0],palette[n.community]._rgb[1],palette[n.community]._rgb[2]);
         n.color = rgbToHex(palette[n.community]._rgb[0],palette[n.community]._rgb[1],palette[n.community]._rgb[2]);
+
       });
+
+
 
      sigma.instances(0).refresh;
 
+
+
+
      //console.log(top_communities);
+  //   console.log(sigma.instances(0).graph.nodes());
+}
 
 
 

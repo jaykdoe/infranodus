@@ -390,13 +390,13 @@ a:hover.app-more-link {
 
 #analytics {
     position: fixed;
-    bottom: 50px;
-    font-size: 10px;
-    line-height: 14px;
+    bottom: 60px;
+    font-size: 13px;
+    line-height: 15px;
     text-align: right;
     right: 0;
     /*background-color: rgba(250, 250, 250, 0.9);*/
-    width: 200px;
+    width: 240px;
     border-radius: 8px;
     padding: 10px;
     margin-right: 0px;
