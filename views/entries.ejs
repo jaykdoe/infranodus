@@ -226,6 +226,9 @@
 <script src="/javascripts/sigma/plugins/sigma.layout.forceAtlas2.min.js"></script>
 <script src="/javascripts/sigma/plugins/sigma.plugins.animate.min.js"></script>
 <script src="/javascripts/sigma/plugins/sigma.plugins.dragNodes.min.js"></script>
+<script src="/javascripts/sigma/plugins/jLouvain.js"></script>
+<script src="/javascripts/sigma/plugins/distinct-colors.min.js"></script>
+<script src="/javascripts/sigma/plugins/randomColor.min.js"></script>
 <script src="/javascripts/jquery-ui.min.js"></script>
 <script src="/javascripts/string.min.js"></script>
 <script src="/javascripts/underscore-min.js"></script>
@@ -1002,6 +1005,7 @@ sigma.parsers.json(
             setTimeout(function() {
                 sigma.stopForceAtlas2();
                 sigma.killForceAtlas2();
+
             },timeout);
 
 
@@ -1009,6 +1013,9 @@ sigma.parsers.json(
 
             dragNodes();
 
+            // Community
+
+            communityDetect();
 
             // When a node is clicked, we check for each node
             // if it is a neighbor of the clicked one. If not,
@@ -1470,6 +1477,8 @@ sigma.parsers.json(
             delay: 1000
 
         });
+
+
 
         var privacyform = '';
 
@@ -2303,6 +2312,61 @@ sigma.parsers.json(
       dragListener.bind('dragend', function(event) {
 
       });
+    }
+
+
+    function communityDetect () {
+
+      var node_data = [];
+      sigma.instances(0).graph.nodes().forEach(function(n) {
+          node_data.push(n.id);
+      });
+
+
+      var edge_data = [];
+      sigma.instances(0).graph.edges().forEach(function(e) {
+          edge_data.push({source: e.source, target: e.target});
+      });
+
+      var community = jLouvain().nodes(node_data).edges(edge_data);
+
+      var community_assignment_result = community();
+      var node_ids = Object.keys(community_assignment_result);
+
+      console.log('Resulting Community Data', community_assignment_result);
+
+      var max_community_number = 0;
+
+      sigma.instances(0).graph.nodes().forEach(function(n) {
+        n.community = community_assignment_result[n.id];
+        max_community_number = max_community_number < community_assignment_result[n.id] ? community_assignment_result[n.id]: max_community_number;
+      });
+
+      console.log(max_community_number);
+
+      var palette = new DistinctColors({count: max_community_number + 1, lightMin: 70, chromaMin: 60, samples: 100});
+
+
+      sigma.instances(0).graph.nodes().forEach(function(n) {
+        n.originalColor = rgbToHex(palette[n.community]._rgb[0],palette[n.community]._rgb[1],palette[n.community]._rgb[2]);
+        n.color = rgbToHex(palette[n.community]._rgb[0],palette[n.community]._rgb[1],palette[n.community]._rgb[2]);
+      });
+
+     sigma.instances(0).refresh;
+
+
+      function componentToHex(c) {
+          var hex = c.toString(16);
+          return hex.length == 1 ? "0" + hex : hex;
+      }
+
+      function rgbToHex(r, g, b) {
+          return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+      }
+
+
+
+
     }
 
 
