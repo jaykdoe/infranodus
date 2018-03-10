@@ -148,9 +148,9 @@ exports.submit = function(req, res, next){
     if (req.multiple) {
       for (var key in req.body.entry.body) {
           if (req.body.entry.body.hasOwnProperty(key)) {
-                splitStatements.push(req.body.entry.body[key]);
+                splitStatements.push(req.body.entry.body[key].substr(0, max_length);
                 // Let's count how many symbols the whole set has
-                currenttextlength += req.body.entry.body[key].length;
+                currenttextlength += req.body.entry.body[key].substr(0, max_length).length;
           }
       }
     }
