@@ -41,7 +41,10 @@ exports.settings = {
     max_nodes: 150,
 
     // Default voice to text input Language
-    inlanguage: "en"
+    inlanguage: "en",
+
+    // Default color palette of the graph
+    palette: "mono"
 
 
 }

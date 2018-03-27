@@ -34,7 +34,7 @@
                     <legend>settings for user <i><%= user.name %></i></legend>
                     <br>
 
-                    Text input language 
+                    Text input language
                     <label for="inlanguage" class="pure-input">
                       <select id="inlanguage" name="inlanguage">
                       <option value="en" <% if (user.inlanguage=='en' || user.inlanguage == undefined) { %> selected <% } %>>English (auto)</option>
@@ -73,6 +73,15 @@
                     <label for="graph-view" class="pure-radio">
                         <input type="text" id="graph-view" size="4" maxlength="4" class="pure-input" name="maxnodes" placeholder="" value="<% if (!user.maxnodes) { %>100<% } else { %><%=user.maxnodes%><% } %>">
                         max number of nodes
+                    </label>
+                    <br>
+
+                    Graph color palette
+                    <label for="palette" class="pure-input">
+                      <select id="palette" name="palette">
+                      <option value="mono" <% if (user.palette=='mono' || user.palette == undefined) { %> selected <% } %>>Monochrome</option>
+                      <option value="color" <% if (user.palette=='color') { %> selected <% } %>>Color</option>
+                      </select>
                     </label>
                     <br>
 

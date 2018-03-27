@@ -44,6 +44,8 @@ exports.modify = function(req, res) {
 
     var inlanguage = req.body.inlanguage;
 
+    var palette = req.body.palette;
+
     var stopwords = req.body.stopwords;
 
     if (isInt(req.body.maxnodes)) {
@@ -54,7 +56,7 @@ exports.modify = function(req, res) {
         return !isNaN(value) && (function(x) { return (x | 0) === x; })(parseFloat(value))
     }
 
-    User.modifySettings(user_id, fullscan, fullview, morphemes, hashnodes, maxnodes, inlanguage, stopwords, function (err, answer) {
+    User.modifySettings(user_id, fullscan, fullview, morphemes, hashnodes, maxnodes, inlanguage, palette, stopwords, function (err, answer) {
 
         // Error? Go back and display it.
 

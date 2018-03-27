@@ -311,6 +311,8 @@
 
     var walkthrough = getUrlVars()["walkthrough"];
 
+    var graphPalette = getUrlVars()["palette"];
+
     if (go_next_url) {
         if ((go_next_url.substr(go_next_url.length - 1) == 's' || go_next_url.substr(go_next_url.length - 6) == 'search' || go_next_url.substr(go_next_url.length - 5) == 'query')) {
            go_next_url = go_next_url + '=';
@@ -452,6 +454,9 @@ var forceatlas_options = {worker: false, startingIterations: 100, scalingRatio: 
 
 <% if (locals.user) { %>
 var inlanguage = '<%= user.inlanguage %>';
+if (!graphPalette) {
+ graphPalette = '<%= user.palette %>';
+}
 <% } %>
 
 // If the user opened a URL with collaborate=xxxxxx then they join the room that's the "url_path/xxxxxx"
@@ -1234,7 +1239,7 @@ sigma.parsers.json(
                     <% } %>
 
                     // TODO make it possible that those statements get submitted in both graphs
-                
+
                     // So the user who posted is not the same who's receiving? then submit the form. If the sender didnt have the mute option
                     if ((receivedby != msg.postedby) && !msg.mute) {
 
@@ -2415,14 +2420,16 @@ sigma.parsers.json(
 
 
     // nice color palette
-    //  var palette = new DistinctColors({count: max_community_number + 1, lightMin: 70, chromaMin: 60, samples: 100});
-
+    if (graphPalette == 'color') {
+        var palette = new DistinctColors({count: max_community_number + 1, lightMin: 70, chromaMin: 60, samples: 100});
+    }
     // good chromo
     //  var palette = new DistinctColors({count: max_community_number + 1, lightMin: 8, lightMax: 100, chromaMin: 4, chromaMax: 7});
 
     // subdued chromo
+    else {
       var palette = new DistinctColors({count: max_community_number + 1, lightMin: 40, lightMax: 60, chromaMin: 2, chromaMax: 8});
-
+    }
 
       var s_x = 0;
       var s_y = 0;
