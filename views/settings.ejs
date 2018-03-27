@@ -34,10 +34,10 @@
                     <legend>settings for user <i><%= user.name %></i></legend>
                     <br>
 
-                    Voice to Text Input Language (Chrome Only)
+                    Text input language 
                     <label for="inlanguage" class="pure-input">
                       <select id="inlanguage" name="inlanguage">
-                      <option value="en" <% if (user.inlanguage=='en' || user.inlanguage == undefined) { %> selected <% } %>>English</option>
+                      <option value="en" <% if (user.inlanguage=='en' || user.inlanguage == undefined) { %> selected <% } %>>English (auto)</option>
                       <option value="ru" <% if (user.inlanguage=='ru') { %> selected <% } %>>Russian</option>
                       <option value="fr" <% if (user.inlanguage=='fr') { %> selected <% } %>>French</option>
                       <option value="de" <% if (user.inlanguage=='de') { %> selected <% } %>>German</option>
