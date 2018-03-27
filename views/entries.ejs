@@ -449,11 +449,18 @@ var collaborate_storage = JSON.parse(localStorage.getItem("collaborate"));
 
 var sigma_dragged = 0;
 
+// default label threshold
+var in_label_threshold = 8;
+
 // TODO for desktop browses that support webwork (not iphone): webworker: true, slowdown: 300
 var forceatlas_options = {worker: false, startingIterations: 100, scalingRatio: 0.1, slowDown: 100, strongGravityMode: true};
 
 <% if (locals.user) { %>
 var inlanguage = '<%= user.inlanguage %>';
+
+<% if (locals.user.label_threshold) { %>
+in_label_threshold = '<%= user.label_threshold %>';
+<% } %>
 if (!graphPalette) {
  graphPalette = '<%= user.palette %>';
 }
@@ -755,7 +762,7 @@ sigma.parsers.json(
                 maxNodeSize: 16,
                 minEdgeSize: 0.5,
                 maxEdgeSize: 2,
-                labelThreshold: 8
+                labelThreshold: in_label_threshold
             }
         },
         function(sigma) {

@@ -46,6 +46,8 @@ exports.modify = function(req, res) {
 
     var palette = req.body.palette;
 
+    var label_threshold = req.body.label_threshold;
+
     var stopwords = req.body.stopwords;
 
     if (isInt(req.body.maxnodes)) {
@@ -56,7 +58,7 @@ exports.modify = function(req, res) {
         return !isNaN(value) && (function(x) { return (x | 0) === x; })(parseFloat(value))
     }
 
-    User.modifySettings(user_id, fullscan, fullview, morphemes, hashnodes, maxnodes, inlanguage, palette, stopwords, function (err, answer) {
+    User.modifySettings(user_id, fullscan, fullview, morphemes, hashnodes, maxnodes, inlanguage, palette, label_threshold, stopwords, function (err, answer) {
 
         // Error? Go back and display it.
 

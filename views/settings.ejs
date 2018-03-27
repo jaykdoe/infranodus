@@ -85,6 +85,15 @@
                     </label>
                     <br>
 
+                    Show node labels
+                    <label for="label_threshold" class="pure-input">
+                      <select id="label_threshold" name="label_threshold">
+                      <option value="8" <% if (user.label_threshold=='8' || user.label_threshold == undefined) { %> selected <% } %>>For big nodes only</option>
+                      <option value="0" <% if (user.label_threshold=='0') { %> selected <% } %>>For all nodes</option>
+                      </select>
+                    </label>
+                    <br>
+
                     Visualize in the graph
                     <label for="hashnodes1" class="pure-radio">
                         <input id="hashnodes1" type="radio" name="hashnodes" value="0" <% if (user.hashnodes=='0') { %> checked <% } %>>

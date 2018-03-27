@@ -40,6 +40,9 @@ exports.settings = {
     // Max nodes to show in a graph
     max_nodes: 150,
 
+    // What's the node size threshold where we show its name
+    label_threshold: 8,
+
     // Default voice to text input Language
     inlanguage: "en",
 
