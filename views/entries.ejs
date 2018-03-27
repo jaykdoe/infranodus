@@ -591,7 +591,6 @@ function submitFormProcess() {
 
         e.preventDefault();
 
-
         $('#statement').addClass('loading');
 
         $('#submitbutton').attr('disabled', 'disabled');
@@ -1208,12 +1207,19 @@ sigma.parsers.json(
 
             socket.on('chat message', function(msg){
 
+                var perceivedby = '';
+
+                <% if (receivername) { %>
+                   perceivedby = '<%= receivername %>';
+                <% } %>
+
                 var posted_by = msg.postedby;
 
                 var added_entry =  "<div class='entry' style='display: none;' data-uid='" + msg.entryuid + "'><p class='entry-text'>" + msg.entrytext + "</p><p class='entry-date'>by " + posted_by + " at " + moment().format('hh:mm:ss') + "</p><div class='separator'>&nbsp;</div><div id='" + msg.entryuid + "' class='hidden'></div></div>";
 
-                if (!selfPosted) {
-
+                // if the message is not self-posted and also if the poster of the message is not the same as the guy logged in (in case there's two logins simultaneously)
+                if (!selfPosted && perceivedby != posted_by) {
+                    // add the alien class so the posted message looks like it's from elsewhere
                     added_entry =  "<div class='entry alien' style='display: none; margin-left: 50px' data-uid='" + msg.entryuid + "'><p class='entry-text gray'>" + msg.entrytext + "</p><p class='entry-date gray'>by " + posted_by + " at " + moment().format('hh:mm:ss') + "</p><div class='separator'>&nbsp;</div><div id='" + msg.entryuid + "' class='hidden'></div></div>";
 
                     if (msg.help) {
@@ -1226,8 +1232,9 @@ sigma.parsers.json(
                      <% if (perceivername) { %>
                         receivedby = '<%= perceivername %>';
                     <% } %>
-                    // TODO make it possible that those statements get submitted in both graphs
 
+                    // TODO make it possible that those statements get submitted in both graphs
+                
                     // So the user who posted is not the same who's receiving? then submit the form. If the sender didnt have the mute option
                     if ((receivedby != msg.postedby) && !msg.mute) {
 
