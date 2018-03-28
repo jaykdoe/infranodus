@@ -113,7 +113,7 @@
 
                 </div>
 
-            
+
 
 
                 <div id="searchtermbox">
@@ -445,6 +445,26 @@
 
 
     })();
+    $("#addNewContext").on('tap', function(e) {
+
+        $("#addcontextinput").css("visibility", "visible");
+        $("#add").css("visibility", "visible");
+        $("#addcontextname").focus();
+
+
+    });
+
+    $('#addcontextinput').submit(function(e) {
+        e.preventDefault(); // to stop the form from submitting
+        if ($('#addcontextname').val().length > 0) {
+            var contextredirect = $('#addcontextname').val();
+            contextredirect = contextredirect.replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+            contextredirect = contextredirect.replace(/[^\w]/gi, '');
+            window.location.href = "/<%= user.name %>/" + contextredirect + '/edit';
+        }
+
+    });
+
 </script>
 
 

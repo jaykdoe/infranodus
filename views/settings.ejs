@@ -6,6 +6,9 @@
     <title><%= title %></title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <link rel="stylesheet" href="/stylesheets/side-menu.css">
+    <link rel='stylesheet' href='/stylesheets/jquery.textcomplete.css' />
+    <link rel="stylesheet" href="/stylesheets/side-menu.css">
+    <link rel="stylesheet" href="/stylesheets/jquery-ui.min.css">
 
 </head>
 <body>
@@ -151,8 +154,36 @@
     </div>
 </div>
 
+<script src="/javascripts/jquery.min.js"></script>
+<script src="/javascripts/jquery-ui.min.js"></script>
+<script src="/javascripts/string.min.js"></script>
+<script src="/javascripts/underscore-min.js"></script>
+<script src="/javascripts/jquery.textcomplete.js"></script>
+<script src='/javascripts/jquery.autosize.js'></script>
 <script src="/javascripts/ui.js"></script>
+<script src="/javascripts/jquery.mobile-events.min.js"></script>
 
+<script>
+$("#addNewContext").on('tap', function(e) {
+
+    $("#addcontextinput").css("visibility", "visible");
+    $("#add").css("visibility", "visible");
+    $("#addcontextname").focus();
+
+
+});
+
+$('#addcontextinput').submit(function(e) {
+    e.preventDefault(); // to stop the form from submitting
+    if ($('#addcontextname').val().length > 0) {
+        var contextredirect = $('#addcontextname').val();
+        contextredirect = contextredirect.replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+        contextredirect = contextredirect.replace(/[^\w]/gi, '');
+        window.location.href = "/<%= user.name %>/" + contextredirect + '/edit';
+    }
+
+});
+</script>
 
 
 <% include statsbelow %>
