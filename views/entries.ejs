@@ -345,7 +345,7 @@
 // MAIN SETTINGS START
 
 // Create node ID - Name index for filtering
-var nodeIDs = [];
+var nodeIDs = {};
 
 // What are the concepts displayed - the opposite of above
 var nodeNames = [];
@@ -879,9 +879,8 @@ sigma.parsers.json(
                 n.originalLabel = n.label;
 
                 // Creating an index of node labels to IDs for filtering
-                nodeIDs[n.label] = n.id;
-
-                //console.log(n);
+                var key = n.label;
+                nodeIDs[key] = n.id;
 
             });
 
@@ -3492,7 +3491,7 @@ sigma.parsers.json(
         }
 
         <% if (!perceivername) { %>
-            addNewContext = '<li id="addNewContext" class="menu-item-divided"><a id="addcontextbutton" href="javascript:"> + new context</a>&nbsp;<form action="/post" method="GET" class="pure-form" id="addcontextinput"><input type="text" id="addcontextname" size="7" class="pure-input"></form></li>';
+            addNewContext = '<li id="addNewContext" class="menu-item-divided"><a id="addcontextbutton" href="javascript:"> + new context&nbsp;&nbsp;</a>&nbsp;<form action="/post" method="GET" class="pure-form" id="addcontextinput"><input type="text" id="addcontextname" size="7" class="pure-input"></form></li>';
         <% } else { %>
             addNewContext = '<li class="menu-item-divided">&nbsp;<a href="javascript:"></a></li>';
 
