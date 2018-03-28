@@ -103,6 +103,13 @@
 
     <script type="text/javascript" src="/javascripts/jquery.fullPage.js"></script>
     <script type="text/javascript">
+
+        var ref = getUrlVars['ref'];
+
+        if (ref == 'im') {
+          window.location = 'https://infranodus.com/infranodus/feedbackemail';
+        }
+
         $(document).ready(function() {
             $('#fullpage').fullpage({
                 anchors: ['home', 'features', 'usecases', 'graphs', 'about'],
