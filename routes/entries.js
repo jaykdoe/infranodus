@@ -37,9 +37,16 @@ exports.list = function(req, res, next){
 
     var contextpublic = null;
 
+    var contextslist = [];
+
     // We checked the context using validate.getContextPrivacy() function and got the variable for it
     if (res.locals.contextpublic) {
         contextpublic = res.locals.contextpublic;
+    }
+
+    // Did we get a list of all the contexts for this user / entries list?
+    if (res.locals.contextslist) {
+        contextslist = res.locals.contextslist;
     }
 
     // If the user is logged in then we know the ID and the name of the user who is viewing
@@ -58,7 +65,7 @@ exports.list = function(req, res, next){
     }
 
 
-    console.log('wtf');
+    console.log('Receiver / Perceiver');
     console.log(receiver);
     console.log(perceiver);
     // Let's see what context the user wants to view if there is one
@@ -92,7 +99,8 @@ exports.list = function(req, res, next){
                 contexts[s] = '';
             }
         }
-
+        console.log(contextslist);
+        console.log(entries);
         res.render('entries', {
             title: 'InfraNodus: Polysingularity Thinking Tool',
             entries: entries,
@@ -101,6 +109,7 @@ exports.list = function(req, res, next){
             perceivername: perceivername,
             receivername: receivername,
             contextpublic: contextpublic,
+            contextlist: contextslist,
             showcontexts: req.query.showcontexts,
             background: req.query.background,
             maxnodes: req.query.maxnodes,

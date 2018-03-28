@@ -160,7 +160,7 @@
                 <form action='/post' name='submitform' id="submitform" method='post' class='pure-form'>
 
                         <textarea columns="40" rows="4" name='entry[body]' id="statement" placeholder='type in some words or #hashtags to see how they connect'><% if (url) { %><%= urltitle %> <%= url %><% } %></textarea>
-                        <div id="addToContextsLabel">sets:</div>
+                        <div id="addToContextsLabel">contexts:</div>
                         <ul id="addToContexts"></ul>
                         <input type="hidden" id="addedContexts" name="addedContexts">
                         <input type="hidden" id="context" name="context" value="<%= context %>">
@@ -891,7 +891,21 @@ sigma.parsers.json(
 
 
             // Get the context names - all the contexts that exist in the graph we just loaded
-            contextNames = _.keys(contextNodeID);
+
+            <% if (contextlist.length > 0) { %>
+            <% contextlist.forEach(function(contextlabel) { %>
+
+              contextNames.push("<%= contextlabel %>");
+
+            <% }); %>
+
+            <% } else { %>
+
+              contextNames = _.keys(contextNodeID);
+
+            <% } %>
+
+            console.log(contextNames);
 
 
 
@@ -3399,11 +3413,11 @@ sigma.parsers.json(
 
         <% if (perceivername) { %>
 
-            currentContextURL = '<li id="listall" class="menu-item-divided pure-menu-selected"><a href="/<%= perceivername %>">all sets</a></li>';
+            currentContextURL = '<li id="listall" class="menu-item-divided pure-menu-selected"><a href="/<%= perceivername %>">all contexts</a></li>';
 
         <% } else { %>
 
-            currentContextURL = '<li id="listall" class="menu-item-divided pure-menu-selected"><a href="/<%= user.name %>/edit">all sets</a></li>';
+            currentContextURL = '<li id="listall" class="menu-item-divided pure-menu-selected"><a href="/<%= user.name %>/edit">all contexts</a></li>';
 
         <% } %>
 
@@ -3418,10 +3432,10 @@ sigma.parsers.json(
                     // for the menu
                     <% if (perceivername) { %>
                         context_filters += '<li class="app-context-link menu-item-divided pure-menu-selected"><a href="/<%= perceivername %>/' + n + '">' + n + '</a></li>';
-                        currentContextURL = '<li id="listall" class="menu-item-divided"><a href="/<%= perceivername %>">all sets</a></li>';
+                        currentContextURL = '<li id="listall" class="menu-item-divided"><a href="/<%= perceivername %>">all contexts</a></li>';
                     <% } else { %>
                         context_filters += '<li class="app-context-link menu-item-divided pure-menu-selected"><a href="/<%= user.name %>/' + n + '/edit">' + n + '</a></li>';
-                        currentContextURL = '<li id="listall" class="menu-item-divided"><a href="/<%= user.name %>/edit">all sets</a></li>';
+                        currentContextURL = '<li id="listall" class="menu-item-divided"><a href="/<%= user.name %>/edit">all contexts</a></li>';
                     <% } %>
 
                 }

@@ -149,9 +149,9 @@ app.get('/evernote_clear', oauths.clear);
 
 // From here we declare all the dynamic paths at the first level of the content tree
 
-app.get('/:user/edit', pass.ensureAuthenticated, entries.list);
-app.get('/:user/:context?/edit', pass.ensureAuthenticated, validate.getContextPrivacy(), entries.list);
-app.get('/:user/:context?', pass.checkUser, validate.getUserID(), validate.getContextPrivacy(), entries.list);
+app.get('/:user/edit', pass.ensureAuthenticated, validate.getContextsList(), entries.list);
+app.get('/:user/:context?/edit', pass.ensureAuthenticated, validate.getContextPrivacy(), validate.getContextsList(), entries.list);
+app.get('/:user/:context?', pass.checkUser, validate.getUserID(), validate.getContextPrivacy(), validate.getContextsList("public"), entries.list);
 app.get('/', main.render);
 
 

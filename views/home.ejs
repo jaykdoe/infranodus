@@ -104,20 +104,21 @@
     <script type="text/javascript" src="/javascripts/jquery.fullPage.js"></script>
     <script type="text/javascript">
 
-    function getUrlVars()
-            {
-                var vars = [], hash;
-                var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
-                for(var i = 0; i < hashes.length; i++)
+        function getUrlVars()
                 {
-                    hash = hashes[i].split('=');
-                    vars.push(hash[0]);
-                    vars[hash[0]] = hash[1];
+                    var vars = [], hash;
+                    var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+                    for(var i = 0; i < hashes.length; i++)
+                    {
+                        hash = hashes[i].split('=');
+                        vars.push(hash[0]);
+                        vars[hash[0]] = hash[1];
+                    }
+                    return vars;
                 }
-                return vars;
-            }
+
         var ref = getUrlVars()['ref'];
-        
+
         if (ref == 'im') {
           window.location = 'https://infranodus.com/infranodus/feedbackemail';
         }
@@ -346,7 +347,7 @@
         <canvas id="network-canvas" height="100%" width="100vh"></canvas>
         <div class="ontop">
             <h1>InfraNodus</h1>
-            <p>Create text netwok visualizations to store, develop and connect your ideas.</p>
+            <p>Create text network visualizations to store, develop and connect your ideas.</p>
             <ul class="submenu">
             <li><a href="/login">Login</a></li>
             <li><a href="/signup">Sign Up</a></li>
@@ -655,9 +656,10 @@
     <div class="section" id="section4">
         <div class="slide">
             <div class="intro">
-                <p>InfraNodus converts texts, notes, ideas into a network constellation, so you can make sense of your knowledge and stimulate your imagination.</p>
+                <p>InfraNodus visualizes texts, notes, and ideas as a network, so you can make sense of your knowledge and stimulate your imagination.</p>
                <br>
-                <p class="smallcaption">Created by agent Paranyushkin / <a href="http://www.noduslabs.com" target="_blank">Nodus Labs</a>
+                <p class="smallcaption">Created by <a href="https://scholar.google.com/citations?user=7fyleFwAAAAJ">Dmitry Paranyushkin</a> / <a href="http://www.noduslabs.com">Nodus Labs</a>.<br>
+                  Read the <a href="https://scholar.google.com/citations?user=7fyleFwAAAAJ">research papers</a> our text-to-network algorithm is based on.
                 </p>
 
             </div>
@@ -665,7 +667,7 @@
         <div class="slide">
             <div class="intro">
                 <p class="smallcaption">This free open-source tool is developed by <a href="http://www.noduslabs.com" target="_blank">Nodus Labs</a> (@noduslabs). Contact us to get an <a href="http://noduslabs.com/features/invite/" target="_blank">invitation code</a> to use this online version or install it on your computer from <a href="http://github.com/noduslabs/infranodus" target="_blank">GitHub</a>.<br>
-                    <br>InfraNodus runs on <a href="http://www.neo4j.org" target="_blank" rel="nofollow">Neo4J</a> graph database, <a href="http://www.sigmajs.org" target="_blank" rel="nofollow">Sigma.Js</a> graph visualization library, Node.Js and uses <a href="http://www.textexture.com" target="_blank">Textexture text network analysis algorithm</a>.
+                    <br>InfraNodus runs on <a href="http://www.neo4j.org" target="_blank" rel="nofollow">Neo4J</a> graph database, <a href="http://www.sigmajs.org" target="_blank" rel="nofollow">Sigma.Js</a> graph visualization library, Node.Js and uses <a href="https://noduslabs.com/research/visualization-text-polysingularity-network-analysis/" target="_blank">Textexture text network analysis algorithm</a>.
                     <br><br>This software is offered "as is" with no warranty or legal liability of any kind, so, please, use it at your own risk.
                 </p>
             </div>
