@@ -3,12 +3,18 @@
 
         <% if (locals.user) { %>
         <a class="pure-menu-heading" href="/<%= user.name %>/edit"><%= user.name %></a>
-        <ul>
+        <ul id="contexts" class="contexts">
           <li>&nbsp;</li>
-            <li class="menu-item-divided"><a href="/<%= user.name %>/edit">all lists</a></li>
-            <li>&nbsp;</li>
-            <li class="menu-item-divided"><a href="/apps">apps</a></li>
-            <li class="menu-item-divided"><a href="/settings">settings</a></li>
+            <li class="menu-item-small"><a href="/apps">apps/home</a></li>
+            <li class="menu-item-small" id="settingspane"><a href="/settings">settings</a></li>
+            <br>
+            <li id="addNewContext" class="menu-item-divided"><a id="addcontextbutton" href="javascript:"> + new context&nbsp;&nbsp;</a><form action="/post" method="GET" class="pure-form" id="addcontextinput"><input type="text" id="addcontextname" size="7" class="pure-input"></form></li>
+            <li class="menu-item-divided"><a href="/<%= user.name %>/edit">all contexts</a></li>
+            <% if (contextlist.length > 0) { %>
+            <% contextlist.forEach(function(contextlabel) { %>
+                  <li class="menu-item-divided"><a href="/<%= user.name %>/<%= contextlabel %>/edit"><%= contextlabel %></a></li>
+            <% }); %>
+            <% } %>
             <li>&nbsp;</li>
             <li class="menu-item-small"><a href="/import">import</a></li>
             <li class="menu-item-small"><a href="http://noduslabs.com/infranodus/" target="_blank">about</a></li>
@@ -18,6 +24,8 @@
             <li class="menu-item-small"><a href="http://noduslabs.com/contact/" target="_blank">contact</a></li>
             <li>&nbsp;</li>
             <li><a href="/logout">logout</a></li>
+            <li>&nbsp;</li>
+            <li>&nbsp;</li>
         </ul>
         <% } else { %>
         <a class="pure-menu-heading" href="/">infranodus</a>

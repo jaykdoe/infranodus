@@ -160,7 +160,7 @@
                 <form action='/post' name='submitform' id="submitform" method='post' class='pure-form'>
 
                         <textarea columns="40" rows="4" name='entry[body]' id="statement" placeholder='type in some words or #hashtags to see how they connect'><% if (url) { %><%= urltitle %> <%= url %><% } %></textarea>
-                        <div id="addToContextsLabel">contexts:</div>
+                        <div id="addToContextsLabel">in context:</div>
                         <ul id="addToContexts"></ul>
                         <input type="hidden" id="addedContexts" name="addedContexts">
                         <input type="hidden" id="context" name="context" value="<%= context %>">
@@ -310,6 +310,8 @@
     var speech = getUrlVars()["speech"];
 
     var walkthrough = getUrlVars()["walkthrough"];
+
+    var newcontextname = getUrlVars()["newcontextname"];
 
     var graphPalette = getUrlVars()["palette"];
 
@@ -542,7 +544,7 @@ if (!collaborate_invite) {
     socket.on('tooMany', function(data){
 
         console.log('one too many');
-        alert('There are already 2 users working on this set and this is our max so far. If you think it is a mistake, please, check if any of your extra browser tabs are opened.');
+        alert('There are already 2 users working on this context and this is our max so far. If you think it is a mistake, please, check if any of your extra browser tabs are opened.');
         window.location.href = 'http://' + hostsite + '/' + 'home' + '/edit';
 
     });
@@ -891,12 +893,10 @@ sigma.parsers.json(
 
 
             // Get the context names - all the contexts that exist in the graph we just loaded
-
+            // This IF statement is for the case when the contextlist parameter is not passed on
             <% if (contextlist.length > 0) { %>
             <% contextlist.forEach(function(contextlabel) { %>
-
               contextNames.push("<%= contextlabel %>");
-
             <% }); %>
 
             <% } else { %>
@@ -905,7 +905,6 @@ sigma.parsers.json(
 
             <% } %>
 
-            console.log(contextNames);
 
 
 
@@ -964,6 +963,7 @@ sigma.parsers.json(
             // Put the contexts into the menu
 
             populateContextMenu(contextNames,nodeNames);
+
 
 
             if (document.getElementById('context').value) {
@@ -1526,10 +1526,10 @@ sigma.parsers.json(
         var privacy_iframe = "<iframe width='100%' height='500' style='height: 500px' src='https://" + graph_share_url + "?hide_always=1&link_hashtags=1' frameborder='0' allowfullscreen></iframe>";
 
         <% if (contextpublic && context && !perceivername && entries.length > 0) { %>
-            privacyform = $('<span><form action="/context" name="privacycontext" method="post" class="pure-form"><input type="hidden" name="context" value="<%= context %>">This set can be viewed on:<br><input type="text" id="embedurl" size="25" maxlength="80" class="pure-input" value="https://' + graph_share_url + '"><br><br>Embed code for websites:<br><input type="text" id="embedcode" size="25" maxlength="100" class="pure-input" value="' + privacy_iframe + '"><br><br><input type="submit" id="privacybutton" name="privacy" value="make private"></form></span>')
+            privacyform = $('<span><form action="/context" name="privacycontext" method="post" class="pure-form"><input type="hidden" name="context" value="<%= context %>">This context can be viewed on:<br><input type="text" id="embedurl" size="25" maxlength="80" class="pure-input" value="https://' + graph_share_url + '"><br><br>Embed code for websites:<br><input type="text" id="embedcode" size="25" maxlength="100" class="pure-input" value="' + privacy_iframe + '"><br><br><input type="submit" id="privacybutton" name="privacy" value="make private"></form></span>')
 
         <% } else if (!perceivername && context && entries.length > 0) { %>
-            privacyform = $('<span><form action="/context" name="privacycontext" method="post" class="pure-form"><input type="hidden" name="context" value="<%= context %>">This set is currently private and cannot be seen by the public.<br><br><input type="submit" id="privacybutton" name="privacy" value="make public"></form></span>')
+            privacyform = $('<span><form action="/context" name="privacycontext" method="post" class="pure-form"><input type="hidden" name="context" value="<%= context %>">This context is currently private and cannot be seen by the public.<br><br><input type="submit" id="privacybutton" name="privacy" value="make public"></form></span>')
         <% }  %>
 
         $('#privacy-link').tooltipster({
@@ -1817,7 +1817,7 @@ sigma.parsers.json(
                   steps: [
                   {
                     element: "#entryform",
-                    placement: "right",
+                    placement: "top",
                     title: "Welcome to InfraNodus",
                     content: "You can start typing your ideas and notes here. Press Enter or Save to submit. They will be visualized as a graph.",
                     onNext: function (tour) {
@@ -1826,6 +1826,7 @@ sigma.parsers.json(
                   },
                   {
                     element: "#statement",
+                    placement: "top",
                     title: "Add a Statement...",
                     content: "You can add this statement or edit and add your own. Then press the SAVE button..."
                   },
@@ -1838,13 +1839,14 @@ sigma.parsers.json(
                   },
                   {
                     element: "#statement",
+                    placement: "top",
                     title: "Delete Statements",
                     content: "If you double-clicked the statement, it appears here. Then simply click the Delete icon below the statement and it will be removed. You can also Edit and click Edit. Or Cancel."
                   },
                   {
                     element: "#menuLink",
                     title: "Context Menu",
-                    content: "You can navigate using this menu here. Choose another list, add a new one, or see all of them at once.",
+                    content: "You can navigate using this menu here. Here you can choose another context (list / graph / set), add a new one, or see all of them at once.",
                     onShow: function (tour) {
                         $('#menuLink').click();
                     }
@@ -1853,13 +1855,20 @@ sigma.parsers.json(
                     element: "#chat-link",
                     placement: "left",
                     title: "Hide/Show Statements",
-                    content: "You can use this button to hide / show statements, so you can clearly see the graph."
+                    content: "You can use this button to hide / show statements, so you can clearly see the graph.",
+                    onShow: function (tour) {
+                        $('#menuLink').click();
+                        $('#chat-link').click();
+                    }
                   },
                   {
                     element: "#walkthrough",
                     placement: "left",
                     title: "This Tutorial",
-                    content: "If, at any point, you want to see this tutorial again, click here."
+                    content: "If, at any point, you want to see this tutorial again, click here.",
+                    onShow: function (tour) {
+                        $('#chat-link').click();
+                    }
                   },
                   {
                     element: "#microphone-link",
@@ -1889,23 +1898,30 @@ sigma.parsers.json(
                   {
                     element: "#collaborate-link",
                     title: "Collaborate",
+                    placement: "top",
                     content: "You can make your graph public or invite somebody to collaborate. Click on these buttons to learn more."
                   },
                   {
                     element: "#settingspane",
                     title: "Settings Pane",
-                    content: "Here you can log out, adjust the settings, and export your graph in any format for further visualization using Gephi or any other software."
+                    content: "Here you can log out, adjust the settings, and export your graph in any format for further visualization using Gephi or any other software.",
+                    onShow: function (tour) {
+                        $('#menuLink').click();
+                    }
                   },
                   {
                     element: "#addNewContext",
-                    title: "Add a New List",
-                    content: "You can add a new list here (click, type in the new name and click Enter to save)."
+                    title: "Add a New Context",
+                    content: "You can add a new context here (click, type in the new name and click Enter to save). Think of contexts as lists or folders. You can store different notes there or you can organize them by hashtags."
                   },
                   {
                     element: "#improve-layout",
                     title: "Improve Graph Layout",
                     placement: "left",
-                    content: "You can use this button to improve the graph's layout."
+                    content: "You can use this button to improve the graph's layout.",
+                    onShow: function (tour) {
+                        $('#menuLink').click();
+                    }
                   },
                   {
                     element: "#graph-tools",
@@ -3411,6 +3427,9 @@ sigma.parsers.json(
 
         var currentContextURL = '';
 
+        var appshome = '';
+
+        var settingspane = '';
         <% if (perceivername) { %>
 
             currentContextURL = '<li id="listall" class="menu-item-divided pure-menu-selected"><a href="/<%= perceivername %>">all contexts</a></li>';
@@ -3425,10 +3444,13 @@ sigma.parsers.json(
 
         var auxLinks = '';
 
+        var detectedContext = null;
+
         // The graph exists already?
         if (typeof contextNames[0] !== 'undefined' && contextNames[0] !== null) {
             contextNames.forEach(function(n) {
                 if (n == current_context) {
+                    detectedContext = 1;
                     // for the menu
                     <% if (perceivername) { %>
                         context_filters += '<li class="app-context-link menu-item-divided pure-menu-selected"><a href="/<%= perceivername %>/' + n + '">' + n + '</a></li>';
@@ -3437,7 +3459,6 @@ sigma.parsers.json(
                         context_filters += '<li class="app-context-link menu-item-divided pure-menu-selected"><a href="/<%= user.name %>/' + n + '/edit">' + n + '</a></li>';
                         currentContextURL = '<li id="listall" class="menu-item-divided"><a href="/<%= user.name %>/edit">all contexts</a></li>';
                     <% } %>
-
                 }
                 else {
                     // for the menu
@@ -3451,6 +3472,16 @@ sigma.parsers.json(
                     // for the statement add
                 }
             });
+            // TODO this is code repeat from above, optimize
+            if (!detectedContext && current_context) {
+              <% if (perceivername) { %>
+                  context_filters = '<li class="app-context-link menu-item-divided pure-menu-selected"><a href="/<%= perceivername %>/' + current_context + '">' + current_context + '</a></li>' + context_filters;
+                  currentContextURL = '<li id="listall" class="menu-item-divided"><a href="/<%= perceivername %>">all contexts</a></li>';
+              <% } else { %>
+                  context_filters = '<li class="app-context-link menu-item-divided pure-menu-selected"><a href="/<%= user.name %>/' + current_context + '/edit">' + current_context + '</a></li>' + context_filters;
+                  currentContextURL = '<li id="listall" class="menu-item-divided"><a href="/<%= user.name %>/edit">all contexts</a></li>';
+              <% } %>
+            }
         }
         // No graph, so show private
         else {
@@ -3458,7 +3489,7 @@ sigma.parsers.json(
         }
 
         <% if (!perceivername) { %>
-            addNewContext = '<li id="addNewContext" class="menu-item-divided"><a id="addcontextbutton" href="javascript:">+ add new</a>&nbsp;<form action="/post" method="GET" class="pure-form" id="addcontextinput"><input type="text" id="addcontextname" size="7" class="pure-input"></form></li><li class="menu-item-divided">&nbsp;<a href="javascript:"></a></li>';
+            addNewContext = '<li id="addNewContext" class="menu-item-divided"><a id="addcontextbutton" href="javascript:"> + new context</a>&nbsp;<form action="/post" method="GET" class="pure-form" id="addcontextinput"><input type="text" id="addcontextname" size="7" class="pure-input"></form></li>';
         <% } else { %>
             addNewContext = '<li class="menu-item-divided">&nbsp;<a href="javascript:"></a></li>';
 
@@ -3473,9 +3504,9 @@ sigma.parsers.json(
             <% if (perceivername == receivername) { %>
 
             <% if (context) { %>
-                switch_field = '<li class="menu-item-small"><a href="/<%= perceivername %>/<%= context %>/edit">go to private view</a></li>';
+                // switch_field = '<li class="menu-item-small"><a href="/<%= perceivername %>/<%= context %>/edit">go to private view</a></li>';
             <% } else { %>
-                switch_field = '<li class="menu-item-small"><a href="/<%= perceivername %>/edit">go to private view</a></li>';
+                // switch_field = '<li class="menu-item-small"><a href="/<%= perceivername %>/edit">go to private view</a></li>';
             <% } %>
 
             // So we know whose statements we're going to view, but the user is not the same as the one who made them.
@@ -3491,11 +3522,11 @@ sigma.parsers.json(
 
         <% if (context) { %>
 
-                switch_field = '<li class="menu-item-small"><a href="/<%= user.name %>/<% context %>">go to public view</a></li>';
+                switch_field = '<li class="menu-item-small">&nbsp;</li><li class="menu-item-small"><a href="/<%= user.name %>/<% context %>">go to public view</a></li>';
 
             <% } else { %>
 
-                switch_field = '<li class="menu-item-small"><a href="/<%= user.name %>">go to public view</a></li>';
+                switch_field = '<li class="menu-item-small">&nbsp;</li><li class="menu-item-small"><a href="/<%= user.name %>">go to public view</a></li>';
 
             <% } %>
 
@@ -3506,14 +3537,12 @@ sigma.parsers.json(
         <% if (perceivername) { %>
 
             <% if (perceivername == receivername) { %>
-
+                settingspane = '<li class="menu-item-small" id="settingspane"><a href="/settings">settings</a></li><br>';
+                appshome = '<li class="menu-item-small"><a href="/apps">apps/home</a></li>';
                 auxLinks = '<br>' +
                         '<li class="menu-item-small"><a href="/<%= perceivername %>/edit">back to private view</a></li>' +
                         '<li class="menu-item-small">&nbsp;</li>' +
-                        '<li class="menu-item-small"><a href="/apps">apps/home</a></li>' +
-                        '<li class="menu-item-small">&nbsp;</li>' +
                         '<li class="menu-item-small"><a href="/logout">logout</a></li>' +
-                        '<li class="menu-item-small"><a href="/settings">settings</a></li>' +
                         '<li class="menu-item-small"><a href="/import">import</a></li>' +
                         '<li class="menu-item-small"><a href="/api/public/nodes/<%= perceivername %>/<%= context %>" target="_blank">export</a> <a href="/api/public/nodes/<%= perceivername %>/<%= context %>?gexf=1" target="_blank">gexf</a> <a href="/api/public/nodes/<%= perceivername %>/<%= context %>?csv=1" target="_blank">csv</a> <a href="/api/public/nodes/<%= perceivername %>/<%= context %>?csvdata=1" target="_blank">csv matrix</a></li>' +
                         '<li class="menu-item-small"><a href="http://noduslabs.com/infranodus/" target="_blank">about</a></li>' +
@@ -3522,13 +3551,13 @@ sigma.parsers.json(
 
 
             <% } else if (receivername) { %>
-
+                settingspane = '<li class="menu-item-small" id="settingspane"><a href="/settings">settings</a></li><br>';
+                appshome = '<li class="menu-item-small"><a href="/apps">apps/home</a></li>';
                 auxLinks = '<br>' +
                         '<li class="menu-item-small"><a href="/<%= receivername %>/edit">back to <%= receivername %></a></li>' +
                         '<li class="menu-item-small">&nbsp;</li>' +
                         '<li class="menu-item-small"><a href="/">home page</a></li>' +
                         '<li class="menu-item-small">&nbsp;</li>' +
-                        '<li class="menu-item-small"><a href="/settings">settings</a></li>' +
                         '<li class="menu-item-small"><a href="/import">import</a></li>' +
                         '<li class="menu-item-small"><a href="/api/user/nodes/<%= context %>" target="_blank">export</a> <a href="/api/user/nodes/<%= context %>?gexf=1" target="_blank">gexf</a> <a href="/api/user/nodes/<%= context %>?csv=1" target="_blank">csv</a> <a href="/api/user/nodes/<%= context %>?csvdata=1" target="_blank">csv matrix</a>  <a href="/api/user/statements/<%= context %>?textonly=1" target="_blank">text only</a></li>' +
                         '<li class="menu-item-small"><a href="http://noduslabs.com/infranodus/" target="_blank">about</a></li>' +
@@ -3554,12 +3583,11 @@ sigma.parsers.json(
             <% } %>
 
         <% } else { %>
-
+            settingspane = '<li class="menu-item-small" id="settingspane"><a href="/settings">settings</a></li><br>';
+            appshome = '<li class="menu-item-small"><a href="/apps">apps/home</a></li>';
             auxLinks = '<br>' +
-                  '<li class="menu-item-small"><a href="/apps">apps/home</a></li>' +
-                    '<li class="menu-item-small">&nbsp;</li>' +
                     '<li class="menu-item-small"><a href="/logout">logout</a></li>' +
-                    '<li class="menu-item-small" id="settingspane"><a href="/settings">settings</a></li>' +
+                    '<li class="menu-item-small">&nbsp;</li>' +
                     '<li class="menu-item-small"><a href="/import">import</a></li>' +
                     '<li class="menu-item-small"><a href="/api/user/nodes/<%= context %>" target="_blank">export</a> <a href="/api/user/nodes/<%= context %>?gexf=1" target="_blank">gexf</a> <a href="/api/user/nodes/<%= context %>?csv=1" target="_blank">csv</a> <a href="/api/user/nodes/<%= context %>?csvdata=1" target="_blank">csv matrix</a> <a href="/api/user/statements/<%= context %>?textonly=1" target="_blank">text only</a></li> ' +
                     '<li class="menu-item-small"><a href="http://noduslabs.com/cases/infranodus-the-network-thinking-app/" target="_blank">demo</a></li>' +
@@ -3569,10 +3597,12 @@ sigma.parsers.json(
 
         <% } %>
 
-        document.getElementById('contexts').innerHTML = switch_field +
+        document.getElementById('contexts').innerHTML = appshome +
+                                                        settingspane +
+                                                        addNewContext +
                                                         currentContextURL +
                                                         context_filters +
-                                                        addNewContext +
+                                                        switch_field +
                                                         auxLinks;
 
 
@@ -3599,6 +3629,7 @@ sigma.parsers.json(
         $("#addNewContext").on('tap', function(e) {
 
             $("#addcontextinput").css("visibility", "visible");
+            $("#add").css("visibility", "visible");
             $("#addcontextname").focus();
 
 
@@ -3623,7 +3654,12 @@ sigma.parsers.json(
         // Initialize autofill for hashtags and contexts
         autofill(nodeNames,contextNames);
 
-
+        if (newcontextname) {
+          // $('#menuLink').click();
+          $("#addcontextinput").css("visibility", "visible");
+          $("#addcontextname").focus();
+          $("#addcontextname").val(newcontextname);
+        }
 
 
     }

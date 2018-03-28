@@ -99,8 +99,7 @@ exports.list = function(req, res, next){
                 contexts[s] = '';
             }
         }
-        console.log(contextslist);
-        console.log(entries);
+        
         res.render('entries', {
             title: 'InfraNodus: Polysingularity Thinking Tool',
             entries: entries,

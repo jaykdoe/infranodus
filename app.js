@@ -135,12 +135,12 @@ app.post('/api2/post',
     validate.getContextForEntry('entry[body]'),
     entries.submit);
 
-app.get('/settings', pass.ensureAuthenticated, settings.render);
+app.get('/settings', pass.ensureAuthenticated, validate.getContextsList(), settings.render);
 app.post('/settings', pass.ensureAuthenticated, settings.modify);
-app.get('/import', pass.ensureAuthenticated, imports.render);
-app.get('/google', pass.ensureAuthenticated, imports.renderGoogle);
-app.get('/apps', pass.ensureAuthenticated, imports.renderApps);
-app.get('/twitter', pass.ensureAuthenticated, imports.renderTwitter);
+app.get('/import', pass.ensureAuthenticated, validate.getContextsList(), imports.render);
+app.get('/google', pass.ensureAuthenticated, validate.getContextsList(), imports.renderGoogle);
+app.get('/apps', pass.ensureAuthenticated, validate.getContextsList(), imports.renderApps);
+app.get('/twitter', pass.ensureAuthenticated, validate.getContextsList(), imports.renderTwitter);
 app.post('/import', pass.ensureAuthenticated, imports.submit);
 
 app.get('/evernote_oauth', oauths.oauth);

@@ -20,8 +20,11 @@ var options = require('../options');
 // GET request to the /settings page (view settings)
 
 exports.render = function(req, res) {
-
-    res.render('settings', { title: 'Settings' });
+    var contextslist = [];
+    if (res.locals.contextslist) {
+        contextslist = res.locals.contextslist;
+    }
+    res.render('settings', { title: 'Settings', contextlist: contextslist });
 
 };
 

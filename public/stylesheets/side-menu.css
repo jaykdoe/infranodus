@@ -415,6 +415,15 @@ small screens.
     margin-top: 6em;
 }
 
+#addcontextinput {
+  padding-bottom: 0.5em;
+}
+
+#addcontextbutton {
+  text-decoration: none;
+}
+
+
 
 
 
@@ -476,7 +485,7 @@ Hides the menu at `48em`, but modify this based on your app's needs.
     }
     #analytics {
 
-    z-index: -0!important;  
+    z-index: -0!important;
 
     }
 

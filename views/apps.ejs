@@ -35,8 +35,8 @@
 
         <div id='maincontent'>
           <!-- TODO: add Apps to the menu -->
-          <a href="/<%= user.name %>/edit" id="newlist"><div class="appbox">Make a new list of notes and visualise them.</div></a>
-          <a href="/<%= user.name %>/edit"><div class="appbox">See all your existing lists and ideas.</div></a>
+          <a href="/<%= user.name %>/edit" id="newlist"><div class="appbox">Create a new context and visualise the text inside.</div></a>
+          <a href="/<%= user.name %>/edit"><div class="appbox">See all your existing contexts and ideas.</div></a>
           <a href="/twitter?fornode=dataviz&context=twitter" id="twitter"><div class="appbox">What’s tweeted about #dataviz right now.</div></a>
           <a href="/<%= user.name %>/edit" id="tldr"><div class="appbox">TL;DR — get an overview of any long text!</div></a>
           <a href="/google?fornode=text+visualization&context=google" id="google"><div class="appbox">What Google shows for “SEO” term.</div></a>
@@ -111,14 +111,35 @@
 
         });
 
+      var newcontextlong = new Date().toISOString().slice(2,16).replace(/-/g,"").replace(/:/g,"");
+      var newcontextshort = new Date().toISOString().slice(2,10).replace(/-/g,"");
 
-      document.getElementById("twitter").href += new Date().toISOString().slice(2,10).replace(/-/g,"");
-      document.getElementById("google").href += new Date().toISOString().slice(2,10).replace(/-/g,"");
-      document.getElementById("newlist").href = "/<%= user.name %>/" + new Date().toISOString().slice(2,16).replace(/-/g,"").replace(/:/g,"") + "/edit?walkthrough=newcontext";
-      document.getElementById("speech").href = "/<%= user.name %>/" + new Date().toISOString().slice(2,16).replace(/-/g,"").replace(/:/g,"") + "/edit?speech=1&walkthrough=mic";
+      document.getElementById("twitter").href += newcontextshort;
+      document.getElementById("google").href += newcontextshort;
+      document.getElementById("newlist").href = "/<%= user.name %>/" + newcontextlong + "/edit?walkthrough=newcontext&newcontextname=" + newcontextlong;
+      document.getElementById("speech").href = "/<%= user.name %>/" + newcontextlong + "/edit?speech=1&walkthrough=mic";
       document.getElementById("tldr").href = "/<%= user.name %>/tldr" + new Date().toISOString().slice(2,10).replace(/-/g,"").replace(/:/g,"") + "/edit?walkthrough=tldr";
-      document.getElementById("start").href = "/<%= user.name %>/" + new Date().toISOString().slice(2,16).replace(/-/g,"").replace(/:/g,"") + "/edit?walkthrough=default";
+      document.getElementById("start").href = "/<%= user.name %>/" + newcontextlong + "/edit?walkthrough=default";
 
+      $("#addNewContext").on('tap', function(e) {
+
+          $("#addcontextinput").css("visibility", "visible");
+          $("#add").css("visibility", "visible");
+          $("#addcontextname").focus();
+
+
+      });
+
+      $('#addcontextinput').submit(function(e) {
+          e.preventDefault(); // to stop the form from submitting
+          if ($('#addcontextname').val().length > 0) {
+              var contextredirect = $('#addcontextname').val();
+              contextredirect = contextredirect.replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+              contextredirect = contextredirect.replace(/[^\w]/gi, '');
+              window.location.href = "/<%= user.name %>/" + contextredirect + '/edit';
+          }
+
+      });
 
 
     })();

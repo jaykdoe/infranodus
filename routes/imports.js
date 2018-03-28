@@ -101,7 +101,10 @@ var T = new Twit({
 // GET request to the /settings page (view settings)
 
 exports.render = function(req, res) {
-
+      var contextslist = [];
+      if (res.locals.contextslist) {
+          contextslist = res.locals.contextslist;
+      }
     if (req.session.oauthAccessToken) {
 
         var client = new Evernote.Client({token: req.session.oauthAccessToken});
@@ -122,7 +125,7 @@ exports.render = function(req, res) {
                 for (var t = 0; t < notebooks.length; t++) {
                     notebooks_names.push(notebooks[t].name);
                 }
-                res.render('import', { title: 'Import Data to InfraNodus', context: '', fornode: '', notebooks: notebooks_names, evernote: req.session.oauthAccessToken});
+                res.render('import', { title: 'Import Data to InfraNodus', context: '', fornode: '', notebooks: notebooks_names, contextlist: contextslist, evernote: req.session.oauthAccessToken});
             }
 
         });
@@ -141,7 +144,7 @@ exports.render = function(req, res) {
     }
     else {
 
-        res.render('import', { title: 'Import Data to InfraNodus', evernote: '', context: req.query.context, notebooks: '', fornode: req.query.fornode });
+        res.render('import', { title: 'Import Data to InfraNodus', evernote: '', contextlist: contextslist, context: req.query.context, notebooks: '', fornode: req.query.fornode });
 
     }
 
@@ -154,20 +157,30 @@ exports.render = function(req, res) {
 // GET request to the /google page (view settings)
 
 exports.renderGoogle = function(req, res) {
-
-        res.render('google', { title: 'Google the Google', evernote: '', context: req.query.context, notebooks: '', fornode: req.query.fornode });
+        var contextslist = [];
+        if (res.locals.contextslist) {
+            contextslist = res.locals.contextslist;
+        }
+        res.render('google', { title: 'Google the Google', evernote: '', context: req.query.context, notebooks: '', contextlist: contextslist, fornode: req.query.fornode });
 
 };
 
 exports.renderApps = function(req, res) {
-
-        res.render('apps', { title: 'InfraNodus: Visualize any Text as a Network', evernote: '', context: req.query.context, notebooks: '', fornode: req.query.fornode });
+        // Did we get a list of all the contexts for this user / entries list?
+        var contextslist = [];
+        if (res.locals.contextslist) {
+            contextslist = res.locals.contextslist;
+        }
+        res.render('apps', { title: 'InfraNodus: Visualize any Text as a Network', evernote: '', context: req.query.context, notebooks: '', contextlist: contextslist, fornode: req.query.fornode });
 
 };
 
 exports.renderTwitter = function(req, res) {
-
-        res.render('twitter', { title: 'InfraNodus: Twitter Text Network Visualization', evernote: '', context: req.query.context, notebooks: '', fornode: req.query.fornode });
+        var contextslist = [];
+        if (res.locals.contextslist) {
+            contextslist = res.locals.contextslist;
+        }
+        res.render('twitter', { title: 'InfraNodus: Twitter Text Network Visualization', evernote: '', context: req.query.context, contextlist: contextslist, notebooks: '', fornode: req.query.fornode });
 
 };
 
