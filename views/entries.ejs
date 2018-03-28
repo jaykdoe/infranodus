@@ -894,19 +894,11 @@ sigma.parsers.json(
 
             // Get the context names - all the contexts that exist in the graph we just loaded
             // This IF statement is for the case when the contextlist parameter is not passed on
-            <% if (contextlist.length > 0) { %>
-            <% contextlist.forEach(function(contextlabel) { %>
-              contextNames.push("<%= contextlabel %>");
-            <% }); %>
 
-            <% } else { %>
+            // NOTE this function can be activated if you want to get the list of contexts from the visible graph only
+            // contextNames = _.keys(contextNodeID);
 
-              contextNames = _.keys(contextNodeID);
-
-            <% } %>
-
-
-
+            // populateContextMenu(contextNames);
 
             // Now we get the context IDs from the graph - a little bit of a workaround
             var suspects = [];
@@ -960,10 +952,10 @@ sigma.parsers.json(
             }
 
 
-            // Put the contexts into the menu
 
-            populateContextMenu(contextNames,nodeNames);
 
+            // Initialize autofill for hashtags and contexts
+            autofill(nodeNames,contextNames);
 
 
             if (document.getElementById('context').value) {
@@ -1504,6 +1496,17 @@ sigma.parsers.json(
 // Auto-resize to fill content;
 
     $(document).ready(function(){
+
+      // Get the context names - all the contexts that exist in the graph we just loaded
+      // This IF statement is for the case when the contextlist parameter is not passed on
+      <% if (contextlist.length > 0) { %>
+      <% contextlist.forEach(function(contextlabel) { %>
+        contextNames.push("<%= contextlabel %>");
+      <% }); %>
+      <% } %>
+
+      // Put the contexts into the menu
+      populateContextMenu(contextNames);
 
         $('.tooltip').tooltipster({
             theme: 'tooltipster-noir',
@@ -3419,7 +3422,7 @@ sigma.parsers.json(
 
     // Populate context menu
 
-    function populateContextMenu (contextNames,nodeNames) {
+    function populateContextMenu (contextNames) {
 
         var switch_field = '';
 
@@ -3651,8 +3654,7 @@ sigma.parsers.json(
         // Now time to trigger the actions we want to have when user clicks on the contexts
         addContextTriggers();
 
-        // Initialize autofill for hashtags and contexts
-        autofill(nodeNames,contextNames);
+
 
         if (newcontextname) {
           // $('#menuLink').click();
