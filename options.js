@@ -32,7 +32,7 @@ exports.settings = {
     max_total_text_length: 90000,
 
     // Min length of a statement text
-    min_text_length: 4,
+    min_text_length: 1,
 
     // Max number of tags in one statement
     max_hashtags: 1000,
