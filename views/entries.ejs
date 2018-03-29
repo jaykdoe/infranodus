@@ -1753,7 +1753,7 @@ sigma.parsers.json(
                         for (var i = event.resultIndex; i < event.results.length; ++i) {
                             if (event.results[i].isFinal) {
                                 recognition.abort();
-                                if (voiceresult.length > 4) {
+                                if (voiceresult.length > 2) {
                                     setTimeout(function(){
                                         $('#submitbutton').trigger('click');
                                     }, 1000);
