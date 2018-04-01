@@ -1099,23 +1099,23 @@ sigma.parsers.json(
 
                     var isHidden = $("#statements").is(":hidden");
 
-                    if (isHidden) {
-
-                        var delayShow = 6000;
-
-                        clearTimeout(inactiveTimeout);
-                        inactiveTimeout = setTimeout(showStatements, delayShow);
-
-                        $('#graph-container').unbind('mousemove orientationchange scroll swipe tap swipeleft swiperight scrolltop');
-                        $('#graph-container').bind('mousemove orientationchange scroll swipe tap swipeleft swiperight scrolltop', function(){
-                            if (graphInteraction) {
-                                clearTimeout(inactiveTimeout);
-                                inactiveTimeout = setTimeout(showStatements, delayShow);
-                            }
-                        });
-
-
-                    }
+                    // if (isHidden) {
+                    //
+                    //     var delayShow = 6000;
+                    //
+                    //     clearTimeout(inactiveTimeout);
+                    //     inactiveTimeout = setTimeout(showStatements, delayShow);
+                    //
+                    //     $('#graph-container').unbind('mousemove orientationchange scroll swipe tap swipeleft swiperight scrolltop');
+                    //     $('#graph-container').bind('mousemove orientationchange scroll swipe tap swipeleft swiperight scrolltop', function(){
+                    //         if (graphInteraction) {
+                    //             clearTimeout(inactiveTimeout);
+                    //             inactiveTimeout = setTimeout(showStatements, delayShow);
+                    //         }
+                    //     });
+                    //
+                    //
+                    // }
 
                 }
 
