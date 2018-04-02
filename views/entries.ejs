@@ -2418,10 +2418,11 @@ sigma.parsers.json(
          }
 
          topp_communities = _.sortBy(topp_communities,'length').reverse();
-      //   console.log(topp_communities);
+         //console.log(topp_communities);
 
 
-         var advice_iterations = 2;
+         var advice_iterations = 4;
+         var recommender_iterations = 2;
          if (topp_communities.length < advice_iterations) {
            advice_iterations = topp_communities.length;
          }
@@ -2433,27 +2434,59 @@ sigma.parsers.json(
            topp_communities[j].nodes = _.first(_.sortBy(topp_communities[j].nodes,'degree').reverse(),3);
          }
 
-      //   console.log(topp_communities);
+         console.log(topp_communities);
 
+         // these are top nodes in each community
          var top_nodes = [];
 
 
-         var analytics = 'next idea tip: what is the relation between "';
+         var recommender = 'next idea tip: what is the relation between "';
+         var analytics = "<div class='headline'>Main Topics Detected:<br></div>"
+         analytics += "1: "
          for (var j = 0; j < topp_communities.length; j++) {
 
             for (var n = 0; n < topp_communities[j].nodes.length; n++) {
-                analytics += topp_communities[j].nodes[n].name +'-'
+                if (recommender_iterations != 0) {
+                  recommender += topp_communities[j].nodes[n].name +' - ';
+                }
+                analytics += topp_communities[j].nodes[n].name + ' - ';
                 top_nodes.push(topp_communities[j].nodes[n].name);
             }
-            analytics = analytics.slice(0, -1);
-            analytics += '"<br> and "'
+            if (recommender_iterations != 0) {
+              recommender = recommender.slice(0, -3);
+              recommender += '"<br> and "';
+              recommender_iterations = recommender_iterations - 1;
+            }
+            analytics = analytics.slice(0, -3);
+            analytics += " <div class='inlinesquare' id='inlinesquare"+(topp_communities[j].id)+"'> </div> <br>" + (j + 2) + ": ";
          }
 
-         analytics = analytics.slice(0, -10);
-         analytics += ''
+         recommender = recommender.slice(0, -10);
+         recommender += ''
+         analytics = analytics.slice(0, -7);
+
+         // Get the nodes with the highest degree
+         var degree_nodes = [];
+         sigma.instances(0).graph.nodes().forEach(function(n)  {
+            degree_nodes.push({id: n.id, label: n.label, degree: sigma.instances(0).graph.degree(n.id)});
+         });
+
+         degree_nodes = _.first(_.sortBy(degree_nodes,'degree').reverse(),9).slice(0,4);
+
+        // console.log(top_nodes);
+        //console.log(degree_nodes.slice(0,4));
+
+
+         analytics += "<br><br><div class='headline'>Most Influential Words:<br></div>";
+
+         var degree_array = [];
+         for (var ind in degree_nodes) {
+           degree_array.push(degree_nodes[ind].label);
+         }
+        analytics += degree_array.join(' - ');
 
          $('#analytics').html(analytics);
-         $("#statement").attr("placeholder", analytics.replace(/<br ?\/?>/g, "") + "?").val("").focus().blur();
+         $("#statement").attr("placeholder", recommender.replace(/<br ?\/?>/g, "") + "?").val("").focus().blur();
 
 
 
@@ -2475,8 +2508,14 @@ sigma.parsers.json(
       var e_x = 0;
       var e_y = 0;
 
-
+    console.log(palette);
     //  console.log(sigma.instances(0).graph.nodes()[54]);
+    for (pall in palette) {
+          if (document.getElementById("inlinesquare" + pall)) {
+            document.getElementById("inlinesquare" + pall).style.backgroundColor=rgbToHex(palette[pall]._rgb[0],palette[pall]._rgb[1],palette[pall]._rgb[2]);
+          }
+    }
+
       sigma.instances(0).graph.nodes().forEach(function(n) {
         if (top_nodes.indexOf(n.originalLabel) != -1) {
           if (n.community == topp_communities[0].id) {
