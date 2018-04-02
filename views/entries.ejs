@@ -213,6 +213,7 @@
                     <span></span>
                 </a>
             <% } %>
+            <div id="analyticsbutton"><img src="/images/info.png"></div>
       </div>
 
     </div>
@@ -1033,15 +1034,20 @@ sigma.parsers.json(
 
             communityDetect();
 
+            var showanalytics = localStorage.getItem('analytics');
+
+            $('#analyticsbutton').click(function(){
+
+                     $('#analytics').toggle("slide");
+
+            });
+
             // When a node is clicked, we check for each node
             // if it is a neighbor of the clicked one. If not,
             // we set its color as grey, and else, it takes its
             // original color.
             // We do the same for the edges, and we only keep
             // edges that have both extremities colored.
-
-
-
 
             sigma.bind('clickNode', function(e) {
               if (!sigma_dragged) {
@@ -2434,14 +2440,15 @@ sigma.parsers.json(
            topp_communities[j].nodes = _.first(_.sortBy(topp_communities[j].nodes,'degree').reverse(),3);
          }
 
-         console.log(topp_communities);
+         //console.log(topp_communities);
 
          // these are top nodes in each community
          var top_nodes = [];
 
 
-         var recommender = 'next idea tip: what is the relation between "';
-         var analytics = "<div class='headline'>Main Topics Detected:<br></div>"
+         var recommender_start = 'next idea tip: what is the relation between "';
+         var recommender = '';
+         var analytics = "<div id='mainanalytics'><div class='headline'>Main Topics Detected:<br></div>"
          analytics += "1: "
          for (var j = 0; j < topp_communities.length; j++) {
 
@@ -2484,9 +2491,16 @@ sigma.parsers.json(
              analytics += '<div class="inlinesquare '+degree_nodes[ind].id+'"></div> ' + degree_nodes[ind].label + ' &nbsp;';
          }
 
+         analytics += "<br><div class='headline'>Next Idea Tip:</div> What is the relation between <br>\"" + recommender + "?";
+         analytics += "</div>";
 
-         $('#analytics').html(analytics);
-         $("#statement").attr("placeholder", recommender.replace(/<br ?\/?>/g, "") + "?").val("").focus().blur();
+         if (localStorage.getItem('analytics') == 0) {
+
+         }
+         else {
+          $('#analytics').html(analytics);
+        }
+         $("#statement").attr("placeholder", recommender_start + recommender.replace(/<br ?\/?>/g, "") + "?").val("").focus().blur();
 
 
 
@@ -2508,7 +2522,7 @@ sigma.parsers.json(
       var e_x = 0;
       var e_y = 0;
 
-    console.log(palette);
+    //console.log(palette);
     //  console.log(sigma.instances(0).graph.nodes()[54]);
 
 
@@ -2547,8 +2561,6 @@ sigma.parsers.json(
 
 
      sigma.instances(0).refresh;
-
-
 
 
      //console.log(top_communities);

@@ -389,20 +389,47 @@ a:hover.app-more-link {
 #analytics {
     font: 15px 'IstokWeb-Regular',sans-serif;
     position: fixed;
-    bottom: 60px;
+    bottom: 20px;
     font-size: 15px;
     line-height: 20px;
     text-align: left;
     right: 0;
     width: 320px;
+    clear: both;
     border-radius: 8px;
     padding: 10px;
     margin-right: 0px;
     z-index: 10;
-    background-color: rgba(250, 250, 250, 0.5);
+    background-color: rgba(250, 250, 250, 0.7);
     border-radius: 5px;
     /* box-shadow: 0px 1px 1px 2px #f3f4f6; */
     word-wrap: break-word;
+}
+#arrowfold {
+  /* display: inline-block; */
+  float: left;
+  position: relative;
+  text-align: center;
+  vertical-align: top;
+}
+#mainanalytics {
+    padding: 10px;
+    /* display: inline-block; */
+    clear: both;
+
+}
+#analyticsbutton {
+      position: fixed;
+      bottom: 15px;
+      text-align: right;
+      right: -2px; /* "#menu width" */
+      font-size: 8px; /* change this value to increase/decrease button size */
+      /* width: 2em;
+       height: auto;*/
+      padding: 0 2.3em;
+      z-index: 10;
+      margin-top: 6em;
+
 }
 
 .headline {

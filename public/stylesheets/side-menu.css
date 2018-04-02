@@ -525,6 +525,11 @@ Hides the menu at `48em`, but modify this based on your app's needs.
     #entryform {
         max-width: 261px;
     }
+    #analytics {
+      background-color: rgba(250, 250, 250, 0.9)!important;
+
+      display:none;
+    }
 
     textarea {
         max-height: 80px!important;
