@@ -2568,7 +2568,8 @@ sigma.parsers.json(
 
     // nice color palette
     if (graphPalette == 'color') {
-        var palette = new DistinctColors({count: max_community_number + 1, lightMin: 70, chromaMin: 60, samples: 100});
+        var palette = new DistinctColors({count: max_community_number + 1, lightMin: 60, lightMax: 75, chromaMin: 2, chromaMax: 15});
+
     }
     else if (graphPalette == 'mono') {
     // subdued chromo
@@ -2577,7 +2578,7 @@ sigma.parsers.json(
     }
     // good chromo
     else {
-        var palette = new DistinctColors({count: max_community_number + 1, lightMin: 60, lightMax: 75, chromaMin: 2, chromaMax: 15});
+        var palette = new DistinctColors({count: max_community_number + 1, lightMin: 70, chromaMin: 60, samples: 100});
     }
 
       var s_x = 0;
@@ -2673,7 +2674,7 @@ sigma.parsers.json(
           $('.community_node').each(function(){
             $(this).removeAttr('style');
           });
-          
+
           $('.top_nodes').each(function(){
             $(this).removeAttr('style');
           });
