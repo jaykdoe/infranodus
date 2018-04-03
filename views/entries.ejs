@@ -2482,7 +2482,7 @@ sigma.parsers.json(
                 if (recommender_iterations != 0) {
                   recommender += topp_communities[j].nodes[n].name +' - ';
                 }
-                analytics += topp_communities[j].nodes[n].name + " <div class='inlinesquare "+(topp_communities[j].id)+"'></div> ";
+                analytics += "<a href='#' class='community_node' community='"+topp_communities[j].id+"'>" + topp_communities[j].nodes[n].name + "</a> <div class='inlinesquare "+(topp_communities[j].id)+"'></div> ";
                 top_nodes.push(topp_communities[j].nodes[n].name);
             }
             if (recommender_iterations != 0) {
@@ -2535,7 +2535,7 @@ sigma.parsers.json(
            $('#analyticsbutton').removeClass('analytics-on');
          }
 
-         console.log(localStorage.getItem('analytics'));
+         //console.log(localStorage.getItem('analytics'));
 
          $("#statement").attr("placeholder", recommender_start + recommender.replace(/<br ?\/?>/g, "") + "?").val("").focus().blur();
 
@@ -2607,8 +2607,7 @@ sigma.parsers.json(
       $('.top_nodes').click(function(){
         var nodeLabel = $(this).text();
 
-        console.log(nodeLabel);
-        console.log('test')
+
         if (pinnedNodes.indexOf(nodeLabel) < 0) {
             pinnedNodes.push(nodeLabel);
         }
@@ -2632,6 +2631,16 @@ sigma.parsers.json(
 
       });
 
+
+      $('.community_node').click(function(){
+            var communityClicked = $(this).attr('community');
+
+
+            console.log(communityClicked);
+
+
+
+      });
 
 
 
@@ -2757,15 +2766,6 @@ sigma.parsers.json(
     }
 
 
-      $('.community_node').click(function(){
-            var communityClicked = $(this).attr('community');
-
-            console.log('here');
-            console.log(communityClicked);
-
-
-
-    });
 
     function entryDoubleClick() {
 
