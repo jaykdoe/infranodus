@@ -406,6 +406,8 @@ a:hover.app-more-link {
     display:none;
 }
 
+
+
 #analytics a {
     color: inherit!important;
     text-decoration: none!important;
@@ -414,6 +416,11 @@ a:hover.app-more-link {
 #analytics a:hover {
     color: #0089E0!important;
     text-decoration: underline!important;
+}
+
+#resetgraph a {
+  color: #0089E0!important;
+  text-decoration: underline!important;
 }
 
 

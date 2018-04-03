@@ -2502,7 +2502,7 @@ sigma.parsers.json(
             if (recommender_iterations != 0) {
               recommender = recommender.slice(0, -3);
               if (j != recommender_iterations) {
-              recommender += '"</div> and <div class="headline">"';
+              recommender += '"</div> and <br><div class="headline">"';
               }
               recommender_iterations = recommender_iterations - 1;
             }
@@ -2537,7 +2537,11 @@ sigma.parsers.json(
          analytics = analytics.slice(0, -7);
 
          analytics += "<br><br><div class='headline'>Next Idea Tip:</div> <br>What is the relation between <br><div class='headline'>\"" + recommender + "\"</div>?";
+
+         analytics += "<br><br><a href='#' id='resetgraph'>reset graph selections</a>";
+
          analytics += "</div>";
+
 
           // Check analytics display
 
@@ -2632,11 +2636,13 @@ sigma.parsers.json(
 
         if (pinnedNodes.indexOf(nodeLabel) < 0) {
             pinnedNodes.push(nodeLabel);
+            $(this).attr('style','color: #0089e0 !important; text-decoration: underline !important;');
         }
         else {
             var pinnedIndex = pinnedNodes.indexOf(nodeLabel);
             if (pinnedIndex > -1) {
                 pinnedNodes.splice(pinnedIndex,1);
+                $(this).removeAttr('style');
                 $('.entry').fadeIn(400);
             }
 
@@ -2654,7 +2660,29 @@ sigma.parsers.json(
       });
 
 
+
       var commClicked = [];
+        $('#resetgraph').click(function(){
+          sigma.instances(0).graph.nodes().forEach(function(n) {
+                  n.color = n.originalColor;
+                  n.label = n.originalLabel;
+          });
+          pinnedNodes = [];
+          commClicked = [];
+
+          $('.community_node').each(function(){
+            $(this).removeAttr('style');
+          });
+          
+          $('.top_nodes').each(function(){
+            $(this).removeAttr('style');
+          });
+
+          filter_statements(pinnedNodes);
+          sigma.instances(0).refresh();
+        });
+
+
 
       $('.community_node').click(function(){
             var communityClicked = $(this).attr('community').toString();
@@ -2663,15 +2691,20 @@ sigma.parsers.json(
 
             if (pinnedNodes.indexOf(nodeLabel) < 0) {
                 pinnedNodes.push(nodeLabel);
+                $(this).attr('style','color: #0089e0 !important; text-decoration: underline !important;');
             }
             else {
                 var pinnedIndex = pinnedNodes.indexOf(nodeLabel);
                 if (pinnedIndex > -1) {
                     pinnedNodes.splice(pinnedIndex,1);
+                    $(this).removeAttr('style');
                     $('.entry').fadeIn(400);
                 }
 
             }
+
+
+
 
           //  socket.emit('node click', {pinnedNodes: pinnedNodes, splicedNodes: splicedNodes, nodeLabel: nodeLabel, pinnedIndex: pinnedIndex});
             // console.log(pinnedNodes);
