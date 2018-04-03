@@ -2661,7 +2661,21 @@ sigma.parsers.json(
 
             var nodeLabel = $(this).text();
 
+            if (pinnedNodes.indexOf(nodeLabel) < 0) {
+                pinnedNodes.push(nodeLabel);
+            }
+            else {
+                var pinnedIndex = pinnedNodes.indexOf(nodeLabel);
+                if (pinnedIndex > -1) {
+                    pinnedNodes.splice(pinnedIndex,1);
+                    $('.entry').fadeIn(400);
+                }
 
+            }
+
+          //  socket.emit('node click', {pinnedNodes: pinnedNodes, splicedNodes: splicedNodes, nodeLabel: nodeLabel, pinnedIndex: pinnedIndex});
+            console.log(pinnedNodes);
+            filter_statements(pinnedNodes, 'community');
 
 
 
@@ -2704,7 +2718,7 @@ sigma.parsers.json(
 
             else {
 
-                if (pinnedNodes.length == 0) {
+
                     // sigma.instances(0).graph.edges().forEach(function(e) {
                     //     e.color = e.originalColor;
                     // });
@@ -2726,7 +2740,7 @@ sigma.parsers.json(
                     });
 
 
-                }
+
 
             }
 
@@ -3282,7 +3296,7 @@ sigma.parsers.json(
 
                     // Relaunch the function with the newly cleared list of pinnedNodes
 
-                    filter_statements(pinnedNodes);
+                    filter_statements(pinnedNodes, origin);
 
                 }
 
@@ -3332,8 +3346,9 @@ sigma.parsers.json(
         }
 
         // Show only the clicked nodes and their neighbors in the graph
-
-        filter_graph(pinnedNodes, origin);
+        if (origin != 'community') {
+          filter_graph(pinnedNodes, origin);
+        }
 
         // Add triggers to newly shown Tags elements
 
