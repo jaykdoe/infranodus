@@ -74,7 +74,7 @@
              </div>
 
              <div id="analytics"></div>
-              <div id="entryform">
+             <div id="entryform">
 
 
 
@@ -213,7 +213,7 @@
                     <span></span>
                 </a>
             <% } %>
-            <div id="analyticsbutton"><img src="/images/info.png"></div>
+            <a href="javascript:" id="analyticsbutton"></a>
       </div>
 
     </div>
@@ -1030,15 +1030,28 @@ sigma.parsers.json(
 
             dragNodes();
 
-            // Community
+            // Community detect algorithm
 
             communityDetect();
 
-            var showanalytics = localStorage.getItem('analytics');
+
+
+
 
             $('#analyticsbutton').click(function(){
 
-                     $('#analytics').toggle("slide");
+                     $('#analytics').toggle('slide', function(){
+                       if ($('#analytics').is(":visible")) {
+                         localStorage.setItem('analytics', 1);
+                         $('#analyticsbutton').addClass('analytics-on');
+                       }
+                       else {
+                         localStorage.setItem('analytics', 0);
+                         $('#analyticsbutton').removeClass('analytics-on')
+                       }
+                     });
+
+
 
             });
 
@@ -2494,12 +2507,22 @@ sigma.parsers.json(
          analytics += "<br><br><div class='headline'>Next Idea Tip:</div> What is the relation between <br>\"" + recommender + "?";
          analytics += "</div>";
 
-         if (localStorage.getItem('analytics') == 0) {
+          // Check analytics display
 
+         if (!localStorage.getItem('analytics') || localStorage.getItem('analytics') == 1) {
+            $('#analytics').html(analytics);
+            $('#analytics').show();
+            localStorage.setItem('analytics', 1);
+            $('#analyticsbutton').addClass('analytics-on');
          }
          else {
-          $('#analytics').html(analytics);
-        }
+           $('#analytics').html(analytics);
+           $('#analytics').hide();
+           $('#analyticsbutton').removeClass('analytics-on');
+         }
+
+         console.log(localStorage.getItem('analytics'));
+
          $("#statement").attr("placeholder", recommender_start + recommender.replace(/<br ?\/?>/g, "") + "?").val("").focus().blur();
 
 
