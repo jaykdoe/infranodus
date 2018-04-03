@@ -2514,8 +2514,9 @@ sigma.parsers.json(
 
 
          for (var ind in degree_nodes) {
-             analytics += '<div class="inlinesquare '+degree_nodes[ind].id+'"></div> ' + degree_nodes[ind].label + ' &nbsp;';
+             analytics += '<div class="inlinesquare '+degree_nodes[ind].id+'"></div> <a href="#" class="top_nodes">' + degree_nodes[ind].label + '</a> &nbsp;';
          }
+         analytics = analytics.slice(0, -7);
 
          analytics += "<br><br><div class='headline'>Next Idea Tip:</div> What is the relation between <br>\"" + recommender + "?";
          analytics += "</div>";
@@ -2603,6 +2604,33 @@ sigma.parsers.json(
   //   console.log(sigma.instances(0).graph.nodes());
 }
 
+      $('.top_nodes').click(function(){
+        var nodeLabel = $(this).text();
+
+        console.log(nodeLabel);
+        console.log('test')
+        if (pinnedNodes.indexOf(nodeLabel) < 0) {
+            pinnedNodes.push(nodeLabel);
+        }
+        else {
+            var pinnedIndex = pinnedNodes.indexOf(nodeLabel);
+            if (pinnedIndex > -1) {
+                pinnedNodes.splice(pinnedIndex,1);
+                $('.entry').fadeIn(400);
+            }
+
+        }
+
+        // console.log("node clicked, now will filter for nodes " + pinnedNodes);
+        socket.emit('node click', {pinnedNodes: pinnedNodes, splicedNodes: splicedNodes, nodeLabel: nodeLabel, pinnedIndex: pinnedIndex});
+
+
+        // Now show / hide statements that have the search field
+
+        filter_statements(pinnedNodes);
+        return false;
+
+      });
 
 
 
@@ -2728,6 +2756,16 @@ sigma.parsers.json(
 
     }
 
+
+      $('.community_node').click(function(){
+            var communityClicked = $(this).attr('community');
+
+            console.log('here');
+            console.log(communityClicked);
+
+
+
+    });
 
     function entryDoubleClick() {
 

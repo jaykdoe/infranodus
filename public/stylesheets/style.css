@@ -405,6 +405,19 @@ a:hover.app-more-link {
     word-wrap: break-word;
     display:none;
 }
+
+#analytics a {
+    color: inherit!important;
+    text-decoration: none!important;
+}
+
+#analytics a:hover {
+    color: #0089E0!important;
+    text-decoration: underline!important;
+}
+
+
+
 #arrowfold {
   /* display: inline-block; */
   float: left;
@@ -704,7 +717,6 @@ a:hover.app-more-link {
     color: #00B7FF;
 
 }
-
 
 
 
