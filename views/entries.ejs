@@ -2566,12 +2566,14 @@ sigma.parsers.json(
     if (graphPalette == 'color') {
         var palette = new DistinctColors({count: max_community_number + 1, lightMin: 70, chromaMin: 60, samples: 100});
     }
-    // good chromo
-    //  var palette = new DistinctColors({count: max_community_number + 1, lightMin: 8, lightMax: 100, chromaMin: 4, chromaMax: 7});
-
+    else if (graphPalette == 'mono') {
     // subdued chromo
+        var palette = new DistinctColors({count: max_community_number + 1, lightMin: 40, lightMax: 60, chromaMin: 2, chromaMax: 8});
+    //
+    }
+    // good chromo
     else {
-      var palette = new DistinctColors({count: max_community_number + 1, lightMin: 40, lightMax: 60, chromaMin: 2, chromaMax: 8});
+        var palette = new DistinctColors({count: max_community_number + 1, lightMin: 60, lightMax: 75, chromaMin: 2, chromaMax: 15});
     }
 
       var s_x = 0;
