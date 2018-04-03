@@ -199,7 +199,7 @@
                 </a>
         <div id="controls">
                 <div id="graph-reload">
-                <a href="javascript:" id="go_next"><img src="/images/eyezoom.png"  title="choose a few nodes from the graph and click this button to find out more" vspace="0" border="0"></a><br><a href="javascript:location.reload();" id="reloadbutton"><img src="/images/reload.png" title="clear and reload graph" vspace="6" border="0"></a><br><a href="javascript:" id="improve-layout"></a><br><a href="javascript:" id="walkthrough"><img src="/images/question.png" title="show tutorial" vspace="3" border="0"></a>
+                <a href="javascript:" id="go_next"><img src="/images/eyezoom.png"  title="choose a few nodes from the graph and click this button to find out more" vspace="0" border="0"></a><br><a href="javascript:location.reload();" id="reloadbutton"><img src="/images/reload.png" title="clear and reload graph" vspace="6" border="0"></a><br><a href="javascript:" title="improve layout" id="improve-layout"></a><br><a href="javascript:" title="show tutorial" id="walkthrough"></a>
 
         </div>
 
@@ -1918,10 +1918,24 @@ sigma.parsers.json(
                     content: "You can click on the nodes on the graph to see what they're connected to and to filter the statements, which contain them."
                   },
                   {
+                    element: "#analyticsbutton",
+                    placement: "left",
+                    title: "Text / Graph Analytics",
+                    content: "Here you can see the main topics identified in the graph and the main keywords / nodes and click them to get more insights about the graph. You can also discover what questions to ask to make your discourse more connected.",
+                    onShow: function (tour) {
+                        $('#chat-link').click();
+                        $('#analyticsbutton').click();
+                    }
+                  },
+                  {
                     element: "#graph-container",
                     placement: "bottom",
                     title: "Discover New Ideas",
-                    content: "You can also discover new ideas if you look for the gaps inside the graph."
+                    content: "You can also discover new ideas if you look for the gaps inside the graph.",
+                    onShow: function (tour) {
+                        $('#chat-link').click();
+                        $('#analyticsbutton').click();
+                    }
                   },
                   {
                     element: "#go_next",
@@ -2480,23 +2494,27 @@ sigma.parsers.json(
 
             for (var n = 0; n < topp_communities[j].nodes.length; n++) {
                 if (recommender_iterations != 0) {
-                  recommender += topp_communities[j].nodes[n].name +' - ';
+                  recommender += "<a href='#' class='community_node' community='"+topp_communities[j].id+"'>" + topp_communities[j].nodes[n].name +'</a> - ';
                 }
                 analytics += "<a href='#' class='community_node' community='"+topp_communities[j].id+"'>" + topp_communities[j].nodes[n].name + "</a> <div class='inlinesquare "+(topp_communities[j].id)+"'></div> ";
                 top_nodes.push(topp_communities[j].nodes[n].name);
             }
             if (recommender_iterations != 0) {
               recommender = recommender.slice(0, -3);
-              recommender += '"<br> and "';
+              if (j != recommender_iterations) {
+              recommender += '"</div> and <div class="headline">"';
+              }
               recommender_iterations = recommender_iterations - 1;
             }
           //  analytics = analytics.slice(0, -3);
             analytics += " <br>" + (j + 2) + ": ";
          }
 
-         recommender = recommender.slice(0, -10);
+         //recommender = recommender.slice(0, -10);
          recommender += ''
          analytics = analytics.slice(0, -7);
+
+
 
          // Get the nodes with the highest degree
          var degree_nodes = [];
@@ -2518,7 +2536,7 @@ sigma.parsers.json(
          }
          analytics = analytics.slice(0, -7);
 
-         analytics += "<br><br><div class='headline'>Next Idea Tip:</div> What is the relation between <br>\"" + recommender + "?";
+         analytics += "<br><br><div class='headline'>Next Idea Tip:</div> <br>What is the relation between <br><div class='headline'>\"" + recommender + "\"</div>?";
          analytics += "</div>";
 
           // Check analytics display
@@ -2537,7 +2555,9 @@ sigma.parsers.json(
 
          //console.log(localStorage.getItem('analytics'));
 
-         $("#statement").attr("placeholder", recommender_start + recommender.replace(/<br ?\/?>/g, "") + "?").val("").focus().blur();
+         var recommender_tip = $(recommender).text();
+
+         $("#statement").attr("placeholder", recommender_start + recommender_tip + "?").val("").focus().blur();
 
 
 

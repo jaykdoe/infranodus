@@ -459,6 +459,7 @@ a:hover.app-more-link {
 
 .headline {
   font: 15px 'IstokWeb-Bold',sans-serif;
+  display:inline;
 }
 
 .inlinesquare {
