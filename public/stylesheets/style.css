@@ -389,7 +389,7 @@ a:hover.app-more-link {
 #analytics {
     font: 15px 'IstokWeb-Regular',sans-serif;
     position: fixed;
-    bottom: 20px;
+    bottom: 0px;
     font-size: 15px;
     line-height: 20px;
     text-align: left;
