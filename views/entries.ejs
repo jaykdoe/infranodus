@@ -2674,12 +2674,13 @@ sigma.parsers.json(
             }
 
           //  socket.emit('node click', {pinnedNodes: pinnedNodes, splicedNodes: splicedNodes, nodeLabel: nodeLabel, pinnedIndex: pinnedIndex});
-            console.log(pinnedNodes);
+            // console.log(pinnedNodes);
             filter_statements(pinnedNodes, 'community');
 
 
 
             if (commClicked.indexOf(communityClicked) == -1) {
+                // console.log("the community clicked was not clicked before");
 
 
                 // sigma.instances(0).graph.edges().forEach(function(e) {
@@ -2704,7 +2705,7 @@ sigma.parsers.json(
                     if (commClicked.indexOf(n.community.toString()) > -1)  {
                         n.color = n.originalColor;
                         n.label = n.originalLabel;
-                        if (n.originalLabel == nodeLabel) {
+                        if (n.originalLabel == nodeLabel && pinnedNodes.indexOf(n.originalLabel) > -1) {
                           n.color = '#0089e0';
                         }
                     }
@@ -2717,8 +2718,9 @@ sigma.parsers.json(
             }
 
             else {
+              // console.log("the community was clicked before");
 
-
+                if (pinnedNodes.length == 0) {
                     // sigma.instances(0).graph.edges().forEach(function(e) {
                     //     e.color = e.originalColor;
                     // });
@@ -2740,7 +2742,81 @@ sigma.parsers.json(
                     });
 
 
+                  }
+                else {
+                    // We clicked on the community which is in the DB of clicked ones and We have some pinned nodes left
 
+                      // Is the node clicked in the pinned nodes?
+                      if (pinnedNodes.indexOf(nodeLabel) > -1) {
+                        // console.log('in the pinned nodes')
+                        sigma.instances(0).graph.nodes().forEach(function(n) {
+                          if (commClicked.indexOf(n.community.toString()) > -1)  {
+                              n.color = n.originalColor;
+                              n.label = n.originalLabel;
+                              if (n.originalLabel == nodeLabel && pinnedNodes.indexOf(n.originalLabel) > -1) {
+                                n.color = '#0089e0';
+                              }
+                          }
+                          else {
+                            n.color = '#ddd';
+                            n.label = '';
+                          }
+                      });
+                    }
+                    // It is not in the pinneed nodes
+                    else {
+                      // console.log('not in the pinneed nodes')
+                      // console.log(commClicked)
+                      // console.log(pinnedNodes);
+
+                      // is the last node of the community?
+                      var islastnode = 0;
+                      for (key in topp_communities) {
+                        if (communityClicked == topp_communities[key].id) {
+                          for (kkey in topp_communities[key].nodes) {
+                            // console.log(topp_communities[key].nodes[kkey].name);
+                            // console.log(pinnedNodes.indexOf(topp_communities[key].nodes[kkey].name));
+                            if (pinnedNodes.indexOf(topp_communities[key].nodes[kkey].name) > -1) {
+                              islastnode = 1;
+                            }
+
+                          }
+                        }
+                      }
+                      // console.log(islastnode);
+
+                      if (!islastnode) {
+                        commClicked.splice(commClicked.indexOf(communityClicked.toString()),1);
+                      }
+                      //console.log(pinnedNodes);
+
+                      sigma.instances(0).graph.nodes().forEach(function(n) {
+                        if (commClicked.indexOf(n.community.toString()) < 0) {
+                                if (commClicked.length == 0) {
+                                  n.color = n.originalColor;
+                                  n.label = n.originalLabel;
+                                }
+                                else {
+                                  n.color = '#ddd';
+                                  n.label = '';
+                                }
+
+                        }
+
+                        if (pinnedNodes.indexOf(n.originalLabel) > -1) {
+                          n.color = '#0089e0';
+                          n.label = n.originalLabel;
+                        }
+                        if (pinnedNodes.indexOf(n.originalLabel) < 0 && islastnode && n.originalLabel == nodeLabel) {
+                          n.color = n.originalColor;
+                          n.label = n.originalLabel;
+                        }
+
+
+                      });
+
+                    }
+                }
 
             }
 
