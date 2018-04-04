@@ -303,6 +303,8 @@
 
     var hide_always = getUrlVars()["hide_always"];
 
+    var show_analytics = getUrlVars()["analytics"];
+
     var hide_when_small = getUrlVars()["hide_when_small"];
 
     var language = getUrlVars()["language"];
@@ -2553,6 +2555,11 @@ sigma.parsers.json(
          }
          else {
            $('#analytics').html(analytics);
+           $('#analytics').hide();
+           $('#analyticsbutton').removeClass('analytics-on');
+         }
+
+         if (hide_always && !show_analytics) {
            $('#analytics').hide();
            $('#analyticsbutton').removeClass('analytics-on');
          }
