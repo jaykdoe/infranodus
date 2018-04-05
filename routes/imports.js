@@ -36,6 +36,8 @@ var Instruments = require('../lib/tools/instruments.js');
 var mimelib = require("mimelib");
 
 var phantom = require('phantom');
+
+var rp = require('request-promise');
 var cheerio = require('cheerio');
 
 var fs = require('fs');
@@ -182,6 +184,14 @@ exports.renderTwitter = function(req, res) {
         }
         res.render('twitter', { title: 'InfraNodus: Twitter Text Network Visualization', evernote: '', context: req.query.context, contextlist: contextslist, notebooks: '', fornode: req.query.fornode });
 
+};
+
+exports.renderURL = function(req, res) {
+        var contextslist = [];
+        if (res.locals.contextslist) {
+            contextslist = res.locals.contextslist;
+        }
+        res.render('importurl', { title: 'InfraNodus: Twitter Text Network Visualization', evernote: '', context: req.query.context, contextlist: contextslist, notebooks: '', fornode: req.query.fornode });
 };
 
 
@@ -1514,29 +1524,7 @@ exports.submit = function(req, res,  next) {
 
                         }
 
-                        function saveHighlight(highlight, contexts) {
 
-
-
-                                // and finally create an object to send this entry with the right context
-
-                                var req = {
-                                    body:  {
-                                        entry: {
-                                            body: highlight
-                                        },
-                                        context: ''
-                                    },
-
-                                    contextids: contexts,
-                                    internal: 1,
-                                };
-
-
-                               entries.submit(req,res);
-
-
-                        }
 
                         function saveFileAtOnce(fullfiletext, contexts) {
 
@@ -1589,6 +1577,152 @@ exports.submit = function(req, res,  next) {
             res.error('Sorry, but InfraNodus does not recognize this kind of content yet. Add a feature request on GitHub and we will look into it.');
             res.redirect('back');
         }
+
+
+
+    }
+
+    else if (service == 'url') {
+
+
+        // TODO add RSS feed service
+
+        var process_type = 'classes';
+
+        var numHighlights = 0;
+
+        //console.log(req.body);
+
+        //TODO sanitize and check if empty
+
+        //TODO limit the length of the article
+
+        // TODO limit not too many snippets
+
+        var processfield = req.body.processfield;
+        var processheadline = req.body.processheadline;
+        var processteaser = req.body.processteaser;
+        var processurl = req.body.processurl;
+
+        console.log("processing url " + req.body.url);
+        if (!processheadline){
+          processheadline = '';
+        }
+        if (!processteaser){
+          processteaser = '';
+        }
+        if (!processurl){
+          processurl = '';
+        }
+
+        var addToContexts = [];
+
+        //TODO what if there's no context
+
+        addToContexts.push(importContext);
+
+        var options = {
+            uri: req.body.url,
+            headers: {
+                'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/21.0.1180.89 Safari/537.1'
+            },
+            transform: function (body) {
+               return cheerio.load(body);
+            }
+        };
+
+
+        validate.getContextID(user_id, addToContexts, function(result, err) {
+
+                if (err) {
+                    res.error('Something went wrong when adding contexts into Neo4J database. Try to choose a different name and do not use special characters.');
+                    res.redirect('back');
+                }
+
+                else {
+
+                    // What are the contexts that already exist for this user and their IDs?
+                    // Note: actually there's been no contexts, so we just created IDs for all the contexts contained in the statement
+                    var contexts = result;
+
+
+                    var atLeastOne = 0;
+
+                    console.log('entering to RP');
+
+                    rp(options)
+
+                      .then(function ($) {
+
+                          console.log('successful RP');
+
+                          $(processfield).each(function (index) {
+
+                                if (processurl.length > 0) {
+                                      var thisurl = $(this).find(processurl).attr('href');
+                                }
+                                else {
+                                      var thisurl = '';
+                                }
+
+                                if (processheadline.length > 0) {
+                                      var thisheadline = $(this).find(processheadline).text();
+                                }
+                                else {
+                                      var thisheadline = '';
+                                }
+
+                                if (processteaser.length > 0) {
+                                      var thisteaser = $(this).find(processteaser).text();
+                                }
+                                else {
+                                      var thisteaser = '';
+                                }
+
+                                var thisprocessurl = processurl;
+
+
+                                if (thisurl === undefined || !thisurl || thisurl == 'undefined' || thisurl == undefined) {
+
+                                    thisprocessurl = processurl + ' a';
+                                    thisurl = $(this).find(thisprocessurl).attr('href');
+
+                                }
+
+                                if (thisheadline.length > 0 || thisteaser.length > 0) {
+                                  console.log('processing snippet');
+                                  saveHighlight(thisheadline + ' ' + thisteaser + ' ' + thisurl, contexts);
+                                  atLeastOne = 1;
+                                }
+
+
+                            });
+                              console.log('processing continues');
+                            if (atLeastOne == 0) {
+                                console.log('enter condition');
+                                var thisurl = req.body.url;
+                              $(processfield).each(function (index) {
+                                      console.log('processing text');
+                                      console.log($(this).text());
+                                      saveHighlight($(this).text() + ' ' + thisurl, contexts);
+
+                              });
+                            }
+
+                            res.error('Importing the content... Please, reload this page in 30 seconds...');
+                            res.redirect(res.locals.user.name + '/' + importContext + '/edit');
+
+                       })
+                       .catch(function (err) {
+                         console.log('nonsuccessful RP');
+                         res.error('Could not access the URL specified or extract any information.' + err);
+                         res.redirect('back');
+                       });
+
+
+                }
+
+        });
 
 
 
@@ -1716,6 +1850,28 @@ exports.submit = function(req, res,  next) {
 
 
 
+
+
+    }
+
+    function saveHighlight(highlight, contexts) {
+
+            // and finally create an object to send this entry with the right context
+
+            var req = {
+                body:  {
+                    entry: {
+                        body: highlight
+                    },
+                    context: ''
+                },
+
+                contextids: contexts,
+                internal: 1,
+            };
+
+
+           entries.submit(req,res);
 
 
     }

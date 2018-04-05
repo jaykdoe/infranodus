@@ -26,6 +26,7 @@
     "pdfreader": "^0.2.4",
     "phantom": "^4.0.12",
     "phpmorphy": "^2.0.13",
+    "request-promise": "^4.2.2",
     "send": "^0.16.2",
     "socket.io": "^2.0.4",
     "string": "^3.3.3",

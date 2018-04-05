@@ -47,7 +47,7 @@ exports.settings = {
     inlanguage: "en",
 
     // Default color palette of the graph
-    palette: "mono"
+    palette: "default"
 
 
 }
