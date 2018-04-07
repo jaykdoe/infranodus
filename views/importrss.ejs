@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/jquery.textcomplete.css' />
+    <link rel="stylesheet" href="/stylesheets/side-menu.css">
+    <link rel="stylesheet" href="/stylesheets/jquery-ui.min.css">
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+</head>
+<body>
+<% include statsabove %>
+<div id="layout">
+    <!-- Menu toggle -->
+    <a href="#menu" id="menuLink" class="menu-link">
+        <!-- Hamburger icon -->
+        <span></span>
+    </a>
+
+    <% include menu %>
+
+
+
+
+    <div id='content'>
+
+        <div id='welcomemessage'>
+
+            Visualize the news of the day (or any set of RSS feeds):
+
+            <% include messages %>
+
+            <form action='/import' name='submitform' id="submitform" method='post' enctype="multipart/form-data" class='pure-form pure-form-stacked'>
+                    <br>
+
+                    <input type="hidden" name="source" value="rss">
+
+                    <select name="urlselect" id="urlselect">
+                      <option value="news" selected>News of the Day</option>
+                      <option value="custom">Custom RSS feeds</option>
+                    </select>
+                    <br>
+                    <a href="javascript:" id="advancedpane">+ settings</a>
+                    <br>
+                    <div id="urlsetting">
+                      <br>
+                        RSS feeds to be visualized:
+                        <textarea id="rssinput" name="rssinput" rows="4" cols="20">https://www.theguardian.com/rss http://www.wsj.com/xml/rss/3_7085.xml http://rss.nytimes.com/services/xml/rss/nyt/World.xml http://feeds.washingtonpost.com/rss/world https://www.telegraph.co.uk/rss.xml https://www.ft.com/?format=rss</textarea>
+                        <br>
+                        <label for="rssitems" class="pure-input" id="rssitemscaption">
+                            # of items for each feed:
+                            <input type="text" name="rssitems" id="rssitems" value="10"/>
+                        </label>
+
+                    </div>
+
+
+
+
+                <br>
+                Save in Context:
+                <br>
+                <input type='text' name='context' id="context" value='<% if (context) { %><%= context %><% } else { %>news<% } %>'/>
+                <br>
+
+
+                <input type="hidden" id="selectedContexts" name="selectedContexts" value="">
+                <input type="hidden" name="statementid" value="">
+                &nbsp;<br>
+                <input type='submit' name="submit" value="save" class="pure-button pure-button-primary">
+
+            </form>   &nbsp;<br>&nbsp;<br>
+
+
+
+
+
+        </div>
+
+        <div id="graph-container"></div>
+
+
+    </div>
+
+
+
+
+</div>
+
+
+<script src="/javascripts/jquery.min.js"></script>
+<script src="/javascripts/jquery-ui.min.js"></script>
+<script src="/javascripts/string.min.js"></script>
+<script src="/javascripts/underscore-min.js"></script>
+<script src="/javascripts/jquery.textcomplete.js"></script>
+<script src='/javascripts/jquery.autosize.js'></script>
+<script src="/javascripts/ui.js"></script>
+<script src="/javascripts/jquery.mobile-events.min.js"></script>
+
+
+<script>
+
+      $(document).ready(function () {
+
+          var nowdate = new Date().toISOString().slice(2,10).replace(/-/g,"").replace(/:/g,"");
+
+          $('#context').val('news' + nowdate);
+
+          var advancedpane = 0;
+
+          $("#advancedsettings").hide();
+          $('#urlsetting').hide();
+
+          $("#advancedpane").click(function() {
+              if (!advancedpane) {
+          //    $("#advancedsettings").show();
+              $("#advancedpane").text('– settings');
+              $("#urlsetting").show();
+              advancedpane = 1;
+              }
+              else {
+            //  $("#advancedsettings").hide();
+              $("#advancedpane").text('+ settings');
+              $("#urlsetting").hide();
+              advancedpane = 0;
+
+              }
+
+          });
+
+          $('#urlselect').change(function () {
+
+
+            var currentselection = $(this).val();
+            $('#context').val(currentselection + nowdate);
+
+            if (currentselection == 'news') {
+              $('#rssinput').val('https://www.theguardian.com/rss http://www.wsj.com/xml/rss/3_7085.xml http://rss.nytimes.com/services/xml/rss/nyt/World.xml http://feeds.washingtonpost.com/rss/world https://www.ft.com/?format=rss');
+            }
+            else if (currentselection == 'custom') {
+              $('#rssinput').val('');
+              $("#urlsetting").show();
+              $("#advancedpane").text('– settings');
+              advancedpane = 1;
+            }
+
+
+
+          });
+
+
+
+
+          $('form#submitform').submit(function(){
+                $(this).find('input[type=submit]').attr('disabled', 'disabled');
+          });
+
+
+
+
+
+
+
+      });
+
+
+</script>
+
+
+<% include statsbelow %>
+</body>
+</html>

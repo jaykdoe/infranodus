@@ -46,6 +46,8 @@ var fs = require('fs');
 
 var google = require('google');
 
+const feedparser = require('feedparser-promised');
+
 // This is for PDF reader
 global.navigator = {
   userAgent: 'node',
@@ -194,6 +196,14 @@ exports.renderURL = function(req, res) {
             contextslist = res.locals.contextslist;
         }
         res.render('importurl', { title: 'InfraNodus: Twitter Text Network Visualization', evernote: '', context: req.query.context, contextlist: contextslist, notebooks: '', fornode: req.query.fornode });
+};
+
+exports.renderRSS = function(req, res) {
+        var contextslist = [];
+        if (res.locals.contextslist) {
+            contextslist = res.locals.contextslist;
+        }
+        res.render('importrss', { title: 'InfraNodus: Twitter Text Network Visualization', evernote: '', context: req.query.context, contextlist: contextslist, notebooks: '', fornode: req.query.fornode });
 };
 
 
@@ -1586,17 +1596,9 @@ exports.submit = function(req, res,  next) {
 
     else if (service == 'url') {
 
-
-        // TODO add RSS feed service
-
-        var process_type = 'classes';
-
         var numHighlights = 0;
 
         //console.log(req.body);
-
-        //TODO limit the length of the article
-
 
         var processfield = validate.sanitize(req.body.processfield);
         var processheadline = validate.sanitize(req.body.processheadline);
@@ -1663,7 +1665,7 @@ exports.submit = function(req, res,  next) {
 
                             saveHighlight(extracteddata.text + ' ' + thisurl, contexts);
 
-                            res.error('Importing the content automatically... Please, reload this page in 30 seconds...');
+                            res.message('Importing the content automatically... Please, reload this page in 30 seconds...');
                             res.redirect(res.locals.user.name + '/' + importContext + '/edit');
 
                           }
@@ -1724,7 +1726,7 @@ exports.submit = function(req, res,  next) {
                               });
                             }
 
-                            res.error('Importing the content based on your classes... Please, reload this page in 30 seconds...');
+                            res.message('Importing the content based on your classes... Please, reload this page in 30 seconds...');
                             res.redirect(res.locals.user.name + '/' + importContext + '/edit');
                         }
 
@@ -1734,6 +1736,94 @@ exports.submit = function(req, res,  next) {
                          res.error('Could not access the URL specified or extract any information.' + err);
                          res.redirect('back');
                        });
+
+
+                }
+
+        });
+
+
+
+    }
+
+    else if (service == 'rss') {
+
+        var rssSubmitted = validate.sanitize(req.body.rssinput);
+
+        var rssRequested = rssSubmitted.split(/\s+/).slice(0,10);
+
+        var addToContexts = [];
+
+        var totalProcessed = 0;
+
+        var rssItemsMax = validate.sanitize(req.body.rssitems);
+
+        addToContexts.push(importContext);
+
+        validate.getContextID(user_id, addToContexts, function(result, err) {
+
+                if (err) {
+                    res.error('Something went wrong when adding contexts into Neo4J database. Try to choose a different name and do not use special characters.');
+                    res.redirect('back');
+                }
+
+                else {
+
+                    // What are the contexts that already exist for this user and their IDs?
+                    // Note: actually there's been no contexts, so we just created IDs for all the contexts contained in the statement
+                    var contexts = result;
+
+                    // How many statements from each RSS feed do we take max?
+                    var limito;
+
+                    if (rssItemsMax) {
+                      if (rssItemsMax < 300) {
+                        limito = rssItemsMax;
+                      }
+                      else {
+                        limito = 10;
+                      }
+                    }
+
+                    for (var item in rssRequested) {
+
+                      // How many RSS feeds in total can we process?
+
+                          feedparser.parse(rssRequested[item]).then( (items) => {
+
+                              var rssIterations = 0;
+
+                              items.forEach(itemo => {
+
+                                if (rssIterations < limito) {
+
+                                    var thisheadline =  S(itemo.title).stripTags().s;
+                                    var thisteaser = S(itemo.description).stripTags().s.replace('Continue reading...', ' ').replace('&nbsp;',' ');
+                                    var thisurl = S(itemo.link).stripTags().s;
+
+                                    saveHighlight(thisheadline + ' ' + thisurl, contexts);
+
+                                    rssIterations = rssIterations + 1;
+                                    totalProcessed = totalProcessed + 1;
+
+                               }
+
+                              });
+
+                            }).catch(error => {
+                              console.log('ERROR WITH RSS FEED');
+                              console.log(error);
+                              // res.message('Something went wrong with one of the RSS feeds... Please, reload this page in 30 seconds... If nothing appears, go back.');
+                              // res.redirect(res.locals.user.name + '/' + importContext + '/edit');
+                            });
+
+
+
+
+                    }
+
+                      res.message('Importing the RSS feeds... Please, reload this page in 30 seconds...');
+                      res.redirect(res.locals.user.name + '/' + importContext + '/edit');
 
 
                 }

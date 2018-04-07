@@ -11,6 +11,7 @@
     "ejs": "^2.5.7",
     "evernote": "^2.0.5",
     "express": "^3.4.8",
+    "feedparser-promised": "^1.5.0",
     "flowdock-text": "^1.2.0",
     "google": "^2.1.0",
     "imap": "^0.8.19",

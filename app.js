@@ -140,6 +140,7 @@ app.post('/settings', pass.ensureAuthenticated, settings.modify);
 app.get('/import', pass.ensureAuthenticated, validate.getContextsList(), imports.render);
 app.get('/google', pass.ensureAuthenticated, validate.getContextsList(), imports.renderGoogle);
 app.get('/importurl', pass.ensureAuthenticated, validate.getContextsList(), imports.renderURL);
+app.get('/importrss', pass.ensureAuthenticated, validate.getContextsList(), imports.renderRSS);
 app.get('/apps', pass.ensureAuthenticated, validate.getContextsList(), imports.renderApps);
 app.get('/twitter', pass.ensureAuthenticated, validate.getContextsList(), imports.renderTwitter);
 app.post('/import', pass.ensureAuthenticated, imports.submit);
