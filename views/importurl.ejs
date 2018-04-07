@@ -37,10 +37,10 @@
                     <input type="hidden" name="source" value="url">
 
                     <select name="urlselect" id="urlselect">
-                      <option value="https://guardian.co.uk" selected>The Guardian Main Page</option>
+                      <option value="https://guardian.co.uk">The Guardian Main Page</option>
                       <option value="https://www.nytimes.com/">The New York Times Main Page</option>
                       <option value="https://www.wsj.com/">The Wall Street Journal Main Page</option>
-                      <option value="https://en.wikipedia.org/wiki/Text_mining">A Wikipedia Article</option>
+                      <option value="https://en.wikipedia.org/wiki/Text_mining" selected>A Wikipedia Article</option>
                       <option value="https://aeon.co">Aeon Main Page</option>
                       <option value="http://">Any Other Page</option>
                     </select>
@@ -50,7 +50,7 @@
                     <div id="urlsetting">
                       <br>
                         Please, enter the full URL:
-                        <input type="text" name="url" id="url" size="30" value="https://guardian.co.uk"/>
+                        <input type="text" name="url" id="url" size="30" value="https://en.wikipedia.org/wiki/Text_mining"/>
 
 
                     </div>
@@ -59,22 +59,22 @@
                         <br>
                       <label for="processfield" class="pure-radio" id="processfieldcaption">
                           Article snippets located in class or id
-                          <input type="text" name="processfield" id="processfield" value=".fc-item__container"/>
+                          <input type="text" name="processfield" id="processfield" value=""/>
                       </label>
 
                       <label for="processheadline" class="pure-radio" id="processfieldcaption">
                           Headlines of articles are in class
-                          <input type="text" name="processheadline" id="processheadline" value=".fc-item__header"/>
+                          <input type="text" name="processheadline" id="processheadline" value=""/>
                       </label>
 
                       <label for="processteaser" class="pure-radio" id="processfieldcaption">
                           Teaser of articles are in class
-                          <input type="text" name="processteaser" id="processteaser" value=".fc-item__standfirst"/>
+                          <input type="text" name="processteaser" id="processteaser" value=""/>
                       </label>
 
                       <label for="processurl" class="pure-radio" id="processfieldcaption">
                           URLS to articles are in class
-                          <input type="text" name="processurl" id="processurl" value=".fc-item__link"/>
+                          <input type="text" name="processurl" id="processurl" value=""/>
                       </label>
                     </div>
 
@@ -82,7 +82,7 @@
                 <br>
                 Save in Context:
                 <br>
-                <input type='text' name='context' id="context" value='<% if (context) { %><%= context %><% } else { %>guardian<% } %>'/>
+                <input type='text' name='context' id="context" value='<% if (context) { %><%= context %><% } else { %>wikipedia<% } %>'/>
                 <br>
 
 
@@ -123,16 +123,18 @@
 <script>
 
       $(document).ready(function () {
+
+
           var advancedpane = 0;
 
           $("#advancedsettings").hide();
-          $('#urlsetting').hide();
+        //  $('#urlsetting').hide();
 
           $("#advancedpane").click(function() {
               if (!advancedpane) {
               $("#advancedsettings").show();
               $("#advancedpane").text('– settings');
-              $("#urlsetting").show();
+            //  $("#urlsetting").show();
               advancedpane = 1;
               }
               else {
@@ -192,7 +194,7 @@
               $('#processheadline').val('');
               $('#processteaser').val('');
               $('#processurl').val('');
-              $('#urlsetting').show();
+            //  $('#urlsetting').show();
             }
 
 

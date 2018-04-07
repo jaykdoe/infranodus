@@ -1660,10 +1660,11 @@ exports.submit = function(req, res,  next) {
                           if (processfield.length == 0 || $(processfield).length == 0) {
                             console.log('entering automatic text extraction');
                             console.log(importContext);
+                            // TODO include options limitation
                             var extracteddata = extractor($.html());
                             var thisurl = req.body.url;
 
-                            saveHighlight(extracteddata.text + ' ' + thisurl, contexts);
+                            saveHighlight(extracteddata.text.substr(0,89000) + ' ' + thisurl, contexts);
 
                             res.message('Importing the content automatically... Please, reload this page in 30 seconds...');
                             res.redirect(res.locals.user.name + '/' + importContext + '/edit');
@@ -1809,7 +1810,7 @@ exports.submit = function(req, res,  next) {
                                }
 
                               });
-
+                            // TODO do something about processing stopping after a certain point in case there are troubles
                             }).catch(error => {
                               console.log('ERROR WITH RSS FEED');
                               console.log(error);

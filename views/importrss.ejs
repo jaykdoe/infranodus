@@ -38,6 +38,10 @@
 
                     <select name="urlselect" id="urlselect">
                       <option value="news" selected>News of the Day</option>
+                      <option value="guardian">The Guardian RSS</option>
+                      <option value="ft">FT.Com RSS</option>
+                      <option value="wsj">Wall Street Journal RSS</option>
+                      <option value="nyt">New York Times RSS</option>
                       <option value="custom">Custom RSS feeds</option>
                     </select>
                     <br>
@@ -46,7 +50,7 @@
                     <div id="urlsetting">
                       <br>
                         RSS feeds to be visualized:
-                        <textarea id="rssinput" name="rssinput" rows="4" cols="20">https://www.theguardian.com/rss http://www.wsj.com/xml/rss/3_7085.xml http://rss.nytimes.com/services/xml/rss/nyt/World.xml http://feeds.washingtonpost.com/rss/world https://www.telegraph.co.uk/rss.xml https://www.ft.com/?format=rss</textarea>
+                        <textarea id="rssinput" name="rssinput" rows="4" cols="20">https://www.theguardian.com/rss http://www.wsj.com/xml/rss/3_7085.xml http://rss.nytimes.com/services/xml/rss/nyt/World.xml http://feeds.washingtonpost.com/rss/world https://www.ft.com/?format=rss</textarea>
                         <br>
                         <label for="rssitems" class="pure-input" id="rssitemscaption">
                             # of items for each feed:
@@ -137,6 +141,34 @@
 
             if (currentselection == 'news') {
               $('#rssinput').val('https://www.theguardian.com/rss http://www.wsj.com/xml/rss/3_7085.xml http://rss.nytimes.com/services/xml/rss/nyt/World.xml http://feeds.washingtonpost.com/rss/world https://www.ft.com/?format=rss');
+            }
+            else if (currentselection == 'guardian') {
+              $('#rssinput').val('https://www.theguardian.com/rss');
+              $("#urlsetting").show();
+              $("#rssitems").val('20');
+              $("#advancedpane").text('– settings');
+              advancedpane = 1;
+            }
+            else if (currentselection == 'ft') {
+              $('#rssinput').val('https://www.ft.com/?format=rss');
+              $("#urlsetting").show();
+              $("#rssitems").val('20');
+              $("#advancedpane").text('– settings');
+              advancedpane = 1;
+            }
+            else if (currentselection == 'wsj') {
+              $('#rssinput').val('http://www.wsj.com/xml/rss/3_7085.xml');
+              $("#urlsetting").show();
+              $("#rssitems").val('10');
+              $("#advancedpane").text('– settings');
+              advancedpane = 1;
+            }
+            else if (currentselection == 'nyt') {
+              $('#rssinput').val('http://rss.nytimes.com/services/xml/rss/nyt/World.xml');
+              $("#urlsetting").show();
+              $("#rssitems").val('20');
+              $("#advancedpane").text('– settings');
+              advancedpane = 1;
             }
             else if (currentselection == 'custom') {
               $('#rssinput').val('');
