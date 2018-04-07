@@ -40,6 +40,8 @@ var phantom = require('phantom');
 var rp = require('request-promise');
 var cheerio = require('cheerio');
 
+var extractor = require('unfluff');
+
 var fs = require('fs');
 
 var google = require('google');
@@ -1602,6 +1604,7 @@ exports.submit = function(req, res,  next) {
         var processurl = validate.sanitize(req.body.processurl);
 
         console.log("processing url " + req.body.url);
+        console.log(importContext);
 
         if (!processheadline){
           processheadline = '';
@@ -1652,6 +1655,19 @@ exports.submit = function(req, res,  next) {
 
                           console.log('successful RP');
 
+                          if (processfield.length == 0 || $(processfield).length == 0) {
+                            console.log('entering automatic text extraction');
+                            console.log(importContext);
+                            var extracteddata = extractor($.html());
+                            var thisurl = req.body.url;
+
+                            saveHighlight(extracteddata.text + ' ' + thisurl, contexts);
+
+                            res.error('Importing the content automatically... Please, reload this page in 30 seconds...');
+                            res.redirect(res.locals.user.name + '/' + importContext + '/edit');
+
+                          }
+                          else {
                           $(processfield).each(function (index) {
 
                                 if (processurl.length > 0) {
@@ -1708,8 +1724,9 @@ exports.submit = function(req, res,  next) {
                               });
                             }
 
-                            res.error('Importing the content... Please, reload this page in 30 seconds...');
+                            res.error('Importing the content based on your classes... Please, reload this page in 30 seconds...');
                             res.redirect(res.locals.user.name + '/' + importContext + '/edit');
+                        }
 
                        })
                        .catch(function (err) {

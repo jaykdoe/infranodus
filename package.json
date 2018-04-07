@@ -32,6 +32,7 @@
     "string": "^3.3.3",
     "transliteration.cyr": "^1.0.5",
     "twit": "^2.2.9",
+    "unfluff": "^3.0.0",
     "youtube-dl": "^1.12.2"
   }
 }
