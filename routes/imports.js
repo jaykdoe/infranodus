@@ -240,7 +240,7 @@ exports.submit = function(req, res,  next) {
     // List to be used for import
     var importContext = 'imported';
     if (req.body.context && req.body.context.length > 2 && req.body.context.length < 20) {
-        importContext = validate.sanitize(req.body.context);
+        importContext = validate.sanitize(req.body.context).replace(/[^\w]/gi, '');
     }
     else {
         req.body.context = importContext;
