@@ -238,7 +238,7 @@ exports.submit = function(req, res,  next) {
     // List to be used for import
     var importContext = 'imported';
     if (req.body.context && req.body.context.length > 2 && req.body.context.length < 20) {
-        importContext = req.body.context;
+        importContext = validate.sanitize(req.body.context);
     }
     else {
         req.body.context = importContext;
@@ -1593,18 +1593,16 @@ exports.submit = function(req, res,  next) {
 
         //console.log(req.body);
 
-        //TODO sanitize and check if empty
-
         //TODO limit the length of the article
 
-        // TODO limit not too many snippets
 
-        var processfield = req.body.processfield;
-        var processheadline = req.body.processheadline;
-        var processteaser = req.body.processteaser;
-        var processurl = req.body.processurl;
+        var processfield = validate.sanitize(req.body.processfield);
+        var processheadline = validate.sanitize(req.body.processheadline);
+        var processteaser = validate.sanitize(req.body.processteaser);
+        var processurl = validate.sanitize(req.body.processurl);
 
         console.log("processing url " + req.body.url);
+
         if (!processheadline){
           processheadline = '';
         }
@@ -1616,8 +1614,6 @@ exports.submit = function(req, res,  next) {
         }
 
         var addToContexts = [];
-
-        //TODO what if there's no context
 
         addToContexts.push(importContext);
 
@@ -1689,10 +1685,10 @@ exports.submit = function(req, res,  next) {
 
                                 }
 
-                                if (thisheadline.length > 0 || thisteaser.length > 0) {
+                                if ((thisheadline.length > 0 || thisteaser.length > 0) && (atLeastOne <= limit)) {
                                   console.log('processing snippet');
                                   saveHighlight(thisheadline + ' ' + thisteaser + ' ' + thisurl, contexts);
-                                  atLeastOne = 1;
+                                  atLeastOne = atLeastOne + 1;
                                 }
 
 
@@ -1702,9 +1698,12 @@ exports.submit = function(req, res,  next) {
                                 console.log('enter condition');
                                 var thisurl = req.body.url;
                               $(processfield).each(function (index) {
-                                      console.log('processing text');
-                                      console.log($(this).text());
-                                      saveHighlight($(this).text() + ' ' + thisurl, contexts);
+                                      if (atLeastOne <= limit) {
+                                        console.log('processing text');
+                                        console.log($(this).text());
+                                        saveHighlight($(this).text() + ' ' + thisurl, contexts);
+                                        atLeastOne = atLeastOne + 1;
+                                      }
 
                               });
                             }

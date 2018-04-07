@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/jquery.textcomplete.css' />
+    <link rel="stylesheet" href="/stylesheets/side-menu.css">
+    <link rel="stylesheet" href="/stylesheets/jquery-ui.min.css">
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+
+
+
+</head>
+<body>
+<% include statsabove %>
+<div id="layout">
+    <!-- Menu toggle -->
+    <a href="#menu" id="menuLink" class="menu-link">
+        <!-- Hamburger icon -->
+        <span></span>
+    </a>
+
+    <% include menu %>
+
+
+
+
+    <div id='content'>
+
+        <div id='welcomemessage'>
+
+            Get the picture of the news of the day from any website:
+
+            <% include messages %>
+
+            <form action='/import' name='submitform' id="submitform" method='post' enctype="multipart/form-data" class='pure-form pure-form-stacked'>
+                <br>
+
+                    <input type="hidden" name="source" value="url">
+
+                    <label for="titlefield" class="pure-radio" id="titlefieldcaption">
+                        Please, enter the website
+                        <input type="text" name="url" id="url" value="https://waytorussia.net/Travel/VisaSupport.html"/>
+                    </label>
+                    <br>
+
+                    <label for="processfield" class="pure-radio" id="processfieldcaption">
+                        Article snippets are located in class
+                        <input type="text" name="processfield" id="processfield" value=".content"/>
+                    </label>
+
+                    <label for="processheadline" class="pure-radio" id="processfieldcaption">
+                        Headlines of articles are in class
+                        <input type="text" name="processheadline" id="processheadline" value=""/>
+                    </label>
+
+                    <label for="processteaser" class="pure-radio" id="processfieldcaption">
+                        Teaser of articles are in class
+                        <input type="text" name="processteaser" id="processteaser" value=""/>
+                    </label>
+
+                    <label for="processurl" class="pure-radio" id="processfieldcaption">
+                        URLS to articles are in class
+                        <input type="text" name="processurl" id="processurl" value=""/>
+                    </label>
+
+
+                <br>&nbsp;<br>
+                Save in Context:
+                <br>
+                <input type='text' name='context' value='<% if (context) { %><%= context %><% } else { %>nyt<% } %>'/>
+                <br>
+
+
+                <input type="hidden" id="selectedContexts" name="selectedContexts" value="">
+                <input type="hidden" name="statementid" value="">
+                &nbsp;<br>
+                <input type='submit' name="submit" value="save" class="pure-button pure-button-primary">
+
+            </form>   &nbsp;<br>&nbsp;<br>
+
+
+
+
+
+        </div>
+
+        <div id="graph-container"></div>
+
+
+    </div>
+
+
+
+
+</div>
+
+
+<script src="/javascripts/jquery.min.js"></script>
+<script src="/javascripts/jquery-ui.min.js"></script>
+<script src="/javascripts/string.min.js"></script>
+<script src="/javascripts/underscore-min.js"></script>
+<script src="/javascripts/jquery.textcomplete.js"></script>
+<script src='/javascripts/jquery.autosize.js'></script>
+<script src="/javascripts/ui.js"></script>
+<script src="/javascripts/jquery.mobile-events.min.js"></script>
+
+
+<script>
+    ;(function(){
+
+      $('form#submitform').submit(function(){
+            $(this).find('input[type=submit]').attr('disabled', 'disabled');
+      });
+
+
+    });
+
+</script>
+
+
+<% include statsbelow %>
+</body>
+</html>
