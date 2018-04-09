@@ -1614,8 +1614,10 @@ exports.submit = function(req, res,  next) {
         var processteaser = validate.sanitize(req.body.processteaser);
         var processurl = validate.sanitize(req.body.processurl);
 
-        console.log("processing url " + req.body.url);
-        console.log(importContext);
+        var default_context = importContext;
+
+        var statements = [];
+
 
         if (!processheadline){
           processheadline = '';
@@ -1658,22 +1660,19 @@ exports.submit = function(req, res,  next) {
 
                     var atLeastOne = 0;
 
-                    console.log('entering to RP');
+
 
                     rp(urloptions)
 
                       .then(function ($) {
 
-                          console.log('successful RP');
-
                           if (processfield.length == 0 || $(processfield).length == 0) {
-                            console.log('entering automatic text extraction');
-                            console.log(importContext);
-                            // TODO include urloptions limitation
+
                             var extracteddata = extractor($.html());
+
                             var thisurl = req.body.url;
 
-                            saveHighlight(extracteddata.text.substr(0,89000) + ' ' + thisurl, contexts);
+                            saveHighlight(extracteddata.text.substr(0,max_total_length) + ' ' + thisurl, contexts);
 
                             res.message('Importing the content automatically... Please, reload this page in 30 seconds...');
                             res.redirect(res.locals.user.name + '/' + importContext + '/edit');
@@ -1714,36 +1713,66 @@ exports.submit = function(req, res,  next) {
                                 }
 
                                 if ((thisheadline.length > 0 || thisteaser.length > 0) && (atLeastOne <= limit)) {
-                                  console.log('processing snippet');
-                                  saveHighlight(thisheadline + ' ' + thisteaser + ' ' + thisurl, contexts);
+
+                                  statements.push(thisheadline + ' ' + validate.splitStatement(thisteaser,(max_length - thisheadline.length - thisurl.length))[0] + ' ' + thisurl);
+
                                   atLeastOne = atLeastOne + 1;
+
                                 }
 
 
                             });
-                              console.log('processing continues');
+
                             if (atLeastOne == 0) {
-                                console.log('enter condition');
-                                var thisurl = req.body.url;
+
+                              var thisurl = req.body.url;
+
                               $(processfield).each(function (index) {
                                       if (atLeastOne <= limit) {
-                                        console.log('processing text');
-                                        console.log($(this).text());
-                                        saveHighlight($(this).text() + ' ' + thisurl, contexts);
+                                        var splittedField = validate.splitStatement($(this).text(),(max_length - thisurl.length));
+                                        for (var y in splittedField) {
+                                          statements.push(splittedField[y] + ' ' + thisurl);
+                                        }
                                         atLeastOne = atLeastOne + 1;
                                       }
 
                               });
+
                             }
 
-                            res.message('Importing the content based on your classes... Please, reload this page in 30 seconds...');
-                            res.redirect(res.locals.user.name + '/' + importContext + '/edit');
+                            // Did we add all the statements into the array? Let's now add them to DB
+                            if (atLeastOne == $(processfield).length || atleastOne == limit) {
+
+                              var reqq = {
+                                  body:  {
+                                      entry: {
+                                          body: []
+                                      },
+                                      context: default_context
+                                  },
+
+                                  contextids: contexts,
+                                  internal: 1,
+                                  multiple: 1
+                              };
+
+                              for (var key in statements) {
+                                  if (statements.hasOwnProperty(key)) {
+                                      reqq.body.entry.body[key] = statements[key];
+                                  }
+                              }
+
+                              entries.submit(reqq, res);
+
+                            }
+                            // res.message('Importing the content based on your classes... Please, reload this page in 30 seconds...');
+                            // res.redirect(res.locals.user.name + '/' + importContext + '/edit');
                         }
 
                        })
                        .catch(function (err) {
-                         console.log('nonsuccessful RP');
-                         res.error('Could not access the URL specified or extract any information.' + err);
+                         console.error('Could not import URL: ' + err);
+                         res.error('Could not access the URL specified or extract any information. Error code: ' + err);
                          res.redirect('back');
                        });
 
@@ -1790,7 +1819,7 @@ exports.submit = function(req, res,  next) {
                     var contexts = result;
 
                     // Construct a new REQ object to add all the statements in
-                    var req = {
+                    var reqq = {
                         body:  {
                             entry: {
                                 body: []
@@ -1857,11 +1886,11 @@ exports.submit = function(req, res,  next) {
                                 // Save all feeds into the database
                                 for (var key in statements) {
                                     if (statements.hasOwnProperty(key)) {
-                                        req.body.entry.body[key] = statements[key];
+                                        reqq.body.entry.body[key] = statements[key];
                                     }
                                 }
 
-                                entries.submit(req, res);
+                                entries.submit(reqq, res);
 
                                 // Display the next page
                                 // res.message('Importing the RSS feeds... Please, reload this page in 30 seconds...');
