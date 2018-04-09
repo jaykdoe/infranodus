@@ -48,6 +48,12 @@ var google = require('google');
 
 const feedparser = require('feedparser-promised');
 
+var options = require('../options');
+
+var max_length = options.settings.max_text_length;
+var max_total_length = options.settings.max_total_text_length;
+
+
 // This is for PDF reader
 global.navigator = {
   userAgent: 'node',
@@ -1596,6 +1602,9 @@ exports.submit = function(req, res,  next) {
 
     else if (service == 'url') {
 
+      // TODO fix savehighlight function for multiple items
+      // TODO do the same above in the file upload
+
         var numHighlights = 0;
 
         //console.log(req.body);
@@ -1622,7 +1631,7 @@ exports.submit = function(req, res,  next) {
 
         addToContexts.push(importContext);
 
-        var options = {
+        var urloptions = {
             uri: req.body.url,
             headers: {
                 'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_7_5) AppleWebKit/537.1 (KHTML, like Gecko) Chrome/21.0.1180.89 Safari/537.1'
@@ -1651,7 +1660,7 @@ exports.submit = function(req, res,  next) {
 
                     console.log('entering to RP');
 
-                    rp(options)
+                    rp(urloptions)
 
                       .then(function ($) {
 
@@ -1660,7 +1669,7 @@ exports.submit = function(req, res,  next) {
                           if (processfield.length == 0 || $(processfield).length == 0) {
                             console.log('entering automatic text extraction');
                             console.log(importContext);
-                            // TODO include options limitation
+                            // TODO include urloptions limitation
                             var extracteddata = extractor($.html());
                             var thisurl = req.body.url;
 
@@ -1759,6 +1768,8 @@ exports.submit = function(req, res,  next) {
 
         var rssItemsMax = validate.sanitize(req.body.rssitems);
 
+        var includeteasers = validate.sanitize(req.body.includeteasers);
+
         var statements = [];
 
         addToContexts.push(importContext);
@@ -1818,10 +1829,17 @@ exports.submit = function(req, res,  next) {
                                 if (rssIterations < limito) {
 
                                     var thisheadline =  S(itemo.title).stripTags().s;
-                                    var thisteaser = S(itemo.description).stripTags().s.replace('Continue reading...', ' ').replace('&nbsp;',' ');
                                     var thisurl = S(itemo.link).stripTags().s;
 
-                                    statements.push(thisheadline + ' ' + thisurl);
+                                    if (includeteasers == 1) {
+                                      var thisteaser = ' / ' + validate.splitStatement(' ' + S(itemo.description).stripTags().s.replace('Continue reading...', ' ').replace('&nbsp;',' '), (max_length - thisheadline.length - thisurl.length))[0] + ' / ';
+                                    }
+                                    else {
+                                      var thisteaser = ' / ';
+                                    }
+
+
+                                    statements.push(thisheadline + thisteaser + thisurl);
 
                                     rssIterations = rssIterations + 1;
 
