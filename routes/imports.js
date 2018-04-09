@@ -1755,11 +1755,15 @@ exports.submit = function(req, res,  next) {
 
         var addToContexts = [];
 
-        var totalProcessed = 0;
+        var rssFeeds = 0;
 
         var rssItemsMax = validate.sanitize(req.body.rssitems);
 
+        var statements = [];
+
         addToContexts.push(importContext);
+
+        var default_context = importContext;
 
         validate.getContextID(user_id, addToContexts, function(result, err) {
 
@@ -1773,6 +1777,21 @@ exports.submit = function(req, res,  next) {
                     // What are the contexts that already exist for this user and their IDs?
                     // Note: actually there's been no contexts, so we just created IDs for all the contexts contained in the statement
                     var contexts = result;
+
+                    // Construct a new REQ object to add all the statements in
+                    var req = {
+                        body:  {
+                            entry: {
+                                body: []
+                            },
+                            context: default_context
+                        },
+
+                        contextids: contexts,
+                        internal: 1,
+                        multiple: 1
+                    };
+
 
                     // How many statements from each RSS feed do we take max?
                     var limito;
@@ -1802,18 +1821,42 @@ exports.submit = function(req, res,  next) {
                                     var thisteaser = S(itemo.description).stripTags().s.replace('Continue reading...', ' ').replace('&nbsp;',' ');
                                     var thisurl = S(itemo.link).stripTags().s;
 
-                                    saveHighlight(thisheadline + ' ' + thisurl, contexts);
+                                    statements.push(thisheadline + ' ' + thisurl);
 
                                     rssIterations = rssIterations + 1;
-                                    totalProcessed = totalProcessed + 1;
 
                                }
 
                               });
-                            // TODO do something about processing stopping after a certain point in case there are troubles
-                            }).catch(error => {
-                              console.log('ERROR WITH RSS FEED');
-                              console.log(error);
+
+                          }).then(done => {
+
+                              // Did we process all the feeds submitted?
+                              rssFeeds = rssFeeds + 1;
+
+                              if (rssFeeds >= rssRequested.length) {
+
+                                // Save all feeds into the database
+                                for (var key in statements) {
+                                    if (statements.hasOwnProperty(key)) {
+                                        req.body.entry.body[key] = statements[key];
+                                    }
+                                }
+
+                                entries.submit(req, res);
+
+                                // Display the next page
+                                // res.message('Importing the RSS feeds... Please, reload this page in 30 seconds...');
+                                // res.redirect(res.locals.user.name + '/' + importContext + '/edit');
+
+                              }
+                          }).catch(error => {
+
+                              // Even if there's an error we still "count" that one
+                              // TODO what if only one element of a feed is broken? We might have this number higher than needed.
+                              rssFeeds = rssFeeds + 1;
+
+                              console.error('error: ', error);
                               // res.message('Something went wrong with one of the RSS feeds... Please, reload this page in 30 seconds... If nothing appears, go back.');
                               // res.redirect(res.locals.user.name + '/' + importContext + '/edit');
                             });
@@ -1823,8 +1866,7 @@ exports.submit = function(req, res,  next) {
 
                     }
 
-                      res.message('Importing the RSS feeds... Please, reload this page in 30 seconds...');
-                      res.redirect(res.locals.user.name + '/' + importContext + '/edit');
+
 
 
                 }

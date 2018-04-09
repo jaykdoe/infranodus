@@ -99,7 +99,7 @@ exports.list = function(req, res, next){
                 contexts[s] = '';
             }
         }
-        
+
         res.render('entries', {
             title: 'InfraNodus: Polysingularity Thinking Tool',
             entries: entries,
