@@ -158,6 +158,7 @@ environ
 es
 ès
 est
+estce
 et
 etant
 étaient
@@ -212,6 +213,7 @@ il
 ils
 importe
 j
+jai
 je
 jusqu
 jusque
@@ -312,6 +314,7 @@ pfft
 pfut
 pif
 plein
+plaît
 plouf
 plus
 plusieurs
@@ -371,6 +374,7 @@ sera
 seront
 ses
 si
+sil
 sien
 sienne
 siennes

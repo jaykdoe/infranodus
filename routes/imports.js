@@ -1832,10 +1832,10 @@ exports.submit = function(req, res,  next) {
                                     var thisurl = S(itemo.link).stripTags().s;
 
                                     if (includeteasers == 1) {
-                                      var thisteaser = ' / ' + validate.splitStatement(' ' + S(itemo.description).stripTags().s.replace('Continue reading...', ' ').replace('&nbsp;',' '), (max_length - thisheadline.length - thisurl.length))[0] + ' / ';
+                                      var thisteaser = ' / ' + validate.splitStatement(' ' + S(itemo.description).stripTags().s.replace('Continue reading...', ' ').replace('&nbsp;',' '), (max_length - thisheadline.length - thisurl.length))[0] + ' ';
                                     }
                                     else {
-                                      var thisteaser = ' / ';
+                                      var thisteaser = ' ';
                                     }
 
 

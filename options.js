@@ -44,7 +44,7 @@ exports.settings = {
     label_threshold: 8,
 
     // Default voice to text input Language
-    inlanguage: "en",
+    inlanguage: "auto",
 
     // Default color palette of the graph
     palette: "default"

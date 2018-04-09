@@ -1725,7 +1725,12 @@ sigma.parsers.json(
                     // Check if the user has a preferred language settings
 
                     if (inlanguage != undefined) {
-                        recognition.lang = inlanguage;
+                        if (inlanguage == 'auto') {
+                          recognition.lang = 'en-US';
+                        }
+                        else {
+                          recognition.lang = inlanguage;
+                        }
                     }
                     else {
                         // We speak The US English here

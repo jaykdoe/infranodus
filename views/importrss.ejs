@@ -43,7 +43,7 @@
                       <option value="wsj">Wall Street Journal RSS</option>
                       <option value="nyt">New York Times RSS</option>
                       <option value="french">France News RSS</option>
-                      <option value="french">Russian News RSS</option>
+                      <option value="russian">Russian News RSS</option>
                       <option value="german">German News RSS</option>
                       <option value="custom">Custom RSS feeds</option>
                     </select>
@@ -150,10 +150,7 @@
 
             if (currentselection == 'news') {
               $('#rssinput').val('https://www.theguardian.com/rss http://www.wsj.com/xml/rss/3_7085.xml http://rss.nytimes.com/services/xml/rss/nyt/World.xml http://feeds.washingtonpost.com/rss/world https://www.ft.com/?format=rss');
-              $("#urlsetting").show();
               $("#rssitems").val('15');
-              $("#advancedpane").text('– settings');
-              advancedpane = 1;
             }
             else if (currentselection == 'guardian') {
               $('#rssinput').val('https://www.theguardian.com/rss');
@@ -185,24 +182,15 @@
             }
             else if (currentselection == 'french') {
               $('#rssinput').val('http://www.lemonde.fr/rss/une.xml  http://www.bfmtv.com/rss http://www.lefigaro.fr/rss/figaro_actualites.xml http://rss.liberation.fr/rss/latest/');
-              $("#urlsetting").show();
               $("#rssitems").val('15');
-              $("#advancedpane").text('– settings');
-              advancedpane = 1;
             }
             else if (currentselection == 'russian') {
-              $('#rssinput').val('https://www.kommersant.ru/RSS/main.xml https://www.vedomosti.ru/rss/news https://meduza.io/rss/all http://static.feed.rbc.ru/rbc/logical/footer/news.rss');
-              $("#urlsetting").show();
+              $('#rssinput').val('https://www.vedomosti.ru/rss/news https://meduza.io/rss/all http://static.feed.rbc.ru/rbc/logical/footer/news.rss');
               $("#rssitems").val('15');
-              $("#advancedpane").text('– settings');
-              advancedpane = 1;
             }
             else if (currentselection == 'german') {
               $('#rssinput').val('http://www.faz.net/rss/aktuell/ http://rss.sueddeutsche.de/app/service/rss/alles/index.rss?output=rss https://www.welt.de/feeds/latest.rss https://www.tagesspiegel.de/contentexport/feed/home http://www.taz.de/!p15;rss/');
-              $("#urlsetting").show();
               $("#rssitems").val('15');
-              $("#advancedpane").text('– settings');
-              advancedpane = 1;
             }
             else if (currentselection == 'custom') {
               $('#rssinput').val('');
