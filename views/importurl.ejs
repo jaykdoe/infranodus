@@ -90,7 +90,7 @@
                 <input type="hidden" name="statementid" value="">
                 &nbsp;<br>
                 <input type='submit' name="submit" value="save" class="pure-button pure-button-primary">
-
+                <div id="message"></div>
             </form>   &nbsp;<br>&nbsp;<br>
 
 
@@ -224,6 +224,7 @@
 
           $('form#submitform').submit(function(){
                 $(this).find('input[type=submit]').attr('disabled', 'disabled');
+                  $('#message').html('We are importing the data, this page will automatically reload. If this does not happen in 30 seconds, please, <a href="/<%= user.name %>/'+$('#context').val()+'/edit">click here</a>.');
           });
 
 
