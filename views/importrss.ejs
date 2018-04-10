@@ -45,6 +45,7 @@
                       <option value="french">France News RSS</option>
                       <option value="russian">Russian News RSS</option>
                       <option value="german">German News RSS</option>
+                      <option value="tech">Tech News RSS</option>
                       <option value="custom">Custom RSS feeds</option>
                     </select>
                     <br>
@@ -183,15 +184,19 @@
               advancedpane = 1;
             }
             else if (currentselection == 'french') {
-              $('#rssinput').val('http://www.lemonde.fr/rss/une.xml  http://www.bfmtv.com/rss http://www.lefigaro.fr/rss/figaro_actualites.xml http://rss.liberation.fr/rss/latest/');
+              $('#rssinput').val('http://www.lemonde.fr/rss/une.xml  http://www.bfmtv.com/rss http://www.lefigaro.fr/rss/figaro_actualites.xml http://rss.liberation.fr/rss/latest/ http://www.leparisien.fr/une/rss.xml');
               $("#rssitems").val('15');
             }
             else if (currentselection == 'russian') {
-              $('#rssinput').val('https://www.vedomosti.ru/rss/news https://meduza.io/rss/all http://static.feed.rbc.ru/rbc/logical/footer/news.rss');
+              $('#rssinput').val('https://www.vedomosti.ru/rss/news https://meduza.io/rss/all http://static.feed.rbc.ru/rbc/logical/footer/news.rss https://russian.rt.com/rss https://lenta.ru/rss');
               $("#rssitems").val('15');
             }
             else if (currentselection == 'german') {
               $('#rssinput').val('http://www.faz.net/rss/aktuell/ http://rss.sueddeutsche.de/app/service/rss/alles/index.rss?output=rss https://www.welt.de/feeds/latest.rss https://www.tagesspiegel.de/contentexport/feed/home http://www.taz.de/!p15;rss/');
+              $("#rssitems").val('15');
+            }
+            else if (currentselection == 'tech') {
+              $('#rssinput').val('http://feeds.feedburner.com/TechCrunch https://www.technologyreview.com/topnews.rss http://feeds.arstechnica.com/arstechnica/technology-lab http://feeds.feedburner.com/venturebeat/SZYF');
               $("#rssitems").val('15');
             }
             else if (currentselection == 'custom') {
