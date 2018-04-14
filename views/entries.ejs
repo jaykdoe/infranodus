@@ -2630,6 +2630,7 @@ sigma.parsers.json(
         // Check if the node is in additional context and if yes, give it a different color
         if (addcontext) {
             if (contextNodeID[addcontext].indexOf(n.id) > -1 && contextNodeID[current_context].indexOf(n.id) == -1) {
+                n.originalColor = color_addcontext;
                 n.color = color_addcontext;
             }
         }
