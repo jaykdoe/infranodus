@@ -765,6 +765,8 @@ sigma.classes.graph.addMethod('neighbors', function(nodeId) {
 
 // Initialize JSON parser for SIGMA visualization
 
+var color_addcontext = '#cccccc';
+
 
 
 sigma.parsers.json(
@@ -788,7 +790,7 @@ sigma.parsers.json(
                     timeout = 4000,
                     nodes = sigma.graph.nodes(),
                     color_context = '#666',
-                    color_addcontext = '#666688',
+                    color_addcontext = '#cccccc',
                     len = nodes.length;
 
 
@@ -880,14 +882,6 @@ sigma.parsers.json(
             });
 
             sigma.graph.nodes().forEach(function(n) {
-
-                // Check if the node is in additional context and if yes, give it a different color
-                if (addcontext) {
-                    if (contextNodeID[addcontext].indexOf(n.id) > -1 && contextNodeID[current_context].indexOf(n.id) > -1) {
-                        n.color = color_addcontext;
-                    }
-                }
-
 
 
                 // Save node's default color, for hide and show later
@@ -2632,6 +2626,15 @@ sigma.parsers.json(
         if (document.getElementsByClassName("inlinesquare " + n.id)[0] != undefined) {
               document.getElementsByClassName("inlinesquare " + n.id)[0].style.backgroundColor=rgbToHex(palette[n.community]._rgb[0],palette[n.community]._rgb[1],palette[n.community]._rgb[2]);
         }
+
+        // Check if the node is in additional context and if yes, give it a different color
+        if (addcontext) {
+            if (contextNodeID[addcontext].indexOf(n.id) > -1 && contextNodeID[current_context].indexOf(n.id) == -1) {
+                n.color = color_addcontext;
+            }
+        }
+
+
       });
 
 
