@@ -478,6 +478,15 @@ a:hover.app-more-link {
 
 }
 
+
+#graphstats {
+  display: inline-block;
+}
+
+#addcontextstats {
+  display: inline-block;
+}
+
 #contextcontrol {
     clear: both;
 }

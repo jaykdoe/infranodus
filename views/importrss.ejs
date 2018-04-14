@@ -54,7 +54,7 @@
                     <div id="urlsetting">
                       <br>
                         RSS feeds to be visualized:
-                        <textarea id="rssinput" name="rssinput" rows="4" cols="20">https://www.theguardian.com/rss http://www.wsj.com/xml/rss/3_7085.xml http://rss.nytimes.com/services/xml/rss/nyt/World.xml http://feeds.washingtonpost.com/rss/world https://www.ft.com/?format=rss</textarea>
+                        <textarea id="rssinput" name="rssinput" rows="4" cols="20">https://www.theguardian.com/world/rss http://www.wsj.com/xml/rss/3_7085.xml http://rss.nytimes.com/services/xml/rss/nyt/World.xml http://feeds.washingtonpost.com/rss/world https://www.ft.com/?format=rss</textarea>
                         <br>
                         <label for="rssitems" class="pure-input" id="rssitemscaption">
                             # of items for each feed:
@@ -152,7 +152,7 @@
             $('#context').val(currentselection + nowdate);
 
             if (currentselection == 'news') {
-              $('#rssinput').val('https://www.theguardian.com/rss http://www.wsj.com/xml/rss/3_7085.xml http://rss.nytimes.com/services/xml/rss/nyt/World.xml http://feeds.washingtonpost.com/rss/world https://www.ft.com/?format=rss');
+              $('#rssinput').val('https://www.theguardian.com/world/rss http://www.wsj.com/xml/rss/3_7085.xml http://rss.nytimes.com/services/xml/rss/nyt/World.xml http://feeds.washingtonpost.com/rss/world https://www.ft.com/?format=rss');
               $("#rssitems").val('15');
             }
             else if (currentselection == 'guardian') {

@@ -2537,7 +2537,9 @@ sigma.parsers.json(
          }
          analytics = analytics.slice(0, -7);
 
-         analytics += "<br><br><div class='headline'>Next Idea Tip:</div> <br>What is the relation between <br><div class='headline'>\"" + recommender + "\"</div>?";
+         analytics += "<br><br><div class='headline'>Question to Ask:</div> <br>What is the relation between <br><div class='headline'>\"" + recommender + "\"</div>?";
+
+         analytics += "<br><br><div id='graphstats'></div>";
 
          analytics += "<br><br><a href='#' id='resetgraph'>reset graph selections</a>";
 
@@ -2604,24 +2606,39 @@ sigma.parsers.json(
           }
     }
 
+      var totalnodescount = 0;
+      var addcontextcount = 0;
+      var nodesfirstcom = 0;
+      var nodessecondcom = 0;
+
+      var diversityindex = 0;
+
+      var diversity = '';
+
       sigma.instances(0).graph.nodes().forEach(function(n) {
         if (top_nodes.indexOf(n.originalLabel) != -1) {
-          if (n.community == topp_communities[0].id) {
-          //  console.log(n.originalLabel + ' ' + n.x);
-              s_x += n.x;
-              s_y += n.y;
-            //  console.log(s_x)
-          }
 
-          if (n.community == topp_communities[1].id) {
-            e_x += n.x;
-            e_y += n.y;
-
-
-          }
         }
         n.originalColor = rgbToHex(palette[n.community]._rgb[0],palette[n.community]._rgb[1],palette[n.community]._rgb[2]);
         n.color = rgbToHex(palette[n.community]._rgb[0],palette[n.community]._rgb[1],palette[n.community]._rgb[2]);
+
+        if (n.community == topp_communities[0].id) {
+        //  console.log(n.originalLabel + ' ' + n.x);
+        // TODO here we can calculate modularity
+            s_x += n.x;
+            s_y += n.y;
+          //  console.log(s_x)
+          nodesfirstcom = nodesfirstcom + 1;
+        }
+
+        if (n.community == topp_communities[1].id) {
+          e_x += n.x;
+          e_y += n.y;
+
+          nodessecondcom = nodessecondcom + 1;
+        }
+
+        totalnodescount = totalnodescount + 1;
 
         if (document.getElementsByClassName("inlinesquare " + n.id)[0] != undefined) {
               document.getElementsByClassName("inlinesquare " + n.id)[0].style.backgroundColor=rgbToHex(palette[n.community]._rgb[0],palette[n.community]._rgb[1],palette[n.community]._rgb[2]);
@@ -2632,13 +2649,28 @@ sigma.parsers.json(
             if (contextNodeID[addcontext].indexOf(n.id) > -1 && contextNodeID[current_context].indexOf(n.id) == -1) {
                 n.originalColor = color_addcontext;
                 n.color = color_addcontext;
+                addcontextcount = addcontextcount + 1;
             }
         }
 
 
       });
 
+      // console.log(nodesfirstcom);
+      // console.log(nodessecondcom);
+      // console.log(totalnodescount);
+      // console.log(top_communities);
 
+     diversityindex = ((((nodesfirstcom + nodessecondcom) / totalnodescount).toFixed(2))*100).toFixed(0);
+
+     var diversitytext = '<div class="headline">Stats:</div> total ' + totalnodescount + ' words, ' + diversityindex + '% of words in top 2 topics.';
+
+     if (addcontextcount > 0) {
+       var addindex = (((addcontextcount / totalnodescount).toFixed(2))*100).toFixed(0);
+       diversitytext += ' ' + addindex + '% of words from ' + addcontext + ' are not in the main context.'
+     }
+
+     $('#graphstats').html(diversitytext);
 
      sigma.instances(0).refresh;
 
