@@ -2661,7 +2661,7 @@ sigma.parsers.json(
       // console.log(totalnodescount);
       // console.log(top_communities);
 
-     diversityindex = ((((nodesfirstcom + nodessecondcom) / totalnodescount).toFixed(2))*100).toFixed(0);
+     diversityindex = ((((nodesfirstcom) / totalnodescount).toFixed(2))*100).toFixed(0);
 
      var diversitytext = '<div class="headline">Stats:</div> total ' + totalnodescount + ' words, ' + diversityindex + '% of words in top 2 topics.';
 
