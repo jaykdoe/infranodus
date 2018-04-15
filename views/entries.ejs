@@ -254,7 +254,7 @@
     var urlPath = location.pathname;
 
     // Initialize Socket.IO
-    var socket = io();
+    var socket = io('https://localhost', {secure: true});
 
 
 
