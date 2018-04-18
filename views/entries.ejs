@@ -905,7 +905,7 @@ sigma.parsers.json(
             // Betweenness Centrality Calculation using Cytoscape
             var eles = cy.add(elesnodes);
 
-            var bc = eles.bc();
+            var bc = eles.bc({directed: true});
 
             var bcmap = [];
 
