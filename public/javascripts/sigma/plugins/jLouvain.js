@@ -1,4 +1,4 @@
-/* 
+/*
  Author: Corneliu S. (github.com/upphiminn)
 
  This is a javascript implementation of the Louvain
@@ -17,6 +17,7 @@
 		var original_graph_edges;
 		var original_graph = {};
 		var partition_init;
+		var final_modularity;
 
 		//Helpers
 		function make_set(array) {
@@ -123,7 +124,7 @@
 			return temp;
 		}
 
-		//Core-Algorithm Related 
+		//Core-Algorithm Related
 		function init_status(graph, status, part) {
 			status['nodes_to_com'] = {};
 			status['total_weight'] = 0;
@@ -225,7 +226,7 @@
 
 		function __renumber(dict) {
 			var count = 0;
-			var ret = clone(dict); //deep copy :) 
+			var ret = clone(dict); //deep copy :)
 			var new_values = {};
 			var dict_keys = Object.keys(dict);
 			dict_keys.forEach(function (key) {
@@ -341,6 +342,7 @@
 				__one_level(current_graph, status);
 				new_mod = __modularity(status);
 				if (new_mod - mod < __MIN) {
+					final_modularity = new_mod;
 					break;
 				}
 
@@ -359,7 +361,11 @@
 			var status = {};
 			var dendogram = generate_dendogram(original_graph, partition_init);
 
-			return partition_at_level(dendogram, dendogram.length - 1);
+			// Modification to expose the final modularity measure from the module
+			var result=[];
+			result['communities'] = partition_at_level(dendogram, dendogram.length - 1);
+			result['modularity'] = final_modularity;
+			return result;
 		};
 
 		core.nodes = function (nds) {

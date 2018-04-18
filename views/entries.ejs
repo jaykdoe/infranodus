@@ -927,8 +927,8 @@ sigma.parsers.json(
                 }
 
             }
-            console.log(bcmin);
-            console.log(bcmax);
+            // console.log(bcmin);
+            // console.log(bcmax);
 
             var bcscore;
 
@@ -945,9 +945,12 @@ sigma.parsers.json(
                 // TODO only if the betweenness centrality setting is on
                 if (bcmap[n.id] == 0) { bcscore = bcmin } else { bcscore = bcmap[n.id] }
                 n.size = Math.round(normalize(bcscore, bcmin, bcmax, 5, 35));
-                console.log(n.label + ': ' + bcmap[n.id] + ' ' + bcscore + ' / '+ Math.round(normalize(bcscore, bcmin, bcmax, 5, maxnodesize)));
-
+                // console.log(n.label + ': ' + bcmap[n.id] + ' ' + bcscore + ' / '+ Math.round(normalize(bcscore, bcmin, bcmax, 5, maxnodesize)));
+                // TODO will use clustering to identify ideology
+                // TODO will use graph density
             });
+
+            // console.log(eles.components());
 
             function normalize(enteredValue, minEntry, maxEntry, normalizedMin, normalizedMax) {
               var mx;
@@ -2503,12 +2506,14 @@ sigma.parsers.json(
           edge_data.push({source: e.source, target: e.target});
       });
       if (node_data.length > 0 && edge_data.length > 0) {
+
       var community = jLouvain().nodes(node_data).edges(edge_data);
 
       var community_assignment_result = community();
-      var node_ids = Object.keys(community_assignment_result);
+      var node_ids = Object.keys(community_assignment_result['communities']);
 
-    //  console.log('Resulting Community Data', community_assignment_result);
+      console.log('Resulting Community Data', community_assignment_result['communities']);
+      console.log('Final Modularity', community_assignment_result['modularity']);
 
 
       var max_community_number = 0;
@@ -2516,13 +2521,13 @@ sigma.parsers.json(
       var top_communities = {};
 
       sigma.instances(0).graph.nodes().forEach(function(n) {
-        n.community = community_assignment_result[n.id];
+        n.community = community_assignment_result['communities'][n.id];
         var commune = n.community;
         if (!top_communities[commune]) {
           top_communities[commune] = []
         }
         top_communities[commune].push({id: n.id, name: n.originalLabel, degree: sigma.instances(0).graph.degree(n.id)});
-        max_community_number = max_community_number < community_assignment_result[n.id] ? community_assignment_result[n.id]: max_community_number;
+        max_community_number = max_community_number < community_assignment_result['communities'][n.id] ? community_assignment_result['communities'][n.id]: max_community_number;
       });
 
     //  console.log(max_community_number);
@@ -2705,12 +2710,13 @@ sigma.parsers.json(
           //  console.log(s_x)
           nodesfirstcom = nodesfirstcom + 1;
         }
-
+        if (topp_communities[1]) {
         if (n.community == topp_communities[1].id) {
           e_x += n.x;
           e_y += n.y;
 
           nodessecondcom = nodessecondcom + 1;
+        }
         }
 
         totalnodescount = totalnodescount + 1;
