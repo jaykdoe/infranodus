@@ -244,7 +244,7 @@
 <script src="/socket.io/socket.io.js"></script>
 <script src="/javascripts/moment.min.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.tooltipster.min.js"></script>
-<script src="/javascripts/cytoscape.min.js"></script>
+<script src="/javascripts/jsnetworkx.js"></script>
 
              <script>
 ;(function(){
@@ -746,12 +746,12 @@ function showEntries () {
 }
 
 
-// Add Cytoscape Library
 
-var cy = cytoscape({
-    container: undefined,
-    headless: true
-});
+
+// Add JSNetworks Library
+
+var G = new jsnx.DiGraph();
+
 
 // Add a method to the graph model that returns an
 // object with every neighbors of a node inside:
@@ -798,9 +798,7 @@ sigma.parsers.json(
                     len = nodes.length;
 
 
-            // Cytoscape object
 
-            var elesnodes = [];
 
             // This is a fix for JSON
             // Sigma requires that nodes have X, Y, Size and Color properties which our JSON doesn't have. So we add them.
@@ -817,14 +815,8 @@ sigma.parsers.json(
                 nodesize = nodes[i].size;
                 if (maxnodesize < nodesize) maxnodesize = nodesize;
                 nodes[i].color = color_context;
-
-                // Add to Cytoscape
-                elesnodes.push({
-                    group: "nodes",
-                    data: { id: nodes[i].id, name: nodes[i].label }
-                });
-
             }
+
 
             // We first need to save the original colors and LABELS of our
             // nodes and edges, like this:
@@ -894,43 +886,35 @@ sigma.parsers.json(
                     statementsOfContext[e.edge_context].push(e.statement_id);
                 }
 
-                // Add to Cytoscape
-                elesnodes.push({
-                    group: "edges",
-                    data: { id: unique_edge_id, source: e.source, target: e.target }
-                });
+                // Add to JSNetworkx
+                G.addEdge(e.source,e.target);
+
 
             });
 
-            // Betweenness Centrality Calculation using Cytoscape
-            var eles = cy.add(elesnodes);
 
-            var bc = eles.bc();
+            // JSNetworkx Betweenness Centrality
 
-            var bcmap = [];
+            var bcjx = jsnx.betweennessCentrality(G, optParameters={normalized: true});
 
+            var bcmap = bcjx._stringValues;
 
-            var bcmin = 1;
-            var bcmax = 0;
+            var bcmin = 100000;
+            var bcmax = _.max(bcmap);
 
-            for (var i = 0; i < cy.nodes().length; i++) {
-                var nn = eles.getElementById(cy.nodes()[i].data('id'));
-                //console.log(nn);
-                bcmap[cy.nodes()[i].data('id')] = bc.betweennessNormalized(nn);
+            var topbc = [];
 
-                if (bcmin > bc.betweennessNormalized(nn) && bc.betweennessNormalized(nn) != 0) {
-                  bcmin = bc.betweennessNormalized(nn);
-                }
-
-                if (bcmax < bc.betweennessNormalized(nn)) {
-                  bcmax = bc.betweennessNormalized(nn);
-                }
-
+            for (var key in bcmap) {
+              if (bcmap[key] < bcmin && bcmap[key] != 0) {
+                bcmin = bcmap[key];
+              }
+              topbc.push({key: key, bc: bcmap[key]});
             }
-            // console.log(bcmin);
-            // console.log(bcmax);
+
+            topbc = _.sortBy(topbc, 'bc').reverse().slice(0,5);
 
             var bcscore;
+
 
             sigma.graph.nodes().forEach(function(n) {
 
@@ -943,11 +927,22 @@ sigma.parsers.json(
                 nodeIDs[key] = n.id;
 
                 // TODO only if the betweenness centrality setting is on
+
                 if (bcmap[n.id] == 0) { bcscore = bcmin } else { bcscore = bcmap[n.id] }
+
                 n.size = Math.round(normalize(bcscore, bcmin, bcmax, 5, 35));
+
+                var ready = _.matcher({key: n.id});
+                if (_.filter(topbc, ready).length > 0) {
+                   console.log(n.label);
+                 }
+
                 // console.log(n.label + ': ' + bcmap[n.id] + ' ' + bcscore + ' / '+ Math.round(normalize(bcscore, bcmin, bcmax, 5, maxnodesize)));
                 // TODO will use clustering to identify ideology
                 // TODO will use graph density
+
+
+
             });
 
             // console.log(eles.components());
