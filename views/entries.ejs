@@ -902,18 +902,16 @@ sigma.parsers.json(
             var bcmin = 100000;
             var bcmax = _.max(bcmap);
 
-            var topbc = [];
 
             for (var key in bcmap) {
               if (bcmap[key] < bcmin && bcmap[key] != 0) {
                 bcmin = bcmap[key];
               }
-              topbc.push({key: key, bc: bcmap[key]});
             }
 
-            topbc = _.sortBy(topbc, 'bc').reverse().slice(0,5);
-
             var bcscore;
+
+            var topbc_nodes = [];
 
 
             sigma.graph.nodes().forEach(function(n) {
@@ -932,18 +930,19 @@ sigma.parsers.json(
 
                 n.size = Math.round(normalize(bcscore, bcmin, bcmax, 5, 35));
 
-                var ready = _.matcher({key: n.id});
-                if (_.filter(topbc, ready).length > 0) {
-                   console.log(n.label);
-                 }
+                topbc_nodes.push({key: n.id, label: n.label, bc: bcmap[n.id]});
 
                 // console.log(n.label + ': ' + bcmap[n.id] + ' ' + bcscore + ' / '+ Math.round(normalize(bcscore, bcmin, bcmax, 5, maxnodesize)));
                 // TODO will use clustering to identify ideology
                 // TODO will use graph density
 
-
-
             });
+
+            topbc_nodes = _.sortBy(topbc_nodes, 'bc').reverse().slice(0,5);
+
+            console.log(topbc_nodes);
+
+            console.log(jsnx.averageClustering(G));
 
             // console.log(eles.components());
 
