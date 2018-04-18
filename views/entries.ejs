@@ -244,9 +244,7 @@
 <script src="/socket.io/socket.io.js"></script>
 <script src="/javascripts/moment.min.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.tooltipster.min.js"></script>
-
-
-
+<script src="/javascripts/cytoscape.min.js"></script>
 
              <script>
 ;(function(){
@@ -748,6 +746,13 @@ function showEntries () {
 }
 
 
+// Add Cytoscape Library
+
+var cy = cytoscape({
+    container: undefined,
+    headless: true
+});
+
 // Add a method to the graph model that returns an
 // object with every neighbors of a node inside:
 
@@ -793,6 +798,10 @@ sigma.parsers.json(
                     len = nodes.length;
 
 
+            // Cytoscape object
+
+            var elesnodes = [];
+
             // This is a fix for JSON
             // Sigma requires that nodes have X, Y, Size and Color properties which our JSON doesn't have. So we add them.
             // We also make the initial graph layout circular, so that ForceAtlas always looks the same
@@ -808,6 +817,13 @@ sigma.parsers.json(
                 nodesize = nodes[i].size;
                 if (maxnodesize < nodesize) maxnodesize = nodesize;
                 nodes[i].color = color_context;
+
+                // Add to Cytoscape
+                elesnodes.push({
+                    group: "nodes",
+                    data: { id: nodes[i].id, name: nodes[i].label }
+                });
+
             }
 
             // We first need to save the original colors and LABELS of our
@@ -878,10 +894,45 @@ sigma.parsers.json(
                     statementsOfContext[e.edge_context].push(e.statement_id);
                 }
 
+                // Add to Cytoscape
+                elesnodes.push({
+                    group: "edges",
+                    data: { id: unique_edge_id, source: e.source, target: e.target }
+                });
+
             });
 
-            sigma.graph.nodes().forEach(function(n) {
+            // Betweenness Centrality Calculation using Cytoscape
+            var eles = cy.add(elesnodes);
 
+            var bc = eles.bc();
+
+            var bcmap = [];
+
+
+            var bcmin = 1;
+            var bcmax = 0;
+
+            for (var i = 0; i < cy.nodes().length; i++) {
+                var nn = eles.getElementById(cy.nodes()[i].data('id'));
+                //console.log(nn);
+                bcmap[cy.nodes()[i].data('id')] = bc.betweennessNormalized(nn);
+
+                if (bcmin > bc.betweennessNormalized(nn) && bc.betweennessNormalized(nn) != 0) {
+                  bcmin = bc.betweennessNormalized(nn);
+                }
+
+                if (bcmax < bc.betweennessNormalized(nn)) {
+                  bcmax = bc.betweennessNormalized(nn);
+                }
+
+            }
+            console.log(bcmin);
+            console.log(bcmax);
+
+            var bcscore;
+
+            sigma.graph.nodes().forEach(function(n) {
 
                 // Save node's default color, for hide and show later
                 n.originalColor = n.color;
@@ -891,7 +942,32 @@ sigma.parsers.json(
                 var key = n.label;
                 nodeIDs[key] = n.id;
 
+                // TODO only if the betweenness centrality setting is on
+                if (bcmap[n.id] == 0) { bcscore = bcmin } else { bcscore = bcmap[n.id] }
+                n.size = Math.round(normalize(bcscore, bcmin, bcmax, 5, 35));
+                console.log(n.label + ': ' + bcmap[n.id] + ' ' + bcscore + ' / '+ Math.round(normalize(bcscore, bcmin, bcmax, 5, maxnodesize)));
+
             });
+
+            function normalize(enteredValue, minEntry, maxEntry, normalizedMin, normalizedMax) {
+              var mx;
+              if ((enteredValue-minEntry) == 0) { mx = 0 } else {
+                mx = (Math.log1p((enteredValue-minEntry))/(Math.log1p(maxEntry-minEntry)));
+              }
+              var preshiftNormalized = mx*(normalizedMax-normalizedMin);
+              var shiftedNormalized = preshiftNormalized + normalizedMin;
+
+              return shiftedNormalized;
+
+            }
+
+
+
+            // for (var j = 0; j < cy.nodes().length; j++) {
+            //    console.log(cy.edges()[j].data());
+            // }
+
+           //  console.log(eles.getElementById('d5167020-d3ac-11e3-a954-ab35be27f3fc'));
 
 
             // Make a list of all the node labels displayed in the graph (for Autofill)
