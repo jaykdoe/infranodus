@@ -920,6 +920,8 @@ sigma.parsers.json(
             // Betweenness Centrality Calculation using Cytoscape
             eles = cy.add(elesnodes);
 
+            //console.log(eles.nodes().length);
+
             betweennessCentrality(eles);
 
             sigma.graph.nodes().forEach(function(n) {
@@ -1421,6 +1423,12 @@ sigma.parsers.json(
                             });
                             nodeNames.push(addednodes[i].label);
 
+                            // Add to Cytoscape
+                            elesnodes.push({
+                                group: "nodes",
+                                data: { id: addednodes[i].id, name: addednodes[i].label }
+                            });
+
 
                         }
                     }
@@ -1439,15 +1447,24 @@ sigma.parsers.json(
                                 edge_context: addededges[j].edge_context
                             });
 
+                            // Add to Cytoscape
+                            elesnodes.push({
+                                group: "edges",
+                                data: { id: addededges[j].id, source: addededges[j].source, target: addededges[j].target }
+                            });
+
+
                         }
 
                     }
+
+
 
                     sigma.graph.nodes().forEach(function(n) {
                         if (n.id == 'dummy') {
                             sigma.graph.dropNode('dummy');
                         }
-                        n.size = sigma.graph.degree(n.id);
+                      //n.size = sigma.graph.degree(n.id);
 
                     });
 
@@ -1474,13 +1491,27 @@ sigma.parsers.json(
                             statementsOfContext[e.edge_context] = [];
                             statementsOfContext[e.edge_context].push(e.statement_id);
                         }
+
+
                     });
 
-                    sigma.refresh();
+                    // Betweenness Centrality Calculation using Cytoscape
+                    eless = cy.add(elesnodes);
+
+                    // console.log(eles.nodes().length);
+
+
+
+                    betweennessCentrality(eless);
+                    communityDetect();
+
+                    // sigma.refresh();
+
+
 
                     sigma.startForceAtlas2(forceatlas_options);
 
-                    communityDetect();
+
 
                     // Don't run it forever not to overheat :)
 
@@ -2495,6 +2526,9 @@ sigma.parsers.json(
 
       }
 
+      console.log(bcmap);
+
+
       sigma.instances(0).graph.nodes().forEach(function(n) {
         if (bcmap[n.id] == 0) { bcscore = bcmin } else { bcscore = bcmap[n.id] }
         n.size = Math.round(normalize(bcscore, bcmin, bcmax, 5, 35));
@@ -2503,7 +2537,11 @@ sigma.parsers.json(
 
       topbc_nodes = _.sortBy(topbc_nodes, 'bc').reverse().slice(0,5);
 
+      console.log(topbc_nodes);
+
       top_components = eles.components();
+
+      sigma.instances(0).refresh();
 
 
      //  console.log(topbc_nodes);
@@ -2861,28 +2899,39 @@ sigma.parsers.json(
         diversity_score = 'Low';
      }
 
-     diversitytext +=  ' <br><div class="headline">Discourse <a href="https://noduslabs.com/research/visualization-text-polysingularity-network-analysis/" target="_blank">polysingularity</a></div>: ' + diversity_score + ' <br>';
+     diversitytext +=  ' <br><div class="headline">Discourse <a href="https://noduslabs.com/research/visualization-text-polysingularity-network-analysis/" target="_blank">polysingularity</a>: <i>' + diversity_score + '</i> </div><br>';
      diversitytext += community_assignment_result['modularity'].toFixed(2) + ' modularity, ';
-     diversitytext +=  diversityindex + '% of words in the top topic, ';
+     diversitytext +=  diversityindex + '% of words in the top topic ';
 
-     
+     diversitytext += '(total ' + all_communities.length + ' topics), ';
 
           if (addcontextcount > 0) {
             var addindex = ((((totalnodescount - addcontextcount) / totalnodescount).toFixed(2))*100).toFixed(0);
-            diversitytext += ' context ' + addcontext + ' uses ' + addindex + '% words from ' + current_context + ', ';
+            diversitytext += 'context ' + addcontext + ' uses ' + addindex + '% words from ' + current_context + ', ';
           }
 
-     diversitytext += all_communities.length + ' topical clusters, ' + top_components.length + ' distinct discoursive components';
+      var most_num_comm = [];
+
+      top_components = _.sortBy(top_components, 'length').reverse();
+
+      var num_nodes_component = ((top_components[0].nodes().length / totalnodescount).toFixed(2)*100).toFixed(0);
+
+      diversitytext += num_nodes_component + '% in the main connected component '
+
+
+     diversitytext += '(' + top_components.length + ' in total), ';
+
+     diversitytext += 'influencers entropy: ' + ((bc_entropy/2).toFixed(1)*100).toFixed(0) + '%';
 
 
      $('#graphstats').html(diversitytext);
 
+     //sigma.instances(0).refresh;
 
-     sigma.instances(0).refresh;
 
 
      //console.log(top_communities);
-  //   console.log(sigma.instances(0).graph.nodes());
+     //console.log(sigma.instances(0).graph.nodes());
 }
 
       $('.top_nodes').click(function(){
