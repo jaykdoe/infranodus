@@ -760,6 +760,7 @@ var elesnodes = [];
 var eles;
 var bc;
 var bcmap = [];
+var topbc_nodes = [];
 
 // Add a method to the graph model that returns an
 // object with every neighbors of a node inside:
@@ -917,9 +918,13 @@ sigma.parsers.json(
             var bcmax = 0;
 
             for (var i = 0; i < cy.nodes().length; i++) {
+
                 var nn = eles.getElementById(cy.nodes()[i].data('id'));
-                //console.log(nn);
-                bcmap[cy.nodes()[i].data('id')] = bc.betweennessNormalized(nn);
+                var currentbc = bc.betweennessNormalized(nn);
+
+                bcmap[cy.nodes()[i].data('id')] = currentbc;
+
+                topbc_nodes.push({key: cy.nodes()[i].data('id'), label: cy.nodes()[i].data('name'), bc: currentbc});
 
                 if (bcmin > bc.betweennessNormalized(nn) && bc.betweennessNormalized(nn) != 0) {
                   bcmin = bc.betweennessNormalized(nn);
@@ -932,7 +937,11 @@ sigma.parsers.json(
             }
 
 
-            console.log(eles);
+
+            topbc_nodes = _.sortBy(topbc_nodes, 'bc').reverse().slice(0,5);
+
+
+            console.log(topbc_nodes);
             //console.log(_.first(_.sortBy(bcmap,'degree').reverse(),3);
             // console.log(bcmin);
             // console.log(bcmax);
