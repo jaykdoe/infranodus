@@ -758,9 +758,6 @@ var cy = cytoscape({
 var elesnodes = [];
 
 var eles;
-var bc;
-var bcmap = [];
-var topbc_nodes = [];
 
 // Add a method to the graph model that returns an
 // object with every neighbors of a node inside:
@@ -912,41 +909,7 @@ sigma.parsers.json(
             // Betweenness Centrality Calculation using Cytoscape
             eles = cy.add(elesnodes);
 
-            bc = eles.bc({directed: true});
-
-            var bcmin = 1;
-            var bcmax = 0;
-
-            for (var i = 0; i < cy.nodes().length; i++) {
-
-                var nn = eles.getElementById(cy.nodes()[i].data('id'));
-                var currentbc = bc.betweennessNormalized(nn);
-
-                bcmap[cy.nodes()[i].data('id')] = currentbc;
-
-                topbc_nodes.push({key: cy.nodes()[i].data('id'), label: cy.nodes()[i].data('name'), bc: currentbc});
-
-                if (bcmin > bc.betweennessNormalized(nn) && bc.betweennessNormalized(nn) != 0) {
-                  bcmin = bc.betweennessNormalized(nn);
-                }
-
-                if (bcmax < bc.betweennessNormalized(nn)) {
-                  bcmax = bc.betweennessNormalized(nn);
-                }
-
-            }
-
-
-
-            topbc_nodes = _.sortBy(topbc_nodes, 'bc').reverse().slice(0,5);
-
-
-            console.log(topbc_nodes);
-            //console.log(_.first(_.sortBy(bcmap,'degree').reverse(),3);
-            // console.log(bcmin);
-            // console.log(bcmax);
-
-            var bcscore;
+            betweennessCentrality(eles);
 
             sigma.graph.nodes().forEach(function(n) {
 
@@ -958,12 +921,6 @@ sigma.parsers.json(
                 var key = n.label;
                 nodeIDs[key] = n.id;
 
-                // TODO only if the betweenness centrality setting is on
-                if (bcmap[n.id] == 0) { bcscore = bcmin } else { bcscore = bcmap[n.id] }
-                n.size = Math.round(normalize(bcscore, bcmin, bcmax, 5, 35));
-                // console.log(n.label + ': ' + bcmap[n.id] + ' ' + bcscore + ' / '+ Math.round(normalize(bcscore, bcmin, bcmax, 5, maxnodesize)));
-                // TODO will use clustering to identify ideology
-                // TODO will use graph density
             });
 
             console.log(eles.components());
@@ -2498,6 +2455,57 @@ sigma.parsers.json(
       });
     }
 
+    // Calculate Betweenness Centrality
+
+    function betweennessCentrality (eles) {
+
+      var bc = eles.bc({directed: true});
+
+      var bcmin = 1;
+      var bcmax = 0;
+
+      var bcmap = [];
+
+      var topbc_nodes = [];
+
+      for (var i = 0; i < cy.nodes().length; i++) {
+
+          var nn = eles.getElementById(cy.nodes()[i].data('id'));
+
+          var currentbc = bc.betweennessNormalized(nn);
+
+          bcmap[cy.nodes()[i].data('id')] = currentbc;
+
+          topbc_nodes.push({key: cy.nodes()[i].data('id'), label: cy.nodes()[i].data('name'), bc: currentbc});
+
+          if (bcmin > currentbc && currentbc != 0) {
+            bcmin = currentbc;
+          }
+
+          if (bcmax < currentbc) {
+            bcmax = currentbc;
+          }
+
+      }
+
+      sigma.instances(0).graph.nodes().forEach(function(n) {
+        if (bcmap[n.id] == 0) { bcscore = bcmin } else { bcscore = bcmap[n.id] }
+        n.size = Math.round(normalize(bcscore, bcmin, bcmax, 5, 35));
+        n.bc = currentbc;
+      });
+
+      topbc_nodes = _.sortBy(topbc_nodes, 'bc').reverse().slice(0,5);
+
+      console.log(topbc_nodes);
+
+      //console.log(_.first(_.sortBy(bcmap,'degree').reverse(),3);
+      // console.log(bcmin);
+      // console.log(bcmax);
+
+
+    }
+
+    // Community Detect Function
 
     function communityDetect () {
 
