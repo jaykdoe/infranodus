@@ -2563,20 +2563,27 @@ sigma.parsers.json(
     //  console.log(max_community_number);
 
 
+
          var topp_communities = {};
+
+         var all_communities = {};
 
          for (var indd in top_communities) {
           if (!topp_communities[indd]) {
-            topp_communities[indd] = {}
+           topp_communities[indd] = {};
+           all_communities[indd] = {};
            topp_communities[indd].id = indd;
+           all_communities[indd].id = indd;
            topp_communities[indd].length = top_communities[indd].length;
-           topp_communities[indd].nodes = top_communities[indd]
+           all_communities[indd].length = top_communities[indd].length;
+           topp_communities[indd].nodes = top_communities[indd];
+           all_communities[indd].nodes = top_communities[indd];
           }
          }
 
          topp_communities = _.sortBy(topp_communities,'length').reverse();
-         //console.log(topp_communities);
-         var all_communities = topp_communities;
+         all_communities = _.sortBy(all_communities,'length').reverse();
+
 
          var advice_iterations = 4;
          var recommender_iterations = 2;
@@ -2586,7 +2593,11 @@ sigma.parsers.json(
 
          topp_communities = _.first(topp_communities,advice_iterations);
 
+
          var toppp_communities = [];
+
+         // Slice first 3 off every topp community
+
          for (var j = 0; j < topp_communities.length; j++) {
            topp_communities[j].nodes = _.first(_.sortBy(topp_communities[j].nodes,'degree').reverse(),3);
          }
@@ -2803,10 +2814,47 @@ sigma.parsers.json(
 
      var diversity_score = 0;
 
-     if (community_assignment_result['modularity'] > 0.4) {
+     // TODO add degree distribution to the indexOf maybe through entropy of degree by nodes
+
+     var bc_dist = [];
+
+     // For every top BC node
+
+    for (var bcid in toppbc_nodes) {
+
+       for (var comid in all_communities) {
+          // Open first community
+
+              //  For every node in that community
+
+                  for (var ccnodes in all_communities[comid].nodes) {
+
+                      // If the node's ID equals to the current BC node, add the marker
+                      if (all_communities[comid].nodes[ccnodes].id == toppbc_nodes[bcid].key) {
+                        bc_dist.push(all_communities[comid].id);
+                      }
+
+                  }
+       }
+
+    }
+
+     console.log(bc_dist);
+
+     var bc_dist_string = bc_dist.join('');
+
+     // Max entropy for a set of 4 elements is 2
+
+     var bc_entropy = shannon(bc_dist_string);
+
+     // TODO fix bug for two-digit communities
+
+     console.log('BC Entropy: ' + bc_entropy);
+
+     if (community_assignment_result['modularity'] > 0.4 && diversityindex < 50 && bc_entropy >= 1.5) {
         diversity_score = 'High';
      }
-     else if (community_assignment_result['modularity'] < 0.4 && community_assignment_result['modularity'] > 0.2 ) {
+     else if ((community_assignment_result['modularity'] < 0.4 && community_assignment_result['modularity'] > 0.2 && bc_entropy >= 0.5) || ((community_assignment_result['modularity'] > 0.4 && diversityindex >= 50)  && bc_entropy >= 0.5) || (community_assignment_result['modularity'] > 0.4 && diversityindex < 50 && bc_entropy >= 0.5)) {
         diversity_score = 'Medium';
      }
      else {
@@ -2814,8 +2862,10 @@ sigma.parsers.json(
      }
 
      diversitytext +=  ' <br><div class="headline">Discourse <a href="https://noduslabs.com/research/visualization-text-polysingularity-network-analysis/" target="_blank">polysingularity</a></div>: ' + diversity_score + ' <br>';
-     diversitytext += 'modularity: ' + community_assignment_result['modularity'].toFixed(2) + ', ';
+     diversitytext += community_assignment_result['modularity'].toFixed(2) + ' modularity, ';
      diversitytext +=  diversityindex + '% of words in the top topic, ';
+
+     
 
           if (addcontextcount > 0) {
             var addindex = ((((totalnodescount - addcontextcount) / totalnodescount).toFixed(2))*100).toFixed(0);
@@ -4636,6 +4686,35 @@ sigma.parsers.json(
       var shiftedNormalized = preshiftNormalized + normalizedMin;
 
       return shiftedNormalized;
+
+    }
+
+    function shannon(data) {
+
+        // Create a dictionary of character frequencies and iterate over it.
+      function process(s, evaluator) {
+          var h = Object.create(null), k;
+          s.split('').forEach(function(c) {
+            h[c] && h[c]++ || (h[c] = 1); });
+          if (evaluator) for (k in h) evaluator(k, h[k]);
+          return h;
+        };
+
+      // Measure the entropy of a string in bits per symbol.
+
+      // Measure the entropy of a string in total bits.
+      function bits (s) {
+        return entropy(s) * s.length;
+      }
+
+
+      var sum = 0,len = data.length;
+      process(data, function(k, f) {
+         var p = f/len;
+         sum -= p * Math.log(p) / Math.log(2);
+      });
+
+      return sum;
 
     }
 
