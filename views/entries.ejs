@@ -455,6 +455,9 @@ var sigma_dragged = 0;
 // default label threshold
 var in_label_threshold = 8;
 
+// default most influential nodes are displayed according to Betwenness Centrality (bc) or Degree (degree)
+var most_influential = 'bc';
+
 // TODO for desktop browses that support webwork (not iphone): webworker: true, slowdown: 300
 var forceatlas_options = {worker: false, startingIterations: 100, scalingRatio: 0.1, slowDown: 100, strongGravityMode: true};
 
@@ -464,6 +467,11 @@ var inlanguage = '<%= user.inlanguage %>';
 <% if (locals.user.label_threshold) { %>
 in_label_threshold = '<%= user.label_threshold %>';
 <% } %>
+
+<% if (locals.user.topnodes) { %>
+most_influential = '<%= user.topnodes %>';
+<% } %>
+
 if (!graphPalette) {
  graphPalette = '<%= user.palette %>';
 }
@@ -759,6 +767,9 @@ var elesnodes = [];
 
 var eles;
 
+var topbc_nodes = [];
+
+
 // Add a method to the graph model that returns an
 // object with every neighbors of a node inside:
 
@@ -933,7 +944,7 @@ sigma.parsers.json(
             //    console.log(cy.edges()[j].data());
             // }
 
-           //  console.log(eles.getElementById('d5167020-d3ac-11e3-a954-ab35be27f3fc'));
+            //  console.log(eles.getElementById('d5167020-d3ac-11e3-a954-ab35be27f3fc'));
 
 
             // Make a list of all the node labels displayed in the graph (for Autofill)
@@ -2466,8 +2477,6 @@ sigma.parsers.json(
 
       var bcmap = [];
 
-      var topbc_nodes = [];
-
       for (var i = 0; i < cy.nodes().length; i++) {
 
           var nn = eles.getElementById(cy.nodes()[i].data('id'));
@@ -2580,6 +2589,8 @@ sigma.parsers.json(
          // these are top nodes in each community
          var top_nodes = [];
 
+         // TODO move parsing logic away from this function
+
 
          var recommender_start = 'next idea tip: what is the relation between "';
          var recommender = '';
@@ -2623,13 +2634,28 @@ sigma.parsers.json(
         //console.log(degree_nodes.slice(0,4));
 
 
+
+        // TODO to move parsing logic away from this function
+
          analytics += "<br><br><div class='headline'>Most Influential Words:<br></div>";
 
 
-         for (var ind in degree_nodes) {
-             analytics += '<div class="inlinesquare '+degree_nodes[ind].id+'"></div> <a href="#" class="top_nodes">' + degree_nodes[ind].label + '</a> &nbsp;';
+         var toppbc_nodes = topbc_nodes.slice(0,4);
+
+         if (most_influential == 'bc') {
+           for (var ind in toppbc_nodes) {
+               analytics += '<div class="inlinesquare '+toppbc_nodes[ind].key+'"></div> <a href="#" class="top_nodes">' + toppbc_nodes[ind].label + '</a> &nbsp;';
+           }
+           analytics = analytics.slice(0, -7);
+
          }
-         analytics = analytics.slice(0, -7);
+         else {
+           for (var ind in degree_nodes) {
+               analytics += '<div class="inlinesquare '+degree_nodes[ind].id+'"></div> <a href="#" class="top_nodes">' + degree_nodes[ind].label + '</a> &nbsp;';
+           }
+           analytics = analytics.slice(0, -7);
+
+         }
 
          analytics += "<br><br><div class='headline'>Question to Ask:</div> <br>What is the relation between <br><div class='headline'>\"" + recommender + "\"</div>?";
 

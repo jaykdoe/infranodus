@@ -99,6 +99,15 @@
                     </label>
                     <br>
 
+                    Most influential words have
+                    <label for="topnodes" class="pure-input">
+                      <select id="topnodes" name="topnodes">
+                      <option value="bc" <% if (user.topnodes=='bc' || user.topnodes == undefined) { %> selected <% } %>>max betweenness centrality</option>
+                      <option value="degree" <% if (user.topnodes=='degree') { %> selected <% } %>>max degree</option>
+                      </select>
+                    </label>
+                    <br>
+
                     Visualize in the graph
                     <label for="hashnodes1" class="pure-radio">
                         <input id="hashnodes1" type="radio" name="hashnodes" value="0" <% if (user.hashnodes=='0') { %> checked <% } %>>
