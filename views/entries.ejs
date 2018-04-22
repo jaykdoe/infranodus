@@ -2527,8 +2527,13 @@ sigma.parsers.json(
 
       var edge_data = [];
 
+      var totaledgescount = 0;
+
       sigma.instances(0).graph.edges().forEach(function(e) {
           edge_data.push({source: e.source, target: e.target});
+          if (e.source != e.target) {
+            totaledgescount = totaledgescount + 1;
+          }
       });
       if (node_data.length > 0 && edge_data.length > 0) {
 
@@ -2786,13 +2791,17 @@ sigma.parsers.json(
 
      diversityindex = ((((nodesfirstcom) / totalnodescount).toFixed(2))*100).toFixed(0);
 
-     var graph_density = ((edge_data.length) / ((totalnodescount)*(totalnodescount -1))).toFixed(3);
 
-     var diversitytext = '<div class="headline">Stats:</div> total ' + totalnodescount + ' words, graph density ' + graph_density + ', ' + diversityindex + '% of words in the top topic.';
+     var graph_density;
+     if ((totalnodescount - 1) == 0 || totalnodescount == 0) { graph_density = 0 } else {
+      graph_density  = ((totaledgescount) / ((totalnodescount)*(totalnodescount - 1))).toFixed(3);
+    }
 
+     var diversitytext = '<div class="headline">Stats:</div> total ' + totalnodescount + ' words, graph density ' + graph_density + ', ';
+
+     diversitytext += 'average degree: ' + (totaledgescount / totalnodescount).toFixed(2);
 
      var diversity_score = 0;
-
 
      if (community_assignment_result['modularity'] > 0.4) {
         diversity_score = 'High';
@@ -2804,14 +2813,17 @@ sigma.parsers.json(
         diversity_score = 'Low';
      }
 
-     diversitytext +=  ' <br><div class="headline">Discourse <a href="https://noduslabs.com/research/visualization-text-polysingularity-network-analysis/" target="_blank">polysingularity</a></div>: ' + diversity_score + ' <br>(' + community_assignment_result['modularity'].toFixed(2) + ' modularity), ';
+     diversitytext +=  ' <br><div class="headline">Discourse <a href="https://noduslabs.com/research/visualization-text-polysingularity-network-analysis/" target="_blank">polysingularity</a></div>: ' + diversity_score + ' <br>';
+     diversitytext += 'modularity: ' + community_assignment_result['modularity'].toFixed(2) + ', ';
+     diversitytext +=  diversityindex + '% of words in the top topic, ';
 
-     diversitytext += ' ' + all_communities.length + ' topical clusters, ' + top_components.length + ' distinct discoursive components';
+          if (addcontextcount > 0) {
+            var addindex = ((((totalnodescount - addcontextcount) / totalnodescount).toFixed(2))*100).toFixed(0);
+            diversitytext += ' context ' + addcontext + ' uses ' + addindex + '% words from ' + current_context + ', ';
+          }
 
-     if (addcontextcount > 0) {
-       var addindex = ((((totalnodescount - addcontextcount) / totalnodescount).toFixed(2))*100).toFixed(0);
-       diversitytext += ' context ' + addcontext + ' uses ' + addindex + '% words from ' + current_context;
-     }
+     diversitytext += all_communities.length + ' topical clusters, ' + top_components.length + ' distinct discoursive components';
+
 
      $('#graphstats').html(diversitytext);
 

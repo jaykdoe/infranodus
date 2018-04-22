@@ -549,5 +549,8 @@ Hides the menu at `48em`, but modify this based on your app's needs.
     }
 
 
+    #analyticsbutton:after {
+      display:none;
+    }
 
 }

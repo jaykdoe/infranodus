@@ -456,6 +456,12 @@ a:hover.app-more-link {
 
 }
 
+#analyticsbutton:after {
+  font-size: 14px; /* change this value to increase/decrease button size */
+  margin-left: -5em;
+  content: "analytics"
+}
+
 .analytics-on {
     opacity: 1!important;
     background-image: url('../images/close.png')!important;
