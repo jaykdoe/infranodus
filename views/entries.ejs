@@ -721,16 +721,18 @@ function toggle_statements() {
     }
     $("#chat-link").toggleClass('chat-highlight');
 
+    if (!localStorage.getItem('analytics')) {
     $('#analytics').toggle('slide', function(){
-    if ($('#analytics').is(":visible")) {
-          $('#analyticsbutton').addClass('analytics-on');
-          localStorage.setItem('analytics', 1);
-    }
-    else {
-          $('#analyticsbutton').removeClass('analytics-on');
-          localStorage.setItem('analytics', 0);
-        }
+      if ($('#analytics').is(":visible")) {
+            $('#analyticsbutton').addClass('analytics-on');
+            //localStorage.setItem('analytics', 1);
+      }
+      else {
+            $('#analyticsbutton').removeClass('analytics-on');
+            //localStorage.setItem('analytics', 0);
+          }
     });
+    }
 
 
 
@@ -2571,7 +2573,7 @@ sigma.parsers.json(
 
       }
 
-      console.log(bcmap);
+      //console.log(bcmap);
 
       topbc_nodes = _.sortBy(topbc_nodes, 'bc').reverse().slice(0,5);
 
@@ -2733,7 +2735,7 @@ sigma.parsers.json(
             degree_nodes.push({id: n.id, label: n.label, degree: sigma.instances(0).graph.degree(n.id)});
          });
 
-console.log(degree_nodes);
+         //console.log(degree_nodes);
          degree_nodes = _.first(_.sortBy(degree_nodes,'degree').reverse(),9).slice(0,4);
 
 
@@ -2954,13 +2956,13 @@ console.log(degree_nodes);
      var num_nodes_component = ((top_components[0].nodes().length / totalnodescount).toFixed(2)*100).toFixed(0);
 
      if ((community_assignment_result['modularity'] > 0.4 && diversityindex < 50) && ((bc_entropy >= 1.5) || (bc_entropy == 0 && toppbc_nodes[0].bc == 0) || (bc_entropy == 0 && num_nodes_component < 40))) {
-        diversity_score = 'High';
+        diversity_score = 'Diversified';
      }
      else if ((community_assignment_result['modularity'] < 0.4 && community_assignment_result['modularity'] > 0.2 && bc_entropy >= 0.5) || ((community_assignment_result['modularity'] > 0.4 && diversityindex >= 50)  && bc_entropy >= 0.5) || (community_assignment_result['modularity'] > 0.4 && diversityindex < 50 && bc_entropy >= 0.5)) {
-        diversity_score = 'Medium';
+        diversity_score = 'Focused';
      }
      else {
-        diversity_score = 'Low';
+        diversity_score = 'Biased';
      }
 
      diversitytext +=  ' <br><div class="headline">Discourse <a href="https://noduslabs.com/research/visualization-text-polysingularity-network-analysis/" target="_blank">polysingularity</a>: <i>' + diversity_score + '</i> </div><br>';
@@ -2981,7 +2983,7 @@ console.log(degree_nodes);
 
      diversitytext += '(' + top_components.length + ' in total), ';
 
-     diversitytext += 'influencers entropy: ' + ((bc_entropy/2).toFixed(1)*100).toFixed(0) + '%';
+     diversitytext += 'influence dispersal ' + ((bc_entropy/2).toFixed(1)*100).toFixed(0) + '%';
 
 
      $('#graphstats').html(diversitytext);
