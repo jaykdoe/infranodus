@@ -560,8 +560,6 @@ if (!collaborate_invite) {
 
 
 
-
-
 // The button to hide / show statements
 
 $("#graph-link").click(function(e) {
@@ -769,6 +767,8 @@ var eles;
 
 var topbc_nodes = [];
 
+var top_components = [];
+
 
 // Add a method to the graph model that returns an
 // object with every neighbors of a node inside:
@@ -933,8 +933,6 @@ sigma.parsers.json(
                 nodeIDs[key] = n.id;
 
             });
-
-            console.log(eles.components());
 
 
 
@@ -2505,7 +2503,10 @@ sigma.parsers.json(
 
       topbc_nodes = _.sortBy(topbc_nodes, 'bc').reverse().slice(0,5);
 
-      console.log(topbc_nodes);
+      top_components = eles.components();
+
+
+     //  console.log(topbc_nodes);
 
       //console.log(_.first(_.sortBy(bcmap,'degree').reverse(),3);
       // console.log(bcmin);
@@ -2525,6 +2526,7 @@ sigma.parsers.json(
 
 
       var edge_data = [];
+
       sigma.instances(0).graph.edges().forEach(function(e) {
           edge_data.push({source: e.source, target: e.target});
       });
@@ -2535,8 +2537,8 @@ sigma.parsers.json(
       var community_assignment_result = community();
       var node_ids = Object.keys(community_assignment_result['communities']);
 
-      console.log('Resulting Community Data', community_assignment_result['communities']);
-      console.log('Final Modularity', community_assignment_result['modularity']);
+      //console.log('Resulting Community Data', community_assignment_result['communities']);
+      // console.log('Final Modularity', community_assignment_result['modularity']);
 
 
       var max_community_number = 0;
@@ -2569,7 +2571,7 @@ sigma.parsers.json(
 
          topp_communities = _.sortBy(topp_communities,'length').reverse();
          //console.log(topp_communities);
-
+         var all_communities = topp_communities;
 
          var advice_iterations = 4;
          var recommender_iterations = 2;
@@ -2784,14 +2786,35 @@ sigma.parsers.json(
 
      diversityindex = ((((nodesfirstcom) / totalnodescount).toFixed(2))*100).toFixed(0);
 
-     var diversitytext = '<div class="headline">Stats:</div> total ' + totalnodescount + ' words, ' + diversityindex + '% of words in the top topic.';
+     var graph_density = ((edge_data.length) / ((totalnodescount)*(totalnodescount -1))).toFixed(3);
+
+     var diversitytext = '<div class="headline">Stats:</div> total ' + totalnodescount + ' words, graph density ' + graph_density + ', ' + diversityindex + '% of words in the top topic.';
+
+
+     var diversity_score = 0;
+
+
+     if (community_assignment_result['modularity'] > 0.4) {
+        diversity_score = 'High';
+     }
+     else if (community_assignment_result['modularity'] < 0.4 && community_assignment_result['modularity'] > 0.2 ) {
+        diversity_score = 'Medium';
+     }
+     else {
+        diversity_score = 'Low';
+     }
+
+     diversitytext +=  ' <br><div class="headline">Discourse <a href="https://noduslabs.com/research/visualization-text-polysingularity-network-analysis/" target="_blank">polysingularity</a></div>: ' + diversity_score + ' <br>(' + community_assignment_result['modularity'].toFixed(2) + ' modularity), ';
+
+     diversitytext += ' ' + all_communities.length + ' topical clusters, ' + top_components.length + ' distinct discoursive components';
 
      if (addcontextcount > 0) {
-       var addindex = (((addcontextcount / totalnodescount).toFixed(2))*100).toFixed(0);
-       diversitytext += ' ' + addindex + '% of words from ' + addcontext + ' are not in the main context.'
+       var addindex = ((((totalnodescount - addcontextcount) / totalnodescount).toFixed(2))*100).toFixed(0);
+       diversitytext += ' context ' + addcontext + ' uses ' + addindex + '% words from ' + current_context;
      }
 
      $('#graphstats').html(diversitytext);
+
 
      sigma.instances(0).refresh;
 
