@@ -917,13 +917,7 @@ sigma.parsers.json(
 
             });
 
-            console.log(elesnodes);
-            // Betweenness Centrality Calculation using Cytoscape
-            eles = cy.add(elesnodes);
 
-            //console.log(eles.nodes().length);
-
-            betweennessCentrality(eles);
 
             sigma.graph.nodes().forEach(function(n) {
 
@@ -1091,6 +1085,13 @@ sigma.parsers.json(
             // Drag nodes
 
             dragNodes();
+
+            // Betweenness Centrality Calculation using Cytoscape
+            eles = cy.add(elesnodes);
+
+            //console.log(eles.nodes().length);
+
+            betweennessCentrality(eles);
 
             // Community detect algorithm
 
@@ -1530,7 +1531,7 @@ sigma.parsers.json(
 
                     });
 
-                    console.log(elesnodes);
+
                     // Betweenness Centrality Calculation using Cytoscape
                     eless = cy.add(elesnodes);
 
@@ -2577,9 +2578,7 @@ sigma.parsers.json(
         n.bc = currentbc;
       });
 
-      //topbc_nodes = _.sortBy(topbc_nodes, 'bc').reverse().slice(0,5);
-
-      console.log(topbc_nodes);
+      topbc_nodes = _.sortBy(topbc_nodes, 'bc').reverse().slice(0,5);
 
       top_components = eles.components();
 
@@ -2739,10 +2738,13 @@ sigma.parsers.json(
 
 
          var toppbc_nodes = topbc_nodes.slice(0,4);
+         console.log(toppbc_nodes);
 
-         if (most_influential == 'bc') {
+         if (most_influential == 'bc' && toppbc_nodes[0].bc > 0) {
            for (var ind in toppbc_nodes) {
-               analytics += '<div class="inlinesquare '+toppbc_nodes[ind].key+'"></div> <a href="#" class="top_nodes">' + toppbc_nodes[ind].label + '</a> &nbsp;';
+               if (toppbc_nodes[ind].bc > 0) {
+                 analytics += '<div class="inlinesquare '+toppbc_nodes[ind].key+'"></div> <a href="#" class="top_nodes">' + toppbc_nodes[ind].label + '</a> &nbsp;';
+               }
            }
            analytics = analytics.slice(0, -7);
 
