@@ -753,6 +753,14 @@ var cy = cytoscape({
     headless: true
 });
 
+// Cytoscape object
+
+var elesnodes = [];
+
+var eles;
+var bc;
+var bcmap = [];
+
 // Add a method to the graph model that returns an
 // object with every neighbors of a node inside:
 
@@ -798,9 +806,7 @@ sigma.parsers.json(
                     len = nodes.length;
 
 
-            // Cytoscape object
 
-            var elesnodes = [];
 
             // This is a fix for JSON
             // Sigma requires that nodes have X, Y, Size and Color properties which our JSON doesn't have. So we add them.
@@ -903,12 +909,9 @@ sigma.parsers.json(
             });
 
             // Betweenness Centrality Calculation using Cytoscape
-            var eles = cy.add(elesnodes);
+            eles = cy.add(elesnodes);
 
-            var bc = eles.bc({directed: true});
-
-            var bcmap = [];
-
+            bc = eles.bc({directed: true});
 
             var bcmin = 1;
             var bcmax = 0;
@@ -927,6 +930,10 @@ sigma.parsers.json(
                 }
 
             }
+
+
+            console.log(eles);
+            //console.log(_.first(_.sortBy(bcmap,'degree').reverse(),3);
             // console.log(bcmin);
             // console.log(bcmax);
 
@@ -952,17 +959,7 @@ sigma.parsers.json(
 
             console.log(eles.components());
 
-            function normalize(enteredValue, minEntry, maxEntry, normalizedMin, normalizedMax) {
-              var mx;
-              if ((enteredValue-minEntry) == 0) { mx = 0 } else {
-                mx = (Math.log1p((enteredValue-minEntry))/(Math.log1p(maxEntry-minEntry)));
-              }
-              var preshiftNormalized = mx*(normalizedMax-normalizedMin);
-              var shiftedNormalized = preshiftNormalized + normalizedMin;
 
-              return shiftedNormalized;
-
-            }
 
 
 
@@ -4549,6 +4546,19 @@ sigma.parsers.json(
             $(this).children('.entry-text').html(originale.replace(/#(\w+)/g,  " <a href='" + forwardTo + "$1' class='app-concept-link' target='_blank'>$&</a>"));
 
         });
+    }
+
+
+    function normalize(enteredValue, minEntry, maxEntry, normalizedMin, normalizedMax) {
+      var mx;
+      if ((enteredValue-minEntry) == 0) { mx = 0 } else {
+        mx = (Math.log1p((enteredValue-minEntry))/(Math.log1p(maxEntry-minEntry)));
+      }
+      var preshiftNormalized = mx*(normalizedMax-normalizedMin);
+      var shiftedNormalized = preshiftNormalized + normalizedMin;
+
+      return shiftedNormalized;
+
     }
 
 
