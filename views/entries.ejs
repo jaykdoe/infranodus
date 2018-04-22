@@ -2532,11 +2532,11 @@ sigma.parsers.json(
 
     function betweennessCentrality (eles) {
 
-      console.log(eles.nodes().length);
+
 
       var collection = cy.elements();
 
-      console.log(collection.edges().length);
+
 
       var bc = eles.bc({directed: true});
 
@@ -2552,7 +2552,6 @@ sigma.parsers.json(
 
           var nn = eles.getElementById(cy.nodes()[i].data('id'));
 
-
           var currentbc = bc.betweennessNormalized(nn);
 
           bcmap[cy.nodes()[i].data('id')] = currentbc;
@@ -2562,6 +2561,9 @@ sigma.parsers.json(
           if (bcmin > currentbc && currentbc != 0) {
             bcmin = currentbc;
           }
+          else {
+            bcmin = 0.00001
+          }
 
           if (bcmax < currentbc) {
             bcmax = currentbc;
@@ -2569,16 +2571,22 @@ sigma.parsers.json(
 
       }
 
-      //console.log(bcmap);
+      console.log(bcmap);
+
+      topbc_nodes = _.sortBy(topbc_nodes, 'bc').reverse().slice(0,5);
 
 
       sigma.instances(0).graph.nodes().forEach(function(n) {
-        if (bcmap[n.id] == 0) { bcscore = bcmin } else { bcscore = bcmap[n.id] }
-        n.size = Math.round(normalize(bcscore, bcmin, bcmax, 5, 35));
-        n.bc = currentbc;
+        if (most_influential == 'bc' && topbc_nodes[0].bc > 0) {
+          if (bcmap[n.id] == 0) { bcscore = bcmin } else { bcscore = bcmap[n.id] }
+          n.size = Math.round(normalize(bcscore, bcmin, bcmax, 5, 35));
+          n.bc = currentbc;
+        }
+        else {
+          n.size = sigma.instances(0).graph.degree(n.id);
+        }
       });
 
-      topbc_nodes = _.sortBy(topbc_nodes, 'bc').reverse().slice(0,5);
 
       top_components = eles.components();
 
@@ -2725,7 +2733,10 @@ sigma.parsers.json(
             degree_nodes.push({id: n.id, label: n.label, degree: sigma.instances(0).graph.degree(n.id)});
          });
 
+console.log(degree_nodes);
          degree_nodes = _.first(_.sortBy(degree_nodes,'degree').reverse(),9).slice(0,4);
+
+
 
         // console.log(top_nodes);
         //console.log(degree_nodes.slice(0,4));
@@ -2738,6 +2749,7 @@ sigma.parsers.json(
 
 
          var toppbc_nodes = topbc_nodes.slice(0,4);
+
          console.log(toppbc_nodes);
 
          if (most_influential == 'bc' && toppbc_nodes[0].bc > 0) {
@@ -2903,6 +2915,7 @@ sigma.parsers.json(
      // For every top BC node
 
     for (var bcid in toppbc_nodes) {
+       if (toppbc_nodes[bcid].bc > 0) {
 
        for (var comid in all_communities) {
           // Open first community
@@ -2917,6 +2930,7 @@ sigma.parsers.json(
                       }
 
                   }
+       }
        }
 
     }
@@ -2933,7 +2947,13 @@ sigma.parsers.json(
 
      console.log('BC Entropy: ' + bc_entropy);
 
-     if (community_assignment_result['modularity'] > 0.4 && diversityindex < 50 && bc_entropy >= 1.5) {
+     var most_num_comm = [];
+
+     top_components = _.sortBy(top_components, 'length').reverse();
+
+     var num_nodes_component = ((top_components[0].nodes().length / totalnodescount).toFixed(2)*100).toFixed(0);
+
+     if ((community_assignment_result['modularity'] > 0.4 && diversityindex < 50) && ((bc_entropy >= 1.5) || (bc_entropy == 0 && toppbc_nodes[0].bc == 0) || (bc_entropy == 0 && num_nodes_component < 40))) {
         diversity_score = 'High';
      }
      else if ((community_assignment_result['modularity'] < 0.4 && community_assignment_result['modularity'] > 0.2 && bc_entropy >= 0.5) || ((community_assignment_result['modularity'] > 0.4 && diversityindex >= 50)  && bc_entropy >= 0.5) || (community_assignment_result['modularity'] > 0.4 && diversityindex < 50 && bc_entropy >= 0.5)) {
@@ -2954,13 +2974,9 @@ sigma.parsers.json(
             diversitytext += 'context ' + addcontext + ' uses ' + addindex + '% words from ' + current_context + ', ';
           }
 
-      var most_num_comm = [];
 
-      top_components = _.sortBy(top_components, 'length').reverse();
 
-      var num_nodes_component = ((top_components[0].nodes().length / totalnodescount).toFixed(2)*100).toFixed(0);
-
-      diversitytext += num_nodes_component + '% in the main connected component '
+     diversitytext += num_nodes_component + '% in the main connected component '
 
 
      diversitytext += '(' + top_components.length + ' in total), ';
