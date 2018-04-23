@@ -316,6 +316,12 @@
 
     var graphPalette = getUrlVars()["palette"];
 
+    var walkthroughtype = 'default';
+
+    <% if (perceivername) { %>
+    walkthroughtype = 'external';
+    <% } %>
+
     if (go_next_url) {
         if ((go_next_url.substr(go_next_url.length - 1) == 's' || go_next_url.substr(go_next_url.length - 6) == 'search' || go_next_url.substr(go_next_url.length - 5) == 'query')) {
            go_next_url = go_next_url + '=';
@@ -1958,240 +1964,346 @@ sigma.parsers.json(
             // END Speech recognition module
 
 
-            // BEGIN WALKTHROUGH Module
-
-            // Basic tutorial
-            function initializeWalkthrough () {
-              // Instance the tour
-                var tour = new Tour({
-                  storage: false,
-                  steps: [
-                  {
-                    element: "#entryform",
-                    placement: "top",
-                    title: "Welcome to InfraNodus",
-                    content: "You can start typing your ideas and notes here. Press Enter or Save to submit. They will be visualized as a graph.",
-                    onNext: function (tour) {
-                        $('#statement').val('Every word you type is a node in a graph. When the words cooccur together, they are connected.');
-                    }
-                  },
-                  {
-                    element: "#statement",
-                    placement: "top",
-                    title: "Add a Statement...",
-                    content: "You can add this statement or edit and add your own. Then press the SAVE button..."
-                  },
-                  {
-                    element: ".entry:first",
-                    orphan: true,
-                    placement: "auto",
-                    title: "See the Statements",
-                    content: "You will then see this statement appear here. To edit it, double-click it."
-                  },
-                  {
-                    element: "#statement",
-                    placement: "top",
-                    title: "Delete Statements",
-                    content: "If you double-clicked the statement, it appears here. Then simply click the Delete icon below the statement and it will be removed. You can also Edit and click Edit. Or Cancel."
-                  },
-                  {
-                    element: "#menuLink",
-                    title: "Context Menu",
-                    content: "You can navigate using this menu here. Here you can choose another context (list / graph / set), add a new one, or see all of them at once.",
-                    onShow: function (tour) {
-                        $('#menuLink').click();
-                    }
-                  },
-                  {
-                    element: "#chat-link",
-                    placement: "left",
-                    title: "Hide/Show Statements",
-                    content: "You can use this button to hide / show statements, so you can clearly see the graph.",
-                    onShow: function (tour) {
-                        $('#menuLink').click();
-                        $('#chat-link').click();
-                    }
-                  },
-                  {
-                    element: "#walkthrough",
-                    placement: "left",
-                    title: "This Tutorial",
-                    content: "If, at any point, you want to see this tutorial again, click here.",
-                    onShow: function (tour) {
-                        $('#chat-link').click();
-                    }
-                  },
-                  {
-                    element: "#microphone-link",
-                    orphan: true,
-                    placement: "left",
-                    title: "Voice to Text Input",
-                    content: "If you use Chrome browser, you can also turn on Voice to Text input. Great for interviews and when you're lazy to type. English, French, German and Russian."
-                  },
-                  {
-                    element: "#graph-container",
-                    placement: "top",
-                    title: "Use the Graph",
-                    content: "You can click on the nodes on the graph to see what they're connected to and to filter the statements, which contain them."
-                  },
-                  {
-                    element: "#analyticsbutton",
-                    placement: "left",
-                    title: "Text / Graph Analytics",
-                    content: "Here you can see the main topics identified in the graph and the main keywords / nodes and click them to get more insights about the graph. You can also discover what questions to ask to make your discourse more connected.",
-                    onShow: function (tour) {
-                        $('#chat-link').click();
-                        $('#analyticsbutton').click();
-                    }
-                  },
-                  {
-                    element: "#graph-container",
-                    placement: "bottom",
-                    title: "Discover New Ideas",
-                    content: "You can also discover new ideas if you look for the gaps inside the graph.",
-                    onShow: function (tour) {
-                        $('#chat-link').click();
-                        $('#analyticsbutton').click();
-                    }
-                  },
-                  {
-                    element: "#go_next",
-                    placement: "left",
-                    title: "Search the Web",
-                    content: "Once you select a few nodes in the graph, you can click this to search them on the web."
-                  },
-                  {
-                    element: "#collaborate-link",
-                    title: "Collaborate",
-                    placement: "top",
-                    content: "You can make your graph public or invite somebody to collaborate. Click on these buttons to learn more."
-                  },
-                  {
-                    element: "#settingspane",
-                    title: "Settings Pane",
-                    content: "Here you can log out, adjust the settings, and export your graph in any format for further visualization using Gephi or any other software.",
-                    onShow: function (tour) {
-                        $('#menuLink').click();
-                    }
-                  },
-                  {
-                    element: "#addNewContext",
-                    title: "Add a New Context",
-                    content: "You can add a new context here (click, type in the new name and click Enter to save). Think of contexts as lists or folders. You can store different notes there or you can organize them by hashtags."
-                  },
-                  {
-                    element: "#improve-layout",
-                    title: "Improve Graph Layout",
-                    placement: "left",
-                    content: "You can use this button to improve the graph's layout.",
-                    onShow: function (tour) {
-                        $('#menuLink').click();
-                    }
-                  },
-                  {
-                    element: "#graph-tools",
-                    placement: "left",
-                    title: "Zoom In / Zoom Out",
-                    content: "Use these buttons to zoom in and zoom out (or scroll your trackpad or pinch your iPad/iPhone)"
-                  },
-                  {
-                    element: "#reloadbutton",
-                    placement: "left",
-                    title: "Reload Graph",
-                    content: "If, at any point, something goes wrong, you can always click this to reload the graph."
-                  },
-                  {
-                    element: "#walkthrough",
-                    placement: "left",
-                    title: "Interactive Help",
-                    content: "When you want to see this guide again, click here."
-                  }
-
-                ]});
-
-                // New context tutorial? Do not show it if it's been shown before
-                if (walkthrough == 'newcontext' || walkthrough == 'tldr') {
-                  tour._options.storage = window.localStorage;
-                }
-
-                if (walkthrough == 'tldr') {
-                //  console.log(tour._options.steps);
-                  tour._options.steps = [
-                    {
-                    element: "#entryform",
-                    placement: "right",
-                    title: "Visualizing a Long Text",
-                    content: "If you would like to visualize a long text, copy and paste it here and click Save. You will probably need to wait for about 20-60 seconds. If nothign happens, you can try to reload the page after. We currently can handle about 150K max.",
-                  },
-                  {
-                  element: "#graph-container",
-                  placement: "bottom",
-                  title: "Navigate the Graph",
-                  content: "You will then see a graph representation of this text. The most prominent topics will be shown as bigger nodes in the graph, those words, which are used in the same context will be closer to each other.",
-                  },
-                  {
-                  element: "#graph-container",
-                  placement: "top",
-                  title: "Search through Text",
-                  content: "You can then click on the nodes in the graph to find the parts of the text that you find interesting.",
-                  },
-                  {
-                  element: "#graph-container",
-                  placement: "left",
-                  title: "Discover New Ideas",
-                  content: "The gaps in the graph will show you where you could do more research or what questions to ask.",
-                  },
-                  {
-                  element: "#graph-container",
-                  placement: "left",
-                  title: "Discover New Ideas",
-                  content: "The gaps in the graph will show you where you could do more research or what questions to ask.",
-                  },
-                  {
-                    element: "#menuLink",
-                    title: "Context Menu",
-                    content: "You will be able to later find your text here.",
-                    onShow: function (tour) {
-                        $('#menuLink').click();
-                    }
-                  },
-                  {
-                    element: "#walkthrough",
-                    placement: "left",
-                    title: "Detailed Tutorial",
-                    content: "If, at any point, you want to see a more detailed Tutorial, click here."
-                  }
-                  ]
-                }
-
-
-                // Initialize the tour
-                tour.init();
-
-                // Start the tour
-                tour.start();
-
-              }
-
-
-
-              if (walkthrough == 'default' || walkthrough == 'newcontext' || walkthrough == "tldr") {
-
-                initializeWalkthrough();
-
-              }
-
-              $("#walkthrough").click(function(e) {
-                  e.preventDefault();
-                  walkthrough = 'default';
-                  initializeWalkthrough();
-              });
 
 
 
             // IMPORTANT NOTE this is the end of the cycle that shows only to editor
          <% } %>
 
+         // BEGIN WALKTHROUGH Module
+
+         // Basic tutorial
+         function initializeWalkthrough () {
+           // Instance the tour
+             var tour = new Tour({
+               storage: false,
+               steps: [
+               {
+                 element: "#entryform",
+                 orphan: true,
+                 placement: "top",
+                 title: "Welcome to InfraNodus",
+                 content: "You can start typing your ideas and notes here. Press Enter or Save to submit. They will be visualized as a graph.",
+                 onNext: function (tour) {
+                     $('#statement').val('Every word you type is a node in a graph. When the words cooccur together, they are connected.');
+                 }
+               },
+               {
+                 element: "#statement",
+                 placement: "top",
+                 title: "Add a Statement...",
+                 content: "You can add this statement or edit and add your own. Then press the SAVE button..."
+               },
+               {
+                 element: ".entry:first",
+                 orphan: true,
+                 placement: "auto",
+                 title: "See the Statements",
+                 content: "You will then see this statement appear here. To edit it, double-click it."
+               },
+               {
+                 element: "#statement",
+                 placement: "top",
+                 title: "Delete Statements",
+                 content: "If you double-clicked the statement, it appears here. Then simply click the Delete icon below the statement and it will be removed. You can also Edit and click Edit. Or Cancel."
+               },
+               {
+                 element: "#menuLink",
+                 title: "Context Menu",
+                 content: "You can navigate using this menu here. Here you can choose another context (list / graph / set), add a new one, or see all of them at once.",
+                 onShow: function (tour) {
+                     $('#menuLink').click();
+                 }
+               },
+               {
+                 element: "#chat-link",
+                 placement: "left",
+                 title: "Hide/Show Statements",
+                 content: "You can use this button to hide / show statements, so you can clearly see the graph.",
+                 onShow: function (tour) {
+                     $('#menuLink').click();
+                     $('#chat-link').click();
+                 }
+               },
+               {
+                 element: "#walkthrough",
+                 placement: "left",
+                 title: "This Tutorial",
+                 content: "If, at any point, you want to see this tutorial again, click here.",
+                 onShow: function (tour) {
+                     $('#chat-link').click();
+                 }
+               },
+               {
+                 element: "#microphone-link",
+                 orphan: true,
+                 placement: "left",
+                 title: "Voice to Text Input",
+                 content: "If you use Chrome browser, you can also turn on Voice to Text input. Great for interviews and when you're lazy to type. English, French, German and Russian."
+               },
+               {
+                 element: "#graph-container",
+                 placement: "top",
+                 title: "Use the Graph",
+                 content: "You can click on the nodes on the graph to see what they're connected to and to filter the statements, which contain them."
+               },
+               {
+                 element: "#analyticsbutton",
+                 placement: "left",
+                 title: "Text / Graph Analytics",
+                 content: "Here you can see the main topics identified in the graph and the main keywords / nodes and click them to get more insights about the graph. You can also discover what questions to ask to make your discourse more connected.",
+                 onShow: function (tour) {
+                     $('#chat-link').click();
+                     if ($('#analytics').is(":visible")) {
+                     }
+                     else {
+                       $('#analyticsbutton').click();
+                     }
+                 }
+               },
+               {
+                 element: "#analytics",
+                 placement: "auto",
+                 title: "How to Analyze the Graph",
+                 content: "The top topics are identified according to Louvain community detection algorithm (Blondes et al 2008). It detects the words that co-occur more often together than others and puts them into the same community (designated with a specific color)."
+               },
+               {
+                 element: "#analytics",
+                 placement: "auto",
+                 title: "Most Influential Words",
+                 content: "The most influential words are the words in the graph that have the highest betweenness centrality — they appear most often on the shortest path between any two randomly chosen words. It means they serve as the 'crossroads' of meaning, often linking different contexts together. This is not the same as the most frequently used words, rather these words connect the different topics in this discourse. (it is also possible to use degree as the most influential words setting)"
+               },
+               {
+                 element: "#graphstats",
+                 placement: "top",
+                 title: "Graph Stats",
+                 content: "We use our own measure of <a href='https://noduslabs.com/research/visualization-text-polysingularity-network-analysis/' target='_blank'>discourse polysingularity</a> (Paranyushkin 2012, 2018) to score the discourse visualized based on the structure of the graph. <br><b>'Sparse'</b> — indicates a fragmented discourse (e.g. poetry, the beginning of a research, etc.) <br><b>'Diversified'</b> — indicates a discourse with a high level of plurality.<br><b>'Focused'</b> — prioritizes one or two topics. <br><b>'Biased'</b> — an agenda or mobilizing action present (e.g. advertising, ideology, manifesto)."
+               },
+               {
+                 element: "#graph-container",
+                 placement: "bottom",
+                 title: "Discover New Ideas",
+                 content: "You can also discover new ideas if you look for the gaps inside the graph.",
+                 onShow: function (tour) {
+                     $('#chat-link').click();
+                 }
+               },
+               {
+                 element: "#go_next",
+                 placement: "left",
+                 title: "Search the Web",
+                 content: "Once you select a few nodes in the graph, you can click this to search them on the web.",
+                 onShow: function (tour) {
+                   if ($('#analytics').is(":visible")) {
+                      $('#analyticsbutton').click();
+                   }
+                 }
+               },
+               {
+                 element: "#collaborate-link",
+                 title: "Collaborate",
+                 placement: "top",
+                 content: "You can make your graph public or invite somebody to collaborate. Click on these buttons to learn more."
+               },
+               {
+                 element: "#settingspane",
+                 title: "Settings Pane",
+                 content: "Here you can log out, adjust the settings, and export your graph in any format for further visualization using Gephi or any other software.",
+                 onShow: function (tour) {
+                     $('#menuLink').click();
+                 }
+               },
+               {
+                 element: "#addNewContext",
+                 title: "Add a New Context",
+                 content: "You can add a new context here (click, type in the new name and click Enter to save). Think of contexts as lists or folders. You can store different notes there or you can organize them by hashtags."
+               },
+               {
+                 element: "#improve-layout",
+                 title: "Improve Graph Layout",
+                 placement: "left",
+                 content: "You can use this button to improve the graph's layout.",
+                 onShow: function (tour) {
+                     $('#menuLink').click();
+                 }
+               },
+               {
+                 element: "#graph-tools",
+                 placement: "left",
+                 title: "Zoom In / Zoom Out",
+                 content: "Use these buttons to zoom in and zoom out (or scroll your trackpad or pinch your iPad/iPhone)"
+               },
+               {
+                 element: "#reloadbutton",
+                 placement: "left",
+                 title: "Reload Graph",
+                 content: "If, at any point, something goes wrong, you can always click this to reload the graph."
+               },
+               {
+                 element: "#walkthrough",
+                 placement: "left",
+                 title: "Interactive Help",
+                 content: "When you want to see this guide again, click here."
+               }
+
+             ]});
+
+             // New context tutorial? Do not show it if it's been shown before
+             if (walkthrough == 'newcontext' || walkthrough == 'tldr') {
+               tour._options.storage = window.localStorage;
+             }
+
+             if (walkthrough == 'tldr') {
+             //  console.log(tour._options.steps);
+               tour._options.steps = [
+                 {
+                 element: "#entryform",
+                 placement: "right",
+                 title: "Visualizing a Long Text",
+                 content: "If you would like to visualize a long text, copy and paste it here and click Save. You will probably need to wait for about 20-60 seconds. If nothign happens, you can try to reload the page after. We currently can handle about 150K max.",
+               },
+               {
+               element: "#graph-container",
+               placement: "bottom",
+               title: "Navigate the Graph",
+               content: "You will then see a graph representation of this text. The most prominent topics will be shown as bigger nodes in the graph, those words, which are used in the same context will be closer to each other.",
+               },
+               {
+               element: "#graph-container",
+               placement: "top",
+               title: "Search through Text",
+               content: "You can then click on the nodes in the graph to find the parts of the text that you find interesting.",
+               },
+               {
+               element: "#graph-container",
+               placement: "left",
+               title: "Discover New Ideas",
+               content: "The gaps in the graph will show you where you could do more research or what questions to ask.",
+               },
+               {
+               element: "#graph-container",
+               placement: "left",
+               title: "Discover New Ideas",
+               content: "The gaps in the graph will show you where you could do more research or what questions to ask.",
+               },
+               {
+                 element: "#menuLink",
+                 title: "Context Menu",
+                 content: "You will be able to later find your text here.",
+                 onShow: function (tour) {
+                     $('#menuLink').click();
+                 }
+               },
+               {
+                 element: "#walkthrough",
+                 placement: "left",
+                 title: "Detailed Tutorial",
+                 content: "If, at any point, you want to see a more detailed Tutorial, click here."
+               }
+               ]
+             }
+
+             if (walkthroughtype=='external') {
+               tour._options.steps = [
+               {
+               element: "#graph-container",
+               placement: "bottom",
+               title: "Welcome to InfraNodus",
+               content: "Here you can see network visualization of the text on the left. The most prominent topics are shown as the bigger nodes in the graph. The words, which are more often used in the same context will be closer to each other. The different colors will show the topical clusters that belong together.",
+               },
+               {
+               element: "#graph-container",
+               placement: "top",
+               title: "Search through Text",
+               content: "You can then click on the nodes in the graph to find the parts of the text that you find interesting.",
+               },
+               {
+                 element: "#chat-link",
+                 placement: "left",
+                 title: "Hide/Show Statements",
+                 content: "You can use this button to hide / show statements, so you can clearly see the graph.",
+                 onShow: function (tour) {
+                     $('#chat-link').click();
+                 }
+               },
+               {
+                 element: "#analyticsbutton",
+                 placement: "left",
+                 title: "Text / Graph Analytics",
+                 content: "Here you can see the main topics identified in the graph and the main keywords / nodes and click them to get more insights about the graph. You can also discover what questions to ask to make your discourse more connected.",
+                 onShow: function (tour) {
+                     $('#chat-link').click();
+                     if ($('#analytics').is(":visible")) {
+                     }
+                     else {
+                       $('#analyticsbutton').click();
+                     }
+                 }
+               },
+               {
+                 element: "#analytics",
+                 placement: "auto",
+                 title: "How to Analyze the Graph",
+                 content: "The top topics are identified according to Louvain community detection algorithm (Blondes et al 2008). It detects the words that co-occur more often together than others and puts them into the same community (designated with a specific color)."
+               },
+               {
+                 element: "#analytics",
+                 placement: "auto",
+                 title: "Most Influential Words",
+                 content: "The most influential words are the words in the graph that have the highest betweenness centrality — they appear most often on the shortest path between any two randomly chosen words. It means they serve as the 'crossroads' of meaning, often linking different contexts together. This is not the same as the most frequently used words, rather these words connect the different topics in this discourse. (it is also possible to use degree as the most influential words setting)"
+               },
+               {
+                 element: "#graphstats",
+                 placement: "top",
+                 title: "Graph Stats",
+                 content: "We use our own measure of <a href='https://noduslabs.com/research/visualization-text-polysingularity-network-analysis/' target='_blank'>discourse polysingularity</a> (Paranyushkin 2012, 2018) to score the discourse visualized based on the structure of the graph. <br><b>'Sparse'</b> — indicates a fragmented discourse (e.g. poetry, the beginning of a research, etc.) <br><b>'Diversified'</b> — indicates a discourse with a high level of plurality.<br><b>'Focused'</b> — prioritizes one or two topics. <br><b>'Biased'</b> — an agenda or mobilizing action present (e.g. advertising, ideology, manifesto)."
+               },
+               {
+               element: "#graph-container",
+               placement: "bottom",
+               title: "Discover the New Ideas",
+               content: "The gaps in the graph will show you where you could do more research or what questions to ask."
+               },
+               {
+                 element: "#walkthrough",
+                 placement: "left",
+                 title: "Detailed Tutorial",
+                 content: "If, at any point, you want to see a this Tutorial again, click here.",
+                 onShow: function (tour) {
+                   if ($('#analytics').is(":visible")) {
+                      $('#analyticsbutton').click();
+                   }
+                 }
+               },
+               {
+                 element: "#menuLink",
+                 title: "Create Your Own Graphs",
+                 content: "To create your own text network visualizations, you can create a new account on <a href='https://infranodus.com'>InfraNodus.Com</a>.",
+               }
+               ]
+             }
+
+             // Initialize the tour
+             tour.init();
+
+             // Start the tour
+             tour.start();
+
+           }
+
+
+
+           if (walkthrough == 'default' || walkthrough == 'newcontext' || walkthrough == "tldr") {
+
+             initializeWalkthrough();
+
+           }
+
+           $("#walkthrough").click(function(e) {
+               e.preventDefault();
+               walkthrough = 'default';
+               initializeWalkthrough();
+           });
 
 
         $("#chat-link").click(function(e) {
