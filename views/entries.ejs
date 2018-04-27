@@ -53,6 +53,7 @@
         </div>
    </div>
      <div id='content'>
+
              <div id='statements'>
 
                  <div id="entries">
@@ -70,7 +71,7 @@
 
                      <% include messages %>
                      <div id="warnings"></div>
-                     <div id="messages"></div>
+
              </div>
 
              <div id="entryform">
@@ -192,6 +193,7 @@
 
         <div id="graph-container"></div>
 
+        <div id="messages"><a href="javascript:" id="deletenodes"></a><div id="nodestopin"></div></div>
 
                 <a href="javascript:" id="chat-link" title="show / hide the text">
                     <!-- Chat icon -->
@@ -2318,6 +2320,14 @@ sigma.parsers.json(
 
         });
 
+        $("#deletenodes").on('click', function(e) {
+          e.preventDefault;
+          console.log('clicked');
+          socket.emit('node delete', {pinnedNodes: pinnedNodes});
+        });
+
+
+
         $("#imports").click(function(e) {
             var fornode = '';
             if (pinnedNodes.length > 0) {
@@ -2540,7 +2550,7 @@ sigma.parsers.json(
         }
 
         socket.on('node click', function(msg){
-
+              console.log('node click');
               pinnedNodes = msg.pinnedNodes;
               splicedNodes = msg.splicedNodes;
               var pinnedIndex = msg.pinnedIndex;
@@ -2555,6 +2565,113 @@ sigma.parsers.json(
 
         });
 
+        socket.on('node delete', function(msg){
+
+              pinnedNodes = msg.pinnedNodes;
+
+              var collectiond = cy.elements();
+              var elesss;
+
+              cy.remove(collectiond);
+
+              elesnodes = [];
+
+              sigma.instances(0).graph.nodes().forEach(function(n) {
+
+                  if (pinnedNodes.indexOf(n.originalLabel) >= 0) {
+                    sigma.instances(0).graph.dropNode(n.id);
+                  }
+                  else {
+                    // Add to Cytoscape
+                    n.color = n.originalColor;
+                    n.label = n.originalLabel;
+                    elesnodes.push({
+                        group: "nodes",
+                        data: { id: n.id, name: n.label}
+                    });
+
+
+                  }
+              //n.size = sigma.graph.degree(n.id);
+
+              });
+
+              // TODO this code duplicates from above - move into a function
+              sigma.instances(0).graph.edges().forEach(function(e) {
+
+                  var unique_edge_id = '';
+
+                  // Let's see if the edge source in alphabetical order is further than its target and change places
+
+                  if (e.source > e.target) {
+                      unique_edge_id = e.target + '-' + e.source;
+                  }
+                  else {
+                      unique_edge_id = e.source + '-' + e.target;
+                  }
+
+                    elesnodes.push({
+                        group: "edges",
+                        data: { id: unique_edge_id, source: e.source, target: e.target }
+                    });
+
+
+              });
+
+
+              // Betweenness Centrality Calculation using Cytoscape
+              elesss = cy.add(elesnodes);
+
+
+              betweennessCentrality(elesss);
+
+              // Community detect algorithm
+
+              communityDetect();
+
+              pinnedNodes = [];
+              commClicked = [];
+
+              $('.community_node').each(function(){
+                $(this).removeAttr('style');
+              });
+
+              $('.top_nodes').each(function(){
+                $(this).removeAttr('style');
+              });
+
+              if (sigma.instances(0).isForceAtlas2Running()) {
+                  sigma.instances(0).stopForceAtlas2();
+                  sigma.instances(0).killForceAtlas2();
+              }
+              else {
+
+                sigma.instances(0).startForceAtlas2(forceatlas_options);
+                setTimeout(function() {
+
+                    sigma.instances(0).stopForceAtlas2();
+                    sigma.instances(0).killForceAtlas2();
+
+                }, 5000);
+
+
+              }
+
+
+              filter_statements(pinnedNodes);
+
+              sigma.instances(0).refresh();
+
+
+        });
+
+
+
+
+
+
+
+        // Document Ready end
 
         });
 
@@ -2684,8 +2801,6 @@ sigma.parsers.json(
           }
 
       }
-
-      //console.log(bcmap);
 
       topbc_nodes = _.sortBy(topbc_nodes, 'bc').reverse().slice(0,5);
 
@@ -3897,9 +4012,16 @@ sigma.parsers.json(
                 // $(this).find('.nonmatched-sentence').fadeOut(500); this is only if we want to fade non-matched sentences - see above also
 
 
+                if (pinnedNodes.length > 0) {
+                        $('#deletenodes').addClass('deletenodes-on');
+                }
+                else {
+                        $('#deletenodes').removeClass('deletenodes-on');
+                }
+
                 // Show tags that are currently used in search
 
-                var htmlNodes = '<ul class="tags">';
+                var htmlNodes =  '<ul class="tags">';
 
                 for (var x = 0; x < notfoundNodes.length; x++) {
                     htmlNodes = htmlNodes + '<li><a class="notfound" href="#">' + notfoundNodes[x] + '</a></li>';
@@ -3914,7 +4036,7 @@ sigma.parsers.json(
 
                 notfoundNodes = [];
 
-                $('#messages').html(htmlNodes);
+                $('#nodestopin').html(htmlNodes);
 
 
 

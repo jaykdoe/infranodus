@@ -215,6 +215,9 @@ io.on('connection', function(socket){
     socket.on('node click', function(msg){
         socket.broadcast.to(socket.room).emit('node click', msg);
     });
+    socket.on('node delete', function(msg){
+        io.sockets.in(socket.room).emit('node delete', msg);
+    });
     socket.on('login', function(data){
 
             // Use the socket object to store data. Each client gets
