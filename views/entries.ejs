@@ -193,7 +193,7 @@
 
         <div id="graph-container"></div>
 
-        <div id="messages"><a href="javascript:" id="deletenodes"></a><div id="nodestopin"></div></div>
+        <div id="messages"><a href="javascript:" id="deletenodes"></a><div id="pinnednodeslist"></div><div id="stopnodeslist"></div></div>
 
                 <a href="javascript:" id="chat-link" title="show / hide the text">
                     <!-- Chat icon -->
@@ -422,6 +422,7 @@ var hostsite = window.location.host;
 var pinnedNodes = [];
 var splicedNodes = [];
 var notfoundNodes = [];
+var deletedNodes = [];
 
 // Whats the clicked nodes in the graph
 var clickedNodes = [];
@@ -2576,10 +2577,13 @@ sigma.parsers.json(
 
               elesnodes = [];
 
+
+
               sigma.instances(0).graph.nodes().forEach(function(n) {
 
                   if (pinnedNodes.indexOf(n.originalLabel) >= 0) {
                     sigma.instances(0).graph.dropNode(n.id);
+                    deletedNodes.push(n.originalLabel);
                   }
                   else {
                     // Add to Cytoscape
@@ -2595,6 +2599,8 @@ sigma.parsers.json(
               //n.size = sigma.graph.degree(n.id);
 
               });
+
+              console.log(deletedNodes);
 
               // TODO this code duplicates from above - move into a function
               sigma.instances(0).graph.edges().forEach(function(e) {
@@ -2658,7 +2664,7 @@ sigma.parsers.json(
               }
 
 
-              filter_statements(pinnedNodes);
+              filter_statements(pinnedNodes, "nodedelete");
 
               sigma.instances(0).refresh();
 
@@ -4036,7 +4042,7 @@ sigma.parsers.json(
 
                 notfoundNodes = [];
 
-                $('#nodestopin').html(htmlNodes);
+                $('#pinnednodeslist').html(htmlNodes);
 
 
 
@@ -4044,6 +4050,7 @@ sigma.parsers.json(
 
 
         });
+
 
         // Highlight the nodes that were clicked
 
@@ -4058,6 +4065,16 @@ sigma.parsers.json(
         if (origin != 'community') {
           filter_graph(pinnedNodes, origin);
         }
+
+        // Show the stopnodes
+
+        var stopNodesList = '<ul class="tags">';
+        for (var x = 0; x < deletedNodes.length; x++) {
+            stopNodesList = stopNodesList + '<li><a class="deleted" href="#">' + deletedNodes[x] + '</a></li>';
+        }
+        stopNodesList = stopNodesList + '</ul>'
+
+        $('#stopnodeslist').html(stopNodesList);
 
         // Add triggers to newly shown Tags elements
 

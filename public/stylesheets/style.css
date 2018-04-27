@@ -322,9 +322,19 @@ a:hover.app-more-link {
     background: #666666;
     opacity: 0.2;
 }
+
 .tags a.notfound:before{
     border-color:transparent #666666 transparent transparent;
 }
+
+.tags a.deleted{
+    background: #ff0000;
+    opacity: 0.3;
+}
+.tags a.deleted:before{
+    border-color:transparent #ff0000 transparent transparent;
+}
+
 
 .tags a:hover{
     background:#666;
@@ -506,11 +516,14 @@ a:hover.app-more-link {
 }
 
 
-#nodestopin {
+#pinnednodeslist {
   float: right;
 }
 
 
+#stopnodeslist {
+  float: right;
+}
 
 #graphstats {
   display: inline-block;
