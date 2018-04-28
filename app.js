@@ -218,6 +218,9 @@ io.on('connection', function(socket){
     socket.on('node delete', function(msg){
         io.sockets.in(socket.room).emit('node delete', msg);
     });
+    socket.on('node add', function(msg){
+        io.sockets.in(socket.room).emit('node add', msg);
+    });
     socket.on('login', function(data){
 
             // Use the socket object to store data. Each client gets

@@ -360,8 +360,11 @@ var nodeIDs = {};
 var nodeNames = [];
 
 // Let's record all the unique edges we've got
-
 var edgesList = [];
+
+// Initial graph model saved
+var nodesDB = [];
+var edgesDB = [];
 
 // Create context-node index for filtering
 var contextNodeID = [];
@@ -926,6 +929,9 @@ sigma.parsers.json(
                     data: { id: unique_edge_id, source: e.source, target: e.target }
                 });
 
+                // Add to EDGES db
+                edgesDB.push(e);
+
             });
 
 
@@ -1100,6 +1106,7 @@ sigma.parsers.json(
             // Betweenness Centrality Calculation using Cytoscape
             eles = cy.add(elesnodes);
 
+            console.log(elesnodes);
             //console.log(eles.nodes().length);
 
             betweennessCentrality(eles);
@@ -2568,7 +2575,7 @@ sigma.parsers.json(
 
         socket.on('node delete', function(msg){
 
-              pinnedNodes = msg.pinnedNodes;
+              var nodesToDelete = msg.pinnedNodes;
 
               var collectiond = cy.elements();
               var elesss;
@@ -2581,7 +2588,7 @@ sigma.parsers.json(
 
               sigma.instances(0).graph.nodes().forEach(function(n) {
 
-                  if (pinnedNodes.indexOf(n.originalLabel) >= 0) {
+                  if (nodesToDelete.indexOf(n.originalLabel) >= 0) {
                     sigma.instances(0).graph.dropNode(n.id);
                     deletedNodes.push(n.originalLabel);
                   }
@@ -2650,7 +2657,7 @@ sigma.parsers.json(
                   sigma.instances(0).stopForceAtlas2();
                   sigma.instances(0).killForceAtlas2();
               }
-              else {
+
 
                 sigma.instances(0).startForceAtlas2(forceatlas_options);
                 setTimeout(function() {
@@ -2661,7 +2668,6 @@ sigma.parsers.json(
                 }, 5000);
 
 
-              }
 
 
               filter_statements(pinnedNodes, "nodedelete");
@@ -2671,7 +2677,142 @@ sigma.parsers.json(
 
         });
 
+        socket.on('node add', function(msg){
+              var addingNodes = msg.addingNodes;
+              var stoplistNodes = msg.stoplistNodes;
 
+              // Remove the clicked node from the stoplist
+
+              stoplistNodes.splice(stoplistNodes.indexOf(addingNodes), 1);
+
+
+              sigma.instances(0).graph.addNode({
+                  id: nodeIDs[addingNodes],
+                  label: addingNodes,
+                  originalLabel: addingNodes,
+                  size: 16,
+                  x: Math.random(),
+                  y: Math.random()
+              });
+
+              var cyclefinished = 0;
+              var edgeproc;
+
+              var testedges = [];
+              for (var i = 0; i < edgesDB.length; i++ ) {
+                if (edgesDB[i].source == nodeIDs[addingNodes] || edgesDB[i].target == nodeIDs[addingNodes]) {
+
+                  edgeproc = edgesDB[i];
+
+                  if (stoplistNodes.length > 0) {
+
+                    for (var j = 0; j < stoplistNodes.length; j++) {
+                      if (edgesDB[i].source != nodeIDs[stoplistNodes[j]] && edgesDB[i].target != nodeIDs[stoplistNodes[j]]) {
+                                        sigma.instances(0).graph.addEdge({
+                                               id: edgeproc.id,
+                                               source: edgeproc.source,
+                                               target: edgeproc.target,
+                                               weight: edgeproc.weight,
+                                               size: edgeproc.weight,
+                                               statement_id: edgeproc.statement_id,
+                                               edge_context: edgeproc.edge_context
+                                        });
+                      }
+                    }
+                  }
+                  else {
+                        console.log('entered the node add');
+                        testedges.push(edgeproc);
+                    sigma.instances(0).graph.addEdge({
+                           id: edgeproc.id,
+                           source: edgeproc.source,
+                           target: edgeproc.target,
+                           weight: edgeproc.weight,
+                           size: edgeproc.weight,
+                           statement_id: edgeproc.statement_id,
+                           edge_context: edgeproc.edge_context
+                    });
+
+                  }
+                }
+                cyclefinished = cyclefinished + 1;
+              }
+
+
+
+              if (cyclefinished == edgesDB.length) {
+                sigma.instances(0).refresh();
+                console.log('finished cycle');
+                var collectiond = cy.elements();
+                var elessss;
+
+                cy.remove(collectiond);
+
+                elesnodes = [];
+
+                var testnode;
+
+                sigma.instances(0).graph.nodes().forEach(function(n) {
+                  if (n.label == 'word') {console.log('bingo'); testnode = n.id; console.log(n.id)}
+                                    elesnodes.push({
+                                        group: "nodes",
+                                        data: { id: n.id, name: n.label}
+                                    });
+                });
+
+                sigma.instances(0).graph.edges().forEach(function(e) {
+
+                    var unique_edge_id = '';
+
+                    // Let's see if the edge source in alphabetical order is further than its target and change places
+
+                    if (e.source > e.target) {
+                        unique_edge_id = e.target + '-' + e.source;
+                    }
+                    else {
+                        unique_edge_id = e.source + '-' + e.target;
+                    }
+
+                      elesnodes.push({
+                          group: "edges",
+                          data: { id: unique_edge_id, source: e.source, target: e.target }
+                      });
+
+
+                });
+
+
+                // Betweenness Centrality Calculation using Cytoscape
+                elessss = cy.add(elesnodes);
+
+
+                betweennessCentrality(elessss);
+
+                // Community detect algorithm
+
+                communityDetect();
+
+                sigma.instances(0).refresh();
+
+                  sigma.instances(0).startForceAtlas2(forceatlas_options);
+                  // Don't run it forever not to overheat :)
+
+                  setTimeout(function() {
+
+                      sigma.instances(0).stopForceAtlas2();
+                      sigma.instances(0).killForceAtlas2();
+
+                  }, 5000);
+
+
+              }
+
+
+
+
+
+
+        });
 
 
 
@@ -2828,7 +2969,7 @@ sigma.parsers.json(
       sigma.instances(0).refresh();
 
 
-     //  console.log(topbc_nodes);
+      console.log(topbc_nodes);
 
       //console.log(_.first(_.sortBy(bcmap,'degree').reverse(),3);
       // console.log(bcmin);
@@ -4982,9 +5123,10 @@ sigma.parsers.json(
 
             var remove_node = e.target.innerText;
 
+            // Is the clicked node in the pinnedNodes list
             var pinnedIndex = pinnedNodes.indexOf(remove_node);
 
-
+            // Yes, it is, remove it and push it into the notfoundNodes list
 
             if (pinnedIndex > -1) {
 
@@ -4994,16 +5136,29 @@ sigma.parsers.json(
 
             }
 
+            // TODO this is very fuzzy logic here bad bad
+
+            // Is there any nodes that were clicked before but not displayed on the graph?
+            // Yes, more than 1
             if (splicedNodes.length > 1) {
+                // Add them into the pinned
                 pinnedNodes = [];
                 for (var p = 0; p < splicedNodes.length; p++ ){
                     pinnedNodes[p] = splicedNodes[p];
                 }
             }
+
+
+            // Only one
             else if (splicedNodes.length == 1) {
                 pinnedNodes = [];
                 pinnedNodes[0] = splicedNodes[0];
                 splicedNodes = [];
+            }
+
+
+            if (deletedNodes.indexOf(remove_node) > -1) {
+                socket.emit('node add', {addingNodes: remove_node, stoplistNodes: deletedNodes});
             }
 
             // console.log("node clicked, now will filter for nodes " + pinnedNodes);
