@@ -32,7 +32,7 @@
 
                 <% include messages %>
                 <% console.log(user) %>
-                <form action='/settings' method='post' class="pure-form pure-form-stacked">
+                <form action='/settings' method='post' id="settingsform" class="pure-form pure-form-stacked">
 
                     <legend>settings for user <i><%= user.name %></i></legend>
                     <br>
@@ -175,6 +175,27 @@
 <script src="/javascripts/jquery.mobile-events.min.js"></script>
 
 <script>
+
+
+var stopwords = decodeURIComponent(getUrlVars()["stopwords"]);
+
+var returncontext = getUrlVars()["returncontext"];
+
+
+
+function getUrlVars()
+{
+    var vars = [], hash;
+    var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+    for(var i = 0; i < hashes.length; i++)
+    {
+        hash = hashes[i].split('=');
+        vars.push(hash[0]);
+        vars[hash[0]] = hash[1];
+    }
+    return vars;
+}
+
 $("#addNewContext").on('tap', function(e) {
 
     $("#addcontextinput").css("visibility", "visible");
@@ -194,6 +215,25 @@ $('#addcontextinput').submit(function(e) {
     }
 
 });
+
+  $(document).ready(function(){
+
+      var previous_stopwords = $('#stopwords').val();
+
+      if (stopwords != 'undefined') {
+
+        $('#stopwords').val(stopwords + ' ' + previous_stopwords);
+        $(window).load(function() {
+          $("html, body").animate({ scrollTop: $(document).height() }, 1000);
+        });
+
+      }
+
+
+
+  });
+
+
 </script>
 
 

@@ -193,7 +193,7 @@
 
         <div id="graph-container"></div>
 
-        <div id="messages"><a href="javascript:" id="undo" title="reset graph"></a><a href="javascript:" id="deletenodes" title="remove nodes from the graph"></a><div id="pinnednodeslist"></div><div id="stopnodeslist"></div></div>
+        <div id="messages"><a href="javascript:" id="undo" title="reset graph"></a><a href="javascript:" id="deletenodes" title="remove nodes from the graph"></a><div id="pinnednodeslist"></div><div id="stopnodeslist"></div><a href="javascript:" id="stopsave" title="save to permanent stopwords"></a></div>
 
                 <a href="javascript:" id="chat-link" title="show / hide the text">
                     <!-- Chat icon -->
@@ -1107,7 +1107,7 @@ sigma.parsers.json(
             // Betweenness Centrality Calculation using Cytoscape
             eles = cy.add(elesnodes);
 
-            console.log(elesnodes);
+            
             //console.log(eles.nodes().length);
 
             betweennessCentrality(eles);
@@ -2337,6 +2337,11 @@ sigma.parsers.json(
         $("#undo").on('click', function(e) {
           e.preventDefault;
           socket.emit('graph reset');
+        });
+
+        $("#stopsave").on('click', function(e) {
+          e.preventDefault;
+          window.location.href = "/settings?stopwords=" + encodeURIComponent(deletedNodes.join(' ')) + "&returncontext=" + current_context;
         });
 
 
@@ -4252,6 +4257,13 @@ sigma.parsers.json(
             stopNodesList = stopNodesList + '<li><a class="deleted" href="#">' + deletedNodes[x] + '</a></li>';
         }
         stopNodesList = stopNodesList + '</ul>'
+
+        if (deletedNodes.length > 0) {
+          $('#stopsave').addClass('stopsave-on');
+        }
+        else {
+          $('#stopsave').removeClass('stopsave-on');
+        }
 
         $('#stopnodeslist').html(stopNodesList);
 

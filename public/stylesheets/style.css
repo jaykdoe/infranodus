@@ -531,6 +531,22 @@ a:hover.app-more-link {
     background-position:center;
 }
 
+#stopsave {
+    float: right;
+    font-size: 8px; /* change this value to increase/decrease button size */
+    width: 2em;
+    height: 25px;
+    padding: 0em 0em 0em 1em;
+    z-index: 10;
+}
+
+.stopsave-on {
+    opacity: 0.5!important;
+    background-image: url('../images/save-to.png');
+    background-repeat:no-repeat;
+    background-position:center;
+}
+
 #pinnednodeslist {
   float: right;
 }
