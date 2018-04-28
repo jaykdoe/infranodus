@@ -2330,7 +2330,6 @@ sigma.parsers.json(
 
         $("#deletenodes").on('click', function(e) {
           e.preventDefault;
-          console.log('clicked');
           socket.emit('node delete', {pinnedNodes: pinnedNodes});
         });
 
@@ -2584,7 +2583,7 @@ sigma.parsers.json(
 
               elesnodes = [];
 
-
+              // Reiterate nodes and delete all the pinned nodes
 
               sigma.instances(0).graph.nodes().forEach(function(n) {
 
@@ -2593,7 +2592,7 @@ sigma.parsers.json(
                     deletedNodes.push(n.originalLabel);
                   }
                   else {
-                    // Add to Cytoscape
+                    // Add the remaining ones to Cytoscape
                     n.color = n.originalColor;
                     n.label = n.originalLabel;
                     elesnodes.push({
@@ -2607,8 +2606,7 @@ sigma.parsers.json(
 
               });
 
-              console.log(deletedNodes);
-
+              // Reiterate all the remaining edges and add them to Cytascape
               // TODO this code duplicates from above - move into a function
               sigma.instances(0).graph.edges().forEach(function(e) {
 
@@ -2642,6 +2640,7 @@ sigma.parsers.json(
 
               communityDetect();
 
+              // No more pinned nodes
               pinnedNodes = [];
               commClicked = [];
 
@@ -2667,10 +2666,9 @@ sigma.parsers.json(
 
                 }, 5000);
 
-
-
-
+              // Unfliter the nodes
               filter_statements(pinnedNodes, "nodedelete");
+
 
               sigma.instances(0).refresh();
 
@@ -2721,7 +2719,6 @@ sigma.parsers.json(
                     }
                   }
                   else {
-                        console.log('entered the node add');
                         testedges.push(edgeproc);
                     sigma.instances(0).graph.addEdge({
                            id: edgeproc.id,
@@ -2742,7 +2739,6 @@ sigma.parsers.json(
 
               if (cyclefinished == edgesDB.length) {
                 sigma.instances(0).refresh();
-                console.log('finished cycle');
                 var collectiond = cy.elements();
                 var elessss;
 
@@ -2753,7 +2749,6 @@ sigma.parsers.json(
                 var testnode;
 
                 sigma.instances(0).graph.nodes().forEach(function(n) {
-                  if (n.label == 'word') {console.log('bingo'); testnode = n.id; console.log(n.id)}
                                     elesnodes.push({
                                         group: "nodes",
                                         data: { id: n.id, name: n.label}
@@ -2803,6 +2798,9 @@ sigma.parsers.json(
                       sigma.instances(0).killForceAtlas2();
 
                   }, 5000);
+
+
+                filter_statements(stoplistNodes, 'stopwords');
 
 
               }
@@ -4004,6 +4002,8 @@ sigma.parsers.json(
 
         // Hide the sentences that don't contain the terms
 
+        if (origin != 'stopwords') {
+
         $(".entry").each(function(){
 
             var currentDiv = $(this).attr('data-uid');
@@ -4100,6 +4100,8 @@ sigma.parsers.json(
 
                 visibleentries = visibleentries - 1;
 
+                // This will get activated only if the iterative search didn't give any results
+
                 if (visibleentries == 0 && showingsomething == 0) {
 
                     $('.entry').fadeIn(500);
@@ -4148,8 +4150,10 @@ sigma.parsers.json(
                     filter_statements(pinnedNodes, origin);
 
                 }
-
+            // END OF not found any entries with the nodes clicked
             }
+
+            // FOUND something with the nodes clicked
             else {
 
                 // Populate statement with a new text
@@ -4203,12 +4207,20 @@ sigma.parsers.json(
         }
 
         // Show only the clicked nodes and their neighbors in the graph
-        if (origin != 'community') {
+        if (origin != 'community' && origin != 'stopwords') {
           filter_graph(pinnedNodes, origin);
         }
 
-        // Show the stopnodes
 
+        // END OF if origin != stopwords
+      }
+
+       // If we're coming from stopwords, adjust deletedNodes
+        if (origin == 'stopwords') {
+                deletedNodes = pinnedNodes;
+        }
+
+        // Then generate the interface
         var stopNodesList = '<ul class="tags">';
         for (var x = 0; x < deletedNodes.length; x++) {
             stopNodesList = stopNodesList + '<li><a class="deleted" href="#">' + deletedNodes[x] + '</a></li>';
@@ -5159,13 +5171,20 @@ sigma.parsers.json(
 
             if (deletedNodes.indexOf(remove_node) > -1) {
                 socket.emit('node add', {addingNodes: remove_node, stoplistNodes: deletedNodes});
+
             }
+            else {
 
             // console.log("node clicked, now will filter for nodes " + pinnedNodes);
 
-            $('.entry').fadeIn(400);
+                  $('.entry').fadeIn(400);
 
-            filter_statements(pinnedNodes);
+                  filter_statements(pinnedNodes);
+
+
+            }
+
+
 
 
 
