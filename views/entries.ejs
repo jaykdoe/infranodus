@@ -193,7 +193,7 @@
 
         <div id="graph-container"></div>
 
-        <div id="messages"><a href="javascript:" id="deletenodes"></a><div id="pinnednodeslist"></div><div id="stopnodeslist"></div></div>
+        <div id="messages"><a href="javascript:" id="undo" title="reset graph"></a><a href="javascript:" id="deletenodes" title="remove nodes from the graph"></a><div id="pinnednodeslist"></div><div id="stopnodeslist"></div></div>
 
                 <a href="javascript:" id="chat-link" title="show / hide the text">
                     <!-- Chat icon -->
@@ -426,6 +426,7 @@ var pinnedNodes = [];
 var splicedNodes = [];
 var notfoundNodes = [];
 var deletedNodes = [];
+
 
 // Whats the clicked nodes in the graph
 var clickedNodes = [];
@@ -2333,6 +2334,10 @@ sigma.parsers.json(
           socket.emit('node delete', {pinnedNodes: pinnedNodes});
         });
 
+        $("#undo").on('click', function(e) {
+          e.preventDefault;
+          socket.emit('graph reset');
+        });
 
 
         $("#imports").click(function(e) {
@@ -2572,6 +2577,19 @@ sigma.parsers.json(
 
         });
 
+        socket.on('graph reset', function(msg){
+
+              pinnedNodes = [];
+              splicedNodes = [];
+
+              $('.entry').fadeIn(400);
+
+              // Filter statements and select nodes on the graph
+              filter_statements(pinnedNodes);
+
+        });
+
+
         socket.on('node delete', function(msg){
 
               var nodesToDelete = msg.pinnedNodes;
@@ -2670,6 +2688,7 @@ sigma.parsers.json(
 
 
               sigma.instances(0).refresh();
+
 
 
         });
@@ -4170,9 +4189,11 @@ sigma.parsers.json(
 
                 if (pinnedNodes.length > 0) {
                         $('#deletenodes').addClass('deletenodes-on');
+                        $('#undo').addClass('undo-on');
                 }
                 else {
                         $('#deletenodes').removeClass('deletenodes-on');
+                        $('#undo').removeClass('undo-on');
                 }
 
                 // Show tags that are currently used in search

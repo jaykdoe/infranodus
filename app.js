@@ -221,6 +221,9 @@ io.on('connection', function(socket){
     socket.on('node add', function(msg){
         io.sockets.in(socket.room).emit('node add', msg);
     });
+    socket.on('graph reset', function(msg){
+        io.sockets.in(socket.room).emit('graph reset', msg);
+    });
     socket.on('login', function(data){
 
             // Use the socket object to store data. Each client gets
