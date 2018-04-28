@@ -2575,7 +2575,6 @@ sigma.parsers.json(
         socket.on('node delete', function(msg){
 
               var nodesToDelete = msg.pinnedNodes;
-
               var collectiond = cy.elements();
               var elesss;
 
@@ -2696,7 +2695,10 @@ sigma.parsers.json(
               var cyclefinished = 0;
               var edgeproc;
 
-              var testedges = [];
+              var nodeIDs_rev = _.invert(nodeIDs);
+
+
+
               for (var i = 0; i < edgesDB.length; i++ ) {
                 if (edgesDB[i].source == nodeIDs[addingNodes] || edgesDB[i].target == nodeIDs[addingNodes]) {
 
@@ -2704,22 +2706,26 @@ sigma.parsers.json(
 
                   if (stoplistNodes.length > 0) {
 
-                    for (var j = 0; j < stoplistNodes.length; j++) {
-                      if (edgesDB[i].source != nodeIDs[stoplistNodes[j]] && edgesDB[i].target != nodeIDs[stoplistNodes[j]]) {
-                                        sigma.instances(0).graph.addEdge({
-                                               id: edgeproc.id,
-                                               source: edgeproc.source,
-                                               target: edgeproc.target,
-                                               weight: edgeproc.weight,
-                                               size: edgeproc.weight,
-                                               statement_id: edgeproc.statement_id,
-                                               edge_context: edgeproc.edge_context
-                                        });
-                      }
-                    }
+                      // Do connections only if target/source is not in the remaining stoplistNodes
+                        if (stoplistNodes.indexOf(nodeIDs_rev[edgeproc.source]) < 0 && stoplistNodes.indexOf(nodeIDs_rev[edgeproc.target]) < 0) {
+
+                              sigma.instances(0).graph.addEdge({
+                                     id: edgeproc.id,
+                                     source: edgeproc.source,
+                                     target: edgeproc.target,
+                                     weight: edgeproc.weight,
+                                     size: edgeproc.weight,
+                                     statement_id: edgeproc.statement_id,
+                                     edge_context: edgeproc.edge_context
+                              });
+
+                          }
+
+
+
+
                   }
                   else {
-                        testedges.push(edgeproc);
                     sigma.instances(0).graph.addEdge({
                            id: edgeproc.id,
                            source: edgeproc.source,
@@ -2746,7 +2752,6 @@ sigma.parsers.json(
 
                 elesnodes = [];
 
-                var testnode;
 
                 sigma.instances(0).graph.nodes().forEach(function(n) {
                                     elesnodes.push({
@@ -5171,7 +5176,6 @@ sigma.parsers.json(
 
             if (deletedNodes.indexOf(remove_node) > -1) {
                 socket.emit('node add', {addingNodes: remove_node, stoplistNodes: deletedNodes});
-
             }
             else {
 
