@@ -520,7 +520,7 @@ a:hover.app-more-link {
     font-size: 8px; /* change this value to increase/decrease button size */
     width: 2em;
     height: 25px;
-    padding: 0em 0em 0em 1em;
+    padding: 0em 1em 0em 1em;
     z-index: 10;
 }
 
@@ -547,6 +547,43 @@ a:hover.app-more-link {
     background-position:center;
 }
 
+
+#addnode {
+    float: right;
+    font-size: 8px; /* change this value to increase/decrease button size */
+    width: 23px;
+    height: 23px;
+    padding: 0em 0em 0em 2em;
+    z-index: 10;
+    opacity: 1!important;
+    background-image: url('../images/add.png');
+    background-repeat:no-repeat;
+    background-position:center;
+}
+.addnode-on {
+  opacity: 1!important;
+  background-image: url('../images/add-blue.png')!important;
+  background-repeat:no-repeat!important;
+  background-position:center!important;
+}
+#searchnode {
+    float: right;
+    font-size: 8px; /* change this value to increase/decrease button size */
+    width: 23px;
+    height: 23px;
+    padding: 0em 0em 0em 2em;
+    z-index: 10;
+    opacity: 1!important;
+    background-image: url('../images/search.png');
+    background-repeat:no-repeat;
+    background-position:center;
+}
+.searchnode-on {
+  opacity: 1!important;
+  background-image: url('../images/search-blue.png')!important;
+  background-repeat:no-repeat!important;
+  background-position:center!important;
+}
 #pinnednodeslist {
   float: right;
 }
@@ -701,6 +738,28 @@ a:hover.app-more-link {
     margin: -20px 0px 0px 10px !important;
 
 }
+
+#addnodeform {
+  float: right;
+  display: inline;
+  z-index:99;
+  padding: 0px 10px 0px 20px;
+  margin: -5px;
+
+}
+#pinnedlist {
+  clear: both;
+  padding: 14px 5px 0px 0px;
+}
+
+#addnodeinput {
+  float: right;
+  /* visibility: hidden; */
+  z-index:99;
+
+}
+
+
 
 #switcher-selector {
     pointer-events: auto!important;

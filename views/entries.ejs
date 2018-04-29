@@ -193,7 +193,13 @@
 
         <div id="graph-container"></div>
 
-        <div id="messages"><a href="javascript:" id="undo" title="reset graph"></a><a href="javascript:" id="deletenodes" title="remove nodes from the graph"></a><div id="pinnednodeslist"></div><div id="stopnodeslist"></div><a href="javascript:" id="stopsave" title="save to permanent stopwords"></a></div>
+        <div id="messages">
+        <% if (!perceivername) { %>
+          <a href="javascript:" id="addnode" title="add a node in the graph"></a>
+        <% } %>
+          <a href="javascript:" id="searchnode" title="find a node in the graph"></a>
+          <form action="" method="" class="pure-form" id="addnodeform"><input type="text" id="addnodeinput" size="10" placeholder="#node_name" class="pure-input"></form>
+          <div id="pinnedlist"><a href="javascript:" id="undo" title="reset graph"></a><a href="javascript:" id="deletenodes" title="remove nodes from the graph"></a><div id="pinnednodeslist"></div><div id="stopnodeslist"></div><a href="javascript:" id="stopsave" title="save to permanent stopwords"></a></div></div>
 
                 <a href="javascript:" id="chat-link" title="show / hide the text">
                     <!-- Chat icon -->
@@ -1107,7 +1113,7 @@ sigma.parsers.json(
             // Betweenness Centrality Calculation using Cytoscape
             eles = cy.add(elesnodes);
 
-            
+
             //console.log(eles.nodes().length);
 
             betweennessCentrality(eles);
@@ -1664,6 +1670,16 @@ sigma.parsers.json(
         contextNames.push("<%= contextlabel %>");
       <% }); %>
       <% } %>
+
+
+
+      if (localStorage.getItem('defaultbehavior') == 'add') {
+        $('#addnode').addClass('addnode-on');
+      }
+      else {
+        $('#searchnode').addClass('searchnode-on');
+      }
+
 
       // Put the contexts into the menu
       populateContextMenu(contextNames);
@@ -2343,6 +2359,64 @@ sigma.parsers.json(
           e.preventDefault;
           window.location.href = "/settings?stopwords=" + encodeURIComponent(deletedNodes.join(' ')) + "&returncontext=" + current_context;
         });
+
+
+        $("#addnode").on('click', function(e) {
+          e.preventDefault();
+
+          $('#addnode').addClass('addnode-on');
+          $('#searchnode').removeClass('searchnode-on');
+          localStorage.setItem('defaultbehavior', 'add');
+
+          document.getElementById('addnodeform').dispatchEvent(new Event('submit'));
+
+
+        });
+
+
+        $("#searchnode").on('click', function(e) {
+          e.preventDefault();
+
+          $('#addnode').removeClass('addnode-on');
+          $('#searchnode').addClass('searchnode-on');
+          localStorage.setItem('defaultbehavior', 'search');
+
+          var searchinput = $('#addnodeinput').val();
+          // TODO lemmas
+          if (searchinput.length > 0) {
+              var searchinarray = searchinput.split(' ');
+              for (var key in searchinarray) {
+                if (searchinarray[key].charAt(0) == '#') { searchinarray[key] = searchinarray[key].slice(1); }
+              }
+              searchinput = searchinarray.join(' ');
+              $('#search').val(searchinput);
+              document.getElementById('searchform').dispatchEvent(new Event('submit'));
+          }
+          else {
+            alert('Please, enter the node name you want to find...');
+          }
+
+        });
+
+        $('#addnodeform').submit(function(e) {
+            e.preventDefault(); // to stop the form from submitting
+            if ($(".searchnode-on").is(":visible")) {
+              $('#searchnode').trigger('click');
+            }
+            else {
+              if ($('#addnodeinput').val().length > 0) {
+                  $('#statement').val($('#addnodeinput').val());
+                  document.getElementById('submitform').dispatchEvent(new Event('submit'));
+                  $('#addnodeinput').val('');
+                  $("#addnodeinput").focus();
+              }
+              else {
+                alert('Please, enter the name of the node you want to add...');
+              }
+            }
+
+        });
+
 
 
         $("#imports").click(function(e) {
