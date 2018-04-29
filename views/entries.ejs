@@ -324,6 +324,8 @@
 
     var graphPalette = getUrlVars()["palette"];
 
+    var addcontext_hide = getUrlVars()["addcontext_hide"];
+
     var walkthroughtype = 'default';
 
     <% if (perceivername) { %>
@@ -943,6 +945,7 @@ sigma.parsers.json(
 
 
 
+
             sigma.graph.nodes().forEach(function(n) {
 
                 // Save node's default color, for hide and show later
@@ -1123,6 +1126,29 @@ sigma.parsers.json(
             communityDetect();
 
 
+            // TODO make it possible for collaboration also
+
+            if (addcontext && addcontext_hide) {
+
+              $('.entry').hide();
+
+              for (var ite in statementsOfContext[current_context]) {
+
+                $('.entry[data-uid="' + statementsOfContext[current_context][ite] + '"]').each(function() {
+                  $(this).show();
+                });
+
+              }
+
+              $('.entry').each(function() {
+                if ($(this).is(':hidden')) {
+                  $(this).remove();
+                }
+              });
+
+
+
+            }
 
 
 
@@ -1142,6 +1168,8 @@ sigma.parsers.json(
 
 
             });
+
+            $('#analytics').on('swipedown',function(){$('#analyticsbutton').trigger('click');});
 
             // When a node is clicked, we check for each node
             // if it is a neighbor of the clicked one. If not,
@@ -1547,6 +1575,20 @@ sigma.parsers.json(
                             statementsOfContext[e.edge_context].push(e.statement_id);
                         }
 
+                                        // Make an index of nodes to context
+                                        if (contextNodeID[e.edge_context]) {
+                                            if (contextNodeID[e.edge_context].indexOf(e.source) < 0)
+                                                contextNodeID[e.edge_context].push(e.source);
+                                            if (contextNodeID[e.edge_context].indexOf(e.target) < 0)
+                                                contextNodeID[e.edge_context].push(e.target);
+                                        }
+                                        else {
+                                            contextNodeID[e.edge_context] = [];
+                                            contextNodeID[e.edge_context].push(e.source);
+                                            contextNodeID[e.edge_context].push(e.target);
+                                        }
+
+
                         // Add to Cytoscape
                         elesnodes.push({
                             group: "edges",
@@ -1670,6 +1712,8 @@ sigma.parsers.json(
         contextNames.push("<%= contextlabel %>");
       <% }); %>
       <% } %>
+
+
 
 
 
@@ -3354,7 +3398,8 @@ sigma.parsers.json(
         }
 
         // Check if the node is in additional context and if yes, give it a different color
-        if (addcontext) {
+
+        if (contextNodeID[addcontext] && contextNodeID[current_context]) {
             if (contextNodeID[addcontext].indexOf(n.id) > -1 && contextNodeID[current_context].indexOf(n.id) == -1) {
                 n.originalColor = color_addcontext;
                 n.color = color_addcontext;
@@ -4105,6 +4150,8 @@ sigma.parsers.json(
         // Hide the sentences that don't contain the terms
 
         if (origin != 'stopwords') {
+
+        // TODO redo this because to do so much for every statement is crazy PRIORITY   
 
         $(".entry").each(function(){
 
