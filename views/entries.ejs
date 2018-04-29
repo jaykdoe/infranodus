@@ -2537,6 +2537,8 @@ sigma.parsers.json(
 
             });
 
+
+
             search_graph();
 
 
@@ -2552,14 +2554,11 @@ sigma.parsers.json(
                 results: function() {}
             },
             select: function(event, ui) {
-
                 var filter = ui.item.value;
-
-
-
             }
-
         });
+
+
 
         search_graph();
 
@@ -2641,7 +2640,7 @@ sigma.parsers.json(
         }
 
         socket.on('node click', function(msg){
-              console.log('node click');
+
               pinnedNodes = msg.pinnedNodes;
               splicedNodes = msg.splicedNodes;
               var pinnedIndex = msg.pinnedIndex;
@@ -4278,13 +4277,24 @@ sigma.parsers.json(
                 // Show tags that are currently used in search
 
                 var htmlNodes =  '<ul class="tags">';
+                var pinnedNodes_string = '';
 
                 for (var x = 0; x < notfoundNodes.length; x++) {
                     htmlNodes = htmlNodes + '<li><a class="notfound" href="#">' + notfoundNodes[x] + '</a></li>';
+                    pinnedNodes_string = pinnedNodes_string + '#' + notfoundNodes[x] + ' ';
                 }
 
                 for (var q = 0; q < pinnedNodes.length; q++) {
                     htmlNodes = htmlNodes + '<li><a href="#">' + pinnedNodes[q] + '</a></li>';
+                    pinnedNodes_string = pinnedNodes_string + '#' + pinnedNodes[q] + ' ';
+                }
+
+                if ($('#addnodeinput').val().length == 0 || $('#addnodeinput').val().charAt(0) == '#') {
+                  $('#addnodeinput').val(pinnedNodes_string);
+                }
+
+                if ($('#statement').val().length == 0 || $('#statement').val().charAt(0) == '#') {
+                  $('#statement').val(pinnedNodes_string);
                 }
 
 
@@ -4915,6 +4925,7 @@ sigma.parsers.json(
             }
 
         });
+
 
         $("#searchform").submit(function(event) {
 
