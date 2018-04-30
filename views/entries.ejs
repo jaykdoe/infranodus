@@ -84,15 +84,32 @@
             <div id='switcher-selector' class='pure-menu pure-menu-open pure-menu-horizontal' style="background: none;">
                 <ul id="topmenuitems">
 
-                    <li>
-                        <a id="finds" class="switcher set1">find</a>
-                    </li>
+
+                    <% if (!addcontext) {%>
+                      <li>
+                          <a id="finds" class="switcher set1">find</a>
+                      </li>
                     <li class="pure-menu-selected-top">
                         <a id="adds" class="switcher set1">add</a>
                     </li>
                     <li>
-                        <a id="imports" href="/import?context=<%= context %>">import</a>
+                        <a id="imports" href="/<%= user.name %>/meta_<%= context %>/edit?addcontext=<%= context %>&addcontext_hide=1">interpret</a>
                     </li>
+                    <% } else { %>
+
+                      <li>
+                          <a id="imports" href="/<%= user.name %>/<%= addcontext %>/edit">original</a>
+                      </li>
+                      <li class="pure-menu-selected-top">
+                          <a id="adds" class="switcher set1">interpret</a>
+                      </li>
+                      <li>
+                          <a id="finds" href="/<%= user.name %>/<%= context %>/edit">result</a>
+                      </li>
+
+
+
+                    <% } %>
 
 
 
@@ -326,6 +343,8 @@
 
     var addcontext_hide = getUrlVars()["addcontext_hide"];
 
+    var add_statement = getUrlVars()["statement"];
+
     var walkthroughtype = 'default';
 
     <% if (perceivername) { %>
@@ -434,6 +453,8 @@ var pinnedNodes = [];
 var splicedNodes = [];
 var notfoundNodes = [];
 var deletedNodes = [];
+
+var selectedNodes = [];
 
 
 // Whats the clicked nodes in the graph
@@ -1140,11 +1161,11 @@ sigma.parsers.json(
 
               }
 
-              $('.entry').each(function() {
-                if ($(this).is(':hidden')) {
-                  $(this).remove();
-                }
-              });
+              // $('.entry').each(function() {
+              //   if ($(this).is(':hidden')) {
+              //     $(this).remove();
+              //   }
+              // });
 
 
 
@@ -1184,6 +1205,10 @@ sigma.parsers.json(
                 graphInteraction = 1;
 
                 var nodeLabel = e.data.node.originalLabel;
+
+                if (addcontext_hide) {
+                  $('.entry').show();
+                }
 
 
                 if (nodeLabel.substr(0,9) == 'context: ') {
@@ -1607,7 +1632,7 @@ sigma.parsers.json(
                     betweennessCentrality(eless);
                     communityDetect();
 
-                    sigma.refresh();
+                    //sigma.refresh();
 
                     sigma.startForceAtlas2(forceatlas_options);
 
@@ -1625,6 +1650,23 @@ sigma.parsers.json(
                     //console.log(newnodes);
                     // console.log(msg.graph.edges);
                     // console.log(sigma.graph.edges());
+
+                    // TODO right now it doubles
+
+
+                    if (addcontext && addcontext_hide) {
+
+                      $('.entry').hide();
+
+                      for (var ite in statementsOfContext[current_context]) {
+
+                        $('.entry[data-uid="' + statementsOfContext[current_context][ite] + '"]').each(function() {
+                          $(this).show();
+                        });
+
+                      }
+
+                  }
 
 
             });
@@ -1712,7 +1754,6 @@ sigma.parsers.json(
         contextNames.push("<%= contextlabel %>");
       <% }); %>
       <% } %>
-
 
 
 
@@ -2464,11 +2505,13 @@ sigma.parsers.json(
 
 
         $("#imports").click(function(e) {
-            var fornode = '';
-            if (pinnedNodes.length > 0) {
-                 fornode = toTitleCase(pinnedNodes[pinnedNodes.length - 1].replace(/_/g, " "));
-            }
-            $(this).attr("href","/import?context=<%= context %>&fornode=" + fornode);
+            // var fornode = $('#statement').val();
+            // // if (pinnedNodes.length > 0) {
+            // //      fornode = toTitleCase(pinnedNodes[pinnedNodes.length - 1].replace(/_/g, " "));
+            // // }
+            //
+            // var current_href = $(this).attr("href");
+            // $(this).attr("href",current_href + '&statement=' + fornode);
         });
 
         function toTitleCase(str)
@@ -2694,6 +2737,7 @@ sigma.parsers.json(
                     $('.entry').fadeIn(400);
               }
 
+
               // Filter statements and select nodes on the graph
               filter_statements(pinnedNodes);
 
@@ -2703,6 +2747,7 @@ sigma.parsers.json(
 
               pinnedNodes = [];
               splicedNodes = [];
+              notfoundNodes = [];
 
               $('.entry').fadeIn(400);
 
@@ -3110,7 +3155,7 @@ sigma.parsers.json(
 
       top_components = eles.components();
 
-      sigma.instances(0).refresh();
+      //sigma.instances(0).refresh();
 
 
       console.log(topbc_nodes);
@@ -3371,8 +3416,21 @@ sigma.parsers.json(
         if (top_nodes.indexOf(n.originalLabel) != -1) {
 
         }
+
         n.originalColor = rgbToHex(palette[n.community]._rgb[0],palette[n.community]._rgb[1],palette[n.community]._rgb[2]);
-        n.color = rgbToHex(palette[n.community]._rgb[0],palette[n.community]._rgb[1],palette[n.community]._rgb[2]);
+
+        if (pinnedNodes.indexOf(n.originalLabel) < 0) {
+
+              if (selectedNodes.length > 0){
+                if (selectedNodes.indexOf(n.originalLabel) > -1) {
+                n.color = rgbToHex(palette[n.community]._rgb[0],palette[n.community]._rgb[1],palette[n.community]._rgb[2]);
+                }
+              }
+              else {
+                n.color = rgbToHex(palette[n.community]._rgb[0],palette[n.community]._rgb[1],palette[n.community]._rgb[2]);
+              }
+
+        }
 
         if (n.community == topp_communities[0].id) {
         //  console.log(n.originalLabel + ' ' + n.x);
@@ -3400,11 +3458,32 @@ sigma.parsers.json(
         // Check if the node is in additional context and if yes, give it a different color
 
         if (contextNodeID[addcontext] && contextNodeID[current_context]) {
-            if (contextNodeID[addcontext].indexOf(n.id) > -1 && contextNodeID[current_context].indexOf(n.id) == -1) {
-                n.originalColor = color_addcontext;
-                n.color = color_addcontext;
-                addcontextcount = addcontextcount + 1;
-            }
+              if (addcontext_hide) {
+                if (contextNodeID[current_context].indexOf(n.id) > -1) {
+                    n.originalColor = '#8cd2ff';
+
+                    if (pinnedNodes.indexOf(n.label) == -1) {
+                      if (selectedNodes.length > 0){
+                        if (selectedNodes.indexOf(n.originalLabel) > -1) {
+                        }
+                      }
+                      else {
+                      n.color = '#8cd2ff';
+                      }
+                    }
+                }
+                if (contextNodeID[addcontext].indexOf(n.id) > -1 && contextNodeID[current_context].indexOf(n.id) == -1) {
+                    addcontextcount = addcontextcount + 1;
+                }
+              }
+              else {
+              if (contextNodeID[addcontext].indexOf(n.id) > -1 && contextNodeID[current_context].indexOf(n.id) == -1) {
+                  n.originalColor = color_addcontext;
+                  n.color = color_addcontext;
+                  addcontextcount = addcontextcount + 1;
+              }
+              }
+
         }
 
 
@@ -4151,7 +4230,7 @@ sigma.parsers.json(
 
         if (origin != 'stopwords') {
 
-        // TODO redo this because to do so much for every statement is crazy PRIORITY   
+        // TODO redo this because to do so much for every statement is crazy PRIORITY
 
         $(".entry").each(function(){
 
@@ -4312,51 +4391,53 @@ sigma.parsers.json(
                 // $(this).find('.nonmatched-sentence').fadeOut(500); this is only if we want to fade non-matched sentences - see above also
 
 
-                if (pinnedNodes.length > 0) {
-                        $('#deletenodes').addClass('deletenodes-on');
-                        $('#undo').addClass('undo-on');
-                }
-                else {
-                        $('#deletenodes').removeClass('deletenodes-on');
-                        $('#undo').removeClass('undo-on');
-                }
-
-                // Show tags that are currently used in search
-
-                var htmlNodes =  '<ul class="tags">';
-                var pinnedNodes_string = '';
-
-                for (var x = 0; x < notfoundNodes.length; x++) {
-                    htmlNodes = htmlNodes + '<li><a class="notfound" href="#">' + notfoundNodes[x] + '</a></li>';
-                    pinnedNodes_string = pinnedNodes_string + '#' + notfoundNodes[x] + ' ';
-                }
-
-                for (var q = 0; q < pinnedNodes.length; q++) {
-                    htmlNodes = htmlNodes + '<li><a href="#">' + pinnedNodes[q] + '</a></li>';
-                    pinnedNodes_string = pinnedNodes_string + '#' + pinnedNodes[q] + ' ';
-                }
-
-                if ($('#addnodeinput').val().length == 0 || $('#addnodeinput').val().charAt(0) == '#') {
-                  $('#addnodeinput').val(pinnedNodes_string);
-                }
-
-                if ($('#statement').val().length == 0 || $('#statement').val().charAt(0) == '#') {
-                  $('#statement').val(pinnedNodes_string);
-                }
-
-
-                htmlNodes = htmlNodes + '<div class="tagsend"></div></ul>';
-
-                notfoundNodes = [];
-
-                $('#pinnednodeslist').html(htmlNodes);
-
-
 
             }
 
 
         });
+
+
+                        if (pinnedNodes.length > 0) {
+                                $('#deletenodes').addClass('deletenodes-on');
+                                $('#undo').addClass('undo-on');
+                        }
+                        else {
+                                $('#deletenodes').removeClass('deletenodes-on');
+                                $('#undo').removeClass('undo-on');
+                        }
+
+                        // Show tags that are currently used in search
+
+                        var htmlNodes =  '<ul class="tags">';
+                        var pinnedNodes_string = '';
+
+                        if (pinnedNodes.length == 0) { notfoundNodes = [] }
+
+                        for (var x = 0; x < notfoundNodes.length; x++) {
+                            htmlNodes = htmlNodes + '<li><a class="notfound" href="#">' + notfoundNodes[x] + '</a></li>';
+                            pinnedNodes_string = pinnedNodes_string + '#' + notfoundNodes[x] + ' ';
+                        }
+
+                        for (var q = 0; q < pinnedNodes.length; q++) {
+                            htmlNodes = htmlNodes + '<li><a href="#">' + pinnedNodes[q] + '</a></li>';
+                            pinnedNodes_string = pinnedNodes_string + '#' + pinnedNodes[q] + ' ';
+                        }
+
+                        if ($('#addnodeinput').val().length == 0 || $('#addnodeinput').val().charAt(0) == '#') {
+                          $('#addnodeinput').val(pinnedNodes_string);
+                        }
+
+                        if ($('#statement').val().length == 0 || $('#statement').val().charAt(0) == '#') {
+                          $('#statement').val(pinnedNodes_string);
+                        }
+
+
+                        htmlNodes = htmlNodes + '<div class="tagsend"></div></ul>';
+
+                      //  notfoundNodes = [];
+
+                        $('#pinnednodeslist').html(htmlNodes);
 
 
         // Highlight the nodes that were clicked
@@ -4401,6 +4482,23 @@ sigma.parsers.json(
         // Add triggers to newly shown Tags elements
 
         addTagTriggers();
+
+
+        if (pinnedNodes.length == 0) {
+            if (addcontext && addcontext_hide) {
+
+              $('.entry').hide();
+
+              for (var ite in statementsOfContext[current_context]) {
+
+                $('.entry[data-uid="' + statementsOfContext[current_context][ite] + '"]').each(function() {
+                  $(this).show();
+                });
+
+              }
+
+          }
+        }
 
     }
 
@@ -5031,7 +5129,7 @@ sigma.parsers.json(
 
             // Debug: show which nodes are clicked
 
-            console.log(pins);
+            //console.log(pins);
 
             // Are any nodes at all selected on the graph?
 
@@ -5117,6 +5215,12 @@ sigma.parsers.json(
                 toKeep = _.uniq(toKeep);
 
                 console.log(toKeep);
+
+                selectedNodes = [];
+                for (var irr in toKeep) {
+                  selectedNodes.push(toKeep[irr].label);
+                }
+
 
                 // Now convert this to an array that will be understood by the functions below
 
@@ -5314,9 +5418,10 @@ sigma.parsers.json(
 
                     pinnedNodes.splice(pinnedIndex,1);
 
-                    notfoundNodes.push(remove_node);
+                  //  notfoundNodes.push(remove_node);
 
             }
+
 
             // TODO this is very fuzzy logic here bad bad
 
