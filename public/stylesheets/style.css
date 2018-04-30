@@ -504,7 +504,7 @@ a:hover.app-more-link {
     font-size: 8px; /* change this value to increase/decrease button size */
     width: 2em;
     height: 25px;
-    padding: 0em 0em 0em 3em;
+    padding: 0em 0em 0em 31px;
     z-index: 10;
 }
 
