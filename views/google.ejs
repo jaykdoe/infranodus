@@ -28,7 +28,7 @@
 
     <div id='content'>
 
-        <div id='statements'>
+        <div id='welcomemessage'>
 
 
             <form action='/import' name='submitform' id="submitform" method='post' enctype="multipart/form-data" class='pure-form pure-form-stacked'>
@@ -58,7 +58,7 @@
                 <input type="hidden" id="selectedContexts" name="selectedContexts" value="">
                 <input type="hidden" name="statementid" value="">
 
-
+                <div id="message"></div>
 
 
 
@@ -96,36 +96,17 @@
 <script>
     ;(function(){
 
-        var cleared_to_submit = 0;
 
-        if (res.errormsg) {
-            $('#statement').removeClass('loading');
-            $('#submitbutton').removeAttr('disabled');
-            alert(res.errormsg);
-        }
+
 
         $('form#submitform').submit(function(event){
 
-            if(cleared_to_submit){
-                cleared_to_submit = 0;
-                return;
 
-            }else{
-
-                event.preventDefault();
 
                 $(this).find('input[type=submit]').attr('disabled', 'disabled');
+                $('#message').html('We are importing the data, this page will automatically reload. If this does not happen in 30 seconds, please, <a href="/<%= user.name %>/'+$('#savegraph').val()+'/edit">click here</a>.');
 
-                if ($("#extractfilter").prop("checked")) {
-                    var current_query = $("#search").val();
-                    $("#go_next_add").val(current_query);
-                }
-
-                cleared_to_submit = 1;
-
-                $('form')[0].submit();  //resubmit form
-
-            }
+            
 
         });
 
