@@ -207,7 +207,7 @@ small screens.
     position: absolute;
     display: inline; /* show this only on small screens */
     bottom: 0;
-    right: 70px; /* "#menu width" */
+    right: 105px; /* "#menu width" */
     font-size: 8px; /* change this value to increase/decrease button size */
     width: 2em;
     height: auto;
@@ -253,7 +253,7 @@ small screens.
     position: absolute;
     display: inline; /* show this only on small screens */
     bottom: 10px;
-    right: 35px; /* "#menu width" */
+    right: 70px; /* "#menu width" */
     font-size: 8px; /* change this value to increase/decrease button size */
     width: 2em;
     height: auto;
@@ -270,7 +270,7 @@ small screens.
     position: absolute;
     display: inline; /* show this only on small screens */
     bottom: 10px;
-    right: 0px; /* "#menu width" */
+    right: 35px; /* "#menu width" */
     font-size: 8px; /* change this value to increase/decrease button size */
     width: 2em;
     height: auto;
@@ -289,6 +289,23 @@ small screens.
     background: url('../images/group-green.png')!important;
     background-repeat:no-repeat!important;
     background-position:center!important;
+}
+
+#import-link {
+    background: url('../images/telescope.png');
+    background-repeat:no-repeat;
+    background-position:center;
+    border: 0;
+    position: absolute;
+    display: inline; /* show this only on small screens */
+    bottom: 10px;
+    right: 0px; /* "#menu width" */
+    font-size: 8px; /* change this value to increase/decrease button size */
+    width: 2em;
+    height: auto;
+    float: right;
+    padding: 3.3em 1.6em;
+    z-index: 10;
 }
 
 #chat-link {

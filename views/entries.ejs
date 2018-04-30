@@ -129,6 +129,10 @@
                       <span></span>
                   </a>
                   <% if (!perceivername) { %>
+                    <a href="/import" id="import-link" title="import from external sources">
+                        <!-- Import icon -->
+                        <span></span>
+                    </a>
                   <a href="javascript:" id="collaborate-link">
                       <!-- Collaborate icon -->
                       <span></span>
@@ -2104,7 +2108,10 @@ sigma.parsers.json(
                  element: "#statement",
                  placement: "top",
                  title: "Add a Statement...",
-                 content: "You can add this statement or edit and add your own. Then press the SAVE button..."
+                 content: "You can add this statement or edit and add your own. Then press the SAVE button...",
+                 onNext: function (tour) {
+                     $('#statement').val('');
+                 }
                },
                {
                  element: ".entry:first",
@@ -2118,6 +2125,12 @@ sigma.parsers.json(
                  placement: "top",
                  title: "Delete Statements",
                  content: "If you double-clicked the statement, it appears here. Then simply click the Delete icon below the statement and it will be removed. You can also Edit and click Edit. Or Cancel."
+               },
+               {
+                 element: "#import-link",
+                 placement: "top",
+                 title: "Import Statements",
+                 content: "You can also import any data from a PDF / TXT file, a URL (inc Wikipedia), RSS Feeds, Twitter, Google search results, your notes, etc."
                },
                {
                  element: "#menuLink",
@@ -2145,6 +2158,18 @@ sigma.parsers.json(
                  onShow: function (tour) {
                      $('#chat-link').click();
                  }
+               },
+               {
+               element: "#addnodeinput",
+               placement: "bottom",
+               title: "Search in Graph",
+               content: "You can also use this search field to look for the nodes in the graph. Once you find the nodes, they will appear below. You can click the 'delete' button to remove them from the graph.",
+               },
+               {
+               element: "#addnode",
+               placement: "bottom",
+               title: "Add a Node",
+               content: "You can use this field to quickly add a node in the graph.",
                },
                {
                  element: "#microphone-link",
@@ -2330,6 +2355,12 @@ sigma.parsers.json(
                content: "You can then click on the nodes in the graph to find the parts of the text that you find interesting.",
                },
                {
+               element: "#addnodeinput",
+               placement: "bottom",
+               title: "Search in Graph",
+               content: "You can also use this search field to look for the nodes in the graph. Once you find the nodes, they will appear below. You can click the 'delete' button to remove them from the graph.",
+               },
+               {
                  element: "#chat-link",
                  placement: "left",
                  title: "Hide/Show Statements",
@@ -2513,6 +2544,33 @@ sigma.parsers.json(
             // var current_href = $(this).attr("href");
             // $(this).attr("href",current_href + '&statement=' + fornode);
         });
+
+        $("#finds").click(function(e) {
+          $('#deletecontextbutton').hide();
+          $('#privacy-link').hide();
+          $('#collaborate-link').hide();
+        });
+
+        $("#adds").click(function(e) {
+          $('#deletecontextbutton').show();
+          $('#privacy-link').show();
+          $('#collaborate-link').show();
+        });
+
+        $("#import-link").click(function(e) {
+
+          var fornode = $('#statement').val();
+
+
+          if (pinnedNodes.length > 0) {
+               fornode = pinnedNodes.join("+");
+          }
+
+          var current_href = $(this).attr("href");
+
+          $(this).attr("href",current_href + '?context=' + current_context + '&fornode=' + fornode);
+        });
+
 
         function toTitleCase(str)
         {
@@ -2976,7 +3034,7 @@ sigma.parsers.json(
 
                 // Community detect algorithm
 
-                communityDetect();
+                communityDetect("node add", addingNodes);
 
                 sigma.instances(0).refresh();
 
@@ -3169,7 +3227,7 @@ sigma.parsers.json(
 
     // Community Detect Function
 
-    function communityDetect () {
+    function communityDetect (coming_from, node_origin) {
 
       var node_data = [];
       sigma.instances(0).graph.nodes().forEach(function(n) {
@@ -3374,7 +3432,6 @@ sigma.parsers.json(
     // nice color palette
     if (graphPalette == 'color') {
         var palette = new DistinctColors({count: max_community_number + 1, lightMin: 60, lightMax: 75, chromaMin: 2, chromaMax: 15});
-
     }
     else if (graphPalette == 'mono') {
     // subdued chromo
@@ -3412,6 +3469,7 @@ sigma.parsers.json(
 
       var diversity = '';
 
+
       sigma.instances(0).graph.nodes().forEach(function(n) {
         if (top_nodes.indexOf(n.originalLabel) != -1) {
 
@@ -3424,6 +3482,9 @@ sigma.parsers.json(
               if (selectedNodes.length > 0){
                 if (selectedNodes.indexOf(n.originalLabel) > -1) {
                 n.color = rgbToHex(palette[n.community]._rgb[0],palette[n.community]._rgb[1],palette[n.community]._rgb[2]);
+                }
+                else if (coming_from == 'node add' && n.originalLabel == node_origin) {
+                  n.color = '#ddd';
                 }
               }
               else {
@@ -3460,7 +3521,7 @@ sigma.parsers.json(
         if (contextNodeID[addcontext] && contextNodeID[current_context]) {
               if (addcontext_hide) {
                 if (contextNodeID[current_context].indexOf(n.id) > -1) {
-                    n.originalColor = '#8cd2ff';
+                    n.originalColor = '#90909f';
 
                     if (pinnedNodes.indexOf(n.label) == -1) {
                       if (selectedNodes.length > 0){
@@ -3468,7 +3529,7 @@ sigma.parsers.json(
                         }
                       }
                       else {
-                      n.color = '#8cd2ff';
+                      n.color = '#90909f';
                       }
                     }
                 }
@@ -5308,6 +5369,9 @@ sigma.parsers.json(
                    e.color = e.originalColor;
 
                 });
+
+                // Remove all selections
+                selectedNodes = [];
 
 
                 // We show the whole graph above so scroll down to all the statements

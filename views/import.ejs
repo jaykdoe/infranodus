@@ -28,20 +28,33 @@
 
     <div id='content'>
 
-        <div id='statements'>
+        <div id='welcomemessage'>
 
-            Enter the type of data you want to import:
+            Import any data to your graph from the following sources:
             <% include messages %>
 
             <form action='/import' name='submitform' id="submitform" method='post' enctype="multipart/form-data" class='pure-form pure-form-stacked'>
                 <br>
                 Data source:
                 <% if (!evernote) { %>
+
+                  <label for="source7" class="pure-radio">
+                      <input id="source7" type="radio" name="source" value="url">
+                      Any Web URL Page / Wikipedia
+                  </label>
+                  <label for="source6" class="pure-radio">
+                      <input id="source6" type="radio" name="source" value="rss">
+                      RSS / News Feeds
+                  </label>
+                  <label for="source8" class="pure-radio">
+                      <input id="source8" type="radio" name="source" value="google">
+                      Google Search Results
+                  </label>
                 <label for="source1" class="pure-radio">
                     <input id="source1" type="radio" name="source" value="twitter" checked>
                     Twitter
                 </label>
-                <label for="source2" class="pure-radio">
+                <!-- <label for="source2" class="pure-radio"> -->
                 <!--<input id="source2" type="radio" name="source" value="evernote">
                     Evernote (<a href="/evernote_oauth">authorize</a>)
                 </label>-->
@@ -283,14 +296,7 @@
     ;(function(){
 
             <% if (context && fornode) { %>
-            $("#source1").prop("checked", false);
-            $("#source4").prop("checked", true);
-            $("#settings1").prop("checked", false);
-            $("#settings2").prop("checked", true);
-            $("#limitgkg").show();
-            $("#extracttwitter").hide();
-            $("#howmanyposts").hide();
-            $("#importsettings").hide();
+
             <% } %>
 
         $('form#submitform').submit(function(){
@@ -349,6 +355,30 @@
                     filebox.hide();
 
 
+                }
+                else if ($(this).val() === "rss") {
+                  var addparams = '';
+                  <% if (context) { %>
+                    addparams = '?context=<%= context %>';
+                  <% } %>
+                    window.location.href = "/importrss" + addparams;
+                }
+                else if ($(this).val() === "url") {
+                  var addparams = '';
+                  <% if (context) { %>
+                    addparams = '?context=<%= context %>';
+                  <% } %>
+                    window.location.href = "/importurl" + addparams;
+                }
+                else if ($(this).val() === "google") {
+                    var addparams = '';
+                    <% if (context) { %>
+                      addparams = '?context=<%= context %>';
+                    <% } %>
+                    <% if (fornode) { %>
+                      addparams += '&fornode=<%= fornode %>';
+                    <% } %>
+                    window.location.href = "/google" + addparams;
                 }
                 else if ($(this).val() === "gkg") {
                     $("#settings1").prop("checked", false);
