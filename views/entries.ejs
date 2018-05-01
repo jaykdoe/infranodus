@@ -3508,16 +3508,23 @@ sigma.parsers.json(
 
               if (selectedNodes.length > 0){
                 if (selectedNodes.indexOf(n.originalLabel) > -1) {
-                n.color = rgbToHex(palette[n.community]._rgb[0],palette[n.community]._rgb[1],palette[n.community]._rgb[2]);
+                  n.color = rgbToHex(palette[n.community]._rgb[0],palette[n.community]._rgb[1],palette[n.community]._rgb[2]);
                 }
                 else if (coming_from == 'node add' && n.originalLabel == node_origin) {
                   n.color = '#ddd';
+                }
+                else if (!nodeIDs[n.originalLabel]) {
+                  n.color = rgbToHex(palette[n.community]._rgb[0],palette[n.community]._rgb[1],palette[n.community]._rgb[2]);
                 }
               }
               else {
                 n.color = rgbToHex(palette[n.community]._rgb[0],palette[n.community]._rgb[1],palette[n.community]._rgb[2]);
               }
 
+        }
+
+        if (!nodeIDs[n.originalLabel]) {
+          nodeIDs[n.originalLabel] == n.id;
         }
 
         if (n.community == topp_communities[0].id) {
