@@ -347,6 +347,8 @@
 
     var interpret = getUrlVars()["interpret"];
 
+    var missing = getUrlVars()["missing"];
+
     var add_statement = getUrlVars()["statement"];
 
     var walkthroughtype = 'default';
@@ -3572,11 +3574,20 @@ sigma.parsers.json(
                 }
               }
               else {
-              if (contextNodeID[addcontext].indexOf(n.id) > -1 && contextNodeID[current_context].indexOf(n.id) == -1) {
-                  n.originalColor = color_addcontext;
-                  n.color = color_addcontext;
-                  addcontextcount = addcontextcount + 1;
-              }
+                if (!missing) {
+                  if (contextNodeID[addcontext].indexOf(n.id) > -1 && contextNodeID[current_context].indexOf(n.id) == -1) {
+                      n.originalColor = color_addcontext;
+                      n.color = color_addcontext;
+                      addcontextcount = addcontextcount + 1;
+                  }
+                }
+                else {
+                  if (contextNodeID[addcontext].indexOf(n.id) == -1 && contextNodeID[current_context].indexOf(n.id) > -1) {
+                      n.originalColor = color_addcontext;
+                      n.color = color_addcontext;
+                      addcontextcount = addcontextcount + 1;
+                  }
+                }
               }
 
         }
