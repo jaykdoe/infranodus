@@ -838,7 +838,7 @@ sigma.classes.graph.addMethod('neighbors', function(nodeId) {
 
 // Initialize JSON parser for SIGMA visualization
 
-var color_addcontext = '#cccccc';
+var color_addcontext = '#666666'; // #cccccc
 
 
 
@@ -3498,6 +3498,8 @@ sigma.parsers.json(
 
       var diversity = '';
 
+      var addcontext_nodes = [];
+
 
       sigma.instances(0).graph.nodes().forEach(function(n) {
         if (top_nodes.indexOf(n.originalLabel) != -1) {
@@ -3571,6 +3573,7 @@ sigma.parsers.json(
                 }
                 if (contextNodeID[addcontext].indexOf(n.id) > -1 && contextNodeID[current_context].indexOf(n.id) == -1) {
                     addcontextcount = addcontextcount + 1;
+                    addcontext_nodes.push({id: n.id, label: n.originalLabel, size: n.size, community: n.community});
                 }
               }
               else {
@@ -3579,6 +3582,7 @@ sigma.parsers.json(
                       n.originalColor = color_addcontext;
                       n.color = color_addcontext;
                       addcontextcount = addcontextcount + 1;
+                      addcontext_nodes.push({id: n.id, label: n.originalLabel, size: n.size, community: n.community});
                   }
                 }
                 else {
@@ -3586,6 +3590,8 @@ sigma.parsers.json(
                       n.originalColor = color_addcontext;
                       n.color = color_addcontext;
                       addcontextcount = addcontextcount + 1;
+                      addcontext_nodes.push({id: n.id, label: n.originalLabel, size: n.size, community: n.community});
+
                   }
                 }
               }
@@ -3600,6 +3606,8 @@ sigma.parsers.json(
       // console.log(totalnodescount);
       // console.log(top_communities);
 
+     addcontext_nodes = _.sortBy(addcontext_nodes, 'size').reverse();
+
      diversityindex = ((((nodesfirstcom) / totalnodescount).toFixed(2))*100).toFixed(0);
 
 
@@ -3607,6 +3615,8 @@ sigma.parsers.json(
      if ((totalnodescount - 1) == 0 || totalnodescount == 0) { graph_density = 0 } else {
       graph_density  = ((totaledgescount) / ((totalnodescount)*(totalnodescount - 1))).toFixed(3);
     }
+
+
 
      var diversitytext = '<div class="headline">Stats:</div> total ' + totalnodescount + ' words, graph density ' + graph_density + ', ';
 
@@ -3676,6 +3686,20 @@ sigma.parsers.json(
      diversitytext += '(total ' + all_communities.length + ' topics), ';
 
           if (addcontextcount > 0) {
+
+
+            if (addcontext_nodes.length > 0) {
+              var addcontext_text = '<div class="headline">In ' + addcontext + ' but not in ' + current_context + ':</div> ';
+              if (addcontext_nodes.length > 4) {
+                addcontext_nodes = addcontext_nodes.slice(0, 4);
+              }
+              for (var nnn = 0; nnn < addcontext_nodes.length; nnn++) {
+                addcontext_text += '<a href="#" class="top_nodes">' + addcontext_nodes[nnn].label + '</a> - ';
+              }
+              addcontext_text = addcontext_text.slice(0, -3);
+              addcontext_text += '<br><br>'
+              diversitytext = addcontext_text + diversitytext;
+            }
             var addindex = ((((totalnodescount - addcontextcount) / totalnodescount).toFixed(2))*100).toFixed(0);
             diversitytext += 'context ' + addcontext + ' uses ' + addindex + '% words from ' + current_context + ', ';
           }
