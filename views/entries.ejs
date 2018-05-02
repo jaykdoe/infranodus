@@ -122,14 +122,14 @@
 
             <% }  %>
 
-                  <a href="javascript:" id="graph-link">
+                  <a href="javascript:" class="tooltip" title="hide this pane and all text" id="graph-link">
                       <span></span>
                   </a>
-                  <a href="javascript:" id="windowdown-link">
+                  <a href="javascript:" class="tooltip" title="minimize this pane" id="windowdown-link">
                       <span></span>
                   </a>
                   <% if (!perceivername) { %>
-                    <a href="/import" id="import-link" title="import from external sources">
+                    <a href="/import" id="import-link" class="tooltip" title="import from external sources">
                         <!-- Import icon -->
                         <span></span>
                     </a>
@@ -216,24 +216,24 @@
 
         <div id="messages">
         <% if (!perceivername) { %>
-          <a href="javascript:" id="addnode" title="add a node in the graph"></a>
+          <a href="javascript:" id="addnode" class="tooltip" title="add a node in the graph"></a>
         <% } %>
-          <a href="javascript:" id="searchnode" title="find a node in the graph"></a>
+          <a href="javascript:" id="searchnode" class="tooltip" title="find a node in the graph"></a>
           <form action="" method="" class="pure-form" id="addnodeform"><input type="text" id="addnodeinput" size="10" placeholder="#node_name" class="pure-input"></form>
-          <div id="pinnedlist"><a href="javascript:" id="undo" title="reset graph"></a><a href="javascript:" id="deletenodes" title="remove nodes from the graph"></a><div id="pinnednodeslist"></div><div id="stopnodeslist"></div><a href="javascript:" id="stopsave" title="save to permanent stopwords"></a></div></div>
+          <div id="pinnedlist"><a href="javascript:" id="undo" class="tooltip" title="remove selected nodes and reset graph" ></a><a href="javascript:" id="deletenodes" class="tooltip" title="remove selected nodes from the graph"></a><div id="pinnednodeslist"></div><div id="stopnodeslist"></div><a href="javascript:" id="stopsave" class="tooltip" title="save to permanent stopwords"></a></div></div>
 
-                <a href="javascript:" id="chat-link" title="show / hide the text">
+                <a href="javascript:" id="chat-link" class="tooltip" title="show / hide the text">
                     <!-- Chat icon -->
                     <span></span>
                 </a>
         <div id="controls">
                 <div id="graph-reload">
-                <a href="javascript:" id="go_next"><img src="/images/eyezoom.png"  title="choose a few nodes from the graph and click this button to find out more" vspace="0" border="0"></a><br><a href="javascript:location.reload();" id="reloadbutton"><img src="/images/reload.png" title="clear and reload graph" vspace="6" border="0"></a><br><a href="javascript:" title="improve layout" id="improve-layout"></a><br><a href="javascript:" title="show tutorial" id="walkthrough"></a>
+                <a href="javascript:" class="tooltip" title="choose a few nodes from the graph and click this button to find out more"  id="go_next"><img src="/images/eyezoom.png" vspace="0" border="0"></a><br><a href="javascript:location.reload();" class="tooltip" title="reload the graph" id="reloadbutton"><img src="/images/reload.png" title="clear and reload graph" vspace="6" border="0"></a><br><a href="javascript:" class="tooltip" title="improve layout" id="improve-layout"></a><br><a href="javascript:" class="tooltip" title="show tutorial" id="walkthrough"></a>
 
         </div>
 
         <div id="graph-tools">
-                <a href="javascript:" id="zoom-in"><img src="/images/zoom-in.png" border="0"></a><br><a href="javascript:" id="zoom-out"><img src="/images/zoom-out.png" border="0"></a>
+                <a href="javascript:" class="tooltip" title="zoom in" id="zoom-in"><img src="/images/zoom-in.png" border="0"></a><br><a href="javascript:" class="tooltip" title="zoom out" id="zoom-out"><img src="/images/zoom-out.png" border="0"></a>
          </div>
          <div id="analytics"></div>
 
@@ -242,8 +242,12 @@
                     <!-- Microphone icon -->
                     <span></span>
                 </a>
+                <a href="javascript:" id="addcontext-link" class="tooltip" title="compare to context">
+                    <!-- Addcontext icon -->
+                    <span></span>
+                </a>
             <% } %>
-            <a href="javascript:" id="analyticsbutton"></a>
+            <a href="javascript:" class="tooltip" title="graph analytics" id="analyticsbutton"></a>
       </div>
 
     </div>
@@ -2525,6 +2529,23 @@ sigma.parsers.json(
 
         });
 
+        if (addcontext) {
+          $('#addcontext-link').addClass('addcontext-visible');
+        }
+        
+        $("#addcontext-link").on('click', function(e) {
+          e.preventDefault();
+          if ($(".addcontext-on").is(":visible")) {
+              $('#addcontext-link').removeClass('addcontext-on');
+          }
+          else {
+              $('#addcontext-link').addClass('addcontext-on');
+          }
+
+
+        });
+
+
         $('#addnodeform').submit(function(e) {
             e.preventDefault(); // to stop the form from submitting
             if ($(".searchnode-on").is(":visible")) {
@@ -4673,7 +4694,7 @@ sigma.parsers.json(
                 if (dblclick > 0) {
                     $(that).data('double', dblclick-1);
                 } else {
-                    if (e.shiftKey) {
+                    if (e.shiftKey || ($(".addcontext-on").is(":visible"))) {
                       shiftClick.call(that, e);
                     }
                     else {

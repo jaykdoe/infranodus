@@ -356,7 +356,7 @@ small screens.
     display: none;
     opacity: 0.5;
     position: fixed;
-    top: 275px;
+    top: 320px;
     font-size: 8px; /* change this value to increase/decrease button size */
     width: 2em;
     height: 25px;
@@ -370,6 +370,36 @@ small screens.
     background-repeat:no-repeat;
     background-position:center;
 
+}
+
+#addcontext-link {
+    position: fixed;
+    top: 280px;
+    font-size: 8px; /* change this value to increase/decrease button size */
+    width: 2em;
+    height: 25px;
+    right: 0; /* "#menu width" */
+    font-size: 8px; /* change this value to increase/decrease button size */
+    /* width: 2em;
+     height: auto;*/
+    padding: 0em 2.3em;
+    z-index: 10;
+    opacity: 0.5;
+    background-image: url('../images/compare.png');
+    background-repeat:no-repeat;
+    background-position:center;
+
+}
+
+.addcontext-on {
+    opacity: 1!important;
+    background-image: url('../images/compare-blue.png')!important;
+    background-repeat:no-repeat!important;
+    background-position:center!important;
+}
+.addcontext-visible {
+    opacity: 1!important;
+  
 }
 
 #improve-layout {
