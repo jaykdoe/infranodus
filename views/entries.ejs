@@ -4649,7 +4649,12 @@ sigma.parsers.json(
                 if (dblclick > 0) {
                     $(that).data('double', dblclick-1);
                 } else {
-                    singleClick.call(that, e);
+                    if (e.shiftKey) {
+                      shiftClick.call(that, e);
+                    }
+                    else {
+                      singleClick.call(that, e);
+                    }
                 }
             }, 300);
         }).dblclick(function(e) {
@@ -4663,6 +4668,14 @@ sigma.parsers.json(
         function singleClick (e) {
 
             window.location = e.target.href;
+
+        }
+
+        // If shift click on the menu, open comparison with other context
+
+        function shiftClick (e) {
+
+            window.location = e.target.href + '?addcontext=' + current_context;
 
         }
 
