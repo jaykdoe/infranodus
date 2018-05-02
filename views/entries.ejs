@@ -1985,6 +1985,7 @@ sigma.parsers.json(
                     }
 
                     if (language == 'en' || language == 'en-US' || language == 'english') {
+                        recognition.lang = 'en-US';
                         localStorage.setItem('language', 'en');
                     }
 
@@ -2532,7 +2533,7 @@ sigma.parsers.json(
         if (addcontext) {
           $('#addcontext-link').addClass('addcontext-visible');
         }
-        
+
         $("#addcontext-link").on('click', function(e) {
           e.preventDefault();
           if ($(".addcontext-on").is(":visible")) {
