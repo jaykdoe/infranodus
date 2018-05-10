@@ -52,14 +52,21 @@
         }
 
         #section3{
-            background: -webkit-gradient(linear, top left, bottom left, from(#a3abd8), to(#c2b7f8));
-            background: -webkit-linear-gradient(#a3abd8, #c2b7f8);
-            background: linear-gradient(#a3abd8,#c2b7f8);
+          background: -webkit-gradient(linear, top left, bottom left, from(#f8a3dc), to(#a0b6ff));
+          background: -webkit-linear-gradient(#f8a3dc, #a0b6ff);
+          background: linear-gradient(#f8a3dc,#a0b6ff);
         }
         #section4{
-            background: -webkit-gradient(linear, top left, bottom left, from(#f8a3dc), to(#a0b6ff));
-            background: -webkit-linear-gradient(#f8a3dc, #a0b6ff);
-            background: linear-gradient(#f8a3dc,#a0b6ff);
+          background: -webkit-gradient(linear, top left, bottom left, from(#a3abd8), to(#c2b7f8));
+          background: -webkit-linear-gradient(#a3abd8, #c2b7f8);
+          background: linear-gradient(#a3abd8,#c2b7f8);
+
+
+        }
+        #section5{
+          background: -webkit-gradient(linear, top left, bottom left, from(#f8a3dc), to(#a0b6ff));
+          background: -webkit-linear-gradient(#f8a3dc, #a0b6ff);
+          background: linear-gradient(#f8a3dc,#a0b6ff);
 
         }
         #network-canvas {
@@ -125,7 +132,7 @@
 
         $(document).ready(function() {
             $('#fullpage').fullpage({
-                anchors: ['home', 'features', 'usecases', 'graphs', 'about'],
+                anchors: ['home', 'features', 'usecases', 'graphs', 'tutorials', 'about'],
                 menu: '#menu',
                 scrollOverflow: true,
                 responsive: 800,
@@ -337,6 +344,7 @@
     <li data-menuanchor="features"><a href="#features" class="menuhit">Features</a></li>
     <li data-menuanchor="usecases"><a href="#usecases" class="menuhit">Use Cases</a></li>
     <li data-menuanchor="graphs"><a href="#graphs" class="menuhit">Graphs</a></li>
+    <li data-menuanchor="tutorials"><a href="#tutorials" class="menuhit">Tutorials</a></li>
     <li data-menuanchor="about"><a href="#about" class="menuhit">About</a></li>
 </ul>
 </div>
@@ -347,7 +355,7 @@
         <canvas id="network-canvas" height="100%" width="100vh"></canvas>
         <div class="ontop">
             <h1>InfraNodus</h1>
-            <p>Create text network visualizations to store, develop and connect your ideas.</p>
+            <p>Connect your thoughts to create patterns and identify gaps. <br>Visualize text as a network to store, understand and develop your ideas.</p>
             <ul class="submenu">
             <li><a href="/login">Login</a></li>
             <li><a href="/signup">Sign Up</a></li>
@@ -683,6 +691,47 @@
 
     </div>
     <div class="section" id="section4">
+        <div class="slide">
+            <div class="intro">
+                <h1>Re-think Discourse</h1>
+                <p>How to represent a text as a graph and have a different perspective on discourse.</p>
+                <ul class="submenu">
+                    <li><a href="https://www.youtube.com/watch?v=0mIT9Ni5SO4" class="demo">Watch Webinar</a></li>
+                    <li><a href="https://noduslabs.com/courses/text-network-analysis-for-cognitive-stimulation/units/think-of-a-discourse-in-a-different-way/?try" class="demo" target="_blank">Practice</a></li>
+                </ul>
+                <div class="videoframe"> <br>
+                    <iframe width="560" height="315" src="https://www.youtube.com/embed/0mIT9Ni5SO4?rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                </div>
+            </div>
+        </div>
+          <div class="slide">
+            <div class="intro">
+                <h1>Visualize Any Big Text</h1>
+                <p>Identify the main topics, see how they are connected, read and study the text in nonlinear way.</p>
+                <ul class="submenu">
+                    <li><a href="https://www.youtube.com/watch?v=OZ1CgtFCQVQ">Watch Webinar</a></li>
+                    <li><a href="https://noduslabs.com/courses/text-network-analysis-for-cognitive-stimulation/units/visualize-any-big-text/?try" class="demo" data-featherlight="#video6" target="_blank">Practice</a></li>
+                </ul>
+                <div class="videoframe" id="video6"> <br>
+                  <iframe width="560" height="315" src="https://www.youtube.com/embed/OZ1CgtFCQVQ?rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+                </div>
+            </div>
+        </div>
+        <div class="slide">
+          <div class="intro">
+              <h1>Enhance Your Research Process</h1>
+              <p>Visualize the connections between all the citations, research notes, and clipped texts. See how to develop the discourse further.</p>
+              <ul class="submenu">
+                  <li><a href="https://www.youtube.com/watch?v=bMmTRBZpjWw">Watch Webinar</a></li>
+                  <li><a href="https://noduslabs.com/courses/text-network-analysis-for-cognitive-stimulation/units/enhance-your-research-using-text-network-analysis/?try" class="demo" data-featherlight="#video6" target="_blank">Practice</a></li>
+              </ul>
+              <div class="videoframe" id="video6"> <br>
+                <iframe width="560" height="315" src="https://www.youtube.com/embed/bMmTRBZpjWw?rel=0" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+              </div>
+          </div>
+      </div>
+    </div>
+    <div class="section" id="section5">
         <div class="slide">
             <div class="intro">
                 <p>InfraNodus visualizes texts, notes, and ideas as a network, so you can make sense of your knowledge and stimulate your imagination.</p>

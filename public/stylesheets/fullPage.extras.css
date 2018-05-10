@@ -209,7 +209,7 @@ p{
 	left:0;
 	height: 40px;
 	z-index: 70;
-	width:640px;
+	width:840px;
 	padding: 0;
 	margin:0;
 
@@ -479,7 +479,3 @@ p{
 #section {
     height:100vh!important;
 }
-
-
-
-
