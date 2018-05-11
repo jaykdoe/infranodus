@@ -169,7 +169,7 @@ exports.submit = function(req, res, next){
       // How long is the text?
       currenttextlength = fullstatement.length;
       // Split statements into the shorter ones
-      splitStatements = validate.splitStatement(fullstatement, max_length, 'snippets');
+      splitStatements = validate.splitStatement(fullstatement, max_length);
     }
 
     var totalcount = splitStatements.length;
