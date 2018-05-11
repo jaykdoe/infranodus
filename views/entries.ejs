@@ -992,6 +992,9 @@ sigma.parsers.json(
             });
 
 
+           sigma.refresh();
+
+
 
 
 
@@ -1164,7 +1167,7 @@ sigma.parsers.json(
 
             communityDetect();
 
-            sigma.refresh();
+
 
 
             // TODO make it possible for collaboration also
@@ -1652,7 +1655,7 @@ sigma.parsers.json(
                     betweennessCentrality(eless);
                     communityDetect();
 
-                    //sigma.refresh();
+                    sigma.refresh();
 
                     sigma.startForceAtlas2(forceatlas_options);
 
