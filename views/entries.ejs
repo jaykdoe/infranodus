@@ -3694,7 +3694,7 @@ sigma.parsers.json(
      if ((community_assignment_result['modularity'] > 0.4 && diversityindex < 50) && ((bc_entropy >= 1.5) || (bc_entropy == 0 && toppbc_nodes[0].bc == 0) || (bc_entropy == 0 && num_nodes_component < 40))) {
         diversity_score = 'Diversified';
      }
-     else if ((community_assignment_result['modularity'] < 0.4 && community_assignment_result['modularity'] > 0.2 && bc_entropy >= 0.5) || ((community_assignment_result['modularity'] > 0.4 && diversityindex >= 50)  && bc_entropy >= 0.5) || (community_assignment_result['modularity'] > 0.4 && diversityindex < 50 && bc_entropy >= 0.5)) {
+     else if ((community_assignment_result['modularity'] < 0.4 && community_assignment_result['modularity'] > 0.2 && bc_entropy > 0.5) || ((community_assignment_result['modularity'] > 0.4 && diversityindex >= 50)  && bc_entropy >= 0.5) || (community_assignment_result['modularity'] > 0.4 && diversityindex < 50 && bc_entropy >= 0.5)) {
         diversity_score = 'Focused';
      }
      else {
