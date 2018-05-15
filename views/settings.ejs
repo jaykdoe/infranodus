@@ -90,6 +90,15 @@
                     </label>
                     <br>
 
+                    Background
+                    <label for="background" class="pure-input">
+                      <select id="background" name="background">
+                      <option value="default" <% if (user.background=='default' || user.background == undefined) { %> selected <% } %>>Default (Light)</option>
+                      <option value="dark" <% if (user.background=='dark') { %> selected <% } %>>Dark</option>
+                      </select>
+                    </label>
+                    <br>
+
                     Show node labels
                     <label for="label_threshold" class="pure-input">
                       <select id="label_threshold" name="label_threshold">

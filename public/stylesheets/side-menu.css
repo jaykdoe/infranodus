@@ -178,6 +178,11 @@ small screens.
     pointer-events: auto!important;
 }
 
+.graph-link-dark {
+      opacity: 0.6;
+      background-image: url('../images/closewhite.png')!important;
+}
+
 #graph-link:hover {
     background: none;
     background-image: url('../images/close.png');
@@ -201,6 +206,10 @@ small screens.
     background-repeat:no-repeat;
     background-position:center;
     pointer-events: auto!important;
+}
+.windowdown-link-dark {
+    opacity: 0.6;
+    background-image: url('../images/closewindow-white.png')!important;
 }
 
 #deletecontext {
@@ -231,6 +240,10 @@ small screens.
     position: relative;
     top: -5px;
 }
+.deletebutton-dark {
+
+    background-image: url('../images/trash-white.png')!important;
+}
 #deletecontextbutton {
     background: url('../images/trash.png');
     background-repeat:no-repeat;
@@ -243,7 +256,10 @@ small screens.
     line-height: 0px;
     font-size: 0px;
 }
-
+.deletecontextbutton-dark {
+  opacity: 0.6;
+  background-image: url('../images/trash-white.png')!important;
+}
 
 #privacy-link {
     background: url('../images/share.png');
@@ -278,6 +294,11 @@ small screens.
     padding: 3.3em 1.6em;
     z-index: 10;
 }
+.collaborate-link-dark {
+  opacity: 0.6;
+  background-image: url('../images/group-white.png')!important;
+
+}
 
 .is-public {
     background: url('../images/share-green.png')!important;
@@ -308,6 +329,12 @@ small screens.
     z-index: 10;
 }
 
+.import-link-dark {
+  opacity: 0.6;
+  background-image: url('../images/telescope-white.png')!important;
+
+}
+
 #chat-link {
 
 
@@ -335,6 +362,9 @@ small screens.
     background-position:center!important;
 
 }
+.chat-dark {
+  background-image: url('../images/chatwhite.png')!important;
+}
 
 .chat-highlight:hover {
 
@@ -354,7 +384,7 @@ small screens.
 
 #microphone-link {
     display: none;
-    opacity: 0.5;
+    opacity: 1;
     position: fixed;
     top: 320px;
     font-size: 8px; /* change this value to increase/decrease button size */
@@ -374,7 +404,7 @@ small screens.
 
 #addcontext-link {
     position: fixed;
-    top: 280px;
+    top: 165px;
     font-size: 8px; /* change this value to increase/decrease button size */
     width: 2em;
     height: 25px;
@@ -384,7 +414,7 @@ small screens.
      height: auto;*/
     padding: 0em 2.3em;
     z-index: 10;
-    opacity: 0.5;
+    opacity: 1;
     background-image: url('../images/compare.png');
     background-repeat:no-repeat;
     background-position:center;
@@ -397,9 +427,12 @@ small screens.
     background-repeat:no-repeat!important;
     background-position:center!important;
 }
+
+
+
 .addcontext-visible {
-    opacity: 1!important;
-  
+    background-image: url('../images/compare-green.png')!important;
+
 }
 
 #improve-layout {
@@ -419,9 +452,14 @@ small screens.
   background-position:center;
 }
 
+.improve-layout-dark {
+    opacity: 0.6;
+    background-image: url('../images/diamond-white.png')!important;
+}
+
 #walkthrough {
   position: fixed;
-  top: 160px;
+  top: 205px;
   font-size: 8px; /* change this value to increase/decrease button size */
   width: 2em;
   height: 25px;
@@ -434,6 +472,12 @@ small screens.
   background-image: url('../images/question.png');
   background-repeat:no-repeat;
   background-position:center;
+}
+
+.walkthrough-dark {
+  opacity: 0.6;
+  background-image: url('../images/question-white.png')!important;
+
 }
 
 .microphone-on {
@@ -454,7 +498,7 @@ small screens.
 #graph-tools {
     position: fixed;
     display: none;
-    top: 205px;
+    top: 245px;
     text-align: right;
     right: -2px; /* "#menu width" */
     height: 80px;

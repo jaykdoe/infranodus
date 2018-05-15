@@ -228,12 +228,12 @@
                 </a>
         <div id="controls">
                 <div id="graph-reload">
-                <a href="javascript:" class="tooltip" title="choose a few nodes from the graph and click this button to find out more"  id="go_next"><img src="/images/eyezoom.png" vspace="0" border="0"></a><br><a href="javascript:location.reload();" class="tooltip" title="reload the graph" id="reloadbutton"><img src="/images/reload.png" title="clear and reload graph" vspace="6" border="0"></a><br><a href="javascript:" class="tooltip" title="improve layout" id="improve-layout"></a><br><a href="javascript:" class="tooltip" title="show tutorial" id="walkthrough"></a>
+                <a href="javascript:" class="tooltip" title="choose a few nodes from the graph and click this button to find out more"  id="go_next"></a><br><a href="javascript:location.reload();" class="tooltip" title="reload the graph" id="reloadbutton"></a><br><a href="javascript:" class="tooltip" title="improve layout" id="improve-layout"></a><br><a href="javascript:" class="tooltip" title="show tutorial" id="walkthrough"></a>
 
         </div>
 
         <div id="graph-tools">
-                <a href="javascript:" class="tooltip" title="zoom in" id="zoom-in"><img src="/images/zoom-in.png" border="0"></a><br><a href="javascript:" class="tooltip" title="zoom out" id="zoom-out"><img src="/images/zoom-out.png" border="0"></a>
+                <a href="javascript:" class="tooltip" title="zoom in" id="zoom-in"></a><br><a href="javascript:" class="tooltip" title="zoom out" id="zoom-out"></a>
          </div>
          <div id="analytics"></div>
 
@@ -348,6 +348,8 @@
     var newcontextname = getUrlVars()["newcontextname"];
 
     var graphPalette = getUrlVars()["palette"];
+
+    var background = getUrlVars()["background"];
 
     var interpret = getUrlVars()["interpret"];
 
@@ -529,7 +531,45 @@ most_influential = '<%= user.topnodes %>';
 if (!graphPalette) {
  graphPalette = '<%= user.palette %>';
 }
+
+if (!background) {
+ background = '<%= user.background %>';
+}
+
+
 <% } %>
+
+var deselected_nodes_color = '#ddd';
+
+if (background == 'dark') {
+  $('#graph-container').addClass('graph-dark');
+  $('.entry').addClass('entry-dark');
+  $('.entry-text').addClass('entry-text-dark');
+  $('#analytics').css('backgroundColor', 'rgba(30, 30, 30, 0.7)');
+  $('#entryform').css('backgroundColor', 'rgba(30, 30, 30, 0.7)');
+  $('#addnodeinput').css({'backgroundColor': 'rgba(250, 250, 250, 0.2)', 'border': 'none', 'box-shadow': 'none', 'color': '#aaaab5'});
+  $('#statement').css({'backgroundColor': 'rgba(250, 250, 250, 0.2)', 'border': 'none', 'box-shadow': 'none', 'color': '#aaaab5'});
+  $('body').css('color', '#aaaab5');
+  $('li.pure-menu-selected-top a').css('backgroundColor', '#888888');
+  $('.menu-link').css('background', 'rgba(250, 250, 250, 0.4)');
+  $('#graph-link').addClass('graph-link-dark');
+  $('#chat-link').addClass('chat-dark');
+  $('#addnode').addClass('addnode-dark');
+  $('#go_next').addClass('go_next-dark');
+  $('#reloadbutton').addClass('reloadbutton-dark');
+  $('#improve-layout').addClass('improve-layout-dark');
+  $('#walkthrough').addClass('walkthrough-dark');
+  $('#zoom-in').addClass('zoom-in-dark');
+  $('#zoom-out').addClass('zoom-out-dark');
+  $('#microphone-link').css({'background-image': "url('/images/microphone-white.png')", "opacity": "0.6"});
+  $('#addcontext-link').css({'background-image': "url('/images/compare-white.png')", "opacity": "0.6"});
+  $('#deletecontextbutton').addClass('deletecontextbutton-dark');
+  $('#collaborate-link').addClass('collaborate-link-dark');
+  $('#import-link').addClass('import-link-dark');
+  $('#windowdown-link').addClass('windowdown-link-dark');
+  deselected_nodes_color = '#444';
+}
+
 
 // If the user opened a URL with collaborate=xxxxxx then they join the room that's the "url_path/xxxxxx"
 if (collaborate_invite) {
@@ -844,6 +884,12 @@ sigma.classes.graph.addMethod('neighbors', function(nodeId) {
 
 var color_addcontext = '#666666'; // #cccccc
 
+var default_label_color = '#000000';
+
+if (background == 'dark') {
+  default_label_color = '#ffffff';
+}
+
 
 
 sigma.parsers.json(
@@ -859,7 +905,8 @@ sigma.parsers.json(
                 maxNodeSize: 16,
                 minEdgeSize: 0.5,
                 maxEdgeSize: 2,
-                labelThreshold: in_label_threshold
+                labelThreshold: in_label_threshold,
+                defaultLabelColor: default_label_color
             }
         },
         function(sigma) {
@@ -1131,6 +1178,7 @@ sigma.parsers.json(
                 }
             });
 
+            if (background == 'dark') { $('#tagInputBox').css({'backgroundColor': 'rgba(250, 250, 250, 0.2)', 'border': 'none', 'box-shadow': 'none', 'color': '#aaaab5'}); }
             // Do ForceAtlasLayout
 
             if (sigma.isForceAtlas2Running()) {
@@ -1491,6 +1539,12 @@ sigma.parsers.json(
                 }
 
                 $(added_entry).appendTo($('#entries')).slideDown("fast");
+
+                if (background == 'dark') {
+                  $('.entry').css('backgroundColor', 'rgba(250, 250, 250, 0.2)');
+                  $('.entry-text').css('color', '#aaaab5');
+                }
+
                 $("#entries").animate({ scrollTop: $('#entries')[0].scrollHeight }, 1000);
 
                 //$('#entries').append(added_entry).slideUp("fast");
@@ -3542,7 +3596,7 @@ sigma.parsers.json(
                   n.color = rgbToHex(palette[n.community]._rgb[0],palette[n.community]._rgb[1],palette[n.community]._rgb[2]);
                 }
                 else if (coming_from == 'node add' && n.originalLabel == node_origin) {
-                  n.color = '#ddd';
+                  n.color = deselected_nodes_color;
                 }
                 else if (!nodeIDs[n.originalLabel]) {
                   n.color = rgbToHex(palette[n.community]._rgb[0],palette[n.community]._rgb[1],palette[n.community]._rgb[2]);
@@ -3864,7 +3918,7 @@ sigma.parsers.json(
                         }
                     }
                     else {
-                      n.color = '#ddd';
+                      n.color = deselected_nodes_color;
                       n.label = '';
                     }
 
@@ -3889,7 +3943,7 @@ sigma.parsers.json(
                                 n.label = n.originalLabel;
                               }
                               else {
-                                n.color = '#ddd';
+                                n.color = deselected_nodes_color;
                                 n.label = '';
                               }
                       }
@@ -3912,7 +3966,7 @@ sigma.parsers.json(
                               }
                           }
                           else {
-                            n.color = '#ddd';
+                            n.color = deselected_nodes_color;
                             n.label = '';
                           }
                       });
@@ -3951,7 +4005,7 @@ sigma.parsers.json(
                                   n.label = n.originalLabel;
                                 }
                                 else {
-                                  n.color = '#ddd';
+                                  n.color = deselected_nodes_color;
                                   n.label = '';
                                 }
 
@@ -4054,7 +4108,7 @@ sigma.parsers.json(
                         e.color = e.originalColor;
                     }
                     else {
-                        e.color = '#ddd';
+                        e.color = deselected_nodes_color;
                     }
 
                 });
@@ -4065,7 +4119,7 @@ sigma.parsers.json(
 
                     // Is there no contexts at all? Show the node.
                     if (nodesOfStatement[keepStatementID].indexOf(n.id) < 0)  {
-                        n.color = '#ddd';
+                        n.color = deselected_nodes_color;
                         n.label = '';
                     }
                     else {
@@ -4228,6 +4282,7 @@ sigma.parsers.json(
                 // TODO a better way of dealing with delete and edit - in the logic of everything else
 
                 submitFormProcess();
+
 
 
 
@@ -4556,12 +4611,26 @@ sigma.parsers.json(
 
 
                         if (pinnedNodes.length > 0) {
-                                $('#deletenodes').addClass('deletenodes-on');
-                                $('#undo').addClass('undo-on');
+                                if (background == 'dark') {
+                                  $('#deletenodes').addClass('deletenodes-dark');
+                                  $('#undo').addClass('undo-dark');
+                                }
+                                else {
+                                  $('#deletenodes').addClass('deletenodes-on');
+                                  $('#undo').addClass('undo-on');
+                                }
+
                         }
                         else {
-                                $('#deletenodes').removeClass('deletenodes-on');
-                                $('#undo').removeClass('undo-on');
+                          if (background == 'dark') {
+                            $('#deletenodes').removeClass('deletenodes-dark');
+                            $('#undo').removeClass('undo-dark');
+                          }
+                          else {
+                            $('#deletenodes').removeClass('deletenodes-on');
+                            $('#undo').removeClass('undo-on');
+                          }
+
                         }
 
                         // Show tags that are currently used in search
@@ -4652,10 +4721,25 @@ sigma.parsers.json(
         localStorage.setItem("selections",JSON.stringify(localstore));
 
         if (deletedNodes.length > 0) {
-          $('#stopsave').addClass('stopsave-on');
+          if (background == 'dark') {
+            $('#stopsave').addClass('stopsave-dark');
+
+          }
+          else {
+            $('#stopsave').addClass('stopsave-on');
+
+          }
         }
         else {
-          $('#stopsave').removeClass('stopsave-on');
+          if (background == 'dark') {
+            $('#stopsave').removeClass('stopsave-dark');
+
+          }
+          else {
+            $('#stopsave').removeClass('stopsave-on');
+
+          }
+
         }
 
         $('#stopnodeslist').html(stopNodesList);
@@ -4955,7 +5039,7 @@ sigma.parsers.json(
             }
             else {
                 // Otherwise (the edge IS in the list for removal), so we color the edge invisible
-                e.color = '#ddd';
+                e.color = deselected_nodes_color;
             }
 
 
@@ -4979,7 +5063,7 @@ sigma.parsers.json(
 
             // The node is not in the list to keep? Hide it!
             else if (nodesToKeep.indexOf(n.id) < 0)  {
-                n.color = '#ddd';
+                n.color = deselected_nodes_color;
                 n.label = '';
             }
 
@@ -5466,7 +5550,7 @@ sigma.parsers.json(
 
                     }
                         else  {
-                            n.color = '#ddd';
+                            n.color = deselected_nodes_color;
                             n.label = '';
                         }
                 });
@@ -5476,7 +5560,7 @@ sigma.parsers.json(
                             e.color = e.originalColor;
                         }
                         else {
-                            e.color = '#ddd';
+                            e.color = deselected_nodes_color;
                         }
                 });
 
