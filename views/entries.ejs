@@ -17,6 +17,9 @@
     <% if (speech) { %>
     <script src="/javascripts/talkify.min.js"></script>
     <%  } %>
+    <% if (midi) { %>
+    <script src="/javascripts/webmidi.min.js"></script>
+    <%  } %>
     <link rel="stylesheet" href="/stylesheets/bootstrap-tour-standalone.min.css" />
     <script src="/javascripts/bootstrap-tour-standalone.min.js"></script>
 
@@ -569,6 +572,62 @@ if (background == 'dark') {
   $('#windowdown-link').addClass('windowdown-link-dark');
   deselected_nodes_color = '#444';
 }
+
+var midi;
+
+<% if (midi) { %>
+
+var output;
+var input;
+
+function getRandomInt(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+WebMidi.enable(function (err) {
+
+  if (err) {
+    console.log("WebMidi could not be enabled.", err);
+  } else {
+
+
+    console.log("WebMidi enabled!");
+    console.log(WebMidi.inputs);
+    console.log(WebMidi.outputs);
+    console.log(WebMidi.time);
+
+    output = WebMidi.outputs[0];
+
+    if (output) {
+      midi = 'connected';
+    }
+    else {
+      console.log('MIDI out device not connected');
+    }
+
+    input = WebMidi.inputs[0];
+
+    if (input) {
+
+      // Listen for a 'note on' message on all channels
+      input.addListener('noteon', "all",
+        function (e) {
+          console.log("Received 'noteon' message (" + e.note.name + e.note.octave + ").");
+          console.log(e);
+        }
+      );
+    }
+    else {
+      console.log('MIDI input device not connected');
+    }
+
+  }
+
+
+
+});
+
+<% } %>
 
 
 // If the user opened a URL with collaborate=xxxxxx then they join the room that's the "url_path/xxxxxx"
@@ -1541,8 +1600,8 @@ sigma.parsers.json(
                 $(added_entry).appendTo($('#entries')).slideDown("fast");
 
                 if (background == 'dark') {
-                  $('.entry').css('backgroundColor', 'rgba(250, 250, 250, 0.2)');
-                  $('.entry-text').css('color', '#aaaab5');
+                  $('.entry').addClass('entry-dark');
+                  $('.entry-text').addClass('entry-text-dark');
                 }
 
                 $("#entries").animate({ scrollTop: $('#entries')[0].scrollHeight }, 1000);
@@ -1559,6 +1618,9 @@ sigma.parsers.json(
 
                     var addednodes = msg.graph.nodes;
                     var addededges = msg.graph.edges;
+
+                    var nodes_added = [];
+                    var edges_added = [];
 
 
 
@@ -1579,6 +1641,7 @@ sigma.parsers.json(
                                 color: color_context
                             });
                             nodeNames.push(addednodes[i].label);
+                            nodes_added.push(addednodes[i]);
 
 
                         }
@@ -1611,6 +1674,8 @@ sigma.parsers.json(
                                 statement_id: addededges[j].statement_id,
                                 edge_context: addededges[j].edge_context
                             });
+
+                            edges_added.push(addededges[j]);
 
 
                         }
@@ -1712,6 +1777,31 @@ sigma.parsers.json(
                     //sigma.refresh();
 
                     sigma.startForceAtlas2(forceatlas_options);
+
+                    var timecode = 0;
+                    console.log(nodes_added);
+                    console.log(edges_added);
+
+                    for (var m = 0; m < nodes_added.length; m++) {
+
+
+                        setTimeout(function () {
+                          output.playNote("C-1", 8);
+                        }, timecode);
+                        timecode = getRandomInt(0,4000);
+                    }
+
+                    var timecodea = 0;
+
+                    for (var ed = 0; ed < edges_added.length; ed++) {
+
+                        setTimeout(function () {
+                          output.playNote("C-1", 6);
+                          console.log('playing another note at ' + timecodea);
+                        }, timecodea);
+                          timecodea = getRandomInt(0,4000);
+
+                    }
 
 
 

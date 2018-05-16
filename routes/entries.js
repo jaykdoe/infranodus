@@ -115,6 +115,7 @@ exports.list = function(req, res, next){
             url: req.query.url,
             urltitle: req.query.urltitle,
             speech: req.query.speech,
+            midi: req.query.midi,
             walkthrough: req.query.walkthrough
         });
     });
