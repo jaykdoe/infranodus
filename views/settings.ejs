@@ -155,6 +155,89 @@
 
                     <br>
 
+                    Output MIDI Signal When Adding Nodes into Graph
+                    <label for="midiactive" class="pure-input">
+                      <select id="midiactive" name="midiactive">
+                      <option value="off" <% if (user.midi == 'off' || user.midi == undefined) { %> selected <% } %>>Inactive</option>
+                      <option value="on" <% if (user.midi != undefined && user.midi.length > 3) { %> selected <% } %>>Active</option>
+                      </select>
+                    </label>
+
+                     <a href="javascript:" id="advancedmidi">+ channel map</a>
+
+                    <br>
+                    <div id="midisetting">
+                      <br>
+                      <label for="midinodechannel" class="pure-input" id="midinodechannelcaption">
+                          MIDI output channel for nodes added:
+                          <select id="midinodechannel" name="midinodechannel">
+                          <option value="01" <% if (user.midi != undefined && user.midi.substr(0,2)=='01' || user.midi == undefined) { %> selected <% } %>>01</option>
+                          <option value="02" <% if (user.midi != undefined && user.midi.substr(0,2)=='02') { %> selected <% } %>>02</option>
+                          <option value="03" <% if (user.midi != undefined && user.midi.substr(0,2)=='03') { %> selected <% } %>>03</option>
+                          <option value="04" <% if (user.midi != undefined && user.midi.substr(0,2)=='04') { %> selected <% } %>>04</option>
+                          <option value="05" <% if (user.midi != undefined && user.midi.substr(0,2)=='05') { %> selected <% } %>>05</option>
+                          <option value="06" <% if (user.midi != undefined && user.midi.substr(0,2)=='06') { %> selected <% } %>>06</option>
+                          <option value="07" <% if (user.midi != undefined && user.midi.substr(0,2)=='07') { %> selected <% } %>>07</option>
+                          <option value="08" <% if (user.midi != undefined && user.midi.substr(0,2)=='08') { %> selected <% } %>>08</option>
+                          <option value="09" <% if (user.midi != undefined && user.midi.substr(0,2)=='09') { %> selected <% } %>>09</option>
+                          <option value="10" <% if (user.midi != undefined && user.midi.substr(0,2)=='10') { %> selected <% } %>>10</option>
+                          <option value="11" <% if (user.midi != undefined && user.midi.substr(0,2)=='11') { %> selected <% } %>>11</option>
+                          <option value="12" <% if (user.midi != undefined && user.midi.substr(0,2)=='12') { %> selected <% } %>>12</option>
+                          <option value="13" <% if (user.midi != undefined && user.midi.substr(0,2)=='13') { %> selected <% } %>>13</option>
+                          <option value="14" <% if (user.midi != undefined && user.midi.substr(0,2)=='14') { %> selected <% } %>>14</option>
+                          <option value="15" <% if (user.midi != undefined && user.midi.substr(0,2)=='15') { %> selected <% } %>>15</option>
+                          <option value="16" <% if (user.midi != undefined && user.midi.substr(0,2)=='16') { %> selected <% } %>>16</option>
+                          </select>
+                      </label>
+
+                      <label for="midiedgechannel" class="pure-input" id="midiedgechannelcaption">
+                          MIDI output channel for edges added:
+                          <select id="midiedgechannel" name="midiedgechannel">
+                            <option value="01" <% if (user.midi != undefined && user.midi.substr(2,2)=='01') { %> selected <% } %>>01</option>
+                            <option value="02" <% if (user.midi != undefined && user.midi.substr(2,2)=='02' || user.midi == undefined) { %> selected <% } %>>02</option>
+                            <option value="03" <% if (user.midi != undefined && user.midi.substr(2,2)=='03') { %> selected <% } %>>03</option>
+                            <option value="04" <% if (user.midi != undefined && user.midi.substr(2,2)=='04') { %> selected <% } %>>04</option>
+                            <option value="05" <% if (user.midi != undefined && user.midi.substr(2,2)=='05') { %> selected <% } %>>05</option>
+                            <option value="06" <% if (user.midi != undefined && user.midi.substr(2,2)=='06') { %> selected <% } %>>06</option>
+                            <option value="07" <% if (user.midi != undefined && user.midi.substr(2,2)=='07') { %> selected <% } %>>07</option>
+                            <option value="08" <% if (user.midi != undefined && user.midi.substr(2,2)=='08') { %> selected <% } %>>08</option>
+                            <option value="09" <% if (user.midi != undefined && user.midi.substr(2,2)=='09') { %> selected <% } %>>09</option>
+                            <option value="10" <% if (user.midi != undefined && user.midi.substr(2,2)=='10') { %> selected <% } %>>10</option>
+                            <option value="11" <% if (user.midi != undefined && user.midi.substr(2,2)=='11') { %> selected <% } %>>11</option>
+                            <option value="12" <% if (user.midi != undefined && user.midi.substr(2,2)=='12') { %> selected <% } %>>12</option>
+                            <option value="13" <% if (user.midi != undefined && user.midi.substr(2,2)=='13') { %> selected <% } %>>13</option>
+                            <option value="14" <% if (user.midi != undefined && user.midi.substr(2,2)=='14') { %> selected <% } %>>14</option>
+                            <option value="15" <% if (user.midi != undefined && user.midi.substr(2,2)=='15') { %> selected <% } %>>15</option>
+                            <option value="16" <% if (user.midi != undefined && user.midi.substr(2,2)=='16') { %> selected <% } %>>16</option>
+                          </select>
+                      </label>
+
+                      <label for="mididevice" class="pure-input" id="mididevicecaption">
+                          MIDI device ID for signal output:
+                          <select id="mididevice" name="mididevice">
+                            <option value="00" <% if (user.midi != undefined && user.midi.substr(4,2)=='00' || user.midi == undefined) { %> selected <% } %>>00</option>
+                            <option value="01" <% if (user.midi != undefined && user.midi.substr(4,2)=='01') { %> selected <% } %>>01</option>
+                            <option value="02" <% if (user.midi != undefined && user.midi.substr(4,2)=='02') { %> selected <% } %>>02</option>
+                            <option value="03" <% if (user.midi != undefined && user.midi.substr(4,2)=='03') { %> selected <% } %>>03</option>
+                          </select>
+                      </label>
+
+                      <label for="mididuration" class="pure-input" id="mididurationcaption">
+                          Duration of output every time:
+                          <select id="mididuration" name="mididuration">
+                            <option value="4000" <% if (user.midi != undefined && user.midi.substr(6,4)=='4000' || user.midi == undefined) { %> selected <% } %>>4000 ms</option>
+                            <option value="3000" <% if (user.midi != undefined && user.midi.substr(6,4)=='3000') { %> selected <% } %>>3000 ms</option>
+                            <option value="2000" <% if (user.midi != undefined && user.midi.substr(6,4)=='2000') { %> selected <% } %>>2000 ms</option>
+                            <option value="1000" <% if (user.midi != undefined && user.midi.substr(6,4)=='1000') { %> selected <% } %>>1000 ms</option>
+                            <option value="9000" <% if (user.midi != undefined && user.midi.substr(6,4)=='9000') { %> selected <% } %>>9000 ms</option>
+                          </select>
+                      </label>
+
+                        <br>
+
+                    </div>
+                    <br>
+
                     <button type='submit' class="pure-button pure-button-primary">save settings</button>
 
 
@@ -226,6 +309,27 @@ $('#addcontextinput').submit(function(e) {
 });
 
   $(document).ready(function(){
+
+    var advancedpane = 0;
+
+    $('#midisetting').hide();
+
+    $("#advancedmidi").click(function() {
+        if (!advancedpane) {
+    //    $("#advancedsettings").show();
+        $("#advancedmidi").text('– channel map');
+        $("#midisetting").show();
+        advancedpane = 1;
+        }
+        else {
+      //  $("#advancedsettings").hide();
+        $("#advancedmidi").text('+ channel map');
+        $("#midisetting").hide();
+        advancedpane = 0;
+
+        }
+
+    });
 
       var previous_stopwords = $('#stopwords').val();
 

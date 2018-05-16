@@ -17,7 +17,7 @@
     <% if (speech) { %>
     <script src="/javascripts/talkify.min.js"></script>
     <%  } %>
-    <% if (midi) { %>
+    <% if (locals.user.midi != undefined && locals.user.midi != 'off') { %>
     <script src="/javascripts/webmidi.min.js"></script>
     <%  } %>
     <link rel="stylesheet" href="/stylesheets/bootstrap-tour-standalone.min.css" />
@@ -517,6 +517,8 @@ var in_label_threshold = 8;
 // default most influential nodes are displayed according to Betwenness Centrality (bc) or Degree (degree)
 var most_influential = 'bc';
 
+var midi = '';
+
 // TODO for desktop browses that support webwork (not iphone): webworker: true, slowdown: 300
 var forceatlas_options = {worker: false, startingIterations: 100, scalingRatio: 0.1, slowDown: 100, strongGravityMode: true};
 
@@ -525,6 +527,10 @@ var inlanguage = '<%= user.inlanguage %>';
 
 <% if (locals.user.label_threshold) { %>
 in_label_threshold = '<%= user.label_threshold %>';
+<% } %>
+
+<% if (locals.user.midi) { %>
+midi = '<%= user.midi %>';
 <% } %>
 
 <% if (locals.user.topnodes) { %>
@@ -573,9 +579,9 @@ if (background == 'dark') {
   deselected_nodes_color = '#444';
 }
 
-var midi;
 
-<% if (midi) { %>
+
+<% if (locals.user.midi != undefined && locals.user.midi != 'off') { %>
 
 var output;
 var input;
@@ -597,9 +603,14 @@ WebMidi.enable(function (err) {
     console.log(WebMidi.time);
 
     output = WebMidi.outputs[0];
+    console.log('midi substr ' + midi.substr(4,2));
+
+    if (midi.substr(4,2) != '00') {
+      output = WebMidi.outputs[parseInt(midi.substr(4,2))];
+    }
 
     if (output) {
-      midi = 'connected';
+      console.log('MIDI device connected');
     }
     else {
       console.log('MIDI out device not connected');
@@ -1778,17 +1789,25 @@ sigma.parsers.json(
 
                     sigma.startForceAtlas2(forceatlas_options);
 
+                    // MIDI activation
+
+                    <% if (locals.user.midi != undefined && locals.user.midi != 'off') { %>
+
+
+                    console.log('using MIDI data ' + midi);
+                    console.log('playing MIDI device:');
+                    console.log(output);
+
                     var timecode = 0;
-                    console.log(nodes_added);
-                    console.log(edges_added);
 
                     for (var m = 0; m < nodes_added.length; m++) {
 
 
                         setTimeout(function () {
-                          output.playNote("C-1", 8);
+                          output.playNote("C2", parseInt(midi.substr(0,2)));
+                          console.log('playing a node at ' + timecode + ' on ' + parseInt(midi.substr(0,2)));
                         }, timecode);
-                        timecode = getRandomInt(0,4000);
+                        timecode = getRandomInt(0,parseInt(midi.substr(6,4)));
                     }
 
                     var timecodea = 0;
@@ -1796,12 +1815,14 @@ sigma.parsers.json(
                     for (var ed = 0; ed < edges_added.length; ed++) {
 
                         setTimeout(function () {
-                          output.playNote("C-1", 6);
-                          console.log('playing another note at ' + timecodea);
+                          output.playNote("C2", parseInt(midi.substr(2,2)));
+                          console.log('playing an edge at ' + timecodea + ' on ' + parseInt(midi.substr(2,2)));
                         }, timecodea);
-                          timecodea = getRandomInt(0,4000);
+                          timecodea = getRandomInt(0,parseInt(midi.substr(6,4)));
 
                     }
+
+                    <% } %>
 
 
 
