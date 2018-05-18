@@ -1804,8 +1804,9 @@ sigma.parsers.json(
 
 
                         setTimeout(function () {
-                          output.playNote("C2", parseInt(midi.substr(0,2)));
+                          output.playNote(midi.substr(10,2), parseInt(midi.substr(0,2)));
                           console.log('playing a node at ' + timecode + ' on ' + parseInt(midi.substr(0,2)));
+                          output.stopNote(midi.substr(10,2), parseInt(midi.substr(0,2)), {time: "+500"});
                         }, timecode);
                         timecode = getRandomInt(0,parseInt(midi.substr(6,4)));
                     }
@@ -1815,7 +1816,8 @@ sigma.parsers.json(
                     for (var ed = 0; ed < edges_added.length; ed++) {
 
                         setTimeout(function () {
-                          output.playNote("C2", parseInt(midi.substr(2,2)));
+                          output.playNote(midi.substr(12,2), parseInt(midi.substr(2,2)));
+                          output.stopNote(midi.substr(12,2), parseInt(midi.substr(2,2)), {time: "+500"});
                           console.log('playing an edge at ' + timecodea + ' on ' + parseInt(midi.substr(2,2)));
                         }, timecodea);
                           timecodea = getRandomInt(0,parseInt(midi.substr(6,4)));

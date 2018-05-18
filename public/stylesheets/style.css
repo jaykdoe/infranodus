@@ -374,8 +374,15 @@ a:hover.app-more-link {
     max-width: 340px;
     padding-left: 50px;
     z-index: 1;
+    overflow-y: hidden;
+    overflow-x: hidden;
 /*    pointer-events: none;*/
 }
+#statements:hover {
+  overflow-y: scroll;
+}
+
+
 
 
 .hide-entries {

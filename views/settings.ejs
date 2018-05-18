@@ -190,6 +190,13 @@
                           </select>
                       </label>
 
+
+                      <label for="graph-view" class="pure-radio">
+                          MIDI nodes play note
+                          <input type="text" id="midinodenote" size="2" maxlength="2" class="pure-input" name="midinodenote" placeholder="" value="<% if (user.midi != undefined && user.midi.substr(10,2).length > 0) { %><%=user.midi.substr(10,2)%><% } else { %>C2<% } %>">
+                      </label>
+                      <br>
+
                       <label for="midiedgechannel" class="pure-input" id="midiedgechannelcaption">
                           MIDI output channel for edges added:
                           <select id="midiedgechannel" name="midiedgechannel">
@@ -211,6 +218,12 @@
                             <option value="16" <% if (user.midi != undefined && user.midi.substr(2,2)=='16') { %> selected <% } %>>16</option>
                           </select>
                       </label>
+
+                      <label for="graph-view" class="pure-radio">
+                          MIDI edges play note
+                          <input type="text" id="midiedgenote" size="2" maxlength="2" class="pure-input" name="midiedgenote" placeholder="" value="<% if (user.midi != undefined && user.midi.substr(12,2).length > 0) { %><%=user.midi.substr(12,2)%><% } else { %>C2<% } %>">
+                      </label>
+                      <br>
 
                       <label for="mididevice" class="pure-input" id="mididevicecaption">
                           MIDI device ID for signal output:

@@ -49,7 +49,7 @@ exports.modify = function(req, res) {
 
     var palette = req.body.palette;
 
-    var midi = '' + req.body.midinodechannel + '' + req.body.midiedgechannel + '' + req.body.mididevice + '' + req.body.mididuration;
+    var midi = '' + req.body.midinodechannel + '' + req.body.midiedgechannel + '' + req.body.mididevice + '' + req.body.mididuration + '' + req.body.midinodenote + '' + req.body.midiedgenote;
 
     if (req.body.midiactive == 'off') {
       midi = 'off';
