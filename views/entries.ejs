@@ -154,7 +154,7 @@
                   </a>
                   <% } %>
 
-                  <% if ((context && entries.length > 0) && (!perceivername)) { %>
+                  <% if ((context) && (!perceivername)) { %>
                   <form action='/post' name='deletecontext' id="deletecontext" method='post' class='pure-form' onsubmit="return confirm('Deleting the context will delete all the statements inside. Are you sure?');">
 
                       <input type="hidden" name="context" value="<%= context %>">
@@ -1980,8 +1980,7 @@ sigma.parsers.json(
             theme: 'tooltipster-noir',
             position: 'left',
             maxWidth: 200,
-            delay: 2000
-
+            delay: 1000
         });
 
 
