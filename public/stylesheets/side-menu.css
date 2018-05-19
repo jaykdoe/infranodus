@@ -618,19 +618,19 @@ Hides the menu at `48em`, but modify this based on your app's needs.
     }
 
     #graph-link {
-        display:none;
+        /* display:none; */
     }
 
-    #windowdown-link {
+    /* #windowdown-link {
         right: 0;
 
-    }
+    } */
 
     #entryform {
-        max-width: 261px;
+        max-width: 280px;
     }
     #analytics {
-      background-color: rgba(250, 250, 250, 0.9)!important;
+      background-color: rgba(250, 250, 250, 0.9);
 
       display:none;
     }
