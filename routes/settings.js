@@ -49,7 +49,10 @@ exports.modify = function(req, res) {
 
     var palette = req.body.palette;
 
-    var midi = '' + req.body.midinodechannel + '' + req.body.midiedgechannel + '' + req.body.mididevice + '' + req.body.mididuration + '' + req.body.midinodenote + '' + req.body.midiedgenote;
+    var midi_node_note = req.body.midinodenote;
+    var midi_edge_note = req.body.midiedgenote;
+
+    var midi = '' + req.body.midinodechannel + '' + req.body.midiedgechannel + '' + req.body.mididevice + '' + req.body.mididuration + '' + midi_node_note + '' + midi_edge_note;
 
     if (req.body.midiactive == 'off') {
       midi = 'off';
