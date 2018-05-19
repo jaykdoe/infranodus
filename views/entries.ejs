@@ -154,7 +154,7 @@
                   </a>
                   <% } %>
 
-                  <% if ((context && entries.length > 2) && (!perceivername)) { %>
+                  <% if ((context && entries.length > 0) && (!perceivername)) { %>
                   <form action='/post' name='deletecontext' id="deletecontext" method='post' class='pure-form' onsubmit="return confirm('Deleting the context will delete all the statements inside. Are you sure?');">
 
                       <input type="hidden" name="context" value="<%= context %>">
