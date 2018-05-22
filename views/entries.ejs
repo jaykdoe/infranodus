@@ -2572,12 +2572,24 @@ sigma.parsers.json(
              }
 
              if (walkthroughtype=='external') {
+
+               var windowsize = $(window).width();
+               if (windowsize <= 460) {
+                  if (!$("#statements").is(":hidden")) {
+                        $('#statements').hide();
+                  }
+
+               }
+
                tour._options.steps = [
                {
                element: "#graph-container",
                placement: "bottom",
                title: "Welcome to InfraNodus",
                content: "Here you can see network visualization of the text on the left. The most prominent topics are shown as the bigger nodes in the graph. The words, which are more often used in the same context will be closer to each other. The different colors will show the topical clusters that belong together.",
+               onShow: function (tour) {
+                   $('#analytics').hide();
+               }
                },
                {
                element: "#graph-container",
