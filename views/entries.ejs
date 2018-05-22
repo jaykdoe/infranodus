@@ -17,8 +17,10 @@
     <% if (speech) { %>
     <script src="/javascripts/talkify.min.js"></script>
     <%  } %>
-    <% if (locals.user.midi != undefined && locals.user.midi != 'off') { %>
+    <% if (locals.user) { %>
+        <% if (locals.user.midi != undefined && locals.user.midi != 'off') { %>
     <script src="/javascripts/webmidi.min.js"></script>
+          <%  } %>
     <%  } %>
     <link rel="stylesheet" href="/stylesheets/bootstrap-tour-standalone.min.css" />
     <script src="/javascripts/bootstrap-tour-standalone.min.js"></script>
