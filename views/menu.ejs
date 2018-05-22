@@ -5,7 +5,8 @@
         <a class="pure-menu-heading" href="/<%= user.name %>/edit"><%= user.name %></a>
         <ul id="contexts" class="contexts">
           <li>&nbsp;</li>
-            <li class="menu-item-small"><a href="/apps">apps/home</a></li>
+            <li class="menu-item-small"><a href="/">infranodus.com</a></li>
+            <li class="menu-item-small"><a href="/apps">apps</a></li>
             <li class="menu-item-small" id="settingspane"><a href="/settings">settings</a></li>
             <br>
             <li id="addNewContext" class="menu-item-divided"><a id="addcontextbutton" href="javascript:"> + new context&nbsp;&nbsp;</a><form action="/post" method="GET" class="pure-form" id="addcontextinput"><input type="text" id="addcontextname" size="7" class="pure-input"></form></li>
@@ -16,9 +17,11 @@
             <% }); %>
             <% } %>
             <li>&nbsp;</li>
-            <li class="menu-item-small"><a href="/import">import</a></li>
-            <li class="menu-item-small"><a href="http://noduslabs.com/infranodus/" target="_blank">about</a></li>
+            <li class="menu-item-divided"><a href="/import">import</a></li>
             <li class="menu-item-small">&nbsp;</li>
+            <li class="menu-item-divided"><a href="/#tutorials">tutorials</a></li>
+            <li class="menu-item-small">&nbsp;</li>
+            <li class="menu-item-small"><a href="http://noduslabs.com/infranodus/" target="_blank">about</a></li>
             <li class="menu-item-small"><a href="/#usecases">case studies</a></li>
             <li class="menu-item-small"><a href="http://github.com/noduslabs/infranodus" target="_blank">github</a></li>
             <li class="menu-item-small"><a href="http://noduslabs.com/contact/" target="_blank">contact</a></li>
