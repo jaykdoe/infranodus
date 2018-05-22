@@ -583,6 +583,7 @@ if (background == 'dark') {
 
 
 
+<% if (locals.user) { %>
 <% if (locals.user.midi != undefined && locals.user.midi != 'off') { %>
 
 var output;
@@ -640,6 +641,7 @@ WebMidi.enable(function (err) {
 
 });
 
+<% } %>
 <% } %>
 
 
