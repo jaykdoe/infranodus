@@ -1801,6 +1801,7 @@ sigma.parsers.json(
 
                     // MIDI activation
 
+                    <% if (locals.user) { %>
                     <% if (locals.user.midi != undefined && locals.user.midi != 'off') { %>
 
 
@@ -1846,6 +1847,7 @@ sigma.parsers.json(
 
                     }
 
+                    <% } %>
                     <% } %>
 
 
@@ -5735,7 +5737,7 @@ sigma.parsers.json(
 
             sigma.instances(0).refresh();
 
-
+            <% if (locals.user) { %>
             <% if (locals.user.midi != undefined && locals.user.midi != 'off') { %>
 
 
@@ -5781,6 +5783,7 @@ sigma.parsers.json(
 
             }
 
+            <% } %>
             <% } %>
 
 
