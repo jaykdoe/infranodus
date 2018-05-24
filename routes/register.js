@@ -52,24 +52,31 @@ exports.submit = function(req, res, next){
 
         // The user doesn't exist? Then create a new object User with the data from the form
         else {
+            
+            if (data.consent != 'yes') {
+                res.error("Please, accept our privacy policy.");
+                res.redirect('back');
+            }
+            else {
 
 
-            user = new User({
-                name: data.username,
-                pepper: data.password,
-                portal: data.email
-            });
+              user = new User({
+                  name: data.username,
+                  pepper: data.password,
+                  portal: data.email
+              });
 
-            // save that object in Neo4J database
-            user.save(function(err){
-                if (err) return next(err);
+              // save that object in Neo4J database
+              user.save(function(err){
+                  if (err) return next(err);
 
-                // save his ID into the session
-                req.session.uid = user.uid;
+                  // save his ID into the session
+                  req.session.uid = user.uid;
 
-                // redirect to the login page
-                res.redirect('/login');
-            });
+                  // redirect to the login page
+                  res.redirect('/login');
+              });
+            }
         }
     });
 };

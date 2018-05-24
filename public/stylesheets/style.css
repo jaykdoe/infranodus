@@ -500,7 +500,7 @@ a:hover.app-more-link {
 #analyticsbutton:after {
   font-size: 14px; /* change this value to increase/decrease button size */
   margin-left: -5em;
-  /* content: "analytics" */
+  content: "analytics"
 }
 
 .analytics-on {
@@ -767,6 +767,10 @@ padding: 0em 0em 1em 0em;
   background-color: #000000!important;
 }
 
+.small-caption {
+  font-size: 13px;
+  line-height: 15px;
+}
 
 
 #introduction {
