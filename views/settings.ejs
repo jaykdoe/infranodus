@@ -155,6 +155,12 @@
 
                     <br>
 
+                    Analytics pane name (customization)
+                    <label for="graph-view" class="pure-radio">
+                        <input type="text" id="customization" size="10" maxlength="20" class="pure-input" name="customization" placeholder="" value="<% if (!user.customization) { %>analytics<% } else { %><%=user.customization%><% } %>">
+                    </label>
+                    <br>
+
                     Output MIDI Signal When Adding Nodes into Graph
                     <label for="midiactive" class="pure-input">
                       <select id="midiactive" name="midiactive">

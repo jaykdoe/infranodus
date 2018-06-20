@@ -376,6 +376,8 @@
 
     var graphPalette = getUrlVars()["palette"];
 
+    var customization = ' ';
+
     var background = getUrlVars()["background"];
 
     var interpret = getUrlVars()["interpret"];
@@ -565,6 +567,10 @@ if (!graphPalette) {
  graphPalette = '<%= user.palette %>';
 }
 
+<% if (locals.user.customization) { %>
+ customization = '<%= user.customization %>';
+<% } %>
+
 if (!background) {
  background = '<%= user.background %>';
 }
@@ -603,7 +609,7 @@ if (background == 'dark') {
   deselected_nodes_color = '#444';
 }
 
-
+$('#analyticsbutton').attr('data-before',customization);
 
 <% if (locals.user) { %>
 <% if (locals.user.midi != undefined && locals.user.midi != 'off') { %>
