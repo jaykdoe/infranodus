@@ -452,6 +452,12 @@ var jsonpath = '';
 
 var addcontext = '';
 
+var maxnodes = '';
+
+<% if (maxnodes) { %>
+  maxnodes = <%= maxnodes %>;
+<% } %>
+
 
 // Path to the JSON graph file (specific context or a general one)
     <% if (addcontext) { %>
@@ -461,6 +467,10 @@ var addcontext = '';
     <% } else if (showcontexts) { %>
         jsonpath = '/api/user/nodes/<%= context %>?showcontexts=<%= showcontexts %>';
         addcontext = "";
+
+        <% } else if (maxnodes) { %>
+            jsonpath = '/api/user/nodes/<%= context %>?maxnodes=<%= maxnodes %>';
+            addcontext = "";
 
     <% } else { %>
         jsonpath = '/api/user/nodes/<%= context %>';
@@ -543,6 +553,10 @@ var in_label_threshold = 8;
 // default most influential nodes are displayed according to Betwenness Centrality (bc) or Degree (degree)
 var most_influential = 'bc';
 
+if (getUrlVars()["most_influential"] == 'bc' || getUrlVars()["most_influential"] == 'degree') {
+  most_influential = getUrlVars()["most_influential"];
+}
+
 var midi = '';
 
 // TODO for desktop browses that support webwork (not iphone): webworker: true, slowdown: 300
@@ -574,6 +588,9 @@ if (!graphPalette) {
 if (!background) {
  background = '<%= user.background %>';
 }
+
+
+
 
 
 <% } %>
@@ -2024,10 +2041,22 @@ sigma.parsers.json(
         var graph_share_url = hostsite + '/' + current_user;
 
         if (current_context) {
-            graph_share_url = graph_share_url + "/" + current_context;
+            graph_share_url = graph_share_url + "/" + current_context + "?";
         }
 
-        var privacy_iframe = "<iframe width='100%' height='500' style='height: 500px' src='https://" + graph_share_url + "?hide_always=1&link_hashtags=1' frameborder='0' allowfullscreen></iframe>";
+        if (background) {
+            graph_share_url += 'background=' + background;
+        }
+
+        if (most_influential) {
+            graph_share_url += '&most_influential=' + most_influential;
+        }
+
+        if (maxnodes) {
+            graph_share_url += '&maxnodes=' + maxnodes;
+        }
+
+        var privacy_iframe = "<iframe width='100%' height='500' style='height: 500px' src='https://" + graph_share_url + "?hide_always=1&link_hashtags=1&background=" + background + "&maxnodes=" + maxnodes + "' frameborder='0' allowfullscreen></iframe>";
 
         <% if (contextpublic && context && !perceivername && entries.length > 0) { %>
             privacyform = $('<span><form action="/context" name="privacycontext" method="post" class="pure-form"><input type="hidden" name="context" value="<%= context %>">This context can be viewed on:<br><input type="text" id="embedurl" size="25" maxlength="80" class="pure-input" value="https://' + graph_share_url + '"><br><br>Embed code for websites:<br><input type="text" id="embedcode" size="25" maxlength="100" class="pure-input" value="' + privacy_iframe + '"><br><br><input type="submit" id="privacybutton" name="privacy" value="make private"></form></span>')
