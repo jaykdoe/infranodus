@@ -43,6 +43,8 @@ exports.modify = function(req, res) {
 
     var hashnodes = req.body.hashnodes;
 
+    var mentions = req.body.mentions;
+
     var maxnodes = options.settings.max_nodes;
 
     var customization = req.body.customization;
@@ -76,7 +78,7 @@ exports.modify = function(req, res) {
         return !isNaN(value) && (function(x) { return (x | 0) === x; })(parseFloat(value))
     }
 
-    User.modifySettings(user_id, fullscan, fullview, morphemes, hashnodes, maxnodes, inlanguage, palette, background, midi, label_threshold, topnodes, customization, stopwords, function (err, answer) {
+    User.modifySettings(user_id, fullscan, fullview, morphemes, hashnodes, maxnodes, inlanguage, palette, background, midi, label_threshold, topnodes, mentions, customization, stopwords, function (err, answer) {
 
         // Error? Go back and display it.
 

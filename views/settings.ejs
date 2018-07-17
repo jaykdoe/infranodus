@@ -147,6 +147,23 @@
                     </label>
                     <br>
 
+                    @Mentions will be
+                    <label for="mentions1" class="pure-radio">
+                        <input id="mentions1" type="radio" name="mentions" value="0" <% if (user.mentions=='0' || user.mentions == undefined) { %> checked <% } %>>
+                        left as they are, connected to all the nodes in a statement
+                    </label>
+
+                    <label for="mentions2" class="pure-radio">
+                        <input id="mentions2" type="radio" name="mentions" value="remove" <% if (user.mentions=='remove') { %> checked <% } %>>
+                        the @ sign will be removed from the graph
+                    </label>
+
+                    <label for="mentions3" class="pure-radio">
+                        <input id="mentions3" type="radio" name="mentions" value="link" <% if (user.mentions=='link') { %> checked <% } %>>
+                        the @ sign is removed, each #hashtag  or word connected to @mention but not to each other
+                    </label>
+                    <br>
+
                     Custom stopwords to add to the default list (<a href="/files/stopwords_en_en.txt">en</a>, <a href="/files/stopwords_de_de.txt">de</a>, <a href="/files/stopwords_fr_fr.txt">fr</a>, <a href="/files/stopwords_es_es.txt">es</a>)
                     (example: "alt, don", to exclude, use a "-", e.g. "-kind, -and")
                     <label for="stopwords" class="pure-input">
