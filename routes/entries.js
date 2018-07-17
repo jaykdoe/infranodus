@@ -288,6 +288,7 @@ exports.submit = function(req, res, next){
                 "mentions": mentions,
                 "text": statement,
                 "fullscan": res.locals.user.fullscan,
+                "addmentions": res.locals.user.mentions,
                 "timestamp": newtimestamp
 
             });
