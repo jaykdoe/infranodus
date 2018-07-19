@@ -3377,6 +3377,41 @@ sigma.parsers.json(
 
 
 
+        // Textarea select conversion to hashtags
+
+        // For now it's disabled, but will be enabled for bulk statement correction later
+
+        var getSelected = function(){
+            var t = '';
+            if(window.getSelection) {
+                t = window.getSelection();
+            } else if(document.getSelection) {
+                t = document.getSelection();
+            } else if(document.selection) {
+                t = document.selection.createRange().text;
+            }
+            return t;
+        }
+
+
+        $("#statement").select(function(eventObject) {
+            var selectedText = getSelected().toString();
+
+            var statementReplace = $("#statement").val();
+
+            if ((statementReplace.indexOf('@'+selectedText) === -1) && (selectedText !== statementReplace)) {
+
+                var regex = RegExp(selectedText, "g");
+
+                var dasherized = S(selectedText).underscore().chompLeft('_').s;
+
+                // TODO check words for morphology (if found, alert)
+
+                var replacedString = statementReplace.replace(regex,"#" + dasherized).replace(/##/g,'#');
+                $("#statement").val(replacedString);
+            }
+
+        });
 
         // Document Ready end
 
@@ -3388,40 +3423,7 @@ sigma.parsers.json(
 
 
 
-    // Textarea select conversion to hashtags
 
-    // For now it's disabled, but will be enabled for bulk statement correction later
-
-    /*var getSelected = function(){
-        var t = '';
-        if(window.getSelection) {
-            t = window.getSelection();
-        } else if(document.getSelection) {
-            t = document.getSelection();
-        } else if(document.selection) {
-            t = document.selection.createRange().text;
-        }
-        return t;
-    }
-
-    $("#statement").select(function(eventObject) {
-        var selectedText = getSelected().toString();
-
-        var statementReplace = $("#statement").val();
-
-        if ((statementReplace.indexOf('@'+selectedText) === -1) && (selectedText !== statementReplace)) {
-
-            var regex = RegExp(selectedText, "g");
-
-            var dasherized = S(selectedText).dasherize().chompLeft('-').s;
-
-            // TODO check words for morphology (if found, alert)
-
-            var replacedString = statementReplace.replace(regex,"#" + dasherized).replace(/##/g,'#');
-            $("#statement").val(replacedString);
-        }
-
-    });*/
 
 
     function dragNodes () {
