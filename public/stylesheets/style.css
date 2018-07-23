@@ -466,6 +466,8 @@ a:hover.app-more-link {
 
 
 
+
+
 #arrowfold {
   /* display: inline-block; */
   float: left;
@@ -479,6 +481,25 @@ a:hover.app-more-link {
     clear: both;
 
 }
+#searchanalytics {
+    display: none;
+    padding: 10px;
+    /* display: inline-block; */
+    clear: both;
+
+}
+
+button {
+  font-size: 12px;
+  background: #ffffff;
+  border: 1px solid #ccc;
+  padding: 5px 10px;
+  border-radius: 3px;
+  cursor: pointer;
+}
+
+
+
 #analyticsbutton {
   position: fixed;
   bottom: 23px;

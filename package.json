@@ -17,7 +17,7 @@
     "imap": "^0.8.19",
     "languagedetect": "^1.1.1",
     "mimelib": "^0.3.1",
-    "natural": "^0.5.6",
+    "natural": "^0.6.1",
     "neo4j-driver": "^1.5.3",
     "nlp-js-tools-french": "^1.0.9",
     "node-neo4j": "^2.0.3",

@@ -27,6 +27,21 @@ The `#menu` `<div>` is the parent `<div>` that contains the `.pure-menu` that
 appears on the left side of the page.
 */
 
+#panelControllers {
+  position: relative;
+  margin-left: -30px;
+  height: 30px;
+}
+
+#panelControllers ul li {
+  float: left;
+  padding-right: 10px;
+  list-style: none;
+}
+
+
+
+
 
 #menu {
     margin-left: -150px; /* "#menu" width */

@@ -3637,7 +3637,11 @@ sigma.parsers.json(
 
          var recommender_start = 'next idea tip: what is the relation between "';
          var recommender = '';
-         var analytics = "<div id='mainanalytics'><div class='headline'>Main Topics Detected:<br></div>"
+         var analytics = "<div id='searchanalytics'><div class='headline'>Most Relevant Texts:<br></div>";
+         analytics += '<div id="similarlist">list of texts</div>';
+         analytics += '</div>';
+
+         analytics = analytics + "<div id='mainanalytics'><div class='headline'>Main Topics Detected:<br></div>"
          analytics += "1: "
          for (var j = 0; j < topp_communities.length; j++) {
 
@@ -3715,12 +3719,48 @@ sigma.parsers.json(
 
          analytics += "</div>";
 
+         // Add control buttons
+
+         analytics = '<div id="panelControllers"><ul><li><button id="analbutton" class="panelControlBtn" data-id="analytics">This Text</li><li><button id="searbutton" class="panelControlBtn" data-id="search_analytics">Other Texts</button></li></ul></div>' + analytics;
+
+         var currentPanel = 'analytics';
+
 
           // Check analytics display
 
          if (!localStorage.getItem('analytics') || localStorage.getItem('analytics') == 1) {
+
+
             $('#analytics').html(analytics);
             $('#analytics').show();
+
+            $("#searbutton").css('background','#ededed');
+
+
+              $('.panelControlBtn').on("click", function() {
+                var ID = $(this).attr('data-id');
+                if (ID == 'search_analytics') {
+                  $("#mainanalytics").fadeOut('fast', function() {
+                  $("#searchanalytics").fadeIn('fast');
+                  $("#analbutton").css('background','#ededed');
+                  $("#searbutton").css('background','#ffffff');
+
+                  });
+                  currentPanel = ID;
+                }
+                if (ID == 'analytics') {
+                  $("#searchanalytics").fadeOut('fast', function() {
+                  $("#mainanalytics").fadeIn('fast');
+                  $("#analbutton").css('background','#ffffff');
+                  $("#searbutton").css('background','#ededed');
+                  });
+                  currentPanel = ID;
+                }
+
+
+              });
+
+
             //localStorage.setItem('analytics', 1);
             $('#analyticsbutton').addClass('analytics-on');
          }
