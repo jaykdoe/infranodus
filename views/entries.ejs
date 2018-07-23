@@ -3721,7 +3721,7 @@ sigma.parsers.json(
 
          // Add control buttons
 
-         analytics = '<div id="panelControllers"><ul><li><button id="analbutton" class="panelControlBtn" data-id="analytics">This Text</li><li><button id="searbutton" class="panelControlBtn" data-id="search_analytics">Other Texts</button></li></ul></div>' + analytics;
+         analytics = '<div id="panelControllers"><ul><li><button id="analbutton" class="panelControlBtn" data-id="analytics">Stats</li><li><button id="searbutton" class="panelControlBtn" data-id="search_analytics">Connections</button></li><li><button id="miningbutton" class="panelControlBtn" data-id="mining_analytics">Text Mining</button></li></ul></div>' + analytics;
 
          var currentPanel = 'analytics';
 
@@ -3735,6 +3735,7 @@ sigma.parsers.json(
             $('#analytics').show();
 
             $("#searbutton").css('background','#ededed');
+            $("#miningbutton").css('background','#ededed');
 
 
               $('.panelControlBtn').on("click", function() {
@@ -3743,16 +3744,27 @@ sigma.parsers.json(
                   $("#mainanalytics").fadeOut('fast', function() {
                   $("#searchanalytics").fadeIn('fast');
                   $("#analbutton").css('background','#ededed');
+                  $("#miningbutton").css('background','#ededed');
                   $("#searbutton").css('background','#ffffff');
 
                   });
                   currentPanel = ID;
                 }
-                if (ID == 'analytics') {
+                else if (ID == 'analytics') {
                   $("#searchanalytics").fadeOut('fast', function() {
                   $("#mainanalytics").fadeIn('fast');
                   $("#analbutton").css('background','#ffffff');
                   $("#searbutton").css('background','#ededed');
+                  $("#miningbutton").css('background','#ededed');
+                  });
+                  currentPanel = ID;
+                }
+                else if (ID == 'mining_analytics') {
+                  $("#searchanalytics").fadeOut('fast', function() {
+                  $("#mainanalytics").fadeIn('fast');
+                  $("#analbutton").css('background','#ededed');
+                  $("#searbutton").css('background','#ededed');
+                  $("#miningbutton").css('background','#ffffff');
                   });
                   currentPanel = ID;
                 }
