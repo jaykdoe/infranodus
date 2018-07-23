@@ -3747,6 +3747,27 @@ sigma.parsers.json(
                   $("#miningbutton").css('background','#ededed');
                   $("#searbutton").css('background','#ffffff');
 
+
+                  $.post('/api/user/connectedcontexts', 'keywords=survival')
+                          .done(function(res) {
+                              //3. Receive the server response, no need to emit an event
+                              if (res) {
+                                  console.log(res);
+
+
+                              }
+                              else if (res.errormsg) {
+                              
+                                  alert(res.errormsg);
+                              }
+                              else {
+                                  alert('Something went wrong, please, try again...');
+                              }
+                          })
+                          .fail(function(res) {
+                              alert("Server Error: " + res.status + " " + res.statusText);
+                          });
+
                   });
                   currentPanel = ID;
                 }
