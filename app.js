@@ -122,8 +122,9 @@ app.get('/api/public/nodes/:user?/:context?', validate.getUserID(), validate.get
 app.get('/api/user/statements/:context?', api.entries);
 
 // Get connected texts through internal connector function
-app.get('/api/user/connectedcontexts/',  api.connectedcontexts);
-app.get('/api/connectedcontexts/',  api.connectedcontextsoutside);
+app.get('/api/connectedcontexts/',  validate.getUserID(), api.connectedcontextsoutside);
+
+app.get('/api/:user/connectedcontexts/',   api.connectedcontexts);
 
 
 // External API to get nodes and statements

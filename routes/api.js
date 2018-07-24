@@ -71,7 +71,7 @@ exports.entries = function(req, res, next){
 
 exports.connectedcontexts = function(req, res, next){
 
-    express.basicAuth(User.authenticate);
+//    express.basicAuth(User.authenticate);
 
     // This is for pagination, but not currently used
     var page = req.page;
@@ -82,22 +82,35 @@ exports.connectedcontexts = function(req, res, next){
 
     console.log('Query for UserConnectedContexts');
     console.log(req.query);
+    console.log(req.user);
 
 
     // Define whose graph is seen (receiver) and who sees the graph (perceiver)
     var receiver = '';
     var perceiver = '';
 
-    // Set that by default the one who sees can only see their own graph, if logged in
-    // TODO implement viewing public data of others
-
-    if (res.locals.user) {
+    // Is the user logged in? Then he is the receiver but ONLY when he's NOT requesting the public user view (even for himself)
+    if (res.locals.user && !req.params.user) {
         receiver = res.locals.user.uid;
-        perceiver = res.locals.user.uid;
+    }
+
+    // Is there user in the URL and we know their ID already? Then the receiver will see their graph...
+    if (req.params.user && res.locals.viewuser) {
+        perceiver = res.locals.viewuser;
+    }
+
+    // Otherwise they see their own
+    else {
+        if (res.locals.user) {
+            perceiver = res.locals.user.uid;
+        }
     }
 
     var keywords = [];
 
+    console.log('receiverperceiver');
+    console.log(receiver);
+        console.log(perceiver);
     keywords.push(req.query);
 
     Entry.getConnectedContexts(receiver, perceiver, keywords, function(err, contexts){
@@ -115,13 +128,10 @@ exports.connectedcontexts = function(req, res, next){
 
 exports.connectedcontextsoutside = function(req, res, next){
 
-    express.basicAuth(User.authenticate);
 
     // This is for pagination, but not currently used
     var page = req.page;
 
-    // Define user
-    res.locals.user = req.user;
 
 
     console.log('Query for AllConnectedContexts');
@@ -132,12 +142,27 @@ exports.connectedcontextsoutside = function(req, res, next){
     var receiver = '';
     var perceiver = '';
 
+    res.locals.user = req.user;
+
+
     // Set that by default the one who sees can only see their own graph, if logged in
     // TODO implement viewing public data of others
 
-    if (res.locals.user) {
+    // Is the user logged in? Then he is the receiver but ONLY when he's NOT requesting the public user view (even for himself)
+    if (res.locals.user && !req.params.user) {
         receiver = res.locals.user.uid;
-        perceiver = res.locals.user.uid;
+    }
+
+    // Is there user in the URL and we know their ID already? Then the receiver will see their graph...
+    if (req.params.user && res.locals.viewuser) {
+        perceiver = res.locals.viewuser;
+    }
+
+    // Otherwise they see their own
+    else {
+        if (res.locals.user) {
+            perceiver = res.locals.user.uid;
+        }
     }
 
     var keywords = [];
@@ -163,6 +188,8 @@ exports.nodes = function(req, res, next){
     var contexts = [];
 
     var showcontexts = '';
+
+    console.log(req.user);
 
     // The one who sees the statements (hello Tengo @1Q84 #Murakami)
     var receiver = '';
