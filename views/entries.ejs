@@ -3637,8 +3637,10 @@ sigma.parsers.json(
 
          var recommender_start = 'next idea tip: what is the relation between "';
          var recommender = '';
-         var analytics = "<div id='searchanalytics'><div class='headline'>Most Relevant Texts:<br></div>";
-         analytics += '<div id="similarlist">list of texts</div>';
+         var analytics = "<div id='searchanalytics'><div class='headline'>Your Texts:<br></div>";
+         analytics += '<div id="similarlist">list of your texts</div><br>';
+         analytics += '<div class="headline">Public Texts:<br></div>';
+         analytics += '<div id="similaroutside">list of public texts</div><br>&nbsp;';
          analytics += '</div>';
 
          analytics = analytics + "<div id='mainanalytics'><div class='headline'>Main Topics Detected:<br></div>"
@@ -3756,6 +3758,22 @@ sigma.parsers.json(
                       squery += pinnedNodes[i] + '+';
                     }
                   }
+                  else {
+
+                    if (most_influential == 'bc' && toppbc_nodes[0].bc > 0) {
+                      for (var ind in toppbc_nodes) {
+                          if (toppbc_nodes[ind].bc > 0) {
+                            squery += toppbc_nodes[ind].label + '+';
+                          }
+                      }
+                    }
+                    else {
+                      for (var ind in degree_nodes) {
+                          squery += degree_nodes[ind].label + '+';
+                      }
+                    }
+                  }
+
                   squery = squery.slice(0, -1);
 
                   $.getJSON("/api/user/connectedcontexts/" + squery, function( data ) {
