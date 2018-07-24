@@ -3789,13 +3789,17 @@ sigma.parsers.json(
                   $("#searchterms").html('<em>' + squery.replace(/\+/g, ' ') + '</em>');
 
                   // Request user's context graphs (texts) which contain either the top nodes or the selected ones
-                  $.getJSON("/api/" + current_user + "/connectedcontexts/?keywords=" + squery, function( data ) {
+                  console.log('<%=perceivername %>'); // public view
+                  console.log('<%=receivername %>'); // private view
+                  $.getJSON("/api/" + current_user + "/connectedcontexts/?keywords=" + squery + "&user=" + current_user, function( data ) {
                     var items = [];
                     $.each( data.slice(0,7), function( key, val ) {
                       <% if (perceivername) { %>
                       items.push("<a href='/<%= perceivername %>/" + val.name + "?keywords=" + squery + "'>" + val.name + "</a><br>");
+
                       <% } else  { %>
                       items.push("<a href='/<%= receivername %>/" + val.name + "/edit?keywords=" + squery + "'>" + val.name + "</a><br>");
+                      
                       <% } %>
                     });
 

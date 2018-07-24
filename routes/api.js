@@ -81,8 +81,7 @@ exports.connectedcontexts = function(req, res, next){
 
 
     console.log('Query for UserConnectedContexts');
-    console.log(req.query);
-    console.log(req.user);
+
 
 
     // Define whose graph is seen (receiver) and who sees the graph (perceiver)
@@ -106,11 +105,12 @@ exports.connectedcontexts = function(req, res, next){
         }
     }
 
+    if (req.user) {
+      receiver = req.user.uid;
+    }
     var keywords = [];
 
-    console.log('receiverperceiver');
-    console.log(receiver);
-        console.log(perceiver);
+
     keywords.push(req.query);
 
     Entry.getConnectedContexts(receiver, perceiver, keywords, function(err, contexts){
