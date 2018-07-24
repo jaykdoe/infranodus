@@ -3645,6 +3645,12 @@ sigma.parsers.json(
          analytics += '<div id="similaroutside">none found</div><br>&nbsp;';
          analytics += '</div>';
 
+         analytics += "<div id='mininganalytics'>The most prominent topics in this text according to LDA:<br>";
+         analytics += "<div id='similarLDA'></div><br>"
+         analytics += "<button id='miningbutton' class='panelControlBtn' data-id='mining_analytics'>LDA Data</button>";
+         analytics += "</div>";
+
+
          analytics = analytics + "<div id='mainanalytics'><div class='headline'>Main Topics Detected:<br></div>"
          analytics += "1: "
          for (var j = 0; j < topp_communities.length; j++) {
@@ -3724,13 +3730,13 @@ sigma.parsers.json(
 
          analytics += "<br><br><div id='graphstats'></div>";
 
-         analytics += "<br><br><a href='#' id='resetgraph'>reset graph selections</a>";
+         analytics += "<br><br><button id='resetgraph' class='panelControlBtn'>Reset Graph</button> &nbsp; <button id='miningbutton' class='panelControlBtn' data-id='mining_analytics'>LDA Data</button>";
 
          analytics += "</div>";
 
          // Add control buttons
 
-         analytics = '<div id="panelControllers"><ul><li><button id="analbutton" class="panelControlBtn" data-id="analytics">Stats</li><li><button id="searbutton" class="panelControlBtn" data-id="search_analytics">Connections</button></li><li><button id="miningbutton" class="panelControlBtn" data-id="mining_analytics">Text Mining</button></li></ul></div>' + analytics;
+         analytics = '<div id="panelControllers"><ul><li><button id="analbutton" class="panelControlBtn" data-id="analytics">Stats</li><li><button id="searbutton" class="panelControlBtn" data-id="search_analytics">Connections</button></li></ul></div>' + analytics;
 
          var currentPanel = 'analytics';
 
@@ -3743,14 +3749,17 @@ sigma.parsers.json(
             $('#analytics').html(analytics);
             $('#analytics').show();
 
+            $("#analbutton").css('background','#ffffff');
             $("#searbutton").css('background','#ededed');
             $("#miningbutton").css('background','#ededed');
+            $("#resetgraph").css('background','#ededed');
 
 
               $('.panelControlBtn').on("click", function() {
                 var ID = $(this).attr('data-id');
                 if (ID == 'search_analytics') {
                   $("#mainanalytics").fadeOut('fast', function() {
+                  $("#mininganalytics").fadeOut('fast');
                   $("#searchanalytics").fadeIn('fast');
                   $("#analbutton").css('background','#ededed');
                   $("#miningbutton").css('background','#ededed');
@@ -3823,6 +3832,7 @@ sigma.parsers.json(
                 }
                 else if (ID == 'analytics') {
                   $("#searchanalytics").fadeOut('fast', function() {
+                  $("#mininganalytics").fadeOut('fast');
                   $("#mainanalytics").fadeIn('fast');
                   $("#analbutton").css('background','#ffffff');
                   $("#searbutton").css('background','#ededed');
@@ -3831,11 +3841,18 @@ sigma.parsers.json(
                   currentPanel = ID;
                 }
                 else if (ID == 'mining_analytics') {
+
                   $("#searchanalytics").fadeOut('fast', function() {
-                  $("#mainanalytics").fadeIn('fast');
+                  $("#mainanalytics").fadeOut('fast');
+                  $("#mininganalytics").fadeIn('fast');
                   $("#analbutton").css('background','#ededed');
                   $("#searbutton").css('background','#ededed');
                   $("#miningbutton").css('background','#ffffff');
+
+                  var html = "n/a";
+
+                  $("#similarLDA").html(html);
+
                   });
                   currentPanel = ID;
                 }
@@ -3851,6 +3868,8 @@ sigma.parsers.json(
            $('#analytics').html(analytics);
            $('#analytics').hide();
            $('#analyticsbutton').removeClass('analytics-on');
+           $("#miningbutton").css('background','#ededed');
+
          }
 
          if (hide_always && !show_analytics) {
