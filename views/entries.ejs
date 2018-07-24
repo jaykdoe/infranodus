@@ -3747,26 +3747,31 @@ sigma.parsers.json(
                   $("#miningbutton").css('background','#ededed');
                   $("#searbutton").css('background','#ffffff');
 
+                  // Show similar texts following a search query on the Connections pane
 
-                  $.post('/api/user/connectedcontexts', 'keywords=survival')
-                          .done(function(res) {
-                              //3. Receive the server response, no need to emit an event
-                              if (res) {
-                                  console.log(res);
+                  var squery = '?keywords=';
+
+                  if (pinnedNodes.length > 0) {
+                    for (var i = 0; i < pinnedNodes.length; i++) {
+                      squery += pinnedNodes[i] + '+';
+                    }
+                  }
+                  squery = squery.slice(0, -1);
+
+                  $.getJSON("/api/user/connectedcontexts/" + squery, function( data ) {
+                    var items = [];
+                    $.each( data, function( key, val ) {
+                      <% if (perceivername) { %>
+                      items.push("<a href='/<%= perceivername %>/" + val.name + "'>" + val.name + "</a><br>");
+                      <% } else  { %>
+                      items.push("<a href='/<%= receivername %>/" + val.name + "/edit'>" + val.name + "</a><br>");
+                      <% } %>
+                    });
+                    console.log(pinnedNodes);
+                    $("#similarlist").html(items.join(""));
 
 
-                              }
-                              else if (res.errormsg) {
-                              
-                                  alert(res.errormsg);
-                              }
-                              else {
-                                  alert('Something went wrong, please, try again...');
-                              }
-                          })
-                          .fail(function(res) {
-                              alert("Server Error: " + res.status + " " + res.statusText);
-                          });
+                  });
 
                   });
                   currentPanel = ID;
