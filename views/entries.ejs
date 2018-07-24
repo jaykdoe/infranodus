@@ -3637,7 +3637,7 @@ sigma.parsers.json(
 
          var recommender_start = 'next idea tip: what is the relation between "';
          var recommender = '';
-         var analytics = "<div id='searchanalytics'><div class='headline'>Your Texts:<br></div>";
+         var analytics = "<div id='searchanalytics'>The following texts contain the nodes <div id='searchterms'></div><br><div class='headline'>Your Texts:<br></div>";
          analytics += '<div id="similarlist">list of your texts</div><br>';
          analytics += '<div class="headline">Public Texts:<br></div>';
          analytics += '<div id="similaroutside">list of public texts</div><br>&nbsp;';
@@ -3696,20 +3696,25 @@ sigma.parsers.json(
 
          console.log(toppbc_nodes);
 
+
          if (most_influential == 'bc' && toppbc_nodes[0].bc > 0) {
            for (var ind in toppbc_nodes) {
                if (toppbc_nodes[ind].bc > 0) {
                  analytics += '<div class="inlinesquare '+toppbc_nodes[ind].key+'"></div> <a href="#" class="top_nodes">' + toppbc_nodes[ind].label + '</a> &nbsp;';
+
                }
            }
            analytics = analytics.slice(0, -7);
+
 
          }
          else {
            for (var ind in degree_nodes) {
                analytics += '<div class="inlinesquare '+degree_nodes[ind].id+'"></div> <a href="#" class="top_nodes">' + degree_nodes[ind].label + '</a> &nbsp;';
+
            }
            analytics = analytics.slice(0, -7);
+
 
          }
 
@@ -3751,7 +3756,7 @@ sigma.parsers.json(
 
                   // Show similar texts following a search query on the Connections pane
 
-                  var squery = '?keywords=';
+                  var squery = '';
 
                   if (pinnedNodes.length > 0) {
                     for (var i = 0; i < pinnedNodes.length; i++) {
@@ -3774,9 +3779,15 @@ sigma.parsers.json(
                     }
                   }
 
+                  // Formed search query for JSON GET
                   squery = squery.slice(0, -1);
 
-                  $.getJSON("/api/user/connectedcontexts/" + squery, function( data ) {
+
+                  // Add search terms into the Statistics pane
+                  $("#searchterms").html('<em>' + squery.replace(/\+/g, ' ') + '</em>');
+
+                  // Request user's context graphs (texts) which contain either the top nodes or the selected ones
+                  $.getJSON("/api/user/connectedcontexts/?keywords=" + squery, function( data ) {
                     var items = [];
                     $.each( data, function( key, val ) {
                       <% if (perceivername) { %>
@@ -3785,9 +3796,23 @@ sigma.parsers.json(
                       items.push("<a href='/<%= receivername %>/" + val.name + "/edit'>" + val.name + "</a><br>");
                       <% } %>
                     });
-                    console.log(pinnedNodes);
+
                     $("#similarlist").html(items.join(""));
 
+                  });
+
+                  // Request user's context graphs (texts) which contain either the top nodes or the selected ones
+                  $.getJSON("/api/connectedcontexts/?keywords=" + squery, function( data ) {
+                    var items = [];
+                    $.each( data, function( key, val ) {
+                      <% if (perceivername) { %>
+                      items.push("<a href='/<%= perceivername %>/" + val.name + "'>" + val.name + "</a><br>");
+                      <% } else  { %>
+                      items.push("<a href='/<%= receivername %>/" + val.name + "/edit'>" + val.name + "</a><br>");
+                      <% } %>
+                    });
+
+                    $("#similaroutside").html(items.join(""));
 
                   });
 
