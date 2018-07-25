@@ -3649,6 +3649,7 @@ sigma.parsers.json(
          analytics += "<div id='topicsLDA'></div><br>";
          analytics += "<div class='headline'>Most Influential Words</div> (main topic and words according to LDA):<br>";
          analytics += "<div id='termsLDA'></div><br>";
+         analytics += "LDA works only for English-language texts at the moment. More support is coming soon, subscribe  @noduslabs to be informed.<br><br>";
          analytics += "<button id='miningbutton' class='panelControlBtn' data-id='mining_analytics'>LDA Data</button> <button id='analbutton' class='panelControlBtn' data-id='analytics'>Graph Stats</button>";
          analytics += "</div>";
 
@@ -3896,7 +3897,7 @@ sigma.parsers.json(
                       for (pall in palette) {
                             if (document.getElementsByClassName("inlinesquare " + pall)) {
                               for (var i = 0; i < document.getElementsByClassName("inlinesquare " + pall).length; i++) {
-                                
+
                                 document.getElementsByClassName("inlinesquare " + pall)[i].style.backgroundColor=rgbToHex(palette[pall]._rgb[0],palette[pall]._rgb[1],palette[pall]._rgb[2]);
                               }
                             }
