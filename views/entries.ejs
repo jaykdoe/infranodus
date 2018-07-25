@@ -3645,13 +3645,15 @@ sigma.parsers.json(
          analytics += '<div id="similaroutside">none found</div><br>&nbsp;';
          analytics += '</div>';
 
-         analytics += "<div id='mininganalytics'>The most prominent topics in this text according to LDA:<br>";
-         analytics += "<div id='similarLDA'></div><br>"
-         analytics += "<button id='miningbutton' class='panelControlBtn' data-id='mining_analytics'>LDA Data</button>";
+         analytics += "<div id='mininganalytics'><div class='headline'>Main Topics</div> (according to Latent Dirichlet Allocation):<br>";
+         analytics += "<div id='topicsLDA'></div><br>";
+         analytics += "<div class='headline'>Most Influential Words</div> (main topic and words according to LDA):<br>";
+         analytics += "<div id='termsLDA'></div><br>";
+         analytics += "<button id='miningbutton' class='panelControlBtn' data-id='mining_analytics'>LDA Data</button> <button id='analbutton' class='panelControlBtn' data-id='analytics'>Graph Stats</button>";
          analytics += "</div>";
 
 
-         analytics = analytics + "<div id='mainanalytics'><div class='headline'>Main Topics Detected:<br></div>"
+         analytics = analytics + "<div id='mainanalytics'><div class='headline'>Main Topics</div> (communities detected):<br>"
          analytics += "1: "
          for (var j = 0; j < topp_communities.length; j++) {
 
@@ -3697,7 +3699,7 @@ sigma.parsers.json(
 
         // TODO to move parsing logic away from this function
 
-         analytics += "<br><br><div class='headline'>Most Influential Words:<br></div>";
+         analytics += "<br><br><div class='headline'>Most Influential Words";
 
 
          var toppbc_nodes = topbc_nodes.slice(0,4);
@@ -3706,8 +3708,10 @@ sigma.parsers.json(
 
 
          if (most_influential == 'bc' && toppbc_nodes[0].bc > 0) {
+           analytics += '</div> (highest betweenness centrality):<br>';
            for (var ind in toppbc_nodes) {
                if (toppbc_nodes[ind].bc > 0) {
+
                  analytics += '<div class="inlinesquare '+toppbc_nodes[ind].key+'"></div> <a href="#" class="top_nodes">' + toppbc_nodes[ind].label + '</a> &nbsp;';
 
                }
@@ -3717,6 +3721,7 @@ sigma.parsers.json(
 
          }
          else {
+           analytics += '</div> (highest degree):<br>';
            for (var ind in degree_nodes) {
                analytics += '<div class="inlinesquare '+degree_nodes[ind].id+'"></div> <a href="#" class="top_nodes">' + degree_nodes[ind].label + '</a> &nbsp;';
            }
@@ -3735,7 +3740,7 @@ sigma.parsers.json(
 
          // Add control buttons
 
-         analytics = '<div id="panelControllers"><ul><li><button id="analbutton" class="panelControlBtn" data-id="analytics">Stats</li><li><button id="searbutton" class="panelControlBtn" data-id="search_analytics">Connections</button></li></ul></div>' + analytics;
+         analytics = '<div id="panelControllers"><ul><li><button id="analbutton" class="panelControlBtn" data-id="analytics">This Text</li><li><button id="searbutton" class="panelControlBtn" data-id="search_analytics">Related Texts</button></li></ul></div>' + analytics;
 
          var currentPanel = 'analytics';
 
@@ -3850,7 +3855,7 @@ sigma.parsers.json(
 
                   var html = "n/a";
 
-                  $.getJSON("/api/user/lda/" + current_context, function( data ) {
+                  $.getJSON("/api/user/lda/topics/" + current_context, function( data ) {
                     var items = [];
                     html = '';
                     for (var i = 0; i < data.length; i++) {
@@ -3867,17 +3872,43 @@ sigma.parsers.json(
                     }
 
 
-                    $("#similarLDA").html(items.join(""));
+                    $("#topicsLDA").html(items.join(""));
 
-                    for (pall in palette) {
-                          if (document.getElementsByClassName("inlinesquare " + pall)) {
-                            for (var i = 0; i < document.getElementsByClassName("inlinesquare " + pall).length; i++) {
-                              console.log(document.getElementsByClassName("inlinesquare " + pall));
-                              document.getElementsByClassName("inlinesquare " + pall)[i].style.backgroundColor=rgbToHex(palette[pall]._rgb[0],palette[pall]._rgb[1],palette[pall]._rgb[2]);
-                            }
+                    $.getJSON("/api/user/lda/terms/" + current_context, function( data ) {
+                      var items = [];
+                      html = '';
+                      for (var i = 0; i < data.length; i++) {
+
+                        for (var j = 0; j < data[i].length; j++) {
+                          //console.log(nodeIDs[data[i][j].term]);
+                          items.push('<div class="inlinesquare ' + community_assignment_result['communities'][nodeIDs[data[i][j].term]] + '"></div> <a href="#" class="top_nodes">' + data[i][j].term + '</a> &nbsp;');
+                          if (j == (data[i].length - 1)) {
+                            items.push('<br>')
                           }
-                    }
-                    top_nodes_activate();
+                        }
+
+
+                      }
+
+
+                      $("#termsLDA").html(items.join(""));
+
+                      for (pall in palette) {
+                            if (document.getElementsByClassName("inlinesquare " + pall)) {
+                              for (var i = 0; i < document.getElementsByClassName("inlinesquare " + pall).length; i++) {
+                                console.log(document.getElementsByClassName("inlinesquare " + pall));
+                                document.getElementsByClassName("inlinesquare " + pall)[i].style.backgroundColor=rgbToHex(palette[pall]._rgb[0],palette[pall]._rgb[1],palette[pall]._rgb[2]);
+                              }
+                            }
+                      }
+                      top_nodes_activate();
+
+
+
+
+                    });
+
+
 
 
 

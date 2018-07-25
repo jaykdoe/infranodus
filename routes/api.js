@@ -94,7 +94,9 @@ exports.entriesLDA = function(req, res, next){
     var contexts = [];
     contexts.push(req.params.context);
 
-    Entry.getLDA(receiver, perceiver, contexts, function(err, entries){
+    var LDA_type = req.params.type;
+
+    Entry.getLDA(receiver, perceiver, contexts, LDA_type, function(err, entries){
 
         if (err) return next(err);
 
