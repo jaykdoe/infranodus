@@ -120,7 +120,7 @@ app.get('/api/user/nodes/:context?', api.nodes);
 app.get('/api/public/nodes/:user?/:context?', validate.getUserID(), validate.getContextPrivacy(), api.nodes);
 
 app.get('/api/user/statements/:context?', api.entries);
-app.get('/api/user/lda/:type/:context?', api.entriesLDA);
+app.get('/api/:user/lda/:type/:context?', validate.getUserID(), api.entriesLDA);
 
 // Get connected texts through internal connector function
 app.get('/api/connectedcontexts/',  validate.getUserID(), api.connectedcontextsoutside);

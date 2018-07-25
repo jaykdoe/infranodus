@@ -3855,7 +3855,7 @@ sigma.parsers.json(
 
                   var html = "n/a";
 
-                  $.getJSON("/api/user/lda/topics/" + current_context, function( data ) {
+                  $.getJSON("/api/" + current_user + "/lda/topics/" + current_context, function( data ) {
                     var items = [];
                     html = '';
                     for (var i = 0; i < data.length; i++) {
@@ -3874,7 +3874,7 @@ sigma.parsers.json(
 
                     $("#topicsLDA").html(items.join(""));
 
-                    $.getJSON("/api/user/lda/terms/" + current_context, function( data ) {
+                    $.getJSON("/api/" + current_user + "/lda/terms/" + current_context, function( data ) {
                       var items = [];
                       html = '';
                       for (var i = 0; i < data.length; i++) {
