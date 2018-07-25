@@ -3719,7 +3719,6 @@ sigma.parsers.json(
          else {
            for (var ind in degree_nodes) {
                analytics += '<div class="inlinesquare '+degree_nodes[ind].id+'"></div> <a href="#" class="top_nodes">' + degree_nodes[ind].label + '</a> &nbsp;';
-
            }
            analytics = analytics.slice(0, -7);
 
@@ -3851,7 +3850,41 @@ sigma.parsers.json(
 
                   var html = "n/a";
 
-                  $("#similarLDA").html(html);
+                  $.getJSON("/api/user/lda/" + current_context, function( data ) {
+                    var items = [];
+                    html = '';
+                    for (var i = 0; i < data.length; i++) {
+
+                      for (var j = 0; j < data[i].length; j++) {
+                        //console.log(nodeIDs[data[i][j].term]);
+                        items.push('<div class="inlinesquare ' + community_assignment_result['communities'][nodeIDs[data[i][j].term]] + '"></div> <a href="#" class="top_nodes">' + data[i][j].term + '</a> &nbsp;');
+                        if (j == (data[i].length - 1)) {
+                          items.push('<br>')
+                        }
+                      }
+
+
+                    }
+
+
+                    $("#similarLDA").html(items.join(""));
+
+                    for (pall in palette) {
+                          if (document.getElementsByClassName("inlinesquare " + pall)) {
+                            for (var i = 0; i < document.getElementsByClassName("inlinesquare " + pall).length; i++) {
+                              console.log(document.getElementsByClassName("inlinesquare " + pall));
+                              document.getElementsByClassName("inlinesquare " + pall)[i].style.backgroundColor=rgbToHex(palette[pall]._rgb[0],palette[pall]._rgb[1],palette[pall]._rgb[2]);
+                            }
+                          }
+                    }
+                    top_nodes_activate();
+
+
+
+
+                  });
+
+
 
                   });
                   currentPanel = ID;
@@ -4152,35 +4185,39 @@ sigma.parsers.json(
      //console.log(sigma.instances(0).graph.nodes());
 }
 
-      $('.top_nodes').click(function(){
-        var nodeLabel = $(this).text();
+      top_nodes_activate();
+
+      function top_nodes_activate() {
+        $('.top_nodes').click(function(){
+          var nodeLabel = $(this).text();
 
 
-        if (pinnedNodes.indexOf(nodeLabel) < 0) {
-            pinnedNodes.push(nodeLabel);
-            $(this).attr('style','color: #0089e0 !important; text-decoration: underline !important;');
-        }
-        else {
-            var pinnedIndex = pinnedNodes.indexOf(nodeLabel);
-            if (pinnedIndex > -1) {
-                pinnedNodes.splice(pinnedIndex,1);
-                $(this).removeAttr('style');
-                $('.entry').fadeIn(400);
-            }
+          if (pinnedNodes.indexOf(nodeLabel) < 0) {
+              pinnedNodes.push(nodeLabel);
+              $(this).attr('style','color: #0089e0 !important; text-decoration: underline !important;');
+          }
+          else {
+              var pinnedIndex = pinnedNodes.indexOf(nodeLabel);
+              if (pinnedIndex > -1) {
+                  pinnedNodes.splice(pinnedIndex,1);
+                  $(this).removeAttr('style');
+                  $('.entry').fadeIn(400);
+              }
 
-        }
+          }
 
-        // console.log("node clicked, now will filter for nodes " + pinnedNodes);
-        socket.emit('node click', {pinnedNodes: pinnedNodes, splicedNodes: splicedNodes, nodeLabel: nodeLabel, pinnedIndex: pinnedIndex});
+          // console.log("node clicked, now will filter for nodes " + pinnedNodes);
+          socket.emit('node click', {pinnedNodes: pinnedNodes, splicedNodes: splicedNodes, nodeLabel: nodeLabel, pinnedIndex: pinnedIndex});
 
 
-        // Now show / hide statements that have the search field
+          // Now show / hide statements that have the search field
 
-        filter_statements(pinnedNodes);
-        return false;
+          filter_statements(pinnedNodes);
+          return false;
 
-      });
+        });
 
+      }
 
 
       var commClicked = [];

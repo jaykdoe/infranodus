@@ -69,6 +69,46 @@ exports.entries = function(req, res, next){
     });
 };
 
+exports.entriesLDA = function(req, res, next){
+
+    express.basicAuth(User.authenticate);
+
+    // This is for pagination, but not currently used
+    var page = req.page;
+
+    // Define user
+    res.locals.user = req.user;
+
+    // Define whose graph is seen (receiver) and who sees the graph (perceiver)
+    var receiver = '';
+    var perceiver = '';
+
+    // Set that by default the one who sees can only see their own graph, if logged in
+    // TODO implement viewing public data of others
+
+    if (res.locals.user) {
+        receiver = res.locals.user.uid;
+        perceiver = res.locals.user.uid;
+    }
+
+    var contexts = [];
+    contexts.push(req.params.context);
+
+    Entry.getLDA(receiver, perceiver, contexts, function(err, entries){
+
+        if (err) return next(err);
+
+          res.format({
+              json: function(){
+                  res.send(entries);
+              }
+
+
+          });
+
+    });
+};
+
 exports.connectedcontexts = function(req, res, next){
 
 //    express.basicAuth(User.authenticate);

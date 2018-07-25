@@ -16,6 +16,7 @@
     "google": "^2.1.0",
     "imap": "^0.8.19",
     "languagedetect": "^1.1.1",
+    "lda": "^0.2.0",
     "mimelib": "^0.3.1",
     "natural": "^0.6.1",
     "neo4j-driver": "^1.5.3",
