@@ -3645,7 +3645,16 @@ sigma.parsers.json(
          analytics += '<div id="similaroutside">none found</div><br>&nbsp;';
          analytics += '</div>';
 
-         analytics = analytics + "<div id='mainanalytics'><div class='headline'>Main Topics Detected:<br></div>"
+         analytics += "<div id='mininganalytics'><div class='headline'>Main Topics</div> (according to Latent Dirichlet Allocation):<br>";
+         analytics += "<div id='topicsLDA'></div><br>";
+         analytics += "<div class='headline'>Most Influential Words</div> (main topic and words according to LDA):<br>";
+         analytics += "<div id='termsLDA'></div><br>";
+         analytics += "LDA works only for English-language texts at the moment. More support is coming soon, subscribe  @noduslabs to be informed.<br><br>";
+         analytics += "<button id='miningbutton' class='panelControlBtn' data-id='mining_analytics'>LDA Data</button> <button id='analbutton' class='panelControlBtn' data-id='analytics'>Graph Stats</button>";
+         analytics += "</div>";
+
+
+         analytics = analytics + "<div id='mainanalytics'><div class='headline'>Main Topics</div> (communities detected):<br>"
          analytics += "1: "
          for (var j = 0; j < topp_communities.length; j++) {
 
@@ -3691,7 +3700,7 @@ sigma.parsers.json(
 
         // TODO to move parsing logic away from this function
 
-         analytics += "<br><br><div class='headline'>Most Influential Words:<br></div>";
+         analytics += "<br><br><div class='headline'>Most Influential Words";
 
 
          var toppbc_nodes = topbc_nodes.slice(0,4);
@@ -3700,8 +3709,10 @@ sigma.parsers.json(
 
 
          if (most_influential == 'bc' && toppbc_nodes[0].bc > 0) {
+           analytics += '</div> (highest betweenness centrality):<br>';
            for (var ind in toppbc_nodes) {
                if (toppbc_nodes[ind].bc > 0) {
+
                  analytics += '<div class="inlinesquare '+toppbc_nodes[ind].key+'"></div> <a href="#" class="top_nodes">' + toppbc_nodes[ind].label + '</a> &nbsp;';
 
                }
@@ -3711,9 +3722,9 @@ sigma.parsers.json(
 
          }
          else {
+           analytics += '</div> (highest degree):<br>';
            for (var ind in degree_nodes) {
                analytics += '<div class="inlinesquare '+degree_nodes[ind].id+'"></div> <a href="#" class="top_nodes">' + degree_nodes[ind].label + '</a> &nbsp;';
-
            }
            analytics = analytics.slice(0, -7);
 
@@ -3724,13 +3735,13 @@ sigma.parsers.json(
 
          analytics += "<br><br><div id='graphstats'></div>";
 
-         analytics += "<br><br><a href='#' id='resetgraph'>reset graph selections</a>";
+         analytics += "<br><br><button id='resetgraph' class='panelControlBtn'>Reset Graph</button> &nbsp; <button id='miningbutton' class='panelControlBtn' data-id='mining_analytics'>LDA Data</button>";
 
          analytics += "</div>";
 
          // Add control buttons
 
-         analytics = '<div id="panelControllers"><ul><li><button id="analbutton" class="panelControlBtn" data-id="analytics">Stats</li><li><button id="searbutton" class="panelControlBtn" data-id="search_analytics">Connections</button></li><li><button id="miningbutton" class="panelControlBtn" data-id="mining_analytics">Text Mining</button></li></ul></div>' + analytics;
+         analytics = '<div id="panelControllers"><ul><li><button id="analbutton" class="panelControlBtn" data-id="analytics">This Text</li><li><button id="searbutton" class="panelControlBtn" data-id="search_analytics">Related Texts</button></li></ul></div>' + analytics;
 
          var currentPanel = 'analytics';
 
@@ -3743,14 +3754,17 @@ sigma.parsers.json(
             $('#analytics').html(analytics);
             $('#analytics').show();
 
+            $("#analbutton").css('background','#ffffff');
             $("#searbutton").css('background','#ededed');
             $("#miningbutton").css('background','#ededed');
+            $("#resetgraph").css('background','#ededed');
 
 
               $('.panelControlBtn').on("click", function() {
                 var ID = $(this).attr('data-id');
                 if (ID == 'search_analytics') {
                   $("#mainanalytics").fadeOut('fast', function() {
+                  $("#mininganalytics").fadeOut('fast');
                   $("#searchanalytics").fadeIn('fast');
                   $("#analbutton").css('background','#ededed');
                   $("#miningbutton").css('background','#ededed');
@@ -3823,6 +3837,7 @@ sigma.parsers.json(
                 }
                 else if (ID == 'analytics') {
                   $("#searchanalytics").fadeOut('fast', function() {
+                  $("#mininganalytics").fadeOut('fast');
                   $("#mainanalytics").fadeIn('fast');
                   $("#analbutton").css('background','#ffffff');
                   $("#searbutton").css('background','#ededed');
@@ -3831,11 +3846,78 @@ sigma.parsers.json(
                   currentPanel = ID;
                 }
                 else if (ID == 'mining_analytics') {
+
                   $("#searchanalytics").fadeOut('fast', function() {
-                  $("#mainanalytics").fadeIn('fast');
+                  $("#mainanalytics").fadeOut('fast');
+                  $("#mininganalytics").fadeIn('fast');
                   $("#analbutton").css('background','#ededed');
                   $("#searbutton").css('background','#ededed');
                   $("#miningbutton").css('background','#ffffff');
+
+                  var html = "n/a";
+
+                  $.getJSON("/api/" + current_user + "/lda/topics/" + current_context, function( data ) {
+                    var items = [];
+                    html = '';
+                    for (var i = 0; i < data.length; i++) {
+
+                      for (var j = 0; j < data[i].length; j++) {
+                        //console.log(nodeIDs[data[i][j].term]);
+                        items.push('<div class="inlinesquare ' + community_assignment_result['communities'][nodeIDs[data[i][j].term]] + '"></div> <a href="#" class="top_nodes">' + data[i][j].term + '</a> &nbsp;');
+                        if (j == (data[i].length - 1)) {
+                          items.push('<br>')
+                        }
+                      }
+
+
+                    }
+
+
+                    $("#topicsLDA").html(items.join(""));
+
+                    $.getJSON("/api/" + current_user + "/lda/terms/" + current_context, function( data ) {
+                      var items = [];
+                      html = '';
+                      for (var i = 0; i < data.length; i++) {
+
+                        for (var j = 0; j < data[i].length; j++) {
+                          //console.log(nodeIDs[data[i][j].term]);
+                          items.push('<div class="inlinesquare ' + community_assignment_result['communities'][nodeIDs[data[i][j].term]] + '"></div> <a href="#" class="top_nodes">' + data[i][j].term + '</a> &nbsp;');
+                          if (j == (data[i].length - 1)) {
+                            items.push('<br>')
+                          }
+                        }
+
+
+                      }
+
+
+                      $("#termsLDA").html(items.join(""));
+
+                      for (pall in palette) {
+                            if (document.getElementsByClassName("inlinesquare " + pall)) {
+                              for (var i = 0; i < document.getElementsByClassName("inlinesquare " + pall).length; i++) {
+
+                                document.getElementsByClassName("inlinesquare " + pall)[i].style.backgroundColor=rgbToHex(palette[pall]._rgb[0],palette[pall]._rgb[1],palette[pall]._rgb[2]);
+                              }
+                            }
+                      }
+                      top_nodes_activate();
+
+
+
+
+                    });
+
+
+
+
+
+
+                  });
+
+
+
                   });
                   currentPanel = ID;
                 }
@@ -3851,6 +3933,8 @@ sigma.parsers.json(
            $('#analytics').html(analytics);
            $('#analytics').hide();
            $('#analyticsbutton').removeClass('analytics-on');
+           $("#miningbutton").css('background','#ededed');
+
          }
 
          if (hide_always && !show_analytics) {
@@ -4133,35 +4217,39 @@ sigma.parsers.json(
      //console.log(sigma.instances(0).graph.nodes());
 }
 
-      $('.top_nodes').click(function(){
-        var nodeLabel = $(this).text();
+      top_nodes_activate();
+
+      function top_nodes_activate() {
+        $('.top_nodes').click(function(){
+          var nodeLabel = $(this).text();
 
 
-        if (pinnedNodes.indexOf(nodeLabel) < 0) {
-            pinnedNodes.push(nodeLabel);
-            $(this).attr('style','color: #0089e0 !important; text-decoration: underline !important;');
-        }
-        else {
-            var pinnedIndex = pinnedNodes.indexOf(nodeLabel);
-            if (pinnedIndex > -1) {
-                pinnedNodes.splice(pinnedIndex,1);
-                $(this).removeAttr('style');
-                $('.entry').fadeIn(400);
-            }
+          if (pinnedNodes.indexOf(nodeLabel) < 0) {
+              pinnedNodes.push(nodeLabel);
+              $(this).attr('style','color: #0089e0 !important; text-decoration: underline !important;');
+          }
+          else {
+              var pinnedIndex = pinnedNodes.indexOf(nodeLabel);
+              if (pinnedIndex > -1) {
+                  pinnedNodes.splice(pinnedIndex,1);
+                  $(this).removeAttr('style');
+                  $('.entry').fadeIn(400);
+              }
 
-        }
+          }
 
-        // console.log("node clicked, now will filter for nodes " + pinnedNodes);
-        socket.emit('node click', {pinnedNodes: pinnedNodes, splicedNodes: splicedNodes, nodeLabel: nodeLabel, pinnedIndex: pinnedIndex});
+          // console.log("node clicked, now will filter for nodes " + pinnedNodes);
+          socket.emit('node click', {pinnedNodes: pinnedNodes, splicedNodes: splicedNodes, nodeLabel: nodeLabel, pinnedIndex: pinnedIndex});
 
 
-        // Now show / hide statements that have the search field
+          // Now show / hide statements that have the search field
 
-        filter_statements(pinnedNodes);
-        return false;
+          filter_statements(pinnedNodes);
+          return false;
 
-      });
+        });
 
+      }
 
 
       var commClicked = [];

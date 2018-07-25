@@ -69,6 +69,61 @@ exports.entries = function(req, res, next){
     });
 };
 
+exports.entriesLDA = function(req, res, next){
+
+
+    // This is for pagination, but not currently used
+    var page = req.page;
+
+    // Define user
+    res.locals.user = req.user;
+
+    // Define whose graph is seen (receiver) and who sees the graph (perceiver)
+    var receiver = '';
+    var perceiver = '';
+
+    // Is the user logged in? Then he is the receiver but ONLY when he's NOT requesting the public user view (even for himself)
+    if (res.locals.user && !req.params.user) {
+        receiver = res.locals.user.uid;
+    }
+
+    // Is there user in the URL and we know their ID already? Then the receiver will see their graph...
+    if (req.params.user && res.locals.viewuser) {
+        perceiver = res.locals.viewuser;
+    }
+
+    // Otherwise they see their own
+    else {
+        if (res.locals.user) {
+            perceiver = res.locals.user.uid;
+        }
+    }
+
+    if (req.user) {
+      receiver = req.user.uid;
+    }
+
+    var contexts = [];
+
+    contexts.push(req.params.context);
+
+    var LDA_type = req.params.type;
+
+    Entry.getLDA(receiver, perceiver, contexts, LDA_type, function(err, entries){
+
+        if (err) return next(err);
+
+          res.format({
+              json: function(){
+                  res.send(entries);
+              }
+
+
+          });
+
+    });
+};
+
 exports.connectedcontexts = function(req, res, next){
 
 //    express.basicAuth(User.authenticate);
