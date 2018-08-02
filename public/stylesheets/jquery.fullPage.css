@@ -73,6 +73,7 @@ html.fp-enabled,
     -ms-transform: translate3d(0,0,0);
     transform: translate3d(0,0,0);
     opacity: 0.5;
+
 }
 .fp-controlArrow:hover {
     opacity: 0.8;
@@ -83,11 +84,26 @@ html.fp-enabled,
     border-width: 38.5px 34px 38.5px 0;
     border-color: transparent #fff transparent transparent;
 }
+.fp-controlArrow.fp-prev:after {
+    position: relative;
+    top: -10px;
+    left: 43px;
+    content: 'previous';
+}
+
 .fp-controlArrow.fp-next {
     right: 15px;
     border-width: 38.5px 0 38.5px 34px;
     border-color: transparent transparent transparent #fff;
 }
+
+.fp-controlArrow.fp-next:after {
+    position: relative;
+    top: -10px;
+    right: 75px;
+    content: 'next';
+}
+
 .fp-scrollable {
     overflow: scroll;
 }
