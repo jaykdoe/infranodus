@@ -88,7 +88,7 @@ html.fp-enabled,
     position: relative;
     top: -10px;
     left: 43px;
-    content: 'previous';
+    content: '';
 }
 
 .fp-controlArrow.fp-next {
