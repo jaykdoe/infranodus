@@ -274,7 +274,7 @@
                     <span></span>
                 </a>
             <% } %>
-            <a href="javascript:" class="tooltip" title="graph analytics" id="analyticsbutton"></a>
+            <a href="javascript:" class="tooltip" title="graph analytics" id="analyticsbutton"><div id="analyticscaption"></div></a>
       </div>
 
     </div>
@@ -628,7 +628,7 @@ if (background == 'dark') {
   deselected_nodes_color = '#444';
 }
 
-$('#analyticsbutton').attr('data-before',customization);
+$('#analyticscaption').html(customization);
 
 <% if (locals.user) { %>
 <% if (locals.user.midi != undefined && locals.user.midi != 'off') { %>
@@ -946,10 +946,12 @@ function toggle_statements() {
     $('#analytics').toggle('slide', function(){
       if ($('#analytics').is(":visible")) {
             $('#analyticsbutton').addClass('analytics-on');
+            $('#analyticscaption').hide();
             //localStorage.setItem('analytics', 1);
       }
       else {
             $('#analyticsbutton').removeClass('analytics-on');
+            $('#analyticscaption').show();
             //localStorage.setItem('analytics', 0);
           }
     });
@@ -1377,10 +1379,13 @@ sigma.parsers.json(
                        if ($('#analytics').is(":visible")) {
                          localStorage.setItem('analytics', 1);
                          $('#analyticsbutton').addClass('analytics-on');
+                         $('#analyticscaption').hide();
+
                        }
                        else {
                          localStorage.setItem('analytics', 0);
                          $('#analyticsbutton').removeClass('analytics-on')
+                         $('#analyticscaption').show();
                        }
                      });
 
@@ -3647,7 +3652,7 @@ sigma.parsers.json(
 
          analytics += "<div id='mininganalytics'><div class='headline'>Main Topics</div> (according to Latent Dirichlet Allocation):<br>";
          analytics += "<div id='topicsLDA'></div><br>";
-         analytics += "<div class='headline'>Most Influential Words</div> (main topic and words according to LDA):<br>";
+         analytics += "<div class='headline'>Most Influential Words</div> (main topics and words according to LDA):<br>";
          analytics += "<div id='termsLDA'></div><br>";
          analytics += "LDA works only for English-language texts at the moment. More support is coming soon, subscribe  @noduslabs to be informed.<br><br>";
          analytics += "<button id='miningbutton' class='panelControlBtn' data-id='mining_analytics'>LDA Data</button> <button id='analbutton' class='panelControlBtn' data-id='analytics'>Graph Stats</button>";
@@ -3735,7 +3740,7 @@ sigma.parsers.json(
 
          analytics += "<br><br><div id='graphstats'></div>";
 
-         analytics += "<br><br><button id='resetgraph' class='panelControlBtn'>Reset Graph</button> &nbsp; <button id='miningbutton' class='panelControlBtn' data-id='mining_analytics'>LDA Data</button>";
+         analytics += "<br><br><button id='resetgraph' class='panelControlBtn'>Reset</button> &nbsp; <button id='miningbutton' class='panelControlBtn' data-id='mining_analytics'>LDA Data</button> &nbsp; <button id='requestbutton' class='panelControlBtn' data-id='request_analytics'>Custom Report</button>";
 
          analytics += "</div>";
 
@@ -3922,17 +3927,24 @@ sigma.parsers.json(
                   currentPanel = ID;
                 }
 
+                else if (ID == 'request_analytics'){
+                  window.open('https://noduslabs.com/services/connections/', '_blank');
+                }
+
 
               });
 
 
             //localStorage.setItem('analytics', 1);
             $('#analyticsbutton').addClass('analytics-on');
+            $('#analyticscaption').hide();
          }
+
          else {
            $('#analytics').html(analytics);
            $('#analytics').hide();
            $('#analyticsbutton').removeClass('analytics-on');
+           $('#analyticscaption').show();
            $("#miningbutton").css('background','#ededed');
 
          }
@@ -3940,6 +3952,7 @@ sigma.parsers.json(
          if (hide_always && !show_analytics) {
            $('#analytics').hide();
            $('#analyticsbutton').removeClass('analytics-on');
+           $('#analyticscaption').show();
          }
 
          //console.log(localStorage.getItem('analytics'));
@@ -6325,7 +6338,7 @@ sigma.parsers.json(
               }
             }
           }
-          else if (selected_keywords.length > 0) {
+          else if (selected_keywords && selected_keywords.length > 0) {
             pinnedNodes = selected_keywords.split("+");
 
 
@@ -6338,7 +6351,7 @@ sigma.parsers.json(
 
       }
       // TODO clear that
-      else if (selected_keywords.length > 0) {
+      else if (selected_keywords && selected_keywords.length > 0) {
         pinnedNodes = selected_keywords.split("+");
 
 

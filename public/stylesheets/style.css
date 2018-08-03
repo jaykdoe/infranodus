@@ -526,10 +526,19 @@ button {
 
 }
 
-#analyticsbutton:after {
+#analyticsbutton {
   font-size: 14px; /* change this value to increase/decrease button size */
-  margin-left: -5em;
+  margin-right: -20px;
   content: attr(data-before);
+}
+
+#analyticscaption {
+
+  position: relative;
+  text-align: right;
+  font-size: 14px; /* change this value to increase/decrease button size */
+  right: 60px;
+
 }
 
 .analytics-on {
