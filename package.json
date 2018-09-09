@@ -32,6 +32,7 @@
     "send": "^0.16.2",
     "socket.io": "^2.0.4",
     "string": "^3.3.3",
+    "subsrt": "^1.0.0",
     "transliteration.cyr": "^1.0.5",
     "twit": "^2.2.9",
     "unfluff": "^3.0.0",

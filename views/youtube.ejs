@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/jquery.textcomplete.css' />
+    <link rel="stylesheet" href="/stylesheets/side-menu.css">
+    <link rel="stylesheet" href="/stylesheets/jquery-ui.min.css">
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+
+
+
+</head>
+<body>
+<% include statsabove %>
+<div id="layout">
+    <!-- Menu toggle -->
+    <a href="#menu" id="menuLink" class="menu-link">
+        <!-- Hamburger icon -->
+        <span></span>
+    </a>
+
+    <% include menu %>
+
+
+
+
+    <div id='content'>
+
+        <div id='welcomemessage'>
+
+
+            <form action='/import' name='submitform' id="submitform" method='post' enctype="multipart/form-data" class='pure-form pure-form-stacked'>
+
+                <input type='text' size="14" maxlength="50" name='search' id="search" class="pure-input" placeholder='youtube video link' value="<% if (fornode) { %><%= fornode %><% } %>" /> &nbsp;&nbsp; <input class="pure-button" type='submit' name="btnSubmit" value=">" class="pure-button pure-button-primary">
+
+                <br>&nbsp;<br>
+                Visualize the subtitles for any video, so you can get a clear idea of what it's about.
+
+                <br>&nbsp;<br>
+                <% include messages %>
+
+                <label for="extractfilter" class="pure-checkbox">
+                    <input id="extractfilter" type="checkbox" name="excludesearchquery" value="1" checked> exclude search terms from the graph<br>
+                </label>
+
+                <label for="savegraph" class="pure-input">
+                    saving in <input style="display:inline;" id="savegraph" type='text' size="10" maxlength="15" name='context' value='<% if (context) { %><%= context %><% } else { %>google<% } %>'/> context
+                </label>
+
+
+                <input type="hidden" name="source" value="youtube">
+                <input type='hidden' name='limit' value='20' />
+                <input type="hidden" name="settings" value="morphemes">
+                <input type="hidden" id="hide_always" name="hide_always" value="1">
+                <input type="hidden" id="go_next_add" name="go_next_add" value="">
+                <input type="hidden" id="selectedContexts" name="selectedContexts" value="">
+                <input type="hidden" name="statementid" value="">
+
+                <div id="message"></div>
+
+
+
+
+
+            </form>   &nbsp;<br>&nbsp;<br>
+
+
+
+
+
+        </div>
+
+        <div id="graph-container"></div>
+
+
+    </div>
+
+
+
+
+</div>
+
+
+<script src="/javascripts/jquery.min.js"></script>
+<script src="/javascripts/jquery-ui.min.js"></script>
+<script src="/javascripts/string.min.js"></script>
+<script src="/javascripts/underscore-min.js"></script>
+<script src="/javascripts/jquery.textcomplete.js"></script>
+<script src='/javascripts/jquery.autosize.js'></script>
+<script src="/javascripts/ui.js"></script>
+<script src="/javascripts/jquery.mobile-events.min.js"></script>
+
+
+<script>
+    ;(function(){
+
+
+
+
+        $('form#submitform').submit(function(event){
+
+
+
+                $(this).find('input[type=submit]').attr('disabled', 'disabled');
+                $('#message').html('We are importing the data, this page will automatically reload. If this does not happen in 30 seconds, please, <a href="/<%= user.name %>/'+$('#savegraph').val()+'/edit">click here</a>.');
+
+
+
+        });
+
+
+    })();
+</script>
+
+
+
+
+<% include statsbelow %>
+</body>
+</html>

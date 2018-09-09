@@ -177,6 +177,15 @@ exports.renderGoogle = function(req, res) {
 
 };
 
+exports.renderYouTube = function(req, res) {
+        var contextslist = [];
+        if (res.locals.contextslist) {
+            contextslist = res.locals.contextslist;
+        }
+        res.render('youtube', { title: 'Analyze YouTube video with subtitles', evernote: '', context: req.query.context, notebooks: '', contextlist: contextslist, fornode: req.query.fornode });
+
+};
+
 exports.renderApps = function(req, res) {
         // Did we get a list of all the contexts for this user / entries list?
         var contextslist = [];
@@ -1919,6 +1928,124 @@ exports.submit = function(req, res,  next) {
                 }
 
         });
+
+
+
+    }
+
+    else if (service == 'youtube')  {
+
+            var youtubedl = require('youtube-dl');
+            var subsrt = require('subsrt');
+
+
+            var ytoptions = {
+              // Write automatic subtitle file (youtube only)
+              auto: false,
+              // Downloads all the available subtitles.
+              all: false,
+              // Languages of subtitles to download, separated by commas.
+              lang: 'en',
+              // The directory to save the downloaded files in.
+              cwd: __dirname,
+            };
+
+
+            var statements = [];
+
+            var default_context = importContext;
+
+            var addToContexts = [];
+
+            addToContexts.push(default_context);
+
+
+            validate.getContextID(user_id, addToContexts, function(result, err) {
+
+            if (err) {
+                console.log(err);
+                res.error('Something went wrong when adding a new context into the database. Try changing its name or open an issue on GitHub.');
+                res.redirect('back');
+            }
+
+            else {
+                var contexts = result;
+                var req = {
+                    body:  {
+                        entry: {
+                            body: []
+                        },
+                        context: default_context
+                    },
+
+                    contextids: contexts,
+                    internal: 1,
+                    multiple: 1
+
+                };
+
+                var url = searchString;
+
+                youtubedl.getSubs(url, options, function(err, files) {
+
+                  if (err)    {
+                      console.log(err);
+                      res.error(JSON.stringify(err));
+                      res.redirect('back');
+                  }
+
+                  console.log('subtitle files downloaded:', files);
+
+
+                  fs.readFile(files[0], 'utf8', function(err, contents) {
+
+                    //console.log(contents);
+
+                    var format = subsrt.detect(contents);
+
+                    console.log('youtube subtitles format ' + format);
+
+                    var captions = subsrt.parse(contents);
+
+                    //Output to console
+                    //console.log(captions[0].data);
+
+                    var statements = captions[0].data.split('\n\n').join('ttttt').replace(/\n/g,' ').split('ttttt');
+
+
+                    for (var i = 0; i < statements.length; ++i) {
+
+                        req.body.entry.body[i] = statements[i];
+
+                    }
+
+                    entries.submit(req, res);
+
+                    // Visualize
+
+                    // We then identify the two main topics
+
+                    // Identify which one is earlier
+
+                    // Minus 2 seconds + 2 seconds — propose to watch that fragment of video
+
+
+                });
+                });
+
+
+
+
+
+
+
+            }
+            });
+
+
+
+
+
 
 
 
