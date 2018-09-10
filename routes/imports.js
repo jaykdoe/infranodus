@@ -2077,6 +2077,8 @@ exports.submit = function(req, res,  next) {
 
                     entries.submit(req, res);
 
+                    // TODO
+
                     // Visualize
 
                     // We then identify the two main topics
@@ -2085,6 +2087,7 @@ exports.submit = function(req, res,  next) {
 
                     // Minus 2 seconds + 2 seconds — propose to watch that fragment of video
 
+                    fs.unlink(files[0]);
 
                 });
                 });
