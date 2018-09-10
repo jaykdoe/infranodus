@@ -1959,6 +1959,18 @@ exports.submit = function(req, res,  next) {
 
             addToContexts.push(default_context);
 
+            var subphrases = req.body.subphrases;
+
+            var sublanguage = req.body.sublanguage;
+
+            if (!sublanguage) { sublanguage = 'en' }
+
+            if (!subphrases) {
+              subphrases = '4';
+            }
+            else {
+              subphrases = parseInt(subphrases);
+            }
 
             validate.getContextID(user_id, addToContexts, function(result, err) {
 
@@ -1986,6 +1998,9 @@ exports.submit = function(req, res,  next) {
 
                 var url = searchString;
 
+                // TODO glue two different subtitles together (from - to)
+                // TODO add a link to the video at the end of each glue youtube.be/23282929?t=192
+
                 youtubedl.getSubs(url, options, function(err, files) {
 
                   if (err)    {
@@ -2012,11 +2027,52 @@ exports.submit = function(req, res,  next) {
 
                     var statements = captions[0].data.split('\n\n').join('ttttt').replace(/\n/g,' ').split('ttttt');
 
+                    var j = 0;
 
-                    for (var i = 0; i < statements.length; ++i) {
+                    for (var i = 1; i < statements.length; ++i) {
 
-                        req.body.entry.body[i] = statements[i];
+                        var timecode;
 
+                        if (statements[i].substr(0,12)) {
+                          var timesplit = statements[i].substr(0,12).split(':');
+
+
+                          if (timesplit) {
+
+                            if (timesplit[2]) {
+                              var secondsplit = timesplit[2].split('.');
+
+                              // recalculate timecode into seconds and deduct 3 to point to the right moment
+                              timecode = parseInt(timesplit[0])*60*60 + parseInt(timesplit[1])*60 + parseInt(secondsplit[0]) - 3;
+
+
+                              var request_body;
+
+                              var start_time;
+                              var end_time;
+
+                              start_time = statements[i].substr(0,12);
+
+                              request_body = statements[i].substr(29) + ' ';
+
+                              end_time = statements[i].substr(17,12);
+
+                              for (var k = 1; k < subphrases; k++) {
+                                if (statements[i+k]) {
+                                  request_body = request_body + statements[i+k].substr(29) + ' ';
+                                  end_time = statements[i+k].substr(17,12);
+                                }
+                              }
+
+                              req.body.entry.body[j] = start_time + ' --> ' + end_time + ' ' + request_body + 'http://youtu.be/' + searchString.substr(searchString.length - 11) + '?t=' + timecode;
+
+
+                              i = i + 3;
+                              j = j + 1;
+                            }
+                          }
+
+                        }
                     }
 
                     entries.submit(req, res);
