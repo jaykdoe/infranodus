@@ -1939,16 +1939,7 @@ exports.submit = function(req, res,  next) {
             var subsrt = require('subsrt');
 
 
-            var ytoptions = {
-              // Write automatic subtitle file (youtube only)
-              auto: false,
-              // Downloads all the available subtitles.
-              all: false,
-              // Languages of subtitles to download, separated by commas.
-              lang: 'en',
-              // The directory to save the downloaded files in.
-              cwd: __dirname,
-            };
+
 
 
             var statements = [];
@@ -1971,6 +1962,16 @@ exports.submit = function(req, res,  next) {
             else {
               subphrases = parseInt(subphrases);
             }
+
+            var ytoptions = {
+              // Write automatic subtitle file (youtube only)
+              auto: false,
+              // Downloads all the available subtitles.
+              all: false,
+              // Languages of subtitles to download, separated by commas.
+              lang: sublanguage
+
+            };
 
             validate.getContextID(user_id, addToContexts, function(result, err) {
 
@@ -2009,9 +2010,11 @@ exports.submit = function(req, res,  next) {
 
                     if (err)    {
                         console.log(err);
-                        res.error(JSON.stringify(err));
+                        res.error('Could not read the video file from the link. We only accept YouTube links like https://www.youtube.com/watch?v=-qgkB0XD4bM or http://youtu.be/-qgkB0XD4bM');
                         res.redirect('back');
                     }
+                    else {
+
 
                     console.log('subtitle files downloaded:', files);
 
@@ -2020,25 +2023,40 @@ exports.submit = function(req, res,  next) {
                       console.log(files[0]);
 
 
+
+
                       fs.readFile(files[0], 'utf8', function(err, contents) {
 
-                        console.log(err);
-                        //console.log(contents);
+                        if (err)    {
+                            console.log(err);
+                            res.error('Could not download the YouTube subtitles file.');
+                            res.redirect('back');
+                        }
+                        else {
 
-                        console.log(contents);
 
                         //Output to console
                         //console.log(captions[0].data);
 
-                        var statements = contents.replace(/<.*?>/g, '').replace('align:start position:0%','').split('\n\n').join('ttttt').replace(/\n/g,' ').split('ttttt');
+                        var statements = contents.replace(/<.*?>/g, '').split('\n\n').join('ttttt').replace(/\n/g,' ').split('ttttt');
+
+                        // Shich statment are we adding
 
                         var j = 0;
+
+                        var repeating_phrase;
+
+                        var prev_statement = ' ';
+                        var future_statement = ' ';
+
 
                         for (var i = 1; i < statements.length; ++i) {
 
                             var timecode;
 
                             if (statements[i].substr(0,12)) {
+
+
                               var timesplit = statements[i].substr(0,12).split(':');
 
 
@@ -2060,20 +2078,46 @@ exports.submit = function(req, res,  next) {
 
                                   request_body = statements[i].substr(29) + ' ';
 
+                                  request_body = request_body.replace('align:start','').replace('position:0%','')
+
+                                  repeating_phrase = request_body;
+
                                   end_time = statements[i].substr(17,12);
 
-                                  for (var k = 1; k < subphrases; k++) {
-                                    if (statements[i+k]) {
-                                      request_body = request_body + statements[i+k].substr(29) + ' ';
-                                      end_time = statements[i+k].substr(17,12);
+                                  // TODO fix this to check for repetition, right now YouTube automated CCs are repeating every 4 times or so
+                                  if (!ytoptions.auto) {
+
+                                    for (var k = 1; k < subphrases; k++) {
+
+
+                                        if (statements[i+k]) {
+
+                                            var interim_statement = statements[i+k].substr(29).replace('align:start','').replace('position:0%','') + ' ';
+
+
+                                              request_body = request_body + interim_statement;
+                                              end_time = statements[i+k].substr(17,12);
+
+
+
+                                        }
+
+
+
                                     }
+
                                   }
 
-                                  req.body.entry.body[j] = start_time + ' --> ' + end_time + ' ' + request_body + 'http://youtu.be/' + searchString.substr(searchString.length - 11) + '?t=' + timecode;
 
 
-                                  i = i + 3;
+                                   req.body.entry.body[j] = start_time + ' --> ' + end_time + ' ' + request_body.replace('align:start position:0%',' ') + 'http://youtu.be/' + searchString.substr(searchString.length - 11) + '?t=' + timecode;
+
+                                  i = i + subphrases - 1;
                                   j = j + 1;
+
+
+
+
                                 }
                               }
 
@@ -2092,7 +2136,9 @@ exports.submit = function(req, res,  next) {
 
                         // Minus 2 seconds + 2 seconds — propose to watch that fragment of video
 
+                        }
                         fs.unlink(files[0]);
+
 
                     });
 
@@ -2101,24 +2147,35 @@ exports.submit = function(req, res,  next) {
                     }
                     else {
 
-                      ytoptions = {
-                        // Write automatic subtitle file (youtube only)
-                        auto: true,
-                        // Downloads all the available subtitles.
-                        all: false,
-                        // Languages of subtitles to download, separated by commas.
-                        lang: 'en',
-                        // The directory to save the downloaded files in.
-                        cwd: __dirname,
-                      };
+                      if (ytoptions.auto) {
+
+                            console.log('NO CAPTIONS');
+                            res.error('Sorry, there are no captions in this video.');
+                            res.redirect('back');
+
+                      }
+                      else {
+
+                        ytoptions = {
+                          // Write automatic subtitle file (youtube only)
+                          auto: true,
+                          // Downloads all the available subtitles.
+                          all: false,
+                          // Languages of subtitles to download, separated by commas.
+                          lang: sublanguage
+                        };
 
                       get_subtitles(ytoptions);
+                      }
 
 
                     }
 
+                  }
+
 
                     });
+
               }
 
 
