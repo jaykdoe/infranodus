@@ -2001,6 +2001,12 @@ exports.submit = function(req, res,  next) {
                 // TODO glue two different subtitles together (from - to)
                 // TODO add a link to the video at the end of each glue youtube.be/23282929?t=192
 
+                function youtube_parser(url){
+                    var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/;
+                    var match = url.match(regExp);
+                    return (match&&match[7].length==11)? match[7] : false;
+                }
+
                 get_subtitles(ytoptions);
 
                 function get_subtitles(ytoptions) {
@@ -2091,7 +2097,7 @@ exports.submit = function(req, res,  next) {
 
                                         if (statements[i+k]) {
 
-                                            var interim_statement = statements[i+k].substr(29).replace('align:start','').replace('position:0%','') + ' ';
+                                              var interim_statement = statements[i+k].substr(29).replace('align:start','').replace('position:0%','') + ' ';
 
 
                                               request_body = request_body + interim_statement;
@@ -2109,7 +2115,7 @@ exports.submit = function(req, res,  next) {
 
 
 
-                                   req.body.entry.body[j] = start_time + ' --> ' + end_time + ' ' + request_body.replace('align:start position:0%',' ') + 'http://youtu.be/' + searchString.substr(searchString.length - 11) + '?t=' + timecode;
+                                   req.body.entry.body[j] = start_time + ' --> ' + end_time + ' ' + request_body.replace('align:start position:0%',' ') + 'http://youtu.be/' + youtube_parser(searchString) + '?t=' + timecode;
 
                                   i = i + subphrases - 1;
                                   j = j + 1;

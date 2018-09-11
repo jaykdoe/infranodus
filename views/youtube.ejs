@@ -118,6 +118,12 @@
 <script>
     ;(function(){
 
+      function youtube_parser(url){
+        var regExp = /^.*((youtu.be\/)|(v\/)|(\/u\/\w\/)|(embed\/)|(watch\?))\??v?=?([^#\&\?]*).*/;
+        var match = url.match(regExp);
+        return (match&&match[7].length==11)? match[7] : false;
+      }
+
       var advancedpane = 0;
 
       $("#advancedsettings").hide();
@@ -141,7 +147,7 @@
 
                 $('#search').on('input', function() {
 
-                  $('#savegraph').val($(this).val().substr($(this).val().length - 11));
+                  $('#savegraph').val(youtube_parser($(this).val()));
 
                 });
 
