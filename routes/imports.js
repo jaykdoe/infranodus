@@ -1936,7 +1936,6 @@ exports.submit = function(req, res,  next) {
     else if (service == 'youtube')  {
 
             var youtubedl = require('youtube-dl');
-            var subsrt = require('subsrt');
 
 
 
