@@ -2001,97 +2001,125 @@ exports.submit = function(req, res,  next) {
                 // TODO glue two different subtitles together (from - to)
                 // TODO add a link to the video at the end of each glue youtube.be/23282929?t=192
 
-                youtubedl.getSubs(url, options, function(err, files) {
+                get_subtitles(ytoptions);
 
-                  if (err)    {
-                      console.log(err);
-                      res.error(JSON.stringify(err));
-                      res.redirect('back');
-                  }
+                function get_subtitles(ytoptions) {
 
-                  console.log('subtitle files downloaded:', files);
+                    youtubedl.getSubs(url, ytoptions, function(err, files) {
 
+                    if (err)    {
+                        console.log(err);
+                        res.error(JSON.stringify(err));
+                        res.redirect('back');
+                    }
 
-                  fs.readFile(files[0], 'utf8', function(err, contents) {
+                    console.log('subtitle files downloaded:', files);
 
-                    //console.log(contents);
+                    if (files[0]) {
 
-                    var format = subsrt.detect(contents);
-
-                    console.log('youtube subtitles format ' + format);
-
-                    var captions = subsrt.parse(contents);
-
-                    //Output to console
-                    //console.log(captions[0].data);
-
-                    var statements = captions[0].data.split('\n\n').join('ttttt').replace(/\n/g,' ').split('ttttt');
-
-                    var j = 0;
-
-                    for (var i = 1; i < statements.length; ++i) {
-
-                        var timecode;
-
-                        if (statements[i].substr(0,12)) {
-                          var timesplit = statements[i].substr(0,12).split(':');
+                      console.log(files[0]);
 
 
-                          if (timesplit) {
+                      fs.readFile(files[0], 'utf8', function(err, contents) {
 
-                            if (timesplit[2]) {
-                              var secondsplit = timesplit[2].split('.');
+                        console.log(err);
+                        //console.log(contents);
 
-                              // recalculate timecode into seconds and deduct 3 to point to the right moment
-                              timecode = parseInt(timesplit[0])*60*60 + parseInt(timesplit[1])*60 + parseInt(secondsplit[0]) - 3;
+                        console.log(contents);
+
+                        //Output to console
+                        //console.log(captions[0].data);
+
+                        var statements = contents.replace(/<.*?>/g, '').replace('align:start position:0%','').split('\n\n').join('ttttt').replace(/\n/g,' ').split('ttttt');
+
+                        var j = 0;
+
+                        for (var i = 1; i < statements.length; ++i) {
+
+                            var timecode;
+
+                            if (statements[i].substr(0,12)) {
+                              var timesplit = statements[i].substr(0,12).split(':');
 
 
-                              var request_body;
+                              if (timesplit) {
 
-                              var start_time;
-                              var end_time;
+                                if (timesplit[2]) {
+                                  var secondsplit = timesplit[2].split('.');
 
-                              start_time = statements[i].substr(0,12);
+                                  // recalculate timecode into seconds and deduct 3 to point to the right moment
+                                  timecode = parseInt(timesplit[0])*60*60 + parseInt(timesplit[1])*60 + parseInt(secondsplit[0]) - 3;
 
-                              request_body = statements[i].substr(29) + ' ';
 
-                              end_time = statements[i].substr(17,12);
+                                  var request_body;
 
-                              for (var k = 1; k < subphrases; k++) {
-                                if (statements[i+k]) {
-                                  request_body = request_body + statements[i+k].substr(29) + ' ';
-                                  end_time = statements[i+k].substr(17,12);
+                                  var start_time;
+                                  var end_time;
+
+                                  start_time = statements[i].substr(0,12);
+
+                                  request_body = statements[i].substr(29) + ' ';
+
+                                  end_time = statements[i].substr(17,12);
+
+                                  for (var k = 1; k < subphrases; k++) {
+                                    if (statements[i+k]) {
+                                      request_body = request_body + statements[i+k].substr(29) + ' ';
+                                      end_time = statements[i+k].substr(17,12);
+                                    }
+                                  }
+
+                                  req.body.entry.body[j] = start_time + ' --> ' + end_time + ' ' + request_body + 'http://youtu.be/' + searchString.substr(searchString.length - 11) + '?t=' + timecode;
+
+
+                                  i = i + 3;
+                                  j = j + 1;
                                 }
                               }
 
-                              req.body.entry.body[j] = start_time + ' --> ' + end_time + ' ' + request_body + 'http://youtu.be/' + searchString.substr(searchString.length - 11) + '?t=' + timecode;
-
-
-                              i = i + 3;
-                              j = j + 1;
                             }
-                          }
-
                         }
+
+                        entries.submit(req, res);
+
+                        // TODO
+
+                        // Visualize
+
+                        // We then identify the two main topics
+
+                        // Identify which one is earlier
+
+                        // Minus 2 seconds + 2 seconds — propose to watch that fragment of video
+
+                        fs.unlink(files[0]);
+
+                    });
+
+
+                    // if files[0]
+                    }
+                    else {
+
+                      ytoptions = {
+                        // Write automatic subtitle file (youtube only)
+                        auto: true,
+                        // Downloads all the available subtitles.
+                        all: false,
+                        // Languages of subtitles to download, separated by commas.
+                        lang: 'en',
+                        // The directory to save the downloaded files in.
+                        cwd: __dirname,
+                      };
+
+                      get_subtitles(ytoptions);
+
+
                     }
 
-                    entries.submit(req, res);
 
-                    // TODO
-
-                    // Visualize
-
-                    // We then identify the two main topics
-
-                    // Identify which one is earlier
-
-                    // Minus 2 seconds + 2 seconds — propose to watch that fragment of video
-
-                    fs.unlink(files[0]);
-
-                });
-                });
-
+                    });
+              }
 
 
 

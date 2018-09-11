@@ -6,6 +6,7 @@
     "start": "node app.js"
   },
   "dependencies": {
+    "@joegesualdo/get-youtube-subtitles-node": "^0.1.0",
     "bcrypt-nodejs": "0.0.3",
     "cheerio": "^1.0.0-rc.2",
     "ejs": "^2.5.7",
