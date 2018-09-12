@@ -171,6 +171,23 @@ small screens.
 
 
 
+
+
+
+       #topnav  {
+         padding-top: 1px;
+         padding-bottom: 15px;
+       }
+
+       #topnav .pure-menu.pure-menu-open.pure-menu-horizontal li  {
+         border-radius: 15px!important;
+       }
+
+
+
+
+
+
 #controls {
     top: 40px;
 }
@@ -658,5 +675,16 @@ Hides the menu at `48em`, but modify this based on your app's needs.
     #analyticsbutton:after {
       display:none;
     }
+
+
+
+}
+
+@media (max-width: 600px) {
+
+  #topnav  {
+    padding-top: 45px;
+    padding-bottom: 15px;
+  }
 
 }

@@ -6,9 +6,9 @@
     <title><%= title %></title>
     <script src="/javascripts/jquery.min.js"></script>
     <link rel='stylesheet' href='/stylesheets/jquery.textcomplete.css' />
-    <link rel="stylesheet" href="/stylesheets/side-menu.css">
     <link rel="stylesheet" href="/stylesheets/jquery-ui.min.css">
     <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel="stylesheet" href="/stylesheets/side-menu.css">
     <link rel='stylesheet' href='/stylesheets/jquery.taghandler.css' />
     <link rel='stylesheet' href='/stylesheets/jquery.content-panel-switcher.css' />
     <script src="/javascripts/jquery.content-panel-switcher.js"></script>
@@ -61,7 +61,26 @@
 
              <div id='statements'>
 
+               <div id='topnav'>
+                 <div class='pure-menu pure-menu-open pure-menu-horizontal'>
+                   <ul>
+                        <li>
+                             <a id="summary">Summary</a>
+                        </li>
+                       <li class="pure-menu-selected-top">
+                           <a id="overview">Overview</a>
+                       </li>
+                       <li>
+                           <a id="insight">Insight</a>
+                       </li>
+                  </ul>
+                </div>
+
+                </div>
+
                  <div id="entries">
+
+
 
                      <% entries.forEach(function(entry) { %>
                      <div class='entry' data-uid='<%= entry.uid %>' data-timestamp='<%= entry.timestamp %>' data-hashtags='<%= entry.name %>'>
@@ -815,6 +834,9 @@ $("#graph-link").click(function(e) {
         $("#entries").fadeToggle();
 
     });
+
+
+
 
 
     document.addEventListener("DOMContentLoaded", function(event) {
@@ -4262,6 +4284,23 @@ sigma.parsers.json(
 
         });
 
+
+        $("#summary").click(function(e) {
+            e.preventDefault();
+
+            // Top influence nodes
+            console.log(toppbc_nodes);
+
+            // Top community nodes
+            console.log(topp_communities);
+
+            filter_statements_summary(toppbc_nodes);
+            // Top community terms
+
+        });
+
+
+
       }
 
 
@@ -4855,10 +4894,78 @@ sigma.parsers.json(
     }
 
 
+    // Summary and Insight statements
+
+    var summary_statements = [];
+
+    function filter_statements_summary(top_words, top_community_words) {
+
+
+
+      // Let's first filter statements that contain all the most influential top_words
+      // If all 4 are nowhere to be found, we reiterate until at least the first 3, 2, 1 is found.
+      // Save that
+
+      var found_statements = [];
+
+      find_statement(top_words);
+
+      function find_statement(key_terms) {
+
+          var nodesfound = 0;
+
+          $(".entry").each(function(){
+
+            if (found_statements.length < 1) {
+              var currentDiv = $(this).attr('data-uid');
+              var originaltext = $(this).children('.entry-text').html();
+              var currentTimecode = $(this).attr('data-timestamp');
+
+
+
+              for (var j = 0; j < top_words.length; j++) {
+
+                  //TODO lemmas
+                  // var search_lemma = window.jstemmer(pinnedNodes[j]);
+
+                  var search_lemma = top_words[j].label;
+
+
+                    if (originaltext.toLowerCase().indexOf(search_lemma.toLowerCase()) > -1) {
+                        nodesfound = nodesfound + 1;
+                    }
+
+                    if (nodesfound == top_words.length) {
+                      found_statements.push({text: originaltext, id: currentDiv, time: currentTimecode});
+                    }
+
+                    if ((j == top_words.length - 1) && nodesfound != top_words.length) {
+                      nodesfound = 0;
+                    }
+
+              }
+            }
+
+          });
+
+
+          if (nodesfound == top_words.length) {
+                console.log(found_statements);
+          }
+          else {
+            top_words = top_words.slice(0, -1);
+            find_statement(top_words)
+          }
+
+
+      }
+
+
+    }
+
     // Filter out the statements that don't have any of the nodes clicked
 
     var timesfiltered = 0;
-
 
     function filter_statements(pinnedNodes, origin) {
 

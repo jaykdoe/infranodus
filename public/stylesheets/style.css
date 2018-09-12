@@ -1763,7 +1763,7 @@ Forms Core
 
 .pure-menu.pure-menu-open,
 .pure-menu.pure-menu-horizontal li .pure-menu-children {
-    background: #ffffff; /* Old browsers */
+    /* background: #ffffff; /* Old browsers */ */
     border: 1px solid #ededed;
 }
 
@@ -1840,7 +1840,7 @@ Forms Core
 
 /* SELECTED MENU ITEM */
 .pure-menu li.pure-menu-selected-top a {
-    background-color: #efefef;
+    background-color: #dedede;
     color: #171616;
 }
 
