@@ -70,7 +70,7 @@
                        <li  id="overview" class="pure-menu-selected-top">
                            <a>Overview</a>
                        </li>
-                       
+
                   </ul>
                 </div>
 
@@ -466,6 +466,9 @@ var contextNames = [];
 var statementsOfContext = [];
 
 var current_context_field = [];
+
+
+var community_of_node = [];
 
 var jsonpath = '';
 
@@ -4035,6 +4038,8 @@ sigma.parsers.json(
 
         }
 
+        community_of_node[n.originalLabel] = n.community;
+
         n.originalColor = rgbToHex(palette[n.community]._rgb[0],palette[n.community]._rgb[1],palette[n.community]._rgb[2]);
 
         if (pinnedNodes.indexOf(n.originalLabel) < 0) {
@@ -4253,83 +4258,54 @@ sigma.parsers.json(
      //console.log(sigma.instances(0).graph.nodes());
 }
 
-      top_nodes_activate();
-
-      function top_nodes_activate() {
-        $('.top_nodes').click(function(){
-          var nodeLabel = $(this).text();
 
 
-          if (pinnedNodes.indexOf(nodeLabel) < 0) {
-              pinnedNodes.push(nodeLabel);
-              $(this).attr('style','color: #0089e0 !important; text-decoration: underline !important;');
+
+
+      $("#summary").click(function(e) {
+          e.preventDefault();
+
+          // // Top influence nodes
+          // console.log(toppbc_nodes);
+          //
+          // // Top community nodes
+          // console.log(topp_communities);
+
+          filter_statements_summary(toppbc_nodes, topp_communities);
+
+          $('#topnav_items').each(function() {
+              $("li", this).each(function(i) {
+                  $(this).removeClass('pure-menu-selected-top');
+              });
+          });
+          this.className = 'pure-menu-selected-top';
+          // Top community terms
+
+      });
+
+      $("#overview").click(function(e) {
+          e.preventDefault();
+          $('.entry').fadeIn(400);
+          $('#topnav_items').each(function() {
+              $("li", this).each(function(i) {
+                  $(this).removeClass('pure-menu-selected-top');
+              });
+          });
+          this.className = 'pure-menu-selected-top';
+          $("#entries").animate({ scrollTop: $('#entries')[0].scrollHeight }, 1000);
+
+          if (pinnedNodes.length > 0) {
+            filter_statements(pinnedNodes);
           }
-          else {
-              var pinnedIndex = pinnedNodes.indexOf(nodeLabel);
-              if (pinnedIndex > -1) {
-                  pinnedNodes.splice(pinnedIndex,1);
-                  $(this).removeAttr('style');
-                  $('.entry').fadeIn(400);
-              }
-
-          }
-
-          // console.log("node clicked, now will filter for nodes " + pinnedNodes);
-          socket.emit('node click', {pinnedNodes: pinnedNodes, splicedNodes: splicedNodes, nodeLabel: nodeLabel, pinnedIndex: pinnedIndex});
-
-
-          // Now show / hide statements that have the search field
-
-          filter_statements(pinnedNodes);
-          return false;
-
-        });
-
-
-        $("#summary").click(function(e) {
-            e.preventDefault();
-
-            // // Top influence nodes
-            // console.log(toppbc_nodes);
-            //
-            // // Top community nodes
-            // console.log(topp_communities);
-
-            filter_statements_summary(toppbc_nodes, topp_communities);
-
-            $('#topnav_items').each(function() {
-                $("li", this).each(function(i) {
-                    $(this).removeClass('pure-menu-selected-top');
-                });
-            });
-            this.className = 'pure-menu-selected-top';
-            // Top community terms
-
-        });
-
-        $("#overview").click(function(e) {
-            e.preventDefault();
-            $('.entry').fadeIn(400);
-            $('#topnav_items').each(function() {
-                $("li", this).each(function(i) {
-                    $(this).removeClass('pure-menu-selected-top');
-                });
-            });
-            this.className = 'pure-menu-selected-top';
-            $("#entries").animate({ scrollTop: $('#entries')[0].scrollHeight }, 1000);
-
-            if (pinnedNodes.length > 0) {
-              filter_statements(pinnedNodes);
-            }
-            filter_graph(pinnedNodes);
-        });
-
-
-
-      }
+          filter_graph(pinnedNodes);
+          $('.summary').remove();
+      });
 
 
       var commClicked = [];
+
+        top_nodes_activate();
+
         $('#resetgraph').click(function(){
           sigma.instances(0).graph.nodes().forEach(function(n) {
                   n.color = n.originalColor;
@@ -4352,178 +4328,7 @@ sigma.parsers.json(
 
 
 
-      $('.community_node').click(function(){
-            var communityClicked = $(this).attr('community').toString();
 
-            var nodeLabel = $(this).text();
-
-            if (pinnedNodes.indexOf(nodeLabel) < 0) {
-                pinnedNodes.push(nodeLabel);
-                $(this).attr('style','color: #0089e0 !important; text-decoration: underline !important;');
-            }
-            else {
-                var pinnedIndex = pinnedNodes.indexOf(nodeLabel);
-                if (pinnedIndex > -1) {
-                    pinnedNodes.splice(pinnedIndex,1);
-                    $(this).removeAttr('style');
-                    $('.entry').fadeIn(400);
-                }
-
-            }
-
-
-
-
-          //  socket.emit('node click', {pinnedNodes: pinnedNodes, splicedNodes: splicedNodes, nodeLabel: nodeLabel, pinnedIndex: pinnedIndex});
-            // console.log(pinnedNodes);
-            filter_statements(pinnedNodes, 'community');
-
-
-
-            if (commClicked.indexOf(communityClicked) == -1) {
-                // console.log("the community clicked was not clicked before");
-
-
-                // sigma.instances(0).graph.edges().forEach(function(e) {
-                //
-                //     if (e.statement_id == keepStatementID) {
-                //         e.color = e.originalColor;
-                //     }
-                //     else {
-                //         e.color = '#ddd';
-                //     }
-                //
-                // });
-
-                // Specify which community is clicked
-                commClicked.push(communityClicked);
-
-
-                // Make only those nodes visible that belong to the community selected
-
-                sigma.instances(0).graph.nodes().forEach(function(n) {
-
-                    if (commClicked.indexOf(n.community.toString()) > -1)  {
-                        n.color = n.originalColor;
-                        n.label = n.originalLabel;
-                        if (n.originalLabel == nodeLabel && pinnedNodes.indexOf(n.originalLabel) > -1) {
-                          n.color = '#0089e0';
-                        }
-                    }
-                    else {
-                      n.color = deselected_nodes_color;
-                      n.label = '';
-                    }
-
-                });
-            }
-
-            else {
-              // console.log("the community was clicked before");
-
-                if (pinnedNodes.length == 0) {
-                    // sigma.instances(0).graph.edges().forEach(function(e) {
-                    //     e.color = e.originalColor;
-                    // });
-
-                    commClicked.splice(commClicked.indexOf(communityClicked.toString()),1);
-
-                    // Make only those nodes visible that belong to the statement selected
-                    sigma.instances(0).graph.nodes().forEach(function(n) {
-                      if (commClicked.indexOf(n.community.toString()) < 0) {
-                              if (commClicked.length == 0) {
-                                n.color = n.originalColor;
-                                n.label = n.originalLabel;
-                              }
-                              else {
-                                n.color = deselected_nodes_color;
-                                n.label = '';
-                              }
-                      }
-                    });
-
-
-                  }
-                else {
-                    // We clicked on the community which is in the DB of clicked ones and We have some pinned nodes left
-
-                      // Is the node clicked in the pinned nodes?
-                      if (pinnedNodes.indexOf(nodeLabel) > -1) {
-                        // console.log('in the pinned nodes')
-                        sigma.instances(0).graph.nodes().forEach(function(n) {
-                          if (commClicked.indexOf(n.community.toString()) > -1)  {
-                              n.color = n.originalColor;
-                              n.label = n.originalLabel;
-                              if (n.originalLabel == nodeLabel && pinnedNodes.indexOf(n.originalLabel) > -1) {
-                                n.color = '#0089e0';
-                              }
-                          }
-                          else {
-                            n.color = deselected_nodes_color;
-                            n.label = '';
-                          }
-                      });
-                    }
-                    // It is not in the pinneed nodes
-                    else {
-                      // console.log('not in the pinneed nodes')
-                      // console.log(commClicked)
-                      // console.log(pinnedNodes);
-
-                      // is the last node of the community?
-                      var islastnode = 0;
-                      for (key in topp_communities) {
-                        if (communityClicked == topp_communities[key].id) {
-                          for (kkey in topp_communities[key].nodes) {
-                            // console.log(topp_communities[key].nodes[kkey].name);
-                            // console.log(pinnedNodes.indexOf(topp_communities[key].nodes[kkey].name));
-                            if (pinnedNodes.indexOf(topp_communities[key].nodes[kkey].name) > -1) {
-                              islastnode = 1;
-                            }
-
-                          }
-                        }
-                      }
-                      // console.log(islastnode);
-
-                      if (!islastnode) {
-                        commClicked.splice(commClicked.indexOf(communityClicked.toString()),1);
-                      }
-                      //console.log(pinnedNodes);
-
-                      sigma.instances(0).graph.nodes().forEach(function(n) {
-                        if (commClicked.indexOf(n.community.toString()) < 0) {
-                                if (commClicked.length == 0) {
-                                  n.color = n.originalColor;
-                                  n.label = n.originalLabel;
-                                }
-                                else {
-                                  n.color = deselected_nodes_color;
-                                  n.label = '';
-                                }
-
-                        }
-
-                        if (pinnedNodes.indexOf(n.originalLabel) > -1) {
-                          n.color = '#0089e0';
-                          n.label = n.originalLabel;
-                        }
-                        if (pinnedNodes.indexOf(n.originalLabel) < 0 && islastnode && n.originalLabel == nodeLabel) {
-                          n.color = n.originalColor;
-                          n.label = n.originalLabel;
-                        }
-
-
-                      });
-
-                    }
-                }
-
-            }
-
-            sigma.instances(0).refresh();
-
-      });
 
 
 
@@ -4940,6 +4745,7 @@ sigma.parsers.json(
       var entries_shown = [];
 
       var entries_ids = [];
+      var entries_keywords = [];
 
       find_statement(top_words,0);
 
@@ -5077,6 +4883,7 @@ sigma.parsers.json(
 
               for (var s = 0; s < entries_shown.length; s++) {
                 entries_ids.push(entries_shown[s].id);
+                entries_keywords[entries_shown[s].id] = entries_shown[s].origin;
               }
 
 
@@ -5087,13 +4894,43 @@ sigma.parsers.json(
 
                   var currentDiv = $(this).attr('data-uid');
                   if (entries_ids.includes(currentDiv)) {
+
                     $(this).fadeIn(400);
+
+                    var summary_helper = '';
+
+                    for (var l = 0; l < entries_keywords[currentDiv].length; l++) {
+
+
+                        if (summary_helper.length > 0) {
+                          summary_helper += ', '
+                        }
+                        if (entries_keywords[currentDiv][l].label) {
+                          summary_helper += '<a href="#" class="top_nodes">' + entries_keywords[currentDiv][l].label + '</a>';
+                        }
+                        else if (entries_keywords[currentDiv][l].name) {
+                          summary_helper += '<a href="#" class="community_node" community="' + community_of_node[entries_keywords[currentDiv][l].name] + '">' + entries_keywords[currentDiv][l].name + '</a>';
+                        }
+
+                    }
+
+                    if($(this).find('.summary').length == 0){
+
+                      $(this).prepend( "<div class='summary'>contains: " + summary_helper + "</div>" );
+                      //console.log(entries_keywords[currentDiv]);
+                    }
 
                   }
 
               });
 
+
+
               document.getElementById('entries').scrollTop = 0;
+              top_nodes_activate();
+
+              console.log('top info');
+              console.log(top_community_words);
 
 
               $('#finds').trigger('click');
@@ -5156,6 +4993,211 @@ sigma.parsers.json(
 
       }
 
+
+    }
+
+    function top_nodes_activate() {
+      $('.top_nodes').click(function(){
+        var nodeLabel = $(this).text();
+
+
+        if (pinnedNodes.indexOf(nodeLabel) < 0) {
+            pinnedNodes.push(nodeLabel);
+            $(this).attr('style','color: #0089e0 !important; text-decoration: underline !important;');
+        }
+        else {
+            var pinnedIndex = pinnedNodes.indexOf(nodeLabel);
+            if (pinnedIndex > -1) {
+                pinnedNodes.splice(pinnedIndex,1);
+                $(this).removeAttr('style');
+                $('.entry').fadeIn(400);
+            }
+
+        }
+
+        // console.log("node clicked, now will filter for nodes " + pinnedNodes);
+        socket.emit('node click', {pinnedNodes: pinnedNodes, splicedNodes: splicedNodes, nodeLabel: nodeLabel, pinnedIndex: pinnedIndex});
+
+
+        // Now show / hide statements that have the search field
+
+        filter_statements(pinnedNodes);
+        return false;
+
+      });
+      var commClicked = [];
+      $('.community_node').click(function(){
+            var communityClicked = $(this).attr('community').toString();
+
+            var nodeLabel = $(this).text();
+
+            if (pinnedNodes.indexOf(nodeLabel) < 0) {
+                pinnedNodes.push(nodeLabel);
+                $(this).attr('style','color: #0089e0 !important; text-decoration: underline !important;');
+            }
+            else {
+                var pinnedIndex = pinnedNodes.indexOf(nodeLabel);
+                if (pinnedIndex > -1) {
+                    pinnedNodes.splice(pinnedIndex,1);
+                    $(this).removeAttr('style');
+                    $('.entry').fadeIn(400);
+                }
+
+            }
+
+
+
+
+          //  socket.emit('node click', {pinnedNodes: pinnedNodes, splicedNodes: splicedNodes, nodeLabel: nodeLabel, pinnedIndex: pinnedIndex});
+            // console.log(pinnedNodes);
+            filter_statements(pinnedNodes, 'community');
+
+
+
+            if (commClicked.indexOf(communityClicked) == -1) {
+                // console.log("the community clicked was not clicked before");
+
+
+                // sigma.instances(0).graph.edges().forEach(function(e) {
+                //
+                //     if (e.statement_id == keepStatementID) {
+                //         e.color = e.originalColor;
+                //     }
+                //     else {
+                //         e.color = '#ddd';
+                //     }
+                //
+                // });
+
+                // Specify which community is clicked
+                commClicked.push(communityClicked);
+
+
+                // Make only those nodes visible that belong to the community selected
+
+                sigma.instances(0).graph.nodes().forEach(function(n) {
+
+                    if (commClicked.indexOf(n.community.toString()) > -1)  {
+                        n.color = n.originalColor;
+                        n.label = n.originalLabel;
+                        if (n.originalLabel == nodeLabel && pinnedNodes.indexOf(n.originalLabel) > -1) {
+                          n.color = '#0089e0';
+                        }
+                    }
+                    else {
+                      n.color = deselected_nodes_color;
+                      n.label = '';
+                    }
+
+                });
+            }
+
+            else {
+              // console.log("the community was clicked before");
+
+                if (pinnedNodes.length == 0) {
+                    // sigma.instances(0).graph.edges().forEach(function(e) {
+                    //     e.color = e.originalColor;
+                    // });
+
+                    commClicked.splice(commClicked.indexOf(communityClicked.toString()),1);
+
+                    // Make only those nodes visible that belong to the statement selected
+                    sigma.instances(0).graph.nodes().forEach(function(n) {
+                      if (commClicked.indexOf(n.community.toString()) < 0) {
+                              if (commClicked.length == 0) {
+                                n.color = n.originalColor;
+                                n.label = n.originalLabel;
+                              }
+                              else {
+                                n.color = deselected_nodes_color;
+                                n.label = '';
+                              }
+                      }
+                    });
+
+
+                  }
+                else {
+                    // We clicked on the community which is in the DB of clicked ones and We have some pinned nodes left
+
+                      // Is the node clicked in the pinned nodes?
+                      if (pinnedNodes.indexOf(nodeLabel) > -1) {
+                        // console.log('in the pinned nodes')
+                        sigma.instances(0).graph.nodes().forEach(function(n) {
+                          if (commClicked.indexOf(n.community.toString()) > -1)  {
+                              n.color = n.originalColor;
+                              n.label = n.originalLabel;
+                              if (n.originalLabel == nodeLabel && pinnedNodes.indexOf(n.originalLabel) > -1) {
+                                n.color = '#0089e0';
+                              }
+                          }
+                          else {
+                            n.color = deselected_nodes_color;
+                            n.label = '';
+                          }
+                      });
+                    }
+                    // It is not in the pinneed nodes
+                    else {
+                      // console.log('not in the pinneed nodes')
+                      // console.log(commClicked)
+                      // console.log(pinnedNodes);
+
+                      // is the last node of the community?
+                      var islastnode = 0;
+                      for (key in topp_communities) {
+                        if (communityClicked == topp_communities[key].id) {
+                          for (kkey in topp_communities[key].nodes) {
+                            // console.log(topp_communities[key].nodes[kkey].name);
+                            // console.log(pinnedNodes.indexOf(topp_communities[key].nodes[kkey].name));
+                            if (pinnedNodes.indexOf(topp_communities[key].nodes[kkey].name) > -1) {
+                              islastnode = 1;
+                            }
+
+                          }
+                        }
+                      }
+                      // console.log(islastnode);
+
+                      if (!islastnode) {
+                        commClicked.splice(commClicked.indexOf(communityClicked.toString()),1);
+                      }
+                      //console.log(pinnedNodes);
+
+                      sigma.instances(0).graph.nodes().forEach(function(n) {
+                        if (commClicked.indexOf(n.community.toString()) < 0) {
+                                if (commClicked.length == 0) {
+                                  n.color = n.originalColor;
+                                  n.label = n.originalLabel;
+                                }
+                                else {
+                                  n.color = deselected_nodes_color;
+                                  n.label = '';
+                                }
+
+                        }
+
+                        if (pinnedNodes.indexOf(n.originalLabel) > -1) {
+                          n.color = '#0089e0';
+                          n.label = n.originalLabel;
+                        }
+                        if (pinnedNodes.indexOf(n.originalLabel) < 0 && islastnode && n.originalLabel == nodeLabel) {
+                          n.color = n.originalColor;
+                          n.label = n.originalLabel;
+                        }
+
+
+                      });
+
+                    }
+                }
+
+            }
+
+            sigma.instances(0).refresh();
+
+      });
 
     }
 
@@ -5342,6 +5384,7 @@ sigma.parsers.json(
         });
 
 
+
                         if (pinnedNodes.length > 0) {
                                 if (background == 'dark') {
                                   $('#deletenodes').addClass('deletenodes-dark');
@@ -5419,6 +5462,9 @@ sigma.parsers.json(
        // If we're coming from stopwords, adjust deletedNodes
         if (origin == 'stopwords') {
                 deletedNodes = pinnedNodes;
+                  if ($('#summary').hasClass('pure-menu-selected-top')) {
+                      $('#summary').click();
+                  }
         }
 
         // Then generate the interface
@@ -5484,6 +5530,7 @@ sigma.parsers.json(
         if (pinnedNodes.length == 0) {
             if (addcontext && interpret) {
 
+
               $('.entry').hide();
 
               for (var ite in statementsOfContext[current_context]) {
@@ -5494,6 +5541,12 @@ sigma.parsers.json(
 
               }
 
+          }
+        }
+
+        if ($('#summary').hasClass('pure-menu-selected-top')) {
+          if (pinnedNodes.length == 0) {
+            $('#summary').click();
           }
         }
 
@@ -6671,9 +6724,9 @@ sigma.parsers.json(
       }
 
 
-    }, 2000);
+    }, 3000);
 
-
+    // TODO this is ridiculously bad - fix this timing issue
 
 
 
