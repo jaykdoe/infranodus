@@ -63,15 +63,15 @@
 
                <div id='topnav'>
                  <div class='pure-menu pure-menu-open pure-menu-horizontal'>
-                   <ul>
-                        <li>
-                             <a id="summary">Summary</a>
+                   <ul id='topnav_items'>
+                        <li id="summary">
+                             <a>Summary</a>
                         </li>
-                       <li class="pure-menu-selected-top">
-                           <a id="overview">Overview</a>
+                       <li  id="overview" class="pure-menu-selected-top">
+                           <a>Overview</a>
                        </li>
-                       <li>
-                           <a id="insight">Insight</a>
+                       <li id="insight">
+                           <a>Insight</a>
                        </li>
                   </ul>
                 </div>
@@ -2873,12 +2873,14 @@ sigma.parsers.json(
           $('#deletecontextbutton').hide();
           $('#privacy-link').hide();
           $('#collaborate-link').hide();
+          $('#entries').css({height:  $(window).height() - 200});
         });
 
         $("#adds").click(function(e) {
           $('#deletecontextbutton').show();
           $('#privacy-link').show();
           $('#collaborate-link').show();
+          $('#entries').css({height:  $(window).height() - 380});
         });
 
         $("#import-link").click(function(e) {
@@ -4295,8 +4297,27 @@ sigma.parsers.json(
             // console.log(topp_communities);
 
             filter_statements_summary(toppbc_nodes, topp_communities);
+
+            $('#topnav_items').each(function() {
+                $("li", this).each(function(i) {
+                    $(this).removeClass('pure-menu-selected-top');
+                });
+            });
+            this.className = 'pure-menu-selected-top';
             // Top community terms
 
+        });
+
+        $("#overview").click(function(e) {
+            e.preventDefault();
+            $('.entry').fadeIn(400);
+            $('#topnav_items').each(function() {
+                $("li", this).each(function(i) {
+                    $(this).removeClass('pure-menu-selected-top');
+                });
+            });
+            this.className = 'pure-menu-selected-top';
+            $("#entries").animate({ scrollTop: $('#entries')[0].scrollHeight }, 1000);
         });
 
 
@@ -4914,6 +4935,8 @@ sigma.parsers.json(
 
       var entries_shown = [];
 
+      var entries_ids = [];
+
       find_statement(top_words,0);
 
       function find_statement(key_terms, sweetch) {
@@ -5046,6 +5069,31 @@ sigma.parsers.json(
 
               entries_shown.sort(compare);
               console.log(entries_shown);
+
+              for (var s = 0; s < entries_shown.length; s++) {
+                entries_ids.push(entries_shown[s].id);
+              }
+
+
+
+              $('.entry').hide();
+
+              $(".entry").each(function(){
+
+                  var currentDiv = $(this).attr('data-uid');
+                  if (entries_ids.includes(currentDiv)) {
+                    $(this).fadeIn(400);
+                  }
+
+              });
+
+              document.getElementById('entries').scrollTop = 0;
+
+
+              $('#finds').trigger('click');
+
+
+
 
             }
 
