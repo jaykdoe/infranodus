@@ -4318,6 +4318,11 @@ sigma.parsers.json(
             });
             this.className = 'pure-menu-selected-top';
             $("#entries").animate({ scrollTop: $('#entries')[0].scrollHeight }, 1000);
+
+            if (pinnedNodes.length > 0) {
+              filter_statements(pinnedNodes);
+            }
+            filter_graph(pinnedNodes);
         });
 
 
@@ -5092,6 +5097,44 @@ sigma.parsers.json(
 
               $('#finds').trigger('click');
 
+
+              // Make only those edges visible that belong to the statement selected
+
+              if (pinnedNodes.length == 0) {
+
+
+                  sigma.instances(0).graph.edges().forEach(function(e) {
+
+                      if (entries_ids.includes(e.statement_id)) {
+                          e.color = e.originalColor;
+                      }
+                      else {
+                          e.color = deselected_nodes_color;
+                      }
+
+                  });
+
+                  // Make only those nodes visible that belong to the statement selected
+                  sigma.instances(0).graph.nodes().forEach(function(n) {
+
+                      // Is there no contexts at all? Show the node.
+                      for (var g = 0; g < entries_ids.length; g++) {
+                        if (!n.marked || n.marked == '0') {
+                          if (nodesOfStatement[entries_ids[g]].indexOf(n.id) < 0)  {
+                              n.color = deselected_nodes_color;
+                              n.label = '';
+                          }
+                          else {
+                              n.color = n.originalColor;
+                              n.label = n.originalLabel;
+                              n.marked = '1';
+                          }
+                        }
+                      }
+                  });
+                  sigma.instances(0).refresh();
+
+              }
 
 
 
@@ -6252,6 +6295,7 @@ sigma.parsers.json(
                             n.color = deselected_nodes_color;
                             n.label = '';
                         }
+
                 });
 
                 sigma.instances(0).graph.edges().forEach(function(e) {
@@ -6270,12 +6314,14 @@ sigma.parsers.json(
             // No nodes are selected (or all are deselected) - show the whole graph
 
             else {
+                console.log('deselecting the graph');
 
                 sigma.instances(0).graph.nodes().forEach(function(n) {
 
 
                    n.color = n.originalColor;
                    n.label = n.originalLabel;
+                   n.marked = 0;
 
 
                 });
