@@ -620,6 +620,7 @@ var deselected_nodes_color = '#ddd';
 
 if (background == 'dark') {
   $('#graph-container').addClass('graph-dark');
+  $('#analyticsbutton').addClass('analyticsbutton-dark');
   $('.entry').addClass('entry-dark');
   $('.entry-text').addClass('entry-text-dark');
   $('#analytics').addClass('analytics-dark');
@@ -4979,10 +4980,10 @@ sigma.parsers.json(
 
                     if (nodesfound == key_terms.length) {
                       if (sweetch == 0) {
-                        found_statements.push({text: originaltext, id: currentDiv, time: currentTimecode});
+                        found_statements.push({text: originaltext, id: currentDiv, time: currentTimecode, origin: key_terms});
                       }
                       else if (sweetch > 0) {
-                        com_statements[sweetch].push({text: originaltext, id: currentDiv, time: currentTimecode});
+                        com_statements[sweetch].push({text: originaltext, id: currentDiv, time: currentTimecode, origin: key_terms});
                       }
 
                     }
@@ -6321,7 +6322,9 @@ sigma.parsers.json(
 
                    n.color = n.originalColor;
                    n.label = n.originalLabel;
+
                    n.marked = 0;
+
 
 
                 });

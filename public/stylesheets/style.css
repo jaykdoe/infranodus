@@ -427,7 +427,7 @@ a:hover.app-more-link {
 #analytics {
     font: 15px 'IstokWeb-Regular',sans-serif;
     position: fixed;
-    bottom: 70px;
+    bottom: 85px;
     font-size: 15px;
     line-height: 20px;
     text-align: left;
@@ -435,7 +435,7 @@ a:hover.app-more-link {
     width: 320px;
     clear: both;
     border-radius: 12px;
-    padding: 10px;
+    padding: 0px 10px 10px 10px;
     margin-right: 0px;
     z-index: 10;
     background-color: rgba(250, 250, 250, 0.7);
@@ -514,10 +514,9 @@ button {
 #analyticsbutton {
   position: fixed;
   bottom: 15px;
-  width: 40px;
-  height: 40px;
+  width: 60px;
+  height: 60px;
   right: 15px; /* "#menu width" */
-  padding-right: 5px;
   font-size: 14px; /* change this value to increase/decrease button size */
   /* width: 2em;
    height: auto;*/
@@ -526,10 +525,19 @@ button {
   background-repeat:no-repeat;
   background-position:center;
   content: attr(data-before);
-  border: 1px solid #a0a0a0;
-  border-radius: 10px;
+  border: 1px solid #cfcfcf;
+  border-radius: 30px;
   vertical-align: middle;
+  background-color: #cfcfcf;
+  box-shadow: 0 5px 20px rgba(0,0,0,.16);
+  -webkit-box-shadow: 0 5px 20px rgba(0,0,0,.16);
 
+
+}
+
+.analyticsbutton-dark {
+  border: 1px solid #444444!important;
+  background-color: #444444!important;
 
 
 }
@@ -539,8 +547,8 @@ button {
   position: absolute;
   text-align: right;
   font-size: 14px; /* change this value to increase/decrease button size */
-  right: 55px;
-  top: 8px;
+  right: 70px;
+  top: 20px;
 
 }
 
