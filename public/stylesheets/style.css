@@ -525,12 +525,12 @@ button {
   background-repeat:no-repeat;
   background-position:center;
   content: attr(data-before);
-  border: 1px solid #cfcfcf;
+  border: 1px solid #d0d0d0;
   border-radius: 30px;
   vertical-align: middle;
-  background-color: #cfcfcf;
-  box-shadow: 0 5px 20px rgba(0,0,0,.16);
-  -webkit-box-shadow: 0 5px 20px rgba(0,0,0,.16);
+  background-color: #d5d5d5;
+  box-shadow: 0 3px 15px rgba(0,0,0,.16);
+  -webkit-box-shadow: 0 3px 15px rgba(0,0,0,.16);
 
 
 }

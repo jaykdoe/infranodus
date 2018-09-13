@@ -70,9 +70,7 @@
                        <li  id="overview" class="pure-menu-selected-top">
                            <a>Overview</a>
                        </li>
-                       <li id="insight">
-                           <a>Insight</a>
-                       </li>
+                       
                   </ul>
                 </div>
 
@@ -5015,7 +5013,8 @@ sigma.parsers.json(
 
 
                 for (var i = 0; i < top_community_words.length; i++) {
-              //    console.log(top_community_words[i].nodes);
+
+
                   current_community = i;
                   find_statement(top_community_words[i].nodes,1+i);
 
@@ -5089,6 +5088,7 @@ sigma.parsers.json(
                   var currentDiv = $(this).attr('data-uid');
                   if (entries_ids.includes(currentDiv)) {
                     $(this).fadeIn(400);
+
                   }
 
               });
@@ -5147,9 +5147,10 @@ sigma.parsers.json(
               top_words = top_words.slice(0, -1);
               find_statement(top_words,0)
             }
-            else {
-
-            }
+            else if (sweetch > 0) {
+                var reduced_query = key_terms.slice(0,-1);
+                find_statement(reduced_query,sweetch);
+              }
           }
 
 
