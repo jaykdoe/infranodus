@@ -4288,13 +4288,13 @@ sigma.parsers.json(
         $("#summary").click(function(e) {
             e.preventDefault();
 
-            // Top influence nodes
-            console.log(toppbc_nodes);
+            // // Top influence nodes
+            // console.log(toppbc_nodes);
+            //
+            // // Top community nodes
+            // console.log(topp_communities);
 
-            // Top community nodes
-            console.log(topp_communities);
-
-            filter_statements_summary(toppbc_nodes);
+            filter_statements_summary(toppbc_nodes, topp_communities);
             // Top community terms
 
         });
@@ -4908,38 +4908,57 @@ sigma.parsers.json(
 
       var found_statements = [];
 
-      find_statement(top_words);
+      var com_statements = {0:[],1:[],2:[],3:[],4:[]};
 
-      function find_statement(key_terms) {
+      var current_community;
+
+      find_statement(top_words,0);
+
+      function find_statement(key_terms, sweetch) {
 
           var nodesfound = 0;
 
+          // Find the first entry that contains ALL the key_terms
+
           $(".entry").each(function(){
 
-            if (found_statements.length < 1) {
+            if ((found_statements.length < 1 && sweetch == 0) || (sweetch > 0 && com_statements[sweetch].length < 1)) {
+
               var currentDiv = $(this).attr('data-uid');
               var originaltext = $(this).children('.entry-text').html();
               var currentTimecode = $(this).attr('data-timestamp');
 
+              for (var j = 0; j < key_terms.length; j++) {
 
 
-              for (var j = 0; j < top_words.length; j++) {
 
+                var search_lemma;
                   //TODO lemmas
                   // var search_lemma = window.jstemmer(pinnedNodes[j]);
 
-                  var search_lemma = top_words[j].label;
-
+                  if (sweetch == 0) {
+                   search_lemma = key_terms[j].label;
+                  }
+                  else {
+                    search_lemma = key_terms[j].name;
+                  }
 
                     if (originaltext.toLowerCase().indexOf(search_lemma.toLowerCase()) > -1) {
                         nodesfound = nodesfound + 1;
                     }
 
-                    if (nodesfound == top_words.length) {
-                      found_statements.push({text: originaltext, id: currentDiv, time: currentTimecode});
+                    if (nodesfound == key_terms.length) {
+                      if (sweetch == 0) {
+                        found_statements.push({text: originaltext, id: currentDiv, time: currentTimecode});
+                      }
+                      else if (sweetch > 0) {
+                        com_statements[sweetch].push({text: originaltext, id: currentDiv, time: currentTimecode});
+                      }
+
                     }
 
-                    if ((j == top_words.length - 1) && nodesfound != top_words.length) {
+                    // If not all the search words are present in an entry, nullify the counter
+                    if ((j == key_terms.length - 1) && nodesfound != key_terms.length) {
                       nodesfound = 0;
                     }
 
@@ -4948,13 +4967,70 @@ sigma.parsers.json(
 
           });
 
+          // Ok, did we already find an entry where all the top_words exist?
 
-          if (nodesfound == top_words.length) {
+          if ((sweetch == 0 && nodesfound == top_words.length)) {
+
+                console.log('found statements');
                 console.log(found_statements);
+                nodesfound = 0;
+
+                // Ok, now let's search through each community
+
+
+                for (var i = 0; i < top_community_words.length; i++) {
+                  console.log(top_community_words[i].nodes);
+                  current_community = i;
+                  find_statement(top_community_words[i].nodes,1+i);
+
+                  // TODO for when 3 words are not found
+
+                  // if (nodesfound == top_community_words[i].nodes.length) {
+                  //   console.log('found community statemenets');
+                  //   console.log(a_statements);
+                  // }
+                  // else {
+                  //   top_community_words[i].nodes = top_community_words[i].nodes.slice(0,-1);
+                  //   find_statement(top_community_words[i].nodes,1+i);
+                  // }
+                }
+
+
+          }
+          else if (sweetch > 0 && nodesfound == key_terms.length) {
+            if (current_community == top_community_words.length -1) {
+              console.log('found community');
+
+              function cleanup(obj) {
+                  let newObj = {};
+                  let idx = 0;
+                  for (var propName in obj) {
+                    let prop = obj[propName];
+
+                    if (prop !== null
+                     && prop !== undefined
+                     && JSON.stringify(prop) != "[]" // not empty array
+                     && JSON.stringify(prop) !== "{}") { // not empty obj
+                      newObj[idx] = prop;
+                      idx++;
+                    }
+                  }
+                  return newObj;
+              }
+
+              console.log(cleanup(com_statements));
+
+            }
+
           }
           else {
-            top_words = top_words.slice(0, -1);
-            find_statement(top_words)
+            if (sweetch == 0) {
+              top_words = top_words.slice(0, -1);
+              find_statement(top_words,0)
+            }
+            else {
+
+            }
           }
 
 
