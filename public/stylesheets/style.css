@@ -516,7 +516,7 @@ button {
   bottom: 15px;
   width: 55px;
   height: 55px;
-  right: 20px; /* "#menu width" */
+  right: 22px; /* "#menu width" */
   font-size: 14px; /* change this value to increase/decrease button size */
   /* width: 2em;
    height: auto;*/
@@ -547,7 +547,7 @@ button {
   position: absolute;
   text-align: right;
   font-size: 14px; /* change this value to increase/decrease button size */
-  right: 65px;
+  right: 67px;
   top: 17px;
 
 }
