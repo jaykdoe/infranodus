@@ -4912,6 +4912,8 @@ sigma.parsers.json(
 
       var current_community;
 
+      var entries_shown = [];
+
       find_statement(top_words,0);
 
       function find_statement(key_terms, sweetch) {
@@ -4973,13 +4975,18 @@ sigma.parsers.json(
 
                 console.log('found statements');
                 console.log(found_statements);
+
+                for (var s = 0; s < found_statements.length; s++) {
+                    entries_shown.push(found_statements[s]);
+                }
+
                 nodesfound = 0;
 
                 // Ok, now let's search through each community
 
 
                 for (var i = 0; i < top_community_words.length; i++) {
-                  console.log(top_community_words[i].nodes);
+              //    console.log(top_community_words[i].nodes);
                   current_community = i;
                   find_statement(top_community_words[i].nodes,1+i);
 
@@ -4999,10 +5006,10 @@ sigma.parsers.json(
           }
           else if (sweetch > 0 && nodesfound == key_terms.length) {
             if (current_community == top_community_words.length -1) {
-              console.log('found community');
+
 
               function cleanup(obj) {
-                  let newObj = {};
+                  let newObj = [];
                   let idx = 0;
                   for (var propName in obj) {
                     let prop = obj[propName];
@@ -5011,14 +5018,34 @@ sigma.parsers.json(
                      && prop !== undefined
                      && JSON.stringify(prop) != "[]" // not empty array
                      && JSON.stringify(prop) !== "{}") { // not empty obj
-                      newObj[idx] = prop;
+                      newObj[idx] = prop[0]; // we only need one object, NOTE can be an array if we decide to get more statemetns for each community
                       idx++;
                     }
                   }
                   return newObj;
               }
 
-              console.log(cleanup(com_statements));
+              com_statements = cleanup(com_statements);
+
+              console.log('com statements');
+              console.log(com_statements);
+
+
+              for (var s = 0; s < com_statements.length; s++) {
+                entries_shown.push(com_statements[s]);
+              }
+
+
+              function compare(a,b) {
+                if (a.time < b.time)
+                  return -1;
+                if (a.time > b.time)
+                  return 1;
+                return 0;
+              }
+
+              entries_shown.sort(compare);
+              console.log(entries_shown);
 
             }
 
