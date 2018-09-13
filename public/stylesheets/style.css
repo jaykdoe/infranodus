@@ -514,9 +514,9 @@ button {
 #analyticsbutton {
   position: fixed;
   bottom: 15px;
-  width: 60px;
-  height: 60px;
-  right: 15px; /* "#menu width" */
+  width: 55px;
+  height: 55px;
+  right: 18px; /* "#menu width" */
   font-size: 14px; /* change this value to increase/decrease button size */
   /* width: 2em;
    height: auto;*/
@@ -547,8 +547,8 @@ button {
   position: absolute;
   text-align: right;
   font-size: 14px; /* change this value to increase/decrease button size */
-  right: 70px;
-  top: 20px;
+  right: 65px;
+  top: 17px;
 
 }
 
