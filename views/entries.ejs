@@ -65,7 +65,7 @@
                  <div class='pure-menu pure-menu-open pure-menu-horizontal'>
                    <ul id='topnav_items'>
                         <li id="summary">
-                             <a>Summary</a>
+                             <a class='greish'>Summary</a>
                         </li>
                        <li  id="overview" class="pure-menu-selected-top">
                            <a>Overview</a>
@@ -112,7 +112,7 @@
                           <a id="finds" class="switcher set1">find</a>
                       </li>
                     <li class="pure-menu-selected-top">
-                        <a id="adds" class="switcher set1">add</a>
+                        <a id="adds" class="switcher set1">edit</a>
                     </li>
                     <li>
                         <a id="imports" href="/<%= user.name %>/meta_<%= context %>/edit?addcontext=<%= context %>&interpret=1">interpret</a>
@@ -151,7 +151,7 @@
                             <a href="javascript:">find</a>
                         </li>
                       <li>
-                          <a href="edit">add</a>
+                          <a href="edit">edit</a>
                       </li>
                       <li>
                           <a href="/import">import</a>
@@ -530,6 +530,9 @@ var deletedNodes = [];
 
 var selectedNodes = [];
 
+var most_inf_nodes = [];
+
+var most_inf_comm_nodes = {};
 
 
 // Whats the clicked nodes in the graph
@@ -3662,6 +3665,9 @@ sigma.parsers.json(
 
          //console.log(topp_communities);
 
+         // Give it to the global 
+         most_inf_comm_nodes = topp_communities;
+
          // these are top nodes in each community
          var top_nodes = [];
 
@@ -3737,6 +3743,10 @@ sigma.parsers.json(
          var toppbc_nodes = topbc_nodes.slice(0,4);
 
          console.log(toppbc_nodes);
+
+         most_inf_nodes = toppbc_nodes;
+
+         // TODO   if (most_influential == 'bc' && toppbc_nodes[0].bc > 0) {
 
 
          if (most_influential == 'bc' && toppbc_nodes[0].bc > 0) {
@@ -4262,44 +4272,7 @@ sigma.parsers.json(
 
 
 
-      $("#summary").click(function(e) {
-          e.preventDefault();
 
-          // // Top influence nodes
-          // console.log(toppbc_nodes);
-          //
-          // // Top community nodes
-          // console.log(topp_communities);
-
-          filter_statements_summary(toppbc_nodes, topp_communities);
-
-          $('#topnav_items').each(function() {
-              $("li", this).each(function(i) {
-                  $(this).removeClass('pure-menu-selected-top');
-              });
-          });
-          this.className = 'pure-menu-selected-top';
-          // Top community terms
-
-      });
-
-      $("#overview").click(function(e) {
-          e.preventDefault();
-          $('.entry').fadeIn(400);
-          $('#topnav_items').each(function() {
-              $("li", this).each(function(i) {
-                  $(this).removeClass('pure-menu-selected-top');
-              });
-          });
-          this.className = 'pure-menu-selected-top';
-          $("#entries").animate({ scrollTop: $('#entries')[0].scrollHeight }, 1000);
-
-          if (pinnedNodes.length > 0) {
-            filter_statements(pinnedNodes);
-          }
-          filter_graph(pinnedNodes);
-          $('.summary').remove();
-      });
 
 
       var commClicked = [];
@@ -4343,7 +4316,7 @@ sigma.parsers.json(
 
 
 
-
+      // communityDetect function ends here
     }
 
 
@@ -4728,9 +4701,11 @@ sigma.parsers.json(
 
     var summary_statements = [];
 
+
     function filter_statements_summary(top_words, top_community_words) {
-
-
+      console.log('Filering Summary top words');
+      console.log(top_words);
+      console.log(top_community_words);
 
       // Let's first filter statements that contain all the most influential top_words
       // If all 4 are nowhere to be found, we reiterate until at least the first 3, 2, 1 is found.
@@ -4806,7 +4781,7 @@ sigma.parsers.json(
 
           if ((sweetch == 0 && nodesfound == top_words.length)) {
 
-                console.log('found statements');
+                console.log('Found influential node statement:');
                 console.log(found_statements);
 
                 for (var s = 0; s < found_statements.length; s++) {
@@ -4861,7 +4836,7 @@ sigma.parsers.json(
 
               com_statements = cleanup(com_statements);
 
-              console.log('com statements');
+              console.log('Main cluster topics:');
               console.log(com_statements);
 
 
@@ -5200,6 +5175,46 @@ sigma.parsers.json(
       });
 
     }
+
+
+    $("#summary").click(function(e) {
+        e.preventDefault();
+
+        // // Top influence nodes
+      //   console.log(toppbc_nodes);
+        //
+        // // Top community nodes
+        // console.log(topp_communities);
+
+        filter_statements_summary(most_inf_nodes, most_inf_comm_nodes);
+
+        $('#topnav_items').each(function() {
+            $("li", this).each(function(i) {
+                $(this).removeClass('pure-menu-selected-top');
+            });
+        });
+        this.className = 'pure-menu-selected-top';
+        // Top community terms
+
+    });
+
+    $("#overview").click(function(e) {
+        e.preventDefault();
+        $('.entry').fadeIn(400);
+        $('#topnav_items').each(function() {
+            $("li", this).each(function(i) {
+                $(this).removeClass('pure-menu-selected-top');
+            });
+        });
+        this.className = 'pure-menu-selected-top';
+        $("#entries").animate({ scrollTop: $('#entries')[0].scrollHeight }, 1000);
+
+        if (pinnedNodes.length > 0) {
+          filter_statements(pinnedNodes);
+        }
+        filter_graph(pinnedNodes);
+        $('.summary').remove();
+    });
 
     // Filter out the statements that don't have any of the nodes clicked
 
