@@ -1956,7 +1956,7 @@ exports.submit = function(req, res,  next) {
             if (!sublanguage) { sublanguage = 'en' }
 
             if (!subphrases) {
-              subphrases = '4';
+              subphrases = '6';
             }
             else {
               subphrases = parseInt(subphrases);
@@ -2054,6 +2054,8 @@ exports.submit = function(req, res,  next) {
                         var prev_statement = ' ';
                         var future_statement = ' ';
 
+                        var previous_timecode;
+
 
                         for (var i = 1; i < statements.length; ++i) {
 
@@ -2090,7 +2092,8 @@ exports.submit = function(req, res,  next) {
                                   end_time = statements[i].substr(17,12);
 
                                   // TODO fix this to check for repetition, right now YouTube automated CCs are repeating every 4 times or so
-                                  if (!ytoptions.auto) {
+
+                                  if ((statements[i].indexOf('align:start') > -1) && ytoptions.auto) { subphrases = '4' }
 
                                     for (var k = 1; k < subphrases; k++) {
 
@@ -2111,13 +2114,15 @@ exports.submit = function(req, res,  next) {
 
                                     }
 
-                                  }
 
 
 
-                                   req.body.entry.body[j] = start_time + ' --> ' + end_time + ' ' + request_body.replace('align:start position:0%',' ') + 'http://youtu.be/' + youtube_parser(searchString) + '?t=' + timecode;
+
+                                  req.body.entry.body[j] = start_time + ' --> ' + end_time + ' ' + request_body.replace('align:start position:0%',' ') + 'http://youtu.be/' + youtube_parser(searchString) + '?t=' + timecode;
+
 
                                   i = i + subphrases - 1;
+
                                   j = j + 1;
 
 

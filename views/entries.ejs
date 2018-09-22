@@ -186,12 +186,12 @@
                   </a>
                   <% } %>
 
-                  <% if (contextpublic && context && !perceivername && entries.length > 0) { %>
+                  <% if (contextpublic && context && !perceivername) { %>
                   <a href="javascript:" id="privacy-link" class="is-public">
                       <!-- Share icon -->
                       <span></span>
                   </a>
-                  <% } else if (!perceivername && context && entries.length > 0) { %>
+                  <% } else if (!perceivername && context) { %>
                   <a href="javascript:" id="privacy-link">
                       <!-- Share icon -->
                       <span></span>
@@ -2546,7 +2546,13 @@ sigma.parsers.json(
                  element: "#collaborate-link",
                  title: "Collaborate",
                  placement: "top",
-                 content: "You can make your graph public or invite somebody to collaborate. Click on these buttons to learn more."
+                 content: "You can invite somebody to collaborate and to work with you on this graph. Click on this button to copy and paste the URL and then send it to your collaborators."
+               },
+               {
+                 element: "#privacy-link",
+                 title: "Privacy / Embed",
+                 placement: "top",
+                 content: "All your data is private by default and cannot be seen by anybody. You can make this graph public and then embed it on any other html page. Just click this button and then copy and paste the URL or the embed code."
                },
                {
                  element: "#settingspane",
@@ -2583,10 +2589,39 @@ sigma.parsers.json(
                  content: "If, at any point, something goes wrong, you can always click this to reload the graph."
                },
                {
+                 element: "#summary",
+                 placement: "bottom",
+                 title: "Essence / Summary",
+                 content: "Click here to filter the most essential statements from the discourse. These will be the ones that contain the key terms (the main topical clusters) of the discourse as identified in the Analytics pane.",
+                 onShow: function (tour) {
+                     $('#summary').click();
+                     if ($('#analytics').is(":visible")) {
+                     }
+                     else {
+                       $('#analyticsbutton').click();
+                     }
+                 }
+               },
+               {
+                 element: "#insight",
+                 placement: "bottom",
+                 title: "Insight",
+                 content: "Click here to generate new ideas: we will show you the two topical clusters and the associated statements, which could be linked together to get a new insight into the discourse or to develop it further (depending on its structure).",
+                 onShow: function (tour) {
+                     $('#insight').click();
+                 }
+               },
+               {
                  element: "#walkthrough",
                  placement: "left",
                  title: "Interactive Help",
-                 content: "When you want to see this guide again, click here."
+                 content: "When you want to see this guide again, click here.",
+                 onShow: function (tour) {
+                     if ($('#analytics').is(":visible")) {
+                        $('#analyticsbutton').click();
+                     }
+                     $('#overview').click();
+                 }
                }
 
              ]});
@@ -2638,10 +2673,39 @@ sigma.parsers.json(
                  }
                },
                {
+                 element: "#summary",
+                 placement: "bottom",
+                 title: "Essence / Summary",
+                 content: "Click here to filter the most essential statements from the discourse. These will be the ones that contain the key terms (the main topical clusters) of the discourse as identified in the Analytics pane.",
+                 onShow: function (tour) {
+                     $('#summary').click();
+                     if ($('#analytics').is(":visible")) {
+                     }
+                     else {
+                       $('#analyticsbutton').click();
+                     }
+                 }
+               },
+               {
+                 element: "#insight",
+                 placement: "bottom",
+                 title: "Insight",
+                 content: "Click here to generate new ideas: we will show you the two topical clusters and the associated statements, which could be linked together to get a new insight into the discourse or to develop it further (depending on its structure).",
+                 onShow: function (tour) {
+                     $('#insight').click();
+                 }
+               },
+               {
                  element: "#walkthrough",
                  placement: "left",
                  title: "Detailed Tutorial",
-                 content: "If, at any point, you want to see a more detailed Tutorial, click here."
+                 content: "If, at any point, you want to see a more detailed Tutorial, click here.",
+                 onShow: function (tour) {
+                     if ($('#analytics').is(":visible")) {
+                        $('#analyticsbutton').click();
+                     }
+                     $('#overview').click();
+                 }
                }
                ]
              }
@@ -4759,8 +4823,9 @@ sigma.parsers.json(
 
               var currentDiv = $(this).attr('data-uid');
 
-              // TODO maybe search through the tags data
+
               var originaltext = $(this).children('.entry-text').html();
+              var statement_hashtags = $(this).attr('data-hashtags');
               var currentTimecode = $(this).attr('data-timestamp');
 
               for (var j = 0; j < key_terms.length; j++) {
@@ -4778,7 +4843,7 @@ sigma.parsers.json(
                     search_lemma = key_terms[j].name;
                   }
 
-                    if (originaltext.toLowerCase().indexOf(search_lemma.toLowerCase()) > -1) {
+                    if (statement_hashtags.toLowerCase().indexOf(search_lemma.toLowerCase()) > -1) {
                         nodesfound = nodesfound + 1;
                     }
 
@@ -6146,7 +6211,7 @@ sigma.parsers.json(
 
         <% } else { %>
             settingspane = '<li class="menu-item-small" id="settingspane"><a href="/settings">settings</a></li><br>';
-            appshome = '<li class="menu-item-small"><a href="/">infranodus.com</a></li><li class="menu-item-small"><a href="/apps">apps</a></li>';
+            appshome = '<li class="menu-item-small"><a href="/">infranodus.com</a></li><li class="menu-item-small"><a href="/apps">apps/home</a></li>';
             auxLinks = '<br>' +
                     '<li class="menu-item-divided"><a href="/logout">logout</a></li>' +
                     '<li class="menu-item-small">&nbsp;</li>' +
