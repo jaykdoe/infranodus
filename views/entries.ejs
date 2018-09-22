@@ -65,13 +65,13 @@
                  <div class='pure-menu pure-menu-open pure-menu-horizontal'>
                    <ul id='topnav_items'>
                         <li id="summary">
-                             <a class='greish'>Summary</a>
+                             <a>Essence</a>
                         </li>
                        <li  id="overview" class="pure-menu-selected-top">
                            <a>Overview</a>
                        </li>
                        <li id="insight">
-                            <a class='greish'>Insight</a>
+                            <a>Insight</a>
                        </li>
 
                   </ul>
@@ -638,7 +638,7 @@ if (background == 'dark') {
   $('#addnodeinput').css({'backgroundColor': 'rgba(250, 250, 250, 0.2)', 'border': 'none', 'box-shadow': 'none', 'color': '#aaaab5'});
   $('#statement').css({'backgroundColor': 'rgba(250, 250, 250, 0.2)', 'border': 'none', 'box-shadow': 'none', 'color': '#aaaab5'});
   $('body').css('color', '#aaaab5');
-  $('li.pure-menu-selected-top a').css('backgroundColor', '#888888');
+  // $('li.pure-menu-selected-top a').css('backgroundColor', '#888888');
   $('.menu-link').css('background', 'rgba(250, 250, 250, 0.4)');
   $('#graph-link').addClass('graph-link-dark');
   $('#chat-link').addClass('chat-dark');
@@ -4733,7 +4733,7 @@ sigma.parsers.json(
 
 
       if (filter_origin == 'insight') {
-        
+
 
           for (var i = 0; i < top_community_words.length; i++) {
 
@@ -4898,7 +4898,7 @@ sigma.parsers.json(
               var explanation_html = 'The excerpts from the text containing the main topics and the most influential terms:';
 
               if (filter_origin == 'insight') {
-                explanation_html = "There is a structural gap and a potential for a new idea between these two sets of keywords and statements below:";
+                explanation_html = "There is a structural gap and a potential for a new idea between these two sets of key terms and statements below:";
               }
 
               $('#explanation').show();
@@ -4933,7 +4933,9 @@ sigma.parsers.json(
 
                     if($(this).find('.summary').length == 0){
 
-                      $(this).prepend( "<div class='summary'>contains: " + summary_helper + "</div>" );
+
+                      $(this).prepend( "<div class='summary'>key terms: " + summary_helper + "</div>" );
+
                       //console.log(entries_keywords[currentDiv]);
                     }
 
@@ -5559,6 +5561,9 @@ sigma.parsers.json(
                   if ($('#summary').hasClass('pure-menu-selected-top')) {
                       $('#summary').click();
                   }
+                  if ($('#insight').hasClass('pure-menu-selected-top')) {
+                      $('#insight').click();
+                  }
         }
 
         // Then generate the interface
@@ -5641,6 +5646,11 @@ sigma.parsers.json(
         if ($('#summary').hasClass('pure-menu-selected-top')) {
           if (pinnedNodes.length == 0) {
             $('#summary').click();
+          }
+        }
+        if ($('#insight').hasClass('pure-menu-selected-top')) {
+          if (pinnedNodes.length == 0) {
+            $('#insight').click();
           }
         }
 

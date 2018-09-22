@@ -1873,13 +1873,13 @@ Forms Core
 
 /* SELECTED MENU ITEM */
 .pure-menu li.pure-menu-selected a {
-    background-color: C8C6C6;
+    /* background-color: C8C6C6; */
     color: #171616;
 }
 
 /* SELECTED MENU ITEM */
 .pure-menu li.pure-menu-selected-top a {
-    background-color: #ededed!important;
+    /* background-color: #ededed!important; */
     color: #40b5ff!important;
     opacity: 0.!important;
 }
