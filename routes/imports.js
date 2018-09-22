@@ -2071,7 +2071,7 @@ exports.submit = function(req, res,  next) {
                                   var secondsplit = timesplit[2].split('.');
 
                                   // recalculate timecode into seconds and deduct 3 to point to the right moment
-                                  timecode = parseInt(timesplit[0])*60*60 + parseInt(timesplit[1])*60 + parseInt(secondsplit[0]) - 3;
+                                  timecode = parseInt(timesplit[0])*60*60 + parseInt(timesplit[1])*60 + parseInt(secondsplit[0]);
 
 
                                   var request_body;

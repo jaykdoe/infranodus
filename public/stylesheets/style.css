@@ -135,12 +135,24 @@ textarea:focus {
 
 .summary {
 
-    font: 15px 'IstokWeb-Regular',sans-serif;
+    font: 14px 'IstokWeb-Regular',sans-serif;
     color: #333;
     padding-top: 5px;
     color: #999999;
     text-align: left;
     font-style: italic;
+}
+
+#explanation {
+  position: relative;
+  width: 80%;
+  padding-left: 13px;
+  padding-top:-5px;
+  font: 14px 'IstokWeb-Regular',sans-serif;
+  font-style: italic;
+  padding-bottom: 15px;
+  color: #666;
+  display: none;
 }
 
 .entry-date {
@@ -410,7 +422,7 @@ a:hover.app-more-link {
 
 #entries {
     position: relative;
-    padding-top: 20px;
+    padding-top: 0px;
     height: 100%;
     max-width: inherit;
     -webkit-overflow-scrolling: touch;

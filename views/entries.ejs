@@ -70,6 +70,9 @@
                        <li  id="overview" class="pure-menu-selected-top">
                            <a>Overview</a>
                        </li>
+                       <li id="insight">
+                            <a class='greish'>Insight</a>
+                       </li>
 
                   </ul>
                 </div>
@@ -78,7 +81,7 @@
 
                  <div id="entries">
 
-
+                     <div id="explanation"></div>
 
                      <% entries.forEach(function(entry) { %>
                      <div class='entry' data-uid='<%= entry.uid %>' data-timestamp='<%= entry.timestamp %>' data-hashtags='<%= entry.name %>'>
@@ -530,10 +533,13 @@ var deletedNodes = [];
 
 var selectedNodes = [];
 
+// These are for Summary / Insight functionality
+
 var most_inf_nodes = [];
 
 var most_inf_comm_nodes = {};
 
+var polysingularity_score = 0;
 
 // Whats the clicked nodes in the graph
 var clickedNodes = [];
@@ -4222,6 +4228,9 @@ sigma.parsers.json(
      else {
         diversity_score = 'Biased';
      }
+     // Set global parameter
+     polysingularity_score = diversity_score;
+
 
      diversitytext +=  ' <br><div class="headline">Discourse <a href="https://noduslabs.com/research/visualization-text-polysingularity-network-analysis/" target="_blank">polysingularity</a>: <i>' + diversity_score + '</i> </div><br>';
      diversitytext += community_assignment_result['modularity'].toFixed(2) + ' modularity, ';
@@ -4702,7 +4711,7 @@ sigma.parsers.json(
     var summary_statements = [];
 
 
-    function filter_statements_summary(top_words, top_community_words) {
+    function filter_statements_summary(top_words, top_community_words, filter_origin) {
       console.log('Filering Summary top words');
       console.log(top_words);
       console.log(top_community_words);
@@ -4722,7 +4731,21 @@ sigma.parsers.json(
       var entries_ids = [];
       var entries_keywords = [];
 
-      find_statement(top_words,0);
+
+      if (filter_origin == 'insight') {
+        
+
+          for (var i = 0; i < top_community_words.length; i++) {
+
+            current_community = i;
+            find_statement(top_community_words[i].nodes,1+i);
+          }
+
+      }
+      else {
+
+          find_statement(top_words,0);
+      }
 
       function find_statement(key_terms, sweetch) {
 
@@ -4735,6 +4758,8 @@ sigma.parsers.json(
             if ((found_statements.length < 1 && sweetch == 0) || (sweetch > 0 && com_statements[sweetch].length < 1)) {
 
               var currentDiv = $(this).attr('data-uid');
+
+              // TODO maybe search through the tags data
               var originaltext = $(this).children('.entry-text').html();
               var currentTimecode = $(this).attr('data-timestamp');
 
@@ -4777,6 +4802,8 @@ sigma.parsers.json(
 
           });
 
+
+
           // Ok, did we already find an entry where all the top_words exist?
 
           if ((sweetch == 0 && nodesfound == top_words.length)) {
@@ -4814,6 +4841,9 @@ sigma.parsers.json(
 
           }
           else if (sweetch > 0 && nodesfound == key_terms.length) {
+
+            // Did we reach the end of all the words?
+
             if (current_community == top_community_words.length -1) {
 
 
@@ -4865,6 +4895,15 @@ sigma.parsers.json(
 
               $('.entry').hide();
 
+              var explanation_html = 'The excerpts from the text containing the main topics and the most influential terms:';
+
+              if (filter_origin == 'insight') {
+                explanation_html = "There is a structural gap and a potential for a new idea between these two sets of keywords and statements below:";
+              }
+
+              $('#explanation').show();
+              $('#explanation').html(explanation_html);
+
               $(".entry").each(function(){
 
                   var currentDiv = $(this).attr('data-uid');
@@ -4872,7 +4911,8 @@ sigma.parsers.json(
 
                     $(this).fadeIn(400);
 
-                  
+                  // TODO clear up the entry text like in the above -
+                  // 1. break into sentences; 2. find the first concentrate pf words; 3. keep it. 4. either create new ones or div the part non-relevant and make it opacity low or remove fully
 
                     var summary_helper = '';
 
@@ -4957,6 +4997,7 @@ sigma.parsers.json(
 
           }
           else {
+            // All top nodes cannot be found anywhere, so we cut the list and search again
             if (sweetch == 0) {
               top_words = top_words.slice(0, -1);
               find_statement(top_words,0)
@@ -5200,6 +5241,41 @@ sigma.parsers.json(
 
     });
 
+    $("#insight").click(function(e) {
+        e.preventDefault();
+
+        var insight_nodes = [];
+
+        if (polysingularity_score == 'Diversified') {
+          if (most_inf_comm_nodes[0]) {
+            insight_nodes.push(most_inf_comm_nodes[0]);
+          }
+          if (most_inf_comm_nodes[1]) {
+            insight_nodes.push(most_inf_comm_nodes[1]);
+          }
+        }
+        else {
+          if (most_inf_comm_nodes[most_inf_comm_nodes.length-1]) {
+            insight_nodes.push(most_inf_comm_nodes[most_inf_comm_nodes.length-1]);
+          }
+          if (most_inf_comm_nodes[most_inf_comm_nodes.length-2]) {
+            insight_nodes.push(most_inf_comm_nodes[most_inf_comm_nodes.length-2]);
+          }
+        }
+
+
+        filter_statements_summary(most_inf_nodes, insight_nodes, 'insight');
+
+        $('#topnav_items').each(function() {
+            $("li", this).each(function(i) {
+                $(this).removeClass('pure-menu-selected-top');
+            });
+        });
+        this.className = 'pure-menu-selected-top';
+        // Top community terms
+
+    });
+
     $("#overview").click(function(e) {
         e.preventDefault();
         $('.entry').fadeIn(400);
@@ -5216,6 +5292,7 @@ sigma.parsers.json(
         }
         filter_graph(pinnedNodes);
         $('.summary').remove();
+        $('#explanation').hide();
     });
 
     // Filter out the statements that don't have any of the nodes clicked
