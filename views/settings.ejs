@@ -112,6 +112,7 @@
                     <label for="topnodes" class="pure-input">
                       <select id="topnodes" name="topnodes">
                       <option value="bc" <% if (user.topnodes=='bc' || user.topnodes == undefined) { %> selected <% } %>>max betweenness centrality</option>
+                      <option value="bc2" <% if (user.topnodes=='bc2') { %> selected <% } %>>max BC (also for topics)</option>
                       <option value="degree" <% if (user.topnodes=='degree') { %> selected <% } %>>max degree</option>
                       </select>
                     </label>

@@ -584,7 +584,7 @@ var in_label_threshold = 8;
 // default most influential nodes are displayed according to Betwenness Centrality (bc) or Degree (degree)
 var most_influential = 'bc';
 
-if (getUrlVars()["most_influential"] == 'bc' || getUrlVars()["most_influential"] == 'degree') {
+if (getUrlVars()["most_influential"] == 'bc' || getUrlVars()["most_influential"] == 'bc2' || getUrlVars()["most_influential"] == 'degree') {
   most_influential = getUrlVars()["most_influential"];
 }
 
@@ -3576,6 +3576,8 @@ sigma.parsers.json(
 
     // Calculate Betweenness Centrality
 
+    var bc_nodes_map;
+
     function betweennessCentrality (eles) {
 
 
@@ -3617,11 +3619,13 @@ sigma.parsers.json(
 
       }
 
+      bc_nodes_map = bcmap;
+
       topbc_nodes = _.sortBy(topbc_nodes, 'bc').reverse().slice(0,5);
 
 
       sigma.instances(0).graph.nodes().forEach(function(n) {
-        if (most_influential == 'bc' && topbc_nodes[0].bc > 0) {
+        if ((most_influential == 'bc' || most_influential == 'bc2') && topbc_nodes[0].bc > 0) {
           if (bcmap[n.id] == 0) { bcscore = bcmin } else { bcscore = bcmap[n.id] }
           n.size = Math.round(normalize(bcscore, bcmin, bcmax, 5, 35));
           n.bc = currentbc;
@@ -3687,7 +3691,7 @@ sigma.parsers.json(
         if (!top_communities[commune]) {
           top_communities[commune] = []
         }
-        top_communities[commune].push({id: n.id, name: n.originalLabel, degree: sigma.instances(0).graph.degree(n.id)});
+        top_communities[commune].push({id: n.id, name: n.originalLabel, degree: sigma.instances(0).graph.degree(n.id), bc: bc_nodes_map[n.id]});
         max_community_number = max_community_number < community_assignment_result['communities'][n.id] ? community_assignment_result['communities'][n.id]: max_community_number;
       });
 
@@ -3724,13 +3728,17 @@ sigma.parsers.json(
 
          topp_communities = _.first(topp_communities,advice_iterations);
 
-
          var toppp_communities = [];
 
          // Slice first 3 off every topp community
 
          for (var j = 0; j < topp_communities.length; j++) {
-           topp_communities[j].nodes = _.first(_.sortBy(topp_communities[j].nodes,'degree').reverse(),3);
+           if (most_influential == 'bc2') {
+             topp_communities[j].nodes = _.first(_.sortBy(topp_communities[j].nodes,'bc').reverse(),3);
+           }
+           else {
+             topp_communities[j].nodes = _.first(_.sortBy(topp_communities[j].nodes,'degree').reverse(),3);
+           }
          }
 
          //console.log(topp_communities);
@@ -3819,7 +3827,7 @@ sigma.parsers.json(
          // TODO   if (most_influential == 'bc' && toppbc_nodes[0].bc > 0) {
 
 
-         if (most_influential == 'bc' && toppbc_nodes[0].bc > 0) {
+         if ((most_influential == 'bc' || (most_influential == 'bc2') && toppbc_nodes[0].bc > 0)) {
            analytics += '</div> (highest betweenness centrality):<br>';
            for (var ind in toppbc_nodes) {
                if (toppbc_nodes[ind].bc > 0) {
@@ -3892,7 +3900,7 @@ sigma.parsers.json(
                   }
                   else {
 
-                    if (most_influential == 'bc' && toppbc_nodes[0].bc > 0) {
+                    if ((most_influential == 'bc' || most_influential == 'bc2') && toppbc_nodes[0].bc > 0) {
                       for (var ind in toppbc_nodes) {
                           if (toppbc_nodes[ind].bc > 0) {
                             squery += toppbc_nodes[ind].label + '+';
