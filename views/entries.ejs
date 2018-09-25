@@ -584,9 +584,7 @@ var in_label_threshold = 8;
 // default most influential nodes are displayed according to Betwenness Centrality (bc) or Degree (degree)
 var most_influential = 'bc';
 
-if (getUrlVars()["most_influential"] == 'bc' || getUrlVars()["most_influential"] == 'bc2' || getUrlVars()["most_influential"] == 'degree') {
-  most_influential = getUrlVars()["most_influential"];
-}
+
 
 var midi = '';
 
@@ -607,6 +605,10 @@ midi = '<%= user.midi %>';
 <% if (locals.user.topnodes) { %>
 most_influential = '<%= user.topnodes %>';
 <% } %>
+
+if (getUrlVars()["most_influential"] == 'bc' || getUrlVars()["most_influential"] == 'bc2' || getUrlVars()["most_influential"] == 'degree') {
+  most_influential = getUrlVars()["most_influential"];
+}
 
 if (!graphPalette) {
  graphPalette = '<%= user.palette %>';
