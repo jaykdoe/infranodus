@@ -382,6 +382,8 @@
 
     var hide_edit = getUrlVars()["hide_edit"];
 
+    var show_text = getUrlVars()["show_text"];
+
     var show_analytics = getUrlVars()["analytics"];
 
     var hide_when_small = getUrlVars()["hide_when_small"];
@@ -2985,14 +2987,19 @@ sigma.parsers.json(
         // Activate content switcher Set1 and set delay time for fade
         jcps.fader(0, '#switcher-panel', '.set1');
 
+        var uproll = $('#entryform').height();
 
+        if (hide_edit) {
+          uproll = 50;
+        }
 
-        $('#entries').css({height:  $(window).height() - $('#entryform').height() - 100});
+        $('#entries').css({height:  $(window).height() - uproll - 100});
 
         $(window).resize(function() {
-            $('#entries').css({height:  $(window).height() - $('#entryform').height() - 100});
-            $("#entries").animate({ scrollTop: $('#entries')[0].scrollHeight }, 1000);
+              $('#entries').css({height:  $(window).height() - uproll - 100});
+              $("#entries").animate({ scrollTop: $('#entries')[0].scrollHeight }, 1000);
         });
+
 
         $("#entries").animate({ scrollTop: $('#entries')[0].scrollHeight }, 1000);
 
@@ -3157,7 +3164,7 @@ sigma.parsers.json(
             return time;
         }
 
-        if (hide_always || hide_edit) {
+        if ((hide_always || hide_edit) && !show_text) {
             toggle_statements();
             //localStorage.setItem('graph', 1);
         }
