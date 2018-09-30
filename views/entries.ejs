@@ -33,7 +33,7 @@
 <% include statsabove %>
 <div id="layout">
     <!-- Menu toggle -->
-    <a href="#menu" id="menuLink" class="menu-link">
+    <a href="#menu" id="menuLink" class="menu-link editorpane">
     <!-- Hamburger icon -->
     <span></span>
     </a>
@@ -99,7 +99,7 @@
 
              </div>
 
-             <div id="entryform">
+             <div id="entryform" class="editorpane">
 
 
 
@@ -263,7 +263,7 @@
 
         <div id="messages">
         <% if (!perceivername) { %>
-          <a href="javascript:" id="addnode" class="tooltip" title="add a node in the graph"></a>
+          <a href="javascript:" id="addnode" class="tooltip editorpane" title="add a node in the graph"></a>
         <% } %>
           <a href="javascript:" id="searchnode" class="tooltip" title="find a node in the graph"></a>
           <form action="" method="" class="pure-form" id="addnodeform"><input type="text" id="addnodeinput" size="10" placeholder="#node_name" class="pure-input"></form>
@@ -285,16 +285,16 @@
          <div id="analytics"></div>
 
             <% if (!perceivername) { %>
-                <a href="javascript:" id="microphone-link" class="tooltip" title="voice to text on/off">
+                <a href="javascript:" id="microphone-link" class="tooltip editorpane" title="voice to text on/off">
                     <!-- Microphone icon -->
                     <span></span>
                 </a>
-                <a href="javascript:" id="addcontext-link" class="tooltip" title="compare to context">
+                <a href="javascript:" id="addcontext-link" class="tooltip editorpane" title="compare to context">
                     <!-- Addcontext icon -->
                     <span></span>
                 </a>
             <% } %>
-            <a href="javascript:" class="tooltip" title="graph analytics" id="analyticsbutton"><div id="analyticscaption"></div></a>
+            <a href="javascript:" class="tooltip editorpane" title="graph analytics" id="analyticsbutton"><div id="analyticscaption"></div></a>
       </div>
 
     </div>
@@ -379,6 +379,8 @@
     var convert_hashtags = getUrlVars()["convert_hashtags"];
 
     var hide_always = getUrlVars()["hide_always"];
+
+    var hide_edit = getUrlVars()["hide_edit"];
 
     var show_analytics = getUrlVars()["analytics"];
 
@@ -3155,7 +3157,7 @@ sigma.parsers.json(
             return time;
         }
 
-        if (hide_always) {
+        if (hide_always || hide_edit) {
             toggle_statements();
             //localStorage.setItem('graph', 1);
         }
@@ -3166,6 +3168,12 @@ sigma.parsers.json(
                 //localStorage.setItem('graph', 1);
             }
 
+        }
+
+        if (hide_edit) {
+          $('.editorpane').each(function() {
+            $(this).hide();
+          });
         }
 
 
@@ -4065,7 +4073,7 @@ sigma.parsers.json(
 
          }
 
-         if (hide_always && !show_analytics) {
+         if ((hide_always || hide_edit) && !show_analytics) {
            $('#analytics').hide();
            $('#analyticsbutton').removeClass('analytics-on');
            $('#analyticscaption').show();
