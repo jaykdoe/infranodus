@@ -4308,7 +4308,10 @@ sigma.parsers.json(
 
      var num_nodes_component = ((top_components[0].nodes().length / totalnodescount).toFixed(2)*100).toFixed(0);
 
-     if ((community_assignment_result['modularity'] > 0.4 && diversityindex < 50) && ((bc_entropy >= 1.5) || (bc_entropy == 0 && toppbc_nodes[0].bc == 0) || (bc_entropy == 0 && num_nodes_component < 40))) {
+     if ((community_assignment_result['modularity'] > 0.65 && diversityindex < 50) && ((bc_entropy >= 1.5) || (bc_entropy == 0 && toppbc_nodes[0].bc == 0) || (bc_entropy == 0 && num_nodes_component < 40))) {
+        diversity_score = 'Dispersed';
+     }
+     else if ((community_assignment_result['modularity'] > 0.4 && diversityindex < 50) && ((bc_entropy >= 1.5) || (bc_entropy == 0 && toppbc_nodes[0].bc == 0) || (bc_entropy == 0 && num_nodes_component < 40))) {
         diversity_score = 'Diversified';
      }
      else if ((community_assignment_result['modularity'] < 0.4 && community_assignment_result['modularity'] > 0.2 && bc_entropy >= 0.5) || ((community_assignment_result['modularity'] > 0.4 && diversityindex >= 50)  && bc_entropy >= 0.5) || (community_assignment_result['modularity'] > 0.4 && diversityindex < 50 && bc_entropy > 0.5)) {
@@ -4321,7 +4324,7 @@ sigma.parsers.json(
      polysingularity_score = diversity_score;
 
 
-     diversitytext +=  ' <br><div class="headline">Discourse <a href="https://noduslabs.com/research/visualization-text-polysingularity-network-analysis/" target="_blank">polysingularity</a>: <i>' + diversity_score + '</i> </div><br>';
+     diversitytext +=  ' <br><div class="headline">Discourse bias: <i>' + diversity_score + '</i> &nbsp;&nbsp;[<a href="https://noduslabs.com/research/visualization-text-polysingularity-network-analysis/" target="_blank">?</a>]</div><br>';
      diversitytext += community_assignment_result['modularity'].toFixed(2) + ' modularity, ';
      diversitytext +=  diversityindex + '% of words in the top topic ';
 
@@ -4981,6 +4984,15 @@ sigma.parsers.json(
                 entries_keywords[entries_shown[s].id] = entries_shown[s].origin;
               }
 
+              var most_inf_nodes_str = '';
+              console.log('mostinfnodes')
+              console.log(most_inf_nodes);
+              for (var l = 0; l < most_inf_nodes.length; l++) {
+                most_inf_nodes_str += most_inf_nodes[l].label;
+                if (l < most_inf_nodes.length - 1) {
+                  most_inf_nodes_str += ', ';
+                }
+              }
 
 
               $('.entry').hide();
@@ -4988,7 +5000,19 @@ sigma.parsers.json(
               var explanation_html = 'The excerpts from the text containing the main topics and the most influential terms:';
 
               if (filter_origin == 'insight') {
-                explanation_html = "There is a structural gap and a potential for a new idea between these two sets of key terms and statements below:";
+                if (polysingularity_score == 'Dispersed') {
+                  explanation_html = "This discourse's structure is <strong>" + polysingularity_score + "</strong>. <br><br>To increase coherency, you can make connections between different separated clusters of key terms and statements. For example, the ones below:";
+                }
+                else if (polysingularity_score == 'Diversified') {
+                  explanation_html = "This discourse's structure is <strong>" + polysingularity_score + "</strong>. It has a balanced representation of several perspectives. <br><br>You can make it more focused if you develop the ideas around the main keywords — <strong>" + most_inf_nodes_str + "</strong> — or by identifying the structural gaps between the less represented clusters and making new connections between them (to focus) or going deeper into them (to diversify even more). Like the ones below:";
+                }
+                else if (polysingularity_score == 'Focused') {
+                  explanation_html = "This discourse's structure is <strong>" + polysingularity_score + "</strong>. While it has several perspectives, it is focused on one. <br><br>You can make it more diversified if you identify the structural gaps in the graph and make connections between them — that's where the new ideas may be. For example, these two sets of key terms and statements below:";
+                }
+                else if (polysingularity_score == 'Biased') {
+                  explanation_html = "This discourse's structure is <strong>" + polysingularity_score + "</strong>. It's leaning towards and promotes a certain perspective, circulating around the most influential words — <strong>" + most_inf_nodes_str + "</strong>. <br><br>You could further develop and make connections between the different perspectives (indicated with colored topical clusters) into this discourse to make it more diversified. For example, the ones below:";
+                }
+                // There is a structural gap and a potential for a new idea between these two sets of key terms and statements below:
               }
 
               $('#explanation').show();
