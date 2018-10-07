@@ -147,6 +147,7 @@ app.post('/settings', pass.ensureAuthenticated, settings.modify);
 app.get('/import', pass.ensureAuthenticated, validate.getContextsList(), imports.render);
 app.get('/google', pass.ensureAuthenticated, validate.getContextsList(), imports.renderGoogle);
 app.get('/import/youtube', pass.ensureAuthenticated, validate.getContextsList(), imports.renderYouTube);
+app.get('/import/evernote', pass.ensureAuthenticated, validate.getContextsList(), imports.renderEvernote);
 app.get('/importurl', pass.ensureAuthenticated, validate.getContextsList(), imports.renderURL);
 app.get('/importrss', pass.ensureAuthenticated, validate.getContextsList(), imports.renderRSS);
 app.get('/apps', pass.ensureAuthenticated, validate.getContextsList(), imports.renderApps);

@@ -120,52 +120,11 @@ exports.render = function(req, res) {
           contextslist = res.locals.contextslist;
       }
 
-      if (req.session.oauthAccessToken) {
 
 
-        var client = new Evernote.Client({
-          token: req.session.oauthAccessToken,
-          sandbox: config.evernote.SANDBOX
-        });
-
-        var noteStore = client.getNoteStore();
-
-        noteStore.listNotebooks().then(function(notebooks) {
-            //var notebookid = notebooks[1].guid
-
-
-                var notebooks_names = [];
-
-                for (var t = 0; t < notebooks.length; t++) {
-                    notebooks_names.push(notebooks[t].name);
-                }
-                res.render('import', { title: 'Import Data to InfraNodus', context: '', fornode: '', notebooks: notebooks_names, contextlist: contextslist, evernote: req.session.oauthAccessToken});
-
-
-        }).catch(function(err) {
-          console.log('Evernote connect error:');
-          req.session.error = JSON.stringify(err);
-          console.log(req.session.error);
-          res.redirect('/');
-        });
-
-
-
-   /*     notebooknotes = noteStore.getNotebook(req.session.oauthAccessToken, "e14d8c18-133f-4bc0-b32a-36ebe6ffd405", function(err, notebook) {
-
-            console.log(notebook);
-
-        });*/
-
-
-
-
-    }
-    else {
 
         res.render('import', { title: 'Import Data to InfraNodus', evernote: '', contextlist: contextslist, context: req.query.context, notebooks: '', fornode: req.query.fornode });
 
-    }
 
 
 
@@ -226,6 +185,64 @@ exports.renderRSS = function(req, res) {
             contextslist = res.locals.contextslist;
         }
         res.render('importrss', { title: 'InfraNodus: Twitter Text Network Visualization', evernote: '', context: req.query.context, contextlist: contextslist, notebooks: '', fornode: req.query.fornode });
+};
+
+exports.renderEvernote = function(req,res) {
+
+  var contextslist = [];
+
+  if (res.locals.contextslist) {
+      contextslist = res.locals.contextslist;
+  }
+
+
+  if (req.session.oauthAccessToken) {
+
+
+    var client = new Evernote.Client({
+      token: req.session.oauthAccessToken,
+      sandbox: config.evernote.SANDBOX
+    });
+
+    var noteStore = client.getNoteStore();
+
+    noteStore.listNotebooks().then(function(notebooks) {
+        //var notebookid = notebooks[1].guid
+
+
+            var notebooks_names = [];
+
+            for (var t = 0; t < notebooks.length; t++) {
+                notebooks_names.push(notebooks[t].name);
+            }
+            res.render('evernote', { title: 'Import Data to InfraNodus', context: '', fornode: '', notebooks: notebooks_names, contextlist: contextslist, evernote: req.session.oauthAccessToken});
+
+
+    }).catch(function(err) {
+      console.log('Evernote connect error:');
+      req.session.error = JSON.stringify(err);
+      console.log(req.session.error);
+      res.redirect('/');
+    });
+
+
+
+/*     notebooknotes = noteStore.getNotebook(req.session.oauthAccessToken, "e14d8c18-133f-4bc0-b32a-36ebe6ffd405", function(err, notebook) {
+
+        console.log(notebook);
+
+    });*/
+
+
+
+
+}
+else {
+  res.render('evernote', { title: 'Import Data to InfraNodus', evernote: '', contextlist: contextslist, context: req.query.context, notebooks: '', fornode: req.query.fornode });
+
+}
+
+
 };
 
 
