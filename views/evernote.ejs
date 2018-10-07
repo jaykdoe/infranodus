@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="/stylesheets/side-menu.css">
     <link rel="stylesheet" href="/stylesheets/jquery-ui.min.css">
     <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script src="/javascripts/string.min.js"></script>
+    <script src="/javascripts/underscore-min.js"></script>
 
 
 
@@ -30,15 +32,15 @@
 
         <div id='welcomemessage'>
 
-            Import any data to your graph from the following sources:
+            Visualize your Evernote notes as a graph, to make sense of them and to develop new ideas.<br>
+
             <% include messages %>
 
             <form action='/import' name='submitform' id="submitform" method='post' enctype="multipart/form-data" class='pure-form pure-form-stacked'>
                 <br>
-                Data source:
                 <% if (!evernote) { %>
 
-
+                Please, authorize InfraNodus in Evernote first to allow it access your notes. You can revoke this authorization at any time.
                 <label for="source2" class="pure-radio">
                 <input id="source2" type="radio" name="source" value="evernote">
                     Evernote (<a href="/evernote_oauth">authorize</a>)
@@ -71,13 +73,18 @@
                 Import Notebooks:
                 <br>
                 <% if (notebooks) { for (var i=0; i<notebooks.length; i++) { %>
-                <input type="radio" name="notebooks" value="<%= notebooks[i] %>"> <%= notebooks[i] %><br>
+                <input type="radio" name="notebooks" class="notebooks" value="<%= notebooks[i] %>"> <%= notebooks[i] %><br>
                 <% } }  %>
 
                 <br>
                 &nbsp;
                 <input type='hidden' name='context' value='<% if (context) { %><%= context %><% } else { %>imported<% } %>'/>
                 <br>
+
+                <label for="savegraph" class="pure-input">
+                    saving in <input style="display:inline;" id="savegraph" type='text' size="10" maxlength="15" name='context' value='<% if (context) { %><%= context %><% } else { %>evernote<% } %>'/> context
+                </label>
+
                 <% } %>
 
 
@@ -105,6 +112,8 @@
                 <input type="hidden" name="statementid" value="">
                 &nbsp;<br>
                 <input type='submit' name="submit" value="save" class="pure-button pure-button-primary">
+                <div id="message"></div>
+
 
             </form>   &nbsp;<br>&nbsp;<br>
 
@@ -142,8 +151,12 @@
 
             <% } %>
 
+
+
+
         $('form#submitform').submit(function(){
             $(this).find('input[type=submit]').attr('disabled', 'disabled');
+            $('#message').html('We are importing the data, this page will automatically reload. If this does not happen in 30 seconds, please, <a href="/<%= user.name %>/'+$('#savegraph').val()+'/edit">click here</a>.');
         });
 
         // toggle email login controls on and off with radio
@@ -161,6 +174,12 @@
             $("#titlefield").hide();
             $("#titlefieldcaption").hide();
 
+            $('.notebooks').on('change', function() {
+
+              $('#savegraph').val(S($(this).val()).dasherize().chompLeft('-').camelize().s.replace(/[\.,-\/#!$%\^&\*;:{}=\-'_`~()]/g,""));
+
+            });
+
         radioButtons.change(function () {
 
                  if ($(this).val() === "evernote") {
@@ -175,7 +194,7 @@
 
 
     })();
-  
+
 
 </script>
 

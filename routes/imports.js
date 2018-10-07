@@ -886,25 +886,26 @@ exports.submit = function(req, res,  next) {
 
 
 
+                                if (noteList.notes.length > 0) {
+                                  for (var i = 0; i < noteList.notes.length; i++ ) {
 
-                                for (var i = 0; i < noteList.notes.length; i++ ) {
 
+                                      var notebook_id = noteList.notes[i].notebookGuid;
 
-                                    var notebook_id = noteList.notes[i].notebookGuid;
+                                      var notebook_name = notebooks_db[notebook_id];
 
-                                    var notebook_name = notebooks_db[notebook_id];
+                                      var note_id = noteList.notes[i].guid;
 
-                                    var note_id = noteList.notes[i].guid;
+                                      if (notebooksList.indexOf(notebook_name) > -1) {
+                                          getStatement(notebook_id, note_id, contexts);
+                                      }
 
-                                    if (notebooksList.indexOf(notebook_name) > -1) {
-                                        getStatement(notebook_id, note_id, contexts);
-                                    }
-
+                                  }
                                 }
-
-
-
-
+                                else {
+                                  res.error('This notebook is empty, maybe select another one?');
+                                  res.redirect('back');
+                                }
 
                                 function getStatement(notebook_id, note_id, contexts) {
 
@@ -952,6 +953,7 @@ exports.submit = function(req, res,  next) {
 
 
                                         }
+
 
 
 
