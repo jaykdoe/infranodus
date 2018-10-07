@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/jquery.textcomplete.css' />
+    <link rel="stylesheet" href="/stylesheets/side-menu.css">
+    <link rel="stylesheet" href="/stylesheets/jquery-ui.min.css">
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+
+
+
+</head>
+<body>
+<% include statsabove %>
+<div id="layout">
+    <!-- Menu toggle -->
+    <a href="#menu" id="menuLink" class="menu-link">
+        <!-- Hamburger icon -->
+        <span></span>
+    </a>
+
+    <% include menu %>
+
+
+
+
+    <div id='content'>
+
+        <div id='welcomemessage'>
+
+            Import any data to your graph from the following sources:
+            <% include messages %>
+
+            <form action='/import' name='submitform' id="submitform" method='post' enctype="multipart/form-data" class='pure-form pure-form-stacked'>
+                <br>
+                Data source:
+                <% if (!evernote) { %>
+
+
+                <label for="source2" class="pure-radio">
+                <input id="source2" type="radio" name="source" value="evernote">
+                    Evernote (<a href="/evernote_oauth">authorize</a>)
+                </label>
+
+                <div id="inputplace"></div>
+
+                <br>
+
+                <% } else { %>
+                <label for="source2" class="pure-radio">
+                    <input id="source2" type="radio" name="source" value="evernote" checked>
+                    Evernote (<a href="/evernote_clear">deauthorize</a>)
+                </label>
+
+                <br>
+
+                Extract:
+                <label for="extract1" class="pure-radio">
+                    <input id="extract1" type="radio" name="extract" value="user" checked>
+                    graph of words used in all the entries
+                </label>
+                <br>
+
+                Evernote Account:
+                <input type='text' name='search' value="<%= evernote %>" readonly/>
+                <br>
+
+
+                Import Notebooks:
+                <br>
+                <% if (notebooks) { for (var i=0; i<notebooks.length; i++) { %>
+                <input type="radio" name="notebooks" value="<%= notebooks[i] %>"> <%= notebooks[i] %><br>
+                <% } }  %>
+
+                <br>
+                &nbsp;
+                <input type='hidden' name='context' value='<% if (context) { %><%= context %><% } else { %>imported<% } %>'/>
+                <br>
+                <% } %>
+
+
+                <div id="howmanyposts">
+                How Many Recent Posts:
+                <input type='text' name='limit' value='100' />
+                <br>
+                </div>
+
+                <div id="importsettings">
+                Settings:
+                <label for="settings1" class="pure-radio">
+                    <input id="settings1" type="radio" name="settings" value="morphemes" checked>
+                    Process both hashtags and words
+                </label>
+
+                <label for="settings2" class="pure-radio">
+                    <input id="settings2" type="radio" name="settings" value="hashtags">
+                    Process only hashtags
+                </label>
+                <br>
+                </div>
+
+                <input type="hidden" id="selectedContexts" name="selectedContexts" value="">
+                <input type="hidden" name="statementid" value="">
+                &nbsp;<br>
+                <input type='submit' name="submit" value="save" class="pure-button pure-button-primary">
+
+            </form>   &nbsp;<br>&nbsp;<br>
+
+
+
+
+
+        </div>
+
+        <div id="graph-container"></div>
+
+
+    </div>
+
+
+
+
+</div>
+
+
+<script src="/javascripts/jquery.min.js"></script>
+<script src="/javascripts/jquery-ui.min.js"></script>
+<script src="/javascripts/string.min.js"></script>
+<script src="/javascripts/underscore-min.js"></script>
+<script src="/javascripts/jquery.textcomplete.js"></script>
+<script src='/javascripts/jquery.autosize.js'></script>
+<script src="/javascripts/ui.js"></script>
+<script src="/javascripts/jquery.mobile-events.min.js"></script>
+
+
+<script>
+    ;(function(){
+
+            <% if (context && fornode) { %>
+
+            <% } %>
+
+        $('form#submitform').submit(function(){
+            $(this).find('input[type=submit]').attr('disabled', 'disabled');
+        });
+
+        // toggle email login controls on and off with radio
+
+            var radioButtons = $("[name=source]"); // get both radiobuttons
+            var radioButtons2 = $("[name=extract]"); // get both radiobuttons
+            var radioButtons3 = $("[name=filetype]"); // get both radiobuttons
+
+            var searchbox  = $("#searchbox");
+            var filebox = $("#filebox");
+            $("#googlesearch").hide();
+
+            $("#processfield").hide();
+            $("#processfieldcaption").hide();
+            $("#titlefield").hide();
+            $("#titlefieldcaption").hide();
+
+        radioButtons.change(function () {
+
+                 if ($(this).val() === "evernote") {
+                    window.location.href = "/evernote_oauth";
+
+
+                }
+
+            });
+
+
+
+
+    })();
+  
+
+</script>
+
+
+
+
+<% include statsbelow %>
+</body>
+</html>
