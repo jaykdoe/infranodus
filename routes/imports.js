@@ -738,9 +738,6 @@ exports.submit = function(req, res,  next) {
         noteStore.listNotebooks().then(function(linkedNotebooks) {
             //var notebookid = notebooks[1].guid
 
-
-
-
                 // This below will be needed if we want to add filter notebooks functionality
                 //noteFilter.notebookGuid = notebookid;
 
@@ -759,12 +756,13 @@ exports.submit = function(req, res,  next) {
                         notebooks_db[linkedNotebooks[t].guid] = linkedNotebooks[t].name;
                         notebooksList.push(linkedNotebooks[t].name);
                         onenotebookid = linkedNotebooks[t].guid;
-                        console.log('caught the notebook');
                      }
 
                 }
 
                 // This is for checkboxes to filter which notebook we import
+                // TODO add a possibility to also filter by a word noteFilter.words = ['one', 'two', 'three'];
+
                 if (notebooksList.length == 1) {
                     noteFilter.notebookGuid = onenotebookid;
                 }
@@ -776,23 +774,22 @@ exports.submit = function(req, res,  next) {
 
 
                 if (notebooksToImport.length > 0) {
-                  console.log('more than one notebook');
 
-                noteStore.findNotesMetadata(noteFilter, offset, count, evspec).then(function(noteList) {
 
-                  console.log('filtering activated');
-                  console.log(noteList);
-                        var notebook_name = [];
+                  noteStore.findNotesMetadata(noteFilter, offset, count, evspec).then(function(noteList) {
 
-                        for (var i = 0; i < noteList.notes.length; i++ ) {
+
+
+                  var notebook_name = [];
+
+                  for (var i = 0; i < noteList.notes.length; i++ ) {
 
                             notebook_name[i] = noteList.notes[i].notebookGuid;
-                            console.log('notebookname');
-                            console.log(notebook_name[i]);
 
-                        }
 
-                        async.waterfall([
+                  }
+
+                  async.waterfall([
 
                             function(callback){
 
@@ -815,8 +812,7 @@ exports.submit = function(req, res,  next) {
                                         // Note: actually there's been no contexts, so we just created IDs for all the contexts contained in the statement
                                         var contexts = result;
 
-                                        console.log('Extracted contexts from DB with IDs');
-                                        console.log(contexts);
+
 
                                         callback(null, contexts);
                                     }
@@ -845,22 +841,53 @@ exports.submit = function(req, res,  next) {
                             else {
 
 
+
+                                var req = {
+                                    body:  {
+                                        entry: {
+                                            body: []
+                                        },
+                                        context: ''
+                                    },
+
+                                    contextids: [],
+                                    internal: 1,
+                                    multiple: 1
+                                };
+
+                                var evernotes = [];
+
+                                // If there's a few contexts (notebooks) then we redirect the user to the general view
+                                // Otherwise — if ther'es only one — to the contextToFilter
+
+                                if (contexts.length == 1)  {
+                                  req.body.context = contexts[0].name;
+                                }
+
+                                // req.contextids = selcontexts
+                                // req.body.entry.body = body
+
+
+
+
                                 for (var i = 0; i < noteList.notes.length; i++ ) {
+
 
                                     var notebook_id = noteList.notes[i].notebookGuid;
 
-                                    var notebook_name =  notebooks_db[notebook_id];
+                                    var notebook_name = notebooks_db[notebook_id];
 
                                     var note_id = noteList.notes[i].guid;
-
 
                                     if (notebooksList.indexOf(notebook_name) > -1) {
                                         getStatement(notebook_id, note_id, contexts);
                                     }
 
-
-
                                 }
+
+
+
+
 
                                 function getStatement(notebook_id, note_id, contexts) {
 
@@ -895,22 +922,21 @@ exports.submit = function(req, res,  next) {
                                             }
                                         }
 
-                                        // and finally create an object to send this entry with the right context
+                                        req.contextids = selcontexts;
 
-                                        var req = {
-                                            body:  {
-                                                entry: {
-                                                    body: sendstring
-                                                },
-                                                context: ''
-                                            },
+                                        evernotes.push(sendstring);
 
-                                            contextids: selcontexts,
-                                            internal: 1
-                                        };
+                                        if (noteList.notes.length == evernotes.length) {
 
 
-                                        entries.submit(req,res);
+                                          req.body.entry.body = evernotes;
+
+                                          entries.submit(req, res);
+
+
+                                        }
+
+
 
 
 
