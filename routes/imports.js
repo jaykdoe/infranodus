@@ -22,7 +22,7 @@ var validate = require('../lib/middleware/validate');
 var entries = require('../routes/entries');
 
 var async = require('async');
-var Evernote = require('evernote').Evernote;
+var Evernote = require('evernote');
 
 var S = require('string');
 
@@ -113,24 +113,26 @@ var T = new Twit({
 // GET request to the /settings page (view settings)
 
 exports.render = function(req, res) {
+
       var contextslist = [];
+
       if (res.locals.contextslist) {
           contextslist = res.locals.contextslist;
       }
-    if (req.session.oauthAccessToken) {
 
-        var client = new Evernote.Client({token: req.session.oauthAccessToken});
+      if (req.session.oauthAccessToken) {
+
+
+        var client = new Evernote.Client({
+          token: req.session.oauthAccessToken,
+          sandbox: config.evernote.SANDBOX
+        });
 
         var noteStore = client.getNoteStore();
 
-        notebooks = noteStore.listNotebooks(function(err, notebooks) {
+        noteStore.listNotebooks().then(function(notebooks) {
             //var notebookid = notebooks[1].guid
-            if (err) {
-                req.session.error = JSON.stringify(err);
-                console.log(req.session.error);
-                res.redirect('/');
-            }
-            else {
+
 
                 var notebooks_names = [];
 
@@ -138,8 +140,13 @@ exports.render = function(req, res) {
                     notebooks_names.push(notebooks[t].name);
                 }
                 res.render('import', { title: 'Import Data to InfraNodus', context: '', fornode: '', notebooks: notebooks_names, contextlist: contextslist, evernote: req.session.oauthAccessToken});
-            }
 
+
+        }).catch(function(err) {
+          console.log('Evernote connect error:');
+          req.session.error = JSON.stringify(err);
+          console.log(req.session.error);
+          res.redirect('/');
         });
 
 
@@ -701,13 +708,16 @@ exports.submit = function(req, res,  next) {
 
         console.log('logged into Evernote');
 
-        var client = new Evernote.Client({token: req.session.oauthAccessToken});
+        var client = new Evernote.Client({
+          token: req.session.oauthAccessToken,
+          sandbox: config.evernote.SANDBOX
+        });
 
         console.log(req.session.oauthAccessToken);
 
         var noteStore = client.getNoteStore();
-        var noteFilter = new Evernote.NoteFilter;
-        var notesMetadataResultSpec = new Evernote.NotesMetadataResultSpec;
+        var noteFilter = new Evernote.NoteStore.NoteFilter;
+        var notesMetadataResultSpec = new Evernote.NoteStore.NotesMetadataResultSpec;
 
         var statements = [];
 
@@ -722,15 +732,13 @@ exports.submit = function(req, res,  next) {
         if (req.body.notebooks) {
             notebooksToImport.push(req.body.notebooks);
         }
+        console.log('notebooks to import:');
+        console.log(notebooksToImport);
 
-        notebooks = noteStore.listNotebooks(function(err, notebooks) {
+        noteStore.listNotebooks().then(function(linkedNotebooks) {
             //var notebookid = notebooks[1].guid
-            if (err) {
-                req.session.error = JSON.stringify(err);
-                console.log(req.session.error);
-                res.redirect('/');
-            }
-            else {
+
+
 
 
                 // This below will be needed if we want to add filter notebooks functionality
@@ -744,13 +752,14 @@ exports.submit = function(req, res,  next) {
 
                 var onenotebookid = [];
 
-                for (var t = 0; t < notebooks.length; t++) {
+                for (var t = 0; t < linkedNotebooks.length; t++) {
 
                      // Check if the notebook is in the list of the notebooks to import
-                     if (notebooksToImport.indexOf(notebooks[t].name) > -1) {
-                        notebooks_db[notebooks[t].guid] = notebooks[t].name;
-                        notebooksList.push(notebooks[t].name);
-                        onenotebookid = notebooks[t].guid;
+                     if (notebooksToImport.indexOf(linkedNotebooks[t].name) > -1) {
+                        notebooks_db[linkedNotebooks[t].guid] = linkedNotebooks[t].name;
+                        notebooksList.push(linkedNotebooks[t].name);
+                        onenotebookid = linkedNotebooks[t].guid;
+                        console.log('caught the notebook');
                      }
 
                 }
@@ -760,17 +769,19 @@ exports.submit = function(req, res,  next) {
                     noteFilter.notebookGuid = onenotebookid;
                 }
 
-                notesMetadataResultSpec.includeNotebookGuid = true;
+                var evspec = new Evernote.NoteStore.NotesMetadataResultSpec({
+                  includeNotebookGuid: true
+                });
+
+
 
                 if (notebooksToImport.length > 0) {
+                  console.log('more than one notebook');
 
-                noteStore.findNotesMetadata(userInfo, noteFilter, offset, count, notesMetadataResultSpec, function(err, noteList) {
-                    if (err) {
+                noteStore.findNotesMetadata(noteFilter, offset, count, evspec).then(function(noteList) {
 
-                        console.log(err);
-
-                    } else {
-
+                  console.log('filtering activated');
+                  console.log(noteList);
                         var notebook_name = [];
 
                         for (var i = 0; i < noteList.notes.length; i++ ) {
@@ -853,14 +864,9 @@ exports.submit = function(req, res,  next) {
 
                                 function getStatement(notebook_id, note_id, contexts) {
 
-                                    noteStore.getNoteContent(userInfo, note_id, function(err, result) {
+                                    noteStore.getNoteContent(note_id).then(function(result) {
 
-                                        if (err) {
-                                            console.log(err);
-                                            res.error(err);
-                                            res.redirect('back');
 
-                                        }
                                         // Normalize note, get rid of tags, etc.
 
                                         var sendstring = S(result).stripTags().s;
@@ -908,12 +914,16 @@ exports.submit = function(req, res,  next) {
 
 
 
+                                    }).catch(function(err) {
+                                      req.session.error = JSON.stringify(err);
+                                      console.log(req.session.error);
+                                      res.redirect('/import');
                                     });
                                 }
 
-                                    // Move on to the next one
-                                res.error('Importing content... Please, reload this page in a few seconds...');
-                                res.redirect(res.locals.user.name + '/edit');
+                                //     // Move on to the next one
+                                // res.error('Importing content... Please, reload this page in a few seconds...');
+                                // res.redirect(res.locals.user.name + '/edit');
 
 
 
@@ -925,22 +935,27 @@ exports.submit = function(req, res,  next) {
 
 
 
-
-
-
-                    }
-
-
+                }).catch(function(err) {
+                  req.session.error = JSON.stringify(err);
+                  console.log(req.session.error);
+                  res.redirect('/import');
                 });
 
                 }
                 else {
+                    console.log('returning back');
                     res.error('You did not select any notebooks, please, try again');
                     res.redirect('back');
                 }
-            }
 
 
+
+        }).catch(function(err) {
+          req.session.error = JSON.stringify(err);
+          console.log('evernote went wrong');
+          console.log(err);
+          console.log(req.session.error);
+          res.redirect('/import');
         });
 
 
