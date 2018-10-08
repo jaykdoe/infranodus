@@ -914,7 +914,7 @@ exports.submit = function(req, res,  next) {
 
                                         // Normalize note, get rid of tags, etc.
 
-                                        var sendstring = S(result).stripTags().s;
+                                        var sendstring = result.replace(/<(?:br|\/div|\/p)>/g, "\n").replace(/<.*?>/g, "");
 
                                         sendstring = sendstring.replace(/&quot;/g, '');
 
