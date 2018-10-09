@@ -6214,7 +6214,7 @@ sigma.parsers.json(
                         '<li class="menu-item-small">&nbsp;</li>' +
                         '<li class="menu-item-divided"><a href="/import">import</a></li>' +
                         '<li class="menu-item-divided"><a href="/api/public/nodes/<%= perceivername %>/<%= context %>" target="_blank">export</a></li>' +
-                        '<li class="menu-item-small"><a href="/api/public/nodes/<%= perceivername %>/<%= context %>?gexf=1" target="_blank">gexf</a> <a href="/api/public/nodes/<%= perceivername %>/<%= context %>?csv=1" target="_blank">csv</a> <a href="/api/public/nodes/<%= perceivername %>/<%= context %>?csvdata=1" target="_blank">csv matrix</a>  <a href="/api/user/statements/<%= context %>?textonly=1" target="_blank">text only</a></li>' +
+                        '<li class="menu-item-small"><a href="/api/public/nodes/<%= perceivername %>/<%= context %>?gexf=1" target="_blank">gexf</a> <a href="/api/public/nodes/<%= perceivername %>/<%= context %>?csv=1" target="_blank">csv</a> <a href="/api/public/nodes/<%= perceivername %>/<%= context %>?csvdata=1" target="_blank">csv matrix</a>  <a href="/api/user/statements/<%= context %>?textonly=1" target="_blank">text only</a> <a href="" target="_blank" id="downloadpng">PNG image</a></li>' +
                         '<li class="menu-item-small">&nbsp;</li>' +
                         '<li class="menu-item-small"><a href="http://noduslabs.com/infranodus/" target="_blank">about</a></li>' +
                         '<li class="menu-item-small"><a href="http://noduslabs.com/contact/" target="_blank">contact</a></li>' +
@@ -6266,7 +6266,7 @@ sigma.parsers.json(
                     '<li class="menu-item-small">&nbsp;</li>' +
                     '<li class="menu-item-divided"><a href="/import">import</a></li>' +
                     '<li class="menu-item-divided"><a href="/api/user/nodes/<%= context %>" target="_blank">export</a></li>' +
-                    '<li class="menu-item-small"><a href="/api/user/nodes/<%= context %>?gexf=1" target="_blank">gexf</a> <a href="/api/user/nodes/<%= context %>?csv=1" target="_blank">csv</a> <a href="/api/user/nodes/<%= context %>?csvdata=1" target="_blank">csv matrix</a>  <a href="/api/user/statements/<%= context %>?textonly=1" target="_blank">text only</a></li>' +
+                    '<li class="menu-item-small"><a href="/api/user/nodes/<%= context %>?gexf=1" target="_blank">gexf</a> <a href="/api/user/nodes/<%= context %>?csv=1" target="_blank">csv</a> <a href="/api/user/nodes/<%= context %>?csvdata=1" target="_blank">csv matrix</a>  <a href="/api/user/statements/<%= context %>?textonly=1" target="_blank">text only</a> <a href="" target="_blank" id="downloadpng">PNG image</a></li>' +
                     '<li class="menu-item-small">&nbsp;</li>' +
                     '<li class="menu-item-small"><a href="/#tutorials" target="_blank">video tutorials</a></li>' +
                     '<li class="menu-item-small"><a href="http://noduslabs.com/courses/text-network-analysis-for-cognitive-stimulation/" target="_blank">online course</a></li>' +
@@ -6941,12 +6941,26 @@ sigma.parsers.json(
 
       }
 
+      downloadPNG();
 
     }, 3000);
 
-    // TODO this is ridiculously bad - fix this timing issue
+    // TODO above is ridiculously bad - fix this timing issue
 
+    downloadPNG();
+    // Download PNG (the graph isn't modified)
+    function downloadPNG() {
+      var canvaspng = document.querySelector('.sigma-scene');
 
+      document.querySelector('#downloadpng').href = canvaspng.toDataURL();
+      document.querySelector('#downloadpng').download = current_user + '_' + current_context + '.png';
+
+      document.querySelector('#downloadpng').addEventListener('click', function(ev) {
+        document.querySelector('#downloadpng').href = canvaspng.toDataURL();
+        document.querySelector('#downloadpng').download = current_user + '_' + current_context + '.png';
+      }, false);
+
+    }
 
 
 
