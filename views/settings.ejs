@@ -270,6 +270,15 @@
                           </select>
                       </label>
 
+                      <label for="midiinput" class="pure-input" id="midiinputcaption">
+                          Record the MIDI input graph (# of the device):
+                          <select id="midiinput" name="midiinput">
+                            <option value="no" <% if (user.midi != undefined && user.midi.substr(14,2)=='no' || user.midi == undefined) { %> selected <% } %>>No</option>
+                            <option value="00" <% if (user.midi != undefined && user.midi.substr(14,2)=='00') { %> selected <% } %>>Device 00</option>
+                            <option value="01" <% if (user.midi != undefined && user.midi.substr(14,2)=='01') { %> selected <% } %>>Device 01</option>
+                          </select>
+                      </label>
+
                         <br>
 
                     </div>

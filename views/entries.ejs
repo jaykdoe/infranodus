@@ -711,6 +711,11 @@ WebMidi.enable(function (err) {
         function (e) {
           console.log("Received 'noteon' message (" + e.note.name + e.note.octave + ").");
           console.log(e);
+
+          if (midi.substr(14,2) != '' && midi.substr(14,2) != undefined && midi.substr(14,2) != 'no') {
+            $('#statement').val($('#statement').val() + '#' + e.note.name.replace(/#/g,'') + e.note.number + ' ');
+          }
+
         }
       );
     }
@@ -6947,7 +6952,7 @@ sigma.parsers.json(
 
     // TODO above is ridiculously bad - fix this timing issue
 
-    downloadPNG();
+    //downloadPNG();
     // Download PNG (the graph isn't modified)
     function downloadPNG() {
       var canvaspng = document.querySelector('.sigma-scene');
