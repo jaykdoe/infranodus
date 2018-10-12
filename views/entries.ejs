@@ -412,6 +412,12 @@
 
     var selected_keywords = getUrlVars()["keywords"];
 
+    var voice_continues = getUrlVars()["voice_continues"];
+
+    <% if (locals.user.voice != undefined && locals.user.voice != '00') { %>
+        voice_continues = '<%=locals.user.voice%>';
+    <% } %>
+
     var walkthroughtype = 'default';
 
     <% if (perceivername) { %>
@@ -2335,20 +2341,45 @@ sigma.parsers.json(
                     // Process parsed result
                     recognition.onresult = function(event){
                         // console.log("onresult", event);
+                        if ($('#statement').val().length == 0) {
+                          previoustalk = '';
+                        }
                         voiceresult = previoustalk + event.results[0][0].transcript;
                         $('#statement').val(voiceresult);
+
                         console.log(event.resultIndex);
                         for (var i = event.resultIndex; i < event.results.length; ++i) {
                             if (event.results[i].isFinal) {
                                 recognition.abort();
+                                lastword = event.results[0][0].transcript.toLowerCase();
                                 if (voiceresult.length > 2) {
-                                    setTimeout(function(){
-                                        $('#submitbutton').trigger('click');
-                                    }, 1000);
+                                    if (!voice_continues) {
 
+                                      setTimeout(function(){
+                                          $('#submitbutton').trigger('click');
+                                      }, 1000);
+                                    }
+                                    else {
+                                      if (lastword == voice_continues) {
+                                        voiceresult = previoustalk;
+                                        previoustalk = '';
+                                        $('#statement').val(voiceresult);
+                                        setTimeout(function(){
+                                            $('#submitbutton').trigger('click');
+                                        }, 1000);
+                                      }
+                                      else if (lastword == 'improve layout') {
+                                        voiceresult = previoustalk;
+                                        $('#statement').val(voiceresult);
+                                        $('#improve-layout').trigger('click');
+                                      }
+                                      else {
+                                        previoustalk = voiceresult + ' ';
+                                      }
+                                    }
                                 }
                                 else {
-                                    previoustalk = voiceresult + ' ';
+                                  previoustalk = voiceresult + ' ';
                                     // recognition.start();
                                 }
                             }
