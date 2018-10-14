@@ -414,7 +414,7 @@
 
     var voice_continues = getUrlVars()["voice_continues"];
 
-    <% if (locals.user.voice != undefined && locals.user.voice != '00') { %>
+    <% if (locals.user && locals.user.voice != undefined && locals.user.voice != '00') { %>
         voice_continues = '<%=locals.user.voice%>';
     <% } %>
 
