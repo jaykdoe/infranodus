@@ -178,6 +178,16 @@
                         <input type="text" id="customization" size="10" maxlength="20" class="pure-input" name="customization" placeholder="" value="<% if (!user.customization) { %>analytics<% } else { %><%=user.customization%><% } %>">
                     </label>
                     <br>
+                    <label for="voice_continues" class="pure-input" id="voicecontinuescaption">
+                        Submit voice-to-text input:
+                        <select id="voice_continues" name="voice_continues">
+                          <option value="00" <% if (user.voice_continues != undefined && user.voice_continues=='00' || user.voice_continues == undefined) { %> selected <% } %>>Automatically on speech pause</option>
+                          <option value="01" <% if (user.voice_continues != undefined && user.voice_continues=='01') { %> selected <% } %>>When you click "Save"</option>
+                          <option value="visualise" <% if (user.voice_continues != undefined && user.voice_continues=='visualise') { %> selected <% } %>>When you say "visualize"</option>
+                          <option value="визуализировать" <% if (user.voice_continues != undefined && user.voice_continues=='визуализировать') { %> selected <% } %>>When you say "визуализировать"</option>
+                        </select>
+                    </label>
+                    <br>
 
                     Output MIDI Signal When Adding Nodes into Graph
                     <label for="midiactive" class="pure-input">
