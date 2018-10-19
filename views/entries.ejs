@@ -414,8 +414,8 @@
 
     var voice_continues = getUrlVars()["voice_continues"];
 
-    <% if (locals.user && locals.user.voice != undefined && locals.user.voice != '00') { %>
-        voice_continues = '<%=locals.user.voice%>';
+    <% if (locals.user && locals.user.voice_continues != undefined && locals.user.voice_continues != '00') { %>
+        voice_continues = '<%=locals.user.voice_continues%>';
     <% } %>
 
     var walkthroughtype = 'default';

@@ -62,6 +62,8 @@ exports.modify = function(req, res) {
       midi = 'off';
     }
 
+    var voice_continues = req.body.voice_continues;
+
     var background = req.body.background;
 
     var label_threshold = req.body.label_threshold;
@@ -78,7 +80,7 @@ exports.modify = function(req, res) {
         return !isNaN(value) && (function(x) { return (x | 0) === x; })(parseFloat(value))
     }
 
-    User.modifySettings(user_id, fullscan, fullview, morphemes, hashnodes, maxnodes, inlanguage, palette, background, midi, label_threshold, topnodes, mentions, customization, stopwords, function (err, answer) {
+    User.modifySettings(user_id, fullscan, fullview, morphemes, hashnodes, maxnodes, inlanguage, palette, background, midi, voice_continues, label_threshold, topnodes, mentions, customization, stopwords, function (err, answer) {
 
         // Error? Go back and display it.
 
