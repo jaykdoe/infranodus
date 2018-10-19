@@ -46,13 +46,13 @@ exports.submit = function(req, res, next){
 
         // We have a setting for invite-only registration and it doesn't match?
         else if (options.invite.length > 0 && data.invite != options.invite) {
-            res.error("Please, enter or request your invitation code.");
+            res.error("Please, enter the corrent invitation code or leave the field empty to create a account.");
             res.redirect('back');
         }
 
         // The user doesn't exist? Then create a new object User with the data from the form
         else {
-            
+
             if (data.consent != 'yes') {
                 res.error("Please, accept our privacy policy.");
                 res.redirect('back');

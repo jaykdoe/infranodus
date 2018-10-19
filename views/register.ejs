@@ -6,6 +6,9 @@
     <title><%= title %></title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <link rel="stylesheet" href="/stylesheets/side-menu.css">
+    <script src="https://js.chargebee.com/v2/chargebee.js" data-cb-site="infranodus-test" ></script>
+    <script src="/javascripts/jquery.min.js"></script>
+
 </head>
 <body>
 
@@ -23,7 +26,7 @@
     <div id="content">
           <div id="welcomemessage">
               <p>Please, create a user account below to start using InfraNodus.<br><br>
-                You can request your invitation code on <a href="http://noduslabs.com/features/invite/" target="_blank">Nodus Labs</a> website (waiting time: from 4 weeks) or <a href="https://noduslabs.dpdcart.com/subscriber/add?plan_id=423&plan_term_id=691">get it instantly</a> in exchange for a small contribution that will help us further develop this open source tool.</p>
+                This open source tool is developed by Nodus Labs without investors or external funds, therefore we ask you to make a small contribution to help finance our work. You will get 15 days free to evaluate the product and you can cancel at any time. </p>
 
               <% include messages %>
 
@@ -41,7 +44,7 @@
                     </p>
 
                     <p>
-                        <input type='text' name='invite' placeholder='invitation code' />
+                        <input type='text' name='invite' id='invitation' placeholder='invitation code' />
                     </p>
                     <p>
 
@@ -53,7 +56,7 @@
 
                     </p>
                     <p>
-                        <button type='submit' class="pure-button pure-button-primary">create account</button>
+                        <button type='submit' id='register' class="pure-button pure-button-primary">create account</button>
                     </p>
                 </form>
 
@@ -65,7 +68,27 @@
 <script src="/javascripts/ui.js"></script>
 
 
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    let cbInstance = Chargebee.getInstance();
+    let cart = cbInstance.getCart();
+    let product = cbInstance.initializeProduct("infranodus-access");
+    cart.replaceProduct(product);
 
+
+
+       $("#register").click(function(event){
+         event.preventDefault();
+
+        if ($("#invitation").val().length == 0) {
+          event.preventDefault();
+          cart.proceedToCheckout();
+
+        }
+      });
+
+  });
+</script>
 
 <% include statsbelow %>
 
