@@ -19,11 +19,38 @@ var User = require('../lib/user');
 // Get options for registration invitation code (if exist in config.json file)
 var options = require('../options');
 
+var chargebee = require("chargebee");
+
+
 
 // The form route function renders the register.ejs template from views and adds 'Register' into the title field there
 
 exports.form = function(req, res){
-    res.render('register', { title: 'InfraNodus: Polysingularity Thinking Tool' });
+
+    if (req.query && req.query.sub_id) {
+      User.checkSubscription(req.query.sub_id, function(err, response) {
+        if (err) {
+          console.log(err);
+          res.error("Your subscription is not active, you have to renew it or create a new one.");
+          res.render('register', { title: 'InfraNodus: Polysingularity Thinking Tool' });
+        }
+        else {
+          console.log(response.customer.email);
+          console.log(response.subscription.status);
+          if (response.subscription.status == 'in_trial' || response.subscription.status == 'active') {
+            res.render('login', { title: 'InfraNodus: Polysingularity Thinking Tool' });
+            // TODO That's when we should create a new user as he was not created before
+          }
+          else {
+            res.error("Your subscription is not active, you have to renew it or create a new one.");
+            res.render('back');
+          }
+        }
+      });
+    }
+    else {
+      res.render('register', { title: 'InfraNodus: Polysingularity Thinking Tool' });
+    }
 };
 
 // This happens when the user accesses /register with a POST request
