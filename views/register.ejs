@@ -26,7 +26,7 @@
     <div id="content">
           <div id="welcomemessage">
               <p>Please, create a user account below to start using InfraNodus.<br><br>
-                This open source tool is developed by Nodus Labs without investors or external funds, therefore we ask you to make a small contribution to help finance our work. You will get 15 days free to evaluate the product and you can cancel at any time. </p>
+                This open source tool is developed by Nodus Labs without investors or external funds, therefore we ask you to make a small contribution to help finance our work. You will get a 14-day trial period to evaluate the product and you can cancel at any time. </p>
 
               <% include messages %>
 
@@ -36,7 +36,7 @@
 
 
                     <p>
-                        <input type='text' name='username' placeholder='username' />
+                        <input type='text' name='username' id="username" placeholder='username' />
                     </p>
                     <p>
                         <input type='password' name='password' placeholder='password' />
@@ -75,7 +75,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
     var cbInstance = window.Chargebee.init({site: "infranodus-test"});
 
+    var account_created;
+
+
+
     $("#register").click(function(event){
+
 
       event.preventDefault();
 
@@ -105,9 +110,16 @@ document.addEventListener("DOMContentLoaded", function() {
                         },
                         error: function() {
                           console.log("error");
+                          $('#errors').html('There was an error with the sign up process. Please, try again and if it doesn\'t work, <a href="http://noduslabs.com/contact/"">contact us</a>, so we can sort this out for you. Thanks!');
                         },
                         close: function() {
                           console.log("checkout closed");
+                          if (account_created == 'success') {
+                            $('#errors').html('It appears like the checkout process ended abruptly. Your account appears to have been created, so, please, <a href="/login?login=' + $('#username').val() + '">try to log in using your details</a>.');
+                          }
+                          else {
+                            $('#errors').html('It appears like the checkout process ended abruptly. Your account may have not been created. Please, try to submit this form again using the same details.');
+                          }
                         },
                         success: function(hostedPageId) {
                           console.log(hostedPageId);
@@ -116,7 +128,7 @@ document.addEventListener("DOMContentLoaded", function() {
                            // and then call our retrieve hosted page api to get subscription details
                            $.post('/signup', $("#registration_form").serialize() + '&hostedPage=' + hostedPageId)
                                    .done(function(res) {
-
+                                     account_created = 'success';
                                    })
                                    .fail(function(res) {
                                        console.log(res);

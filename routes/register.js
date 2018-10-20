@@ -116,6 +116,12 @@ exports.submit = function(req, res, next){
                                 if(error){
                                   //handle error
                                   console.log(error);
+                                  if (error.error_code == 'wrong_format') {
+                                    res.send({errormsg:"Your e-mail is in the wrong format. Please, make sure it's correct and try to submit this form again."})
+                                  }
+                                  else {
+                                    res.send({errormsg:"There was a problem passing your details to the payment processing gateway. Please, check your internet connection and try again or <a href='http://noduslabs.com/contact/'>contact us</a> and let us know about this problem, so we can resolve it for you. Thanks!"})
+                                  }
                                 }else{
                                   //console.log(result);
                                   res.send({hosted_page: result.hosted_page});
