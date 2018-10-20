@@ -103,7 +103,7 @@ exports.list = function(req, res, next){
         }
 
         res.render('entries', {
-            title: 'InfraNodus: Polysingularity Thinking Tool',
+            title: 'InfraNodus.Com — Text Network Visualization and Discourse Analysis',
             entries: entries,
             context: contexts[0],
             addcontext: req.query.addcontext,

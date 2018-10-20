@@ -33,7 +33,7 @@ var validate = require('../lib/middleware/validate');
 exports.form = function(req, res){
 
       // TODO remove invitation field by default
-      res.render('register', { title: 'InfraNodus: Polysingularity Thinking Tool' });
+      res.render('register', { title: 'InfraNodus.Com Text Network Analysis — Sign Up' , invitation: req.query.invitation});
 
 };
 
