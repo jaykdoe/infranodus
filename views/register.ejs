@@ -212,94 +212,118 @@
 
     });
 
+    document.addEventListener("DOMContentLoaded", function() {
+
+        var cbInstance = window.Chargebee.init({site: "infranodus-test", enableGATracking: true, enableFBQTracking: true});
+
+        var account_created;
+
+
+
+        $("#register").click(function(event){
+
+
+          event.preventDefault();
+
+          $.post('/signup', $("#registration_form").serialize())
+                  .done(function(res) {
+                      if (res.errormsg) {
+                        $('#errors').html(res.errormsg);
+                      }
+                      else if (res.moveon) {
+                        window.location.href = res.moveon;
+                      }
+                      else {
+                        $('#errors').html('');
+                        cbInstance.openCheckout({
+                          hostedPage: function() {
+                            // Hit your end point that returns hosted page object as response
+                            // This sample end point will call checkout new api
+                            // https://apidocs.chargebee.com/docs/api/hosted_pages#checkout_new_subscription
+                            // If you want to use paypal, go cardless and plaid, pass embed parameter as false
+                            return new Promise(function(resolve, reject){
+                              var obtainedResponse = res.hosted_page;
+                              resolve(obtainedResponse);
+                            });
+                            },
+                            loaded: function() {
+                              console.log("checkout opened");
+                              if(window.parent.ga) {
+                                   console.log('GA detected');
+                                   ga('send', {
+                                       hitType: 'event',
+                                       eventCategory: 'InfraNodus',
+                                       eventAction: 'checkout_opened'
+                                   });
+                               }
+                            },
+                            error: function() {
+                              console.log("error");
+                              $('#errors').html('There was an error with the sign up process. Please, try again and if it doesn\'t work, <a href="http://noduslabs.com/contact/"">contact us</a>, so we can sort this out for you. Thanks!');
+                            },
+                            close: function() {
+                              console.log("checkout closed");
+                              if (account_created == 'success') {
+                                $('#errors').html('It appears like the checkout process ended abruptly. Your account appears to have been created, so, please, <a href="/login?login=' + $('#username').val() + '">try to log in using your details</a>.');
+                              }
+                              else {
+                                $('#errors').html('It appears like the checkout process ended abruptly. Your account may have not been created. Please, try to submit this form again using the same details.');
+                              }
+                            },
+                            success: function(hostedPageId) {
+                            //  console.log(hostedPageId);
+                               // Hosted page id will be unique token for the checkout that happened
+                               // You can pass this hosted page id to your backend
+                               // and then call our retrieve hosted page api to get subscription details
+                               $.post('/signup', $("#registration_form").serialize() + '&hostedPage=' + hostedPageId)
+                                       .done(function(res) {
+                                         account_created = 'success';
+                                         if(window.parent.ga) {
+                                              ga('send', {
+                                                  hitType: 'event',
+                                                  eventCategory: 'InfraNodus',
+                                                  eventAction: 'Subscribed'
+                                              });
+                                          }
+                                       })
+                                       .fail(function(res) {
+                                           console.log(res);
+                                       });
+                            },
+                            step: function(value) {
+                              // value -> which step in checkout
+                              console.log(value);
+                              if(window.parent.ga) {
+                                   ga('send', {
+                                       hitType: 'event',
+                                       eventCategory: 'InfraNodus',
+                                       eventAction: value
+                                   });
+                               }
+                            }
+                          });
+
+                      }
+
+                  })
+                  .fail(function(res) {
+                      console.log(res);
+                  });
+
+
+
+
+          });
+
+
+
+    });
+
 
 
 
 })();
-document.addEventListener("DOMContentLoaded", function() {
 
-    var cbInstance = window.Chargebee.init({site: "infranodus-test"});
-
-    var account_created;
-
-
-
-    $("#register").click(function(event){
-
-
-      event.preventDefault();
-
-      $.post('/signup', $("#registration_form").serialize())
-              .done(function(res) {
-                  if (res.errormsg) {
-                    $('#errors').html(res.errormsg);
-                  }
-                  else if (res.moveon) {
-                    window.location.href = res.moveon;
-                  }
-                  else {
-                    $('#errors').html('');
-                    cbInstance.openCheckout({
-                      hostedPage: function() {
-                        // Hit your end point that returns hosted page object as response
-                        // This sample end point will call checkout new api
-                        // https://apidocs.chargebee.com/docs/api/hosted_pages#checkout_new_subscription
-                        // If you want to use paypal, go cardless and plaid, pass embed parameter as false
-                        return new Promise(function(resolve, reject){
-                          var obtainedResponse = res.hosted_page;
-                          resolve(obtainedResponse);
-                        });
-                        },
-                        loaded: function() {
-                          console.log("checkout opened");
-                        },
-                        error: function() {
-                          console.log("error");
-                          $('#errors').html('There was an error with the sign up process. Please, try again and if it doesn\'t work, <a href="http://noduslabs.com/contact/"">contact us</a>, so we can sort this out for you. Thanks!');
-                        },
-                        close: function() {
-                          console.log("checkout closed");
-                          if (account_created == 'success') {
-                            $('#errors').html('It appears like the checkout process ended abruptly. Your account appears to have been created, so, please, <a href="/login?login=' + $('#username').val() + '">try to log in using your details</a>.');
-                          }
-                          else {
-                            $('#errors').html('It appears like the checkout process ended abruptly. Your account may have not been created. Please, try to submit this form again using the same details.');
-                          }
-                        },
-                        success: function(hostedPageId) {
-                          console.log(hostedPageId);
-                           // Hosted page id will be unique token for the checkout that happened
-                           // You can pass this hosted page id to your backend
-                           // and then call our retrieve hosted page api to get subscription details
-                           $.post('/signup', $("#registration_form").serialize() + '&hostedPage=' + hostedPageId)
-                                   .done(function(res) {
-                                     account_created = 'success';
-                                   })
-                                   .fail(function(res) {
-                                       console.log(res);
-                                   });
-                        },
-                        step: function(value) {
-                          // value -> which step in checkout
-                          console.log(value);
-                        }
-                      });
-
-                  }
-
-              })
-              .fail(function(res) {
-                  console.log(res);
-              });
-
-
-
-
-      });
-
-
-
-});
 
 </script>
 

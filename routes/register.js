@@ -21,8 +21,6 @@ var options = require('../options');
 
 var chargebee = require("chargebee");
 
-var config = require('../config.json');
-
 var validate = require('../lib/middleware/validate');
 
 
@@ -94,13 +92,13 @@ exports.submit = function(req, res, next){
          // As there's no invitation code or it's not right, let's proceed to create a subscription for the user
          else {
 
-           if (data.invite.length == 0 && config.chargebee && config.chargebee.site && config.chargebee.api_key ) {
+           if (data.invite.length == 0 && options.chargebee && options.chargebee.site && options.chargebee.api_key ) {
 
                             // here we call for ChargeBee
-                            var chargebee_site = config.chargebee.site;
-                            var chargebee_api = config.chargebee.api_key;
+                            var chargebee_site = options.chargebee.site;
+                            var chargebee_api = options.chargebee.api_key;
                             var chargebee_plan = 'infranodus-access';
-                            var redirecturl = config.chargebee.redirect_url + '?login=' + data.username;
+                            var redirecturl = options.chargebee.redirect_url + '?login=' + data.username;
 
                             chargebee.configure({site : chargebee_site,
                             api_key : chargebee_api});

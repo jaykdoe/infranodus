@@ -84,6 +84,12 @@ if (fs.existsSync(configPath)) {
 
     exports.default_user = parsed['infranodus']['default_user'];
 
+    exports.chargebee = parsed['chargebee'];
+
+    exports.chargebee.site = parsed['chargebee']['site'];
+    exports.chargebee.api_key = parsed['chargebee']['api_key'];
+    exports.chargebee.redirect_url = parsed['chargebee']['redirect_url'];
+
 
 }
 
