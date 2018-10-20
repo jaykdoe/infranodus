@@ -25,15 +25,10 @@
         <!-- Hamburger icon -->
         <span></span>
     </a>
-
-
     <% include menu %>
-
-
-
-            <div id="content">
+          <div id="content">
                 <div id="welcomemessage" style="background: white;">
-                    <p>Please, log in below or <a href="/signup">sign up</a> for a new account to start using InfraNodus. </p>
+                    <p class="large-caption">Please, log in below or <a href="/signup">sign up</a> for a new account to start using InfraNodus. </p>
                     <% include messages %>
                     <form action='/login' method='post' class="pure-form pure-form-stacked">
                             <p>
@@ -115,7 +110,7 @@
                 var i,
                         timeout = 4000,
                         nodes = sigma.graph.nodes(),
-                        color_context = '#666',
+                        color_context = '#888',
                         color_addcontext = '#666688',
                         len = nodes.length;
 

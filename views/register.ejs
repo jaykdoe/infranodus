@@ -7,6 +7,10 @@
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <link rel="stylesheet" href="/stylesheets/side-menu.css">
     <script src="https://js.chargebee.com/v2/chargebee.js"></script>
+    <script src="/javascripts/sigma/sigma.min.js"></script>
+    <script src="/javascripts/sigma/plugins/sigma.parsers.json.min.js"></script>
+    <script src="/javascripts/sigma/plugins/sigma.layout.forceAtlas2.js"></script>
+    <script src="/javascripts/sigma/plugins/sigma.plugins.animate.min.js"></script>
     <script src="/javascripts/jquery.min.js"></script>
 
 </head>
@@ -24,9 +28,9 @@
     <% include menu %>
 
     <div id="content">
-          <div id="welcomemessage">
-              <p>Please, create a user account below to start using InfraNodus.<br><br>
-                This open source tool is developed by Nodus Labs without investors or external funds, therefore we ask you to make a small contribution to help finance our work. You will get a 14-day trial period to evaluate the product and you can cancel at any time. </p>
+          <div id="welcomemessage" style="background: white;">
+              <p class="large-caption">Please, create a user account below to start using InfraNodus.</p>
+                <p class="medium-caption">This open source tool is developed by Nodus Labs without investors or external funds, therefore we ask you to make a small contribution to help finance our work. You will get a 14-day trial period to evaluate the product and you can cancel at any time. </p>
 
               <% include messages %>
 
@@ -44,10 +48,13 @@
                     <p>
                         <input type='email' name='email' placeholder='email' />
                     </p>
-
+                    <% if (invitation) { %>
                     <p>
-                        <input type='text' name='invite' id='invitation' placeholder='invitation code' />
+                        <input type='text' name='invite' id='invitation' placeholder='invitation code' value=<%=invitation%> />
                     </p>
+                    <% } else { %>
+                        <input type='hidden' name='invite' id='invitation'/>
+                    <% } %>
                     <p>
 
                       <div class="small-caption">
@@ -63,6 +70,8 @@
                 </form>
 
           </div>
+          <div id="graph-container" style="background: white;"></div>
+
     </div>
 
 </div>
@@ -71,6 +80,142 @@
 
 
 <script>
+;(function(){
+
+    var jsonpath = '/files/signup.json';
+
+
+
+// The button to hide / show statements
+
+    $("#graph-link").click(function(e) {
+        e.preventDefault();
+        $("#statements").fadeToggle();
+    });
+
+// Add a method to the graph model that returns an
+// object with every neighbors of a node inside:
+
+    sigma.classes.graph.addMethod('neighbors', function(nodeId) {
+        var k,
+                neighbors = {},
+                index = this.allNeighborsIndex[nodeId] || {};
+
+        for (k in index)
+            neighbors[k] = this.nodesIndex[k];
+
+        return neighbors;
+    });
+
+// Initialize JSON parser for SIGMA visualization
+
+    sigma.parsers.json(
+            jsonpath,
+            {
+                container: 'graph-container',
+                renderer: {
+                    container: document.getElementById('graph-container'),
+                    type: 'canvas'
+                },
+                settings: {
+                    minNodeSize: 1,
+                    maxNodeSize: 13,
+                    minEdgeSize: 0.5,
+                    maxEdgeSize: 2,
+                    labelThreshold: 21
+                }
+            },
+            function(sigma) {
+
+                var i,
+                        timeout = 4000,
+                        nodes = sigma.graph.nodes(),
+                        color_context = '#888',
+                        color_addcontext = '#666688',
+                        len = nodes.length;
+
+
+                // This is a fix for JSON
+                // Sigma requires that nodes have X, Y, Size and Color properties which our JSON doesn't have. So we add them.
+                // We also make the initial graph layout circular, so that ForceAtlas always looks the same
+
+                for (i = 0; i < len; i++) {
+                    var angle = Math.PI * 2 * i / len;
+                    nodes[i].x = Math.cos(angle);
+                    nodes[i].y = Math.sin(angle);
+                    nodes[i].size = sigma.graph.degree(nodes[i].id);
+                    nodes[i].color = color_context;
+                }
+
+
+                // Do ForceAtlasLayout
+
+                sigma.startForceAtlas2();
+
+                // Don't run it forever not to overheat :)
+
+                setTimeout(function() {
+                    sigma.stopForceAtlas2();
+                },timeout);
+
+
+
+
+                // Zoom Graph Control
+
+                var c = sigma.camera;
+
+
+                $("#zoom-in").on('click', function(e) {
+                    // Zoom in - single frame :
+                    c.goTo({
+                        ratio: c.ratio / c.settings('zoomingRatio')
+                    });
+                });
+
+                $("#zoom-out").on('click', function(e) {
+                    // Zoom out - single frame :
+                    c.goTo({
+                        ratio: c.ratio * c.settings('zoomingRatio')
+                    });
+                });
+
+
+
+
+            }
+    );
+
+
+    $(document).ready(function(){
+    function getUrlVars()
+    {
+        var vars = [], hash;
+        var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+        for(var i = 0; i < hashes.length; i++)
+        {
+            hash = hashes[i].split('=');
+            vars.push(hash[0]);
+            vars[hash[0]] = hash[1];
+        }
+        return vars;
+    }
+
+    var redirect = getUrlVars()["redirect"];
+
+    var login = getUrlVars()["login"];
+
+    $('#redirect').val(redirect);
+
+    $('#username').val(login);
+
+
+    });
+
+
+
+
+})();
 document.addEventListener("DOMContentLoaded", function() {
 
     var cbInstance = window.Chargebee.init({site: "infranodus-test"});

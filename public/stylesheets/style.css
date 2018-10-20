@@ -843,6 +843,17 @@ padding: 0em 0em 1em 0em;
   line-height: 15px;
 }
 
+.medium-caption {
+  font-size: 16px;
+  line-height: 22px;
+  color: #555555;
+}
+
+.large-caption {
+  font-size: 17px;
+  line-height: 24px;
+}
+
 
 #introduction {
     position: relative;
@@ -986,15 +997,18 @@ padding: 0em 0em 1em 0em;
 
 #welcomemessage {
     position: relative;
-    top: 5px;
+    
     left: 14px;
     bottom: 0;
     height: 100%;
     background-color: rgba(255, 255, 255, 0);
     max-width: 275px;
     padding-left: 50px;
+    padding-top: 5px;
+    padding-right: 10px;
     margin-bottom: 20px;
     z-index: 1;
+    opacity: 0.9;
 /*    pointer-events: none;*/
 }
 
