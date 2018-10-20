@@ -6,7 +6,7 @@
     <title><%= title %></title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <link rel="stylesheet" href="/stylesheets/side-menu.css">
-    <script src="https://js.chargebee.com/v2/chargebee.js" data-cb-site="infranodus-test" ></script>
+    <script src="https://js.chargebee.com/v2/chargebee.js"></script>
     <script src="/javascripts/jquery.min.js"></script>
 
 </head>
@@ -30,7 +30,9 @@
 
               <% include messages %>
 
-                <form action='/signup' method='post' class="pure-form pure-form-stacked">
+              <div class="warning" id="errors"></div>
+
+                <form action='/signup' id="registration_form" method='post' class="pure-form pure-form-stacked">
 
 
                     <p>
@@ -70,22 +72,78 @@
 
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-    let cbInstance = Chargebee.getInstance();
-    let cart = cbInstance.getCart();
-    let product = cbInstance.initializeProduct("infranodus-access");
-    cart.replaceProduct(product);
 
-       $("#register").click(function(event){
-         event.preventDefault();
+    var cbInstance = window.Chargebee.init({site: "infranodus-test"});
 
-        if ($("#invitation").val().length == 0) {
-          event.preventDefault();
-          cart.proceedToCheckout();
+    $("#register").click(function(event){
 
-        }
+      event.preventDefault();
+
+      $.post('/signup', $("#registration_form").serialize())
+              .done(function(res) {
+                  if (res.errormsg) {
+                    $('#errors').html(res.errormsg);
+                  }
+                  else if (res.moveon) {
+                    window.location.href = res.moveon;
+                  }
+                  else {
+                    $('#errors').html('');
+                    cbInstance.openCheckout({
+                      hostedPage: function() {
+                        // Hit your end point that returns hosted page object as response
+                        // This sample end point will call checkout new api
+                        // https://apidocs.chargebee.com/docs/api/hosted_pages#checkout_new_subscription
+                        // If you want to use paypal, go cardless and plaid, pass embed parameter as false
+                        return new Promise(function(resolve, reject){
+                          var obtainedResponse = res.hosted_page;
+                          resolve(obtainedResponse);
+                        });
+                        },
+                        loaded: function() {
+                          console.log("checkout opened");
+                        },
+                        error: function() {
+                          console.log("error");
+                        },
+                        close: function() {
+                          console.log("checkout closed");
+                        },
+                        success: function(hostedPageId) {
+                          console.log(hostedPageId);
+                           // Hosted page id will be unique token for the checkout that happened
+                           // You can pass this hosted page id to your backend
+                           // and then call our retrieve hosted page api to get subscription details
+                           $.post('/signup', $("#registration_form").serialize() + '&hostedPage=' + hostedPageId)
+                                   .done(function(res) {
+
+                                   })
+                                   .fail(function(res) {
+                                       console.log(res);
+                                   });
+                        },
+                        step: function(value) {
+                          // value -> which step in checkout
+                          console.log(value);
+                        }
+                      });
+
+                  }
+
+              })
+              .fail(function(res) {
+                  console.log(res);
+              });
+
+
+
+
       });
 
-  });
+
+
+});
+
 </script>
 
 <% include statsbelow %>

@@ -21,7 +21,9 @@ var passport = require('passport');
 
 // when user accesses /login page with GET, populate login template view with data
 exports.form = function(req, res){
-    res.render('login', { title: 'InfraNodus: Polysingularity Thinking Tool' });
+
+      res.render('login', { title: 'InfraNodus: Polysingularity Thinking Tool' });
+
 };
 
 // when user accesses /login page with POST, authenticate the user

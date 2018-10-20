@@ -47,6 +47,11 @@ var passport = require('passport');
 var settings = require('./routes/settings');
 var imports = require('./routes/imports');
 
+var config = require('./config.json');
+
+var chargebee = require("chargebee");
+
+
 var app = express();
 
 var server = http.Server(app);
@@ -164,6 +169,39 @@ app.get('/:user/edit', pass.ensureAuthenticated, validate.getContextsList(), ent
 app.get('/:user/:context?/edit', pass.ensureAuthenticated, validate.getContextPrivacy(), validate.getContextsList(), entries.list);
 app.get('/:user/:context?', pass.checkUser, validate.getUserID(), validate.getContextPrivacy(), validate.getContextsList("public"), entries.list);
 app.get('/', main.render);
+
+
+// app.post("/chargebee", (req, res) => {
+//   if (config.chargebee && config.chargebee.site && config.chargebee.api_key ) {
+//
+//                    // here we call for ChargeBee
+//                    var chargebee_site = config.chargebee.site;
+//                    var chargebee_api = config.chargebee.api_key;
+//                    var chargebee_plan = 'infranodus-access';
+//                    var redirecturl = config.chargebee.redirect_url;
+//
+//                    chargebee.configure({site : chargebee_site,
+//                    api_key : chargebee_api});
+//                    chargebee.hosted_page.checkout_new({
+//                        subscription : {
+//                          plan_id : chargebee_plan
+//                        },
+//                       redirect_url : redirecturl,
+//                        customer : {
+//                          email : req.body.email,
+//                        }
+//                      }).request(function(error,result){
+//                        if(error){
+//                          //handle error
+//                          console.log(error);
+//                        }else{
+//                          //console.log(result);
+//                          res.send(result.hosted_page);
+//                        }
+//                     });
+//
+//   }
+// });
 
 
 

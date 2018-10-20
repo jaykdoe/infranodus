@@ -37,7 +37,7 @@
                     <% include messages %>
                     <form action='/login' method='post' class="pure-form pure-form-stacked">
                             <p>
-                            <input type='text' name='username' placeholder='username' />
+                            <input type='text' name='username' id="username" placeholder='username' />
                             </p>
                             <p>
                             <input type='password' name='password' placeholder='password' />
@@ -188,7 +188,11 @@
 
     var redirect = getUrlVars()["redirect"];
 
+    var login = getUrlVars()["login"];
+
     $('#redirect').val(redirect);
+
+    $('#username').val(login);
 
 
     });

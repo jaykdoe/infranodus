@@ -21,36 +21,20 @@ var options = require('../options');
 
 var chargebee = require("chargebee");
 
+var config = require('../config.json');
+
+var validate = require('../lib/middleware/validate');
+
+
 
 
 // The form route function renders the register.ejs template from views and adds 'Register' into the title field there
 
 exports.form = function(req, res){
 
-    if (req.query && req.query.sub_id) {
-      User.checkSubscription(req.query.sub_id, function(err, response) {
-        if (err) {
-          console.log(err);
-          res.error("Your subscription is not active, you have to renew it or create a new one.");
-          res.render('register', { title: 'InfraNodus: Polysingularity Thinking Tool' });
-        }
-        else {
-          console.log(response.customer.email);
-          console.log(response.subscription.status);
-          if (response.subscription.status == 'in_trial' || response.subscription.status == 'active') {
-            res.render('login', { title: 'InfraNodus: Polysingularity Thinking Tool' });
-            // TODO That's when we should create a new user as he was not created before
-          }
-          else {
-            res.error("Your subscription is not active, you have to renew it or create a new one.");
-            res.render('back');
-          }
-        }
-      });
-    }
-    else {
+      // TODO remove invitation field by default
       res.render('register', { title: 'InfraNodus: Polysingularity Thinking Tool' });
-    }
+
 };
 
 // This happens when the user accesses /register with a POST request
@@ -63,47 +47,116 @@ exports.submit = function(req, res, next){
     // Call getByName method from User class with the user.name from the form and check if it already exists
 
     User.getByName(data.username, function(err, user){
-        if (err) return next(err);
+
+       if (err) return next(err);
 
         // The user with this UID already exists?
-        if (user.uid) {
-            res.error("Username already taken!");
-            res.redirect('back');
-        }
+       if (user.uid) {
+           res.send({errormsg:"This username is already taken! Please, choose another one."});
+       }
 
-        // We have a setting for invite-only registration and it doesn't match?
-        else if (options.invite.length > 0 && data.invite != options.invite) {
-            res.error("Please, enter the corrent invitation code or leave the field empty to create a account.");
-            res.redirect('back');
-        }
+       // Ok, doesn't exist. Did the user accept the privacy policy?
+       else if (data.consent != 'yes') {
+           res.send({errormsg:"Please, accept our privacy policy."});
+       }
 
-        // The user doesn't exist? Then create a new object User with the data from the form
-        else {
+       else if (data.hostedPage) {
 
-            if (data.consent != 'yes') {
-                res.error("Please, accept our privacy policy.");
-                res.redirect('back');
-            }
-            else {
+         User.checkHostedPage(data.hostedPage, function(err, response) {
+           if (err) {
+             console.log(err);
+             res.send({errormsg:"Your subscription is not active, you have to renew it or create a new one."});
+           }
+           else {
+             console.log(response.content.customer.email);
+             console.log(response.content.subscription.status);
+             if (response.content.subscription.status == 'in_trial' || response.content.subscription.status == 'active') {
+               create_user();
+
+             }
+             else {
+               res.send({errormsg:"Your subscription is not active, you have to renew it or create a new one."});
+             }
+           }
+         });
+
+       }
+
+       // Ok, now on to the account creation
+       else {
+
+         // Do we have a setting for the invitation code and the user submitted it but it's not right?
+
+         if (options.invite.length > 0 && data.invite.length > 0 && data.invite != options.invite) {
+             res.send({errormsg:"Please, enter the correct invitation code or leave the field empty to create an account."});
+         }
+
+         // As there's no invitation code or it's not right, let's proceed to create a subscription for the user
+         else {
+
+           if (data.invite.length == 0 && config.chargebee && config.chargebee.site && config.chargebee.api_key ) {
+
+                            // here we call for ChargeBee
+                            var chargebee_site = config.chargebee.site;
+                            var chargebee_api = config.chargebee.api_key;
+                            var chargebee_plan = 'infranodus-access';
+                            var redirecturl = config.chargebee.redirect_url + '?login=' + data.username;
+
+                            chargebee.configure({site : chargebee_site,
+                            api_key : chargebee_api});
+                            chargebee.hosted_page.checkout_new({
+                                subscription : {
+                                  plan_id : chargebee_plan
+                                },
+                               redirect_url : redirecturl,
+                                customer : {
+                                  email : req.body.email,
+                                }
+                              }).request(function(error,result){
+                                if(error){
+                                  //handle error
+                                  console.log(error);
+                                }else{
+                                  //console.log(result);
+                                  res.send({hosted_page: result.hosted_page});
+                                }
+                             });
+
+           }
+           else if (options.invite.length > 0 && data.invite == options.invite) {
+              create_user();
+              res.send({moveon: '/login?login=' + data.username});
+           }
+           else {
+             res.send({errormsg:"Please, enter the correct invitation code. "});
+           }
+
+         }
+
+       }
 
 
-              user = new User({
-                  name: data.username,
-                  pepper: data.password,
-                  portal: data.email
-              });
+      function create_user(redirecting) {
 
-              // save that object in Neo4J database
-              user.save(function(err){
-                  if (err) return next(err);
+         user = new User({
+             name: data.username,
+             pepper: data.password,
+             portal: data.email
+         });
 
-                  // save his ID into the session
-                  req.session.uid = user.uid;
+         // save that object in Neo4J database
+         user.save(function(err){
+             if (err) return next(err);
 
-                  // redirect to the login page
-                  res.redirect('/login');
-              });
-            }
-        }
+             // save his ID into the session
+             req.session.uid = user.uid;
+
+
+         });
+
+       }
+
+
+
     });
 };
