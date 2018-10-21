@@ -1,4 +1,4 @@
-## InfraNodus a text-to-network visualization system, based on Neo4J, Node.Js and Sigma.Js.
+## InfraNodus is a text-to-network visualization tool, based on Neo4J, Node.Js and Sigma.Js.
 
 #### Keep track of all the connections using this simple tool that converts natural language into graph (English, Russian, French, German are supported, other languages — limited support).
 
@@ -25,17 +25,16 @@
 
 The basic ideas behind InfraNodus are:
 
-- Graph DB model that can suit any purpose.
+- Graph DB model suitable for large graphs and collaboration.
+- Represent text as a network of interconnected nodes.
 - Works on desktop and mobile.
 - Make it easy to add nodes into a graph through a simple web interface.
 - Work with what people already know and use well: #hashtags and @mentions, not nodes and edges.
 - Use natural language to enter nodes in a graph (English and Russian morphology is supported)
 - Move away from binary edges (e.g. A < - > B) to hyperedges in one statement (e.g. A and B and C or D)
 - API and JSON export of all data;
-- Twitter, Evernote, Gmail (Notes) import (TODO: gexf, xml, csv upload)
-- Make it as lightweight, portable, and standalone as possible;
-- Make it as fast as possible;
-- Enable people to use ше collaboratively, both locally and over the internet (TODO);
+- Twitter, Evernote, Gmail, Google, YouTube subtitles, RSS import (TODO: gexf, xml, csv upload)
+- Enable people to use ше collaboratively, both locally and over the internet
 - Your suggestions? (open an issue)
 
 
@@ -110,9 +109,10 @@ InfraNodus can also be used on a mobile.
 =================
 
 
-### MIT License
+### GPL License
 
-This open source, free software is available under MIT license.
+This open source, free software is available under the GPL license.
+You can make modifications to this code and binaries based on it, but only on the condition that you provide access to those modifications on the same license.
 It is provided as is, with no guarantees and no liabilities.
 You can re-use it as long as you keep this notice inside the code
 
