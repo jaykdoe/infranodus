@@ -332,7 +332,7 @@
     var urlPath = location.pathname;
 
     // Initialize Socket.IO
-    var socket = io({ transports: ['websocket'] });
+    var socket = io('https://infranodus.com',{ transports: ['websocket'] });
 
 
     // Get URL variables in the form of an array
