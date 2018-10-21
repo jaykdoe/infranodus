@@ -332,7 +332,7 @@
     var urlPath = location.pathname;
 
     // Initialize Socket.IO
-    var socket = io();
+    var socket = io({ transports: ['websocket'] });
 
 
     // Get URL variables in the form of an array
