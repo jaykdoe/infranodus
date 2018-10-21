@@ -68,6 +68,8 @@
                         <button type='submit' id='register' class="pure-button pure-button-primary">create account</button>
                     </p>
                 </form>
+                <br>
+                <div id="message" class="small-caption"></div>
 
           </div>
           <div id="graph-container" style="background: white;"></div>
@@ -214,7 +216,7 @@
 
     document.addEventListener("DOMContentLoaded", function() {
 
-        var cbInstance = window.Chargebee.init({site: "infranodus-test", enableGATracking: true, enableFBQTracking: true});
+        var cbInstance = window.Chargebee.init({site: "infranodus", enableGATracking: true, enableFBQTracking: true});
 
         var account_created;
 
@@ -225,10 +227,16 @@
 
           event.preventDefault();
 
+          $('#register').prop('disabled', true);
+          $('#message').html('We are now forwarding you to our payment processor...');
+
+
           $.post('/signup', $("#registration_form").serialize())
                   .done(function(res) {
                       if (res.errormsg) {
                         $('#errors').html(res.errormsg);
+                        $('#message').html('');
+                        $('#register').prop('disabled', false);
                       }
                       else if (res.moveon) {
                         window.location.href = res.moveon;
@@ -260,14 +268,20 @@
                             error: function() {
                               console.log("error");
                               $('#errors').html('There was an error with the sign up process. Please, try again and if it doesn\'t work, <a href="http://noduslabs.com/contact/"">contact us</a>, so we can sort this out for you. Thanks!');
+                              $('#message').html('');
+                              $('#register').prop('disabled', false);
                             },
                             close: function() {
                               console.log("checkout closed");
                               if (account_created == 'success') {
                                 $('#errors').html('It appears like the checkout process ended abruptly. Your account appears to have been created, so, please, <a href="/login?login=' + $('#username').val() + '">try to log in using your details</a>.');
+                                $('#message').html('');
+                                $('#register').prop('disabled', false);
                               }
                               else {
                                 $('#errors').html('It appears like the checkout process ended abruptly. Your account may have not been created. Please, try to submit this form again using the same details.');
+                                $('#message').html('');
+                                $('#register').prop('disabled', false);
                               }
                             },
                             success: function(hostedPageId) {

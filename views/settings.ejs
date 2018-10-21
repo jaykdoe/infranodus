@@ -9,6 +9,7 @@
     <link rel='stylesheet' href='/stylesheets/jquery.textcomplete.css' />
     <link rel="stylesheet" href="/stylesheets/side-menu.css">
     <link rel="stylesheet" href="/stylesheets/jquery-ui.min.css">
+    <script src="https://js.chargebee.com/v2/chargebee.js" data-cb-site="infranodus"></script>
 
 </head>
 <body>
@@ -178,8 +179,8 @@
                         <input type="text" id="customization" size="10" maxlength="20" class="pure-input" name="customization" placeholder="" value="<% if (!user.customization) { %>analytics<% } else { %><%=user.customization%><% } %>">
                     </label>
                     <br>
+                    Submit voice to text input:
                     <label for="voice_continues" class="pure-input" id="voicecontinuescaption">
-                        Submit voice-to-text input:
                         <select id="voice_continues" name="voice_continues">
                           <option value="00" <% if (user.voice_continues != undefined && user.voice_continues=='00' || user.voice_continues == undefined) { %> selected <% } %>>Automatically on speech pause</option>
                           <option value="01" <% if (user.voice_continues != undefined && user.voice_continues=='01') { %> selected <% } %>>When you click "Save"</option>
@@ -189,7 +190,13 @@
                     </label>
                     <br>
 
-                    Output MIDI Signal When Adding Nodes into Graph
+                    Manage your paid subscription:<br>
+                    <a href="javascript:void(0)" data-cb-type="portal">
+                        Click Here</a>
+                    <br>
+                    <br>
+
+                    MIDI Interface
                     <label for="midiactive" class="pure-input">
                       <select id="midiactive" name="midiactive">
                       <option value="off" <% if (user.midi == 'off' || user.midi == undefined) { %> selected <% } %>>Inactive</option>
@@ -279,6 +286,7 @@
                             <option value="9000" <% if (user.midi != undefined && user.midi.substr(6,4)=='9000') { %> selected <% } %>>9000 ms</option>
                           </select>
                       </label>
+                      <br>
 
                       <label for="midiinput" class="pure-input" id="midiinputcaption">
                           Record the MIDI input graph (# of the device):
