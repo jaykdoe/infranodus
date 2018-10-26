@@ -418,6 +418,13 @@
         voice_continues = '<%=locals.user.voice_continues%>';
     <% } %>
 
+    var abstract = getUrlVars()["abstract"];
+
+    <% if (locals.user && locals.user.abstract != undefined) { %>
+        abstract = '<%=locals.user.abstract%>';
+    <% } %>
+
+
     var walkthroughtype = 'default';
 
     <% if (perceivername) { %>
@@ -1069,6 +1076,14 @@ if (background == 'dark') {
   default_label_color = '#ffffff';
 }
 
+var minnodesize = 5;
+var maxnodesize = 16;
+
+if (abstract && abstract != 'no') {
+   minnodesize = 1;
+   maxnodesize = 1;
+   in_label_threshold = 20;
+}
 
 
 sigma.parsers.json(
@@ -1080,8 +1095,8 @@ sigma.parsers.json(
                 type: 'canvas'
             },
             settings: {
-                minNodeSize: 5,
-                maxNodeSize: 16,
+                minNodeSize: minnodesize,
+                maxNodeSize: maxnodesize,
                 minEdgeSize: 0.5,
                 maxEdgeSize: 2,
                 labelThreshold: in_label_threshold,

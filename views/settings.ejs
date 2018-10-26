@@ -109,6 +109,15 @@
                     </label>
                     <br>
 
+                    Abstract the graph (show only edges, no nodes):
+                    <label for="absract" class="pure-input" id="abstractcaption">
+                        <select id="abstract" name="abstract">
+                          <option value="no" <% if ((user.abstract != undefined && user.abstract=='no') || user.abstract == undefined) { %> selected <% } %>>No</option>
+                          <option value="yes" <% if (user.abstract != undefined && user.abstract=='yes') { %> selected <% } %>>Yes</option>
+                        </select>
+                    </label>
+                    <br>
+
                     Most influential words have
                     <label for="topnodes" class="pure-input">
                       <select id="topnodes" name="topnodes">
@@ -178,6 +187,7 @@
                     <label for="graph-view" class="pure-radio">
                         <input type="text" id="customization" size="10" maxlength="20" class="pure-input" name="customization" placeholder="" value="<% if (!user.customization) { %>analytics<% } else { %><%=user.customization%><% } %>">
                     </label>
+
                     <br>
                     Submit voice to text input:
                     <label for="voice_continues" class="pure-input" id="voicecontinuescaption">
