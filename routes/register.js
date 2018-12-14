@@ -138,7 +138,7 @@ exports.generatehash = function(req, res, next){
 
     // Call getByName method from User class with the user.name from the form and check if it already exists
 
-    User.getByName(data.username, function(err, user){
+    User.getByNameEmail(data.username, data.email, function(err, user){
 
        if (err) return next(err);
 
@@ -162,6 +162,17 @@ exports.generatehash = function(req, res, next){
            console.log('/reset/' + user.substance + '/' + nowtime.toString(36) + '/' + hash);
 
            console.log(bcrypt.compareSync(complete_string, hash)); // true)
+       }
+       else {
+         if (data.username && data.email) {
+           res.send({errormsg:"We did not find this username / email combination. Try to enter either the username or the email and try again."});
+         }
+         else if (data.username) {
+           res.send({errormsg:"There's no record of this username in our database. Usernames are case-sensitive, so you can try again. Or enter only the email."});
+         }
+         else if (data.email) {
+           res.send({errormsg:"There's no record of this email in our database. Try submitting the form with just the username."});
+         }
        }
 
     });
