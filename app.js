@@ -89,8 +89,12 @@ if ('development' == app.get('env')) {
 // First we declare all the static paths in the script
 
 app.get('/signup', register.form);
+app.get('/recover', register.recover);
+app.post('/recover', register.generatehash);
 app.post('/signup', register.submit);
 app.get('/login', pass.checkLogin, login.form);
+app.get('/reset/:user/:timestamp/:hash', register.reset);
+app.post('/reset', register.reset);
 
 // POST /login
 //   This is an alternative implementation that uses a custom callback to

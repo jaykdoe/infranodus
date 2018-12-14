@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+    <link rel="stylesheet" href="/stylesheets/side-menu.css">
+    <script src="https://js.chargebee.com/v2/chargebee.js"></script>
+    <script src="/javascripts/sigma/sigma.min.js"></script>
+    <script src="/javascripts/sigma/plugins/sigma.parsers.json.min.js"></script>
+    <script src="/javascripts/sigma/plugins/sigma.layout.forceAtlas2.js"></script>
+    <script src="/javascripts/sigma/plugins/sigma.plugins.animate.min.js"></script>
+    <script src="/javascripts/jquery.min.js"></script>
+
+</head>
+<body>
+
+<% include statsabove %>
+
+<div id="layout">
+    <!-- Menu toggle -->
+    <a href="#menu" id="menuLink" class="menu-link">
+        <!-- Hamburger icon -->
+        <span></span>
+    </a>
+
+    <% include menu %>
+
+    <div id="content">
+          <div id="welcomemessage" style="background: white;">
+              <p class="large-caption">Changing the password for the following user: <em><%=login%></em></p>
+
+              <% include messages %>
+
+              <div class="warning" id="errors"></div>
+
+                <form action='/reset' id="reset_form" method='post' class="pure-form pure-form-stacked">
+
+                    <p>
+                        <input type='hidden' name='username' id="username" value='<%=login%>' />
+                    </p>
+                    <p>
+                        <input type='hidden' name='email' value='<%=email%>' />
+                    </p>
+
+                    <p class="medium-caption">enter your new password below:</p>
+
+                    <p>
+                        <input type='password' name='password' id="password" placeholder='password'/>
+                    </p>
+                    <p class="medium-caption">please, enter it again:</p>
+                    <p>
+                        <input type='password' name='password2' id="password2" placeholder='password'/>
+                    </p>
+
+
+                        <input type='hidden' name='hash' id='hash' value='<%=hash%>'/>
+
+
+                    <p>
+                        <button type='submit' id='register' class="pure-button pure-button-primary">reset password</button>
+                    </p>
+                </form>
+                <br>
+                <div id="message" class="small-caption"></div>
+
+          </div>
+          <div id="graph-container" style="background: white;"></div>
+
+    </div>
+
+</div>
+
+<script src="/javascripts/ui.js"></script>
+
+
+<script>
+;(function(){
+
+    var jsonpath = '/files/signup.json';
+
+
+
+// The button to hide / show statements
+
+    $("#graph-link").click(function(e) {
+        e.preventDefault();
+        $("#statements").fadeToggle();
+    });
+
+// Add a method to the graph model that returns an
+// object with every neighbors of a node inside:
+
+    sigma.classes.graph.addMethod('neighbors', function(nodeId) {
+        var k,
+                neighbors = {},
+                index = this.allNeighborsIndex[nodeId] || {};
+
+        for (k in index)
+            neighbors[k] = this.nodesIndex[k];
+
+        return neighbors;
+    });
+
+// Initialize JSON parser for SIGMA visualization
+
+    sigma.parsers.json(
+            jsonpath,
+            {
+                container: 'graph-container',
+                renderer: {
+                    container: document.getElementById('graph-container'),
+                    type: 'canvas'
+                },
+                settings: {
+                    minNodeSize: 1,
+                    maxNodeSize: 13,
+                    minEdgeSize: 0.5,
+                    maxEdgeSize: 2,
+                    labelThreshold: 21
+                }
+            },
+            function(sigma) {
+
+                var i,
+                        timeout = 4000,
+                        nodes = sigma.graph.nodes(),
+                        color_context = '#888',
+                        color_addcontext = '#666688',
+                        len = nodes.length;
+
+
+                // This is a fix for JSON
+                // Sigma requires that nodes have X, Y, Size and Color properties which our JSON doesn't have. So we add them.
+                // We also make the initial graph layout circular, so that ForceAtlas always looks the same
+
+                for (i = 0; i < len; i++) {
+                    var angle = Math.PI * 2 * i / len;
+                    nodes[i].x = Math.cos(angle);
+                    nodes[i].y = Math.sin(angle);
+                    nodes[i].size = sigma.graph.degree(nodes[i].id);
+                    nodes[i].color = color_context;
+                }
+
+
+                // Do ForceAtlasLayout
+
+                sigma.startForceAtlas2();
+
+                // Don't run it forever not to overheat :)
+
+                setTimeout(function() {
+                    sigma.stopForceAtlas2();
+                },timeout);
+
+
+
+
+                // Zoom Graph Control
+
+                var c = sigma.camera;
+
+
+                $("#zoom-in").on('click', function(e) {
+                    // Zoom in - single frame :
+                    c.goTo({
+                        ratio: c.ratio / c.settings('zoomingRatio')
+                    });
+                });
+
+                $("#zoom-out").on('click', function(e) {
+                    // Zoom out - single frame :
+                    c.goTo({
+                        ratio: c.ratio * c.settings('zoomingRatio')
+                    });
+                });
+
+
+
+
+            }
+    );
+
+
+    $(document).ready(function(){
+    function getUrlVars()
+    {
+        var vars = [], hash;
+        var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+        for(var i = 0; i < hashes.length; i++)
+        {
+            hash = hashes[i].split('=');
+            vars.push(hash[0]);
+            vars[hash[0]] = hash[1];
+        }
+        return vars;
+    }
+
+    var redirect = getUrlVars()["redirect"];
+
+
+
+    $('#redirect').val(redirect);
+
+
+
+
+    });
+
+    document.addEventListener("DOMContentLoaded", function() {
+
+
+
+
+
+        $("#register").click(function(event){
+
+
+          event.preventDefault();
+
+
+            if ($('#password').val() != $('#password2').val()) {
+              $('#errors').html('Your passwords do not match. Please, try again.');
+            }
+            else {
+              $('#register').prop('disabled', true);
+              $('#message').html('We are now changing your password, please, wait a moment...');
+
+
+              $.post('/reset', $("#reset_form").serialize())
+                      .done(function(res) {
+                          if (res.moveon) {
+                            $('#errors').html(res.errormsg);
+                            $('#message').html('');
+                            window.location.href = res.moveon;
+                          }
+                          else if (res.errormsg) {
+                            $('#errors').html(res.errormsg);
+                            $('#message').html('');
+                            $('#register').prop('disabled', false);
+                          }
+
+
+                      })
+                      .fail(function(res) {
+                          console.log(res);
+                      });
+
+            }
+          });
+
+
+
+    });
+
+
+
+
+})();
+
+
+</script>
+
+<% include statsbelow %>
+
+</body>
+</html>

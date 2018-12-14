@@ -23,6 +23,8 @@ var chargebee = require("chargebee");
 
 var validate = require('../lib/middleware/validate');
 
+var bcrypt = require('bcrypt-nodejs');
+
 
 
 
@@ -33,6 +35,145 @@ exports.form = function(req, res){
       // TODO remove invitation field by default
       res.render('register', { title: 'InfraNodus.Com Text Network Analysis — Sign Up' , invitation: req.query.invitation});
 
+};
+
+// This renders the password recover page
+
+exports.recover = function(req, res){
+
+      // TODO remove invitation field by default
+      res.render('recover', { title: 'InfraNodus.Com — Recover Password' , login: req.query.login, hash: req.query.hash});
+
+};
+
+exports.reset = function(req, res, next){
+
+    var data = req.body;
+
+    var urluser;
+    if (req.params.user) {
+
+      urluser = req.params.user;
+    }
+    else {
+
+      urluser = req.body.username;
+    }
+    console.log('urluser');
+    console.log(urluser);
+
+    var hash;
+    if (req.params.hash) {
+      hash = req.params.hash;
+    }
+    else {
+      hash = req.body.hash;
+    }
+
+    var newpass;
+    if (req.body) {
+      newpass = req.body.password;
+    }
+
+    User.getByName(urluser, function(err, user){
+
+       if (err) return next(err);
+
+        // The user with this UID already exists?
+       if (user.uid) {
+
+           console.log(user);
+
+           var nowtime = Date.now().toString();
+
+           // Round the time to about 1000 seconds or the 15-minutes period
+           nowtime = parseInt(nowtime.slice(0,6) + '0000000');
+
+           // TODO add check the link is expired
+
+           var complete_string = user.substance + user.portal + user.pepper + nowtime;
+
+           //res.send({errormsg:"This username is already taken! Please, choose another one."});
+           var old_hash = bcrypt.hashSync(complete_string);
+
+           if (req.params.hash && bcrypt.compareSync(complete_string, hash)) {
+             console.log('here we are');
+             res.render('reset', { title: 'InfraNodus.Com — Reset Password' , login: user.substance, email: user.portal, hash: hash});
+           }
+           else if (req.body && req.body.hash && bcrypt.compareSync(complete_string, hash)) {
+             console.log('changing password');
+             User.modifyPassword(urluser, newpass, function (err, answer) {
+
+                 // Error? Go back and display it.
+
+                 if (err) {
+                     console.log(answer);
+                     res.send({errormsg:"There was an error when changing your password. Please, try again."});
+                 }
+
+                 // If all is good, make a message for the user and reload the settings page
+                 else {
+
+                
+
+
+                     // To just render the page, use: res.render('settings', { title: 'Settings' });
+
+                     // To reload the page:
+
+                     res.send({moveon: '/login?login=' + data.username, errormsg:"Your password has been changed. You can now log in."});
+
+                 }
+
+
+             });
+
+           }
+           else {
+             console.log('didnt work');
+           }
+       }
+
+    });
+};
+
+
+// This happens when the user submits data to recover the password
+
+exports.generatehash = function(req, res, next){
+
+    // Define data as the parameters entered into the registration form
+    var data = req.body;
+
+    // Call getByName method from User class with the user.name from the form and check if it already exists
+
+    User.getByName(data.username, function(err, user){
+
+       if (err) return next(err);
+
+        // The user with this UID already exists?
+       if (user.uid) {
+
+           console.log(user);
+
+           var nowtime = Date.now().toString();
+
+           // Round the time to about 1000 seconds or the 15-minutes period
+           nowtime = parseInt(nowtime.slice(0,6) + '0000000');
+
+           var salt = user.salt;
+           var complete_string = user.substance + user.portal + user.pepper + nowtime;
+
+           //res.send({errormsg:"This username is already taken! Please, choose another one."});
+           var hash = bcrypt.hashSync(complete_string, salt);
+
+           // Generate link
+           console.log('/reset/' + user.substance + '/' + nowtime.toString(36) + '/' + hash);
+
+           console.log(bcrypt.compareSync(complete_string, hash)); // true)
+       }
+
+    });
 };
 
 // This happens when the user accesses /register with a POST request
