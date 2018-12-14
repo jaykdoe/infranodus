@@ -59,8 +59,8 @@ exports.reset = function(req, res, next){
 
       urluser = req.body.username;
     }
-    console.log('urluser');
-    console.log(urluser);
+    urluser = validate.sanitize(urluser);
+
 
     var hash;
     if (req.params.hash) {
@@ -74,6 +74,7 @@ exports.reset = function(req, res, next){
     if (req.body) {
       newpass = req.body.password;
     }
+    newpass = validate.sanitize(newpass);
 
     User.getByName(urluser, function(err, user){
 
@@ -97,29 +98,19 @@ exports.reset = function(req, res, next){
            var old_hash = bcrypt.hashSync(complete_string);
 
            if (req.params.hash && bcrypt.compareSync(complete_string, hash)) {
-             console.log('here we are');
+
              res.render('reset', { title: 'InfraNodus.Com — Reset Password' , login: user.substance, email: user.portal, hash: hash});
            }
            else if (req.body && req.body.hash && bcrypt.compareSync(complete_string, hash)) {
-             console.log('changing password');
-             User.modifyPassword(urluser, newpass, function (err, answer) {
 
-                 // Error? Go back and display it.
+             User.modifyPassword(urluser, newpass, function (err, answer) {
 
                  if (err) {
                      console.log(answer);
                      res.send({errormsg:"There was an error when changing your password. Please, try again."});
                  }
 
-                 // If all is good, make a message for the user and reload the settings page
                  else {
-
-                
-
-
-                     // To just render the page, use: res.render('settings', { title: 'Settings' });
-
-                     // To reload the page:
 
                      res.send({moveon: '/login?login=' + data.username, errormsg:"Your password has been changed. You can now log in."});
 
@@ -130,7 +121,7 @@ exports.reset = function(req, res, next){
 
            }
            else {
-             console.log('didnt work');
+
            }
        }
 
