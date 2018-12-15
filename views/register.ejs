@@ -357,9 +357,12 @@
                             },
                             step: function(value) {
                               if (value == 'thankyou_screen') {
+
                                 if (payPage) {
                                   payPage.close();
                                 }
+                                window.location.href = '/login?login=' + $('#username').val();
+
                               }
                               // value -> which step in checkout
                           //    $('#errors').html(value);
