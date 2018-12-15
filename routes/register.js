@@ -262,6 +262,7 @@ exports.submit = function(req, res, next){
        }
 
        else if (data.hostedPage) {
+      //  console.log('hosted page initiated');
 
          User.checkHostedPage(data.hostedPage, function(err, response) {
            if (err) {
@@ -309,7 +310,8 @@ exports.submit = function(req, res, next){
                                 subscription : {
                                   plan_id : chargebee_plan
                                 },
-                               redirect_url : redirecturl,
+                            //  redirect_url : redirecturl,
+                              // embed: false,
                                 customer : {
                                   email : req.body.email,
                                 }
@@ -324,7 +326,7 @@ exports.submit = function(req, res, next){
                                     res.send({errormsg:"There was a problem passing your details to the payment processing gateway. Please, check your internet connection and try again or <a href='http://noduslabs.com/contact/'>contact us</a> and let us know about this problem, so we can resolve it for you. Thanks!"})
                                   }
                                 }else{
-                                  //console.log(result);
+                                  console.log(result);
                                   res.send({hosted_page: result.hosted_page});
                                 }
                              });

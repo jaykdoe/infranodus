@@ -223,7 +223,7 @@
 
     document.addEventListener("DOMContentLoaded", function() {
 
-        var cbInstance = Chargebee.init({site: "infranodus", enableGATracking: true, enableFBQTracking: true});
+        var cbInstance = window.Chargebee.init({site: "infranodus", enableGATracking: true, enableFBQTracking: true});
 
         var account_created;
 
@@ -318,7 +318,7 @@
                               }
                             },
                             close: function() {
-                              console.log("checkout closed");
+                              // console.log("checkout closed");
                               if (account_created == 'success') {
                                 $('#errors').html('It appears like the checkout process ended abruptly. Your account appears to have been created, so, please, <a href="/login?login=' + $('#username').val() + '">try to log in using your details</a>.');
                                 $('#message').html('');
@@ -331,15 +331,15 @@
                               }
                             },
                             success: function(hostedPageId) {
-                              $('#errors').html('Successfully subscribed...');
-                              console.log("checkout success");
+                              // console.log("checkout success");
+                              // console.log($("#registration_form").serialize());
+                              // console.log(hostedPageId);
                             //  console.log(hostedPageId);
                                // Hosted page id will be unique token for the checkout that happened
                                // You can pass this hosted page id to your backend
                                // and then call our retrieve hosted page api to get subscription details
                                $.post('/signup', $("#registration_form").serialize() + '&hostedPage=' + hostedPageId)
                                        .done(function(res) {
-                                         $('#errors').html('Account created...');
                                          account_created = 'success';
                                          if(window.parent.ga) {
                                               ga('send', {
@@ -356,7 +356,8 @@
                             },
                             step: function(value) {
                               // value -> which step in checkout
-                              console.log(value);
+                          //    $('#errors').html(value);
+                            //  console.log(value);
                               if(window.parent.ga) {
                                    ga('send', {
                                        hitType: 'event',
