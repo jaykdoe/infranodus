@@ -290,6 +290,7 @@
                             });
                             },
                             loaded: function() {
+                              $('#errors').html('Processing payment...');
                               console.log("checkout opened");
                               if(window.parent.ga) {
                                    console.log('GA detected');
