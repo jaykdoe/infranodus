@@ -249,9 +249,8 @@
                             // This sample end point will call checkout new api
                             // https://apidocs.chargebee.com/docs/api/hosted_pages#checkout_new_subscription
                             // If you want to use paypal, go cardless and plaid, pass embed parameter as false
-                            return new Promise(function(resolve, reject){
-                              var obtainedResponse = res.hosted_page;
-                              resolve(obtainedResponse);
+                            return $.post('/signup', $("#registration_form").serialize()).then(function(result) {
+                              return result.hosted_page;
                             });
                             },
                             loaded: function() {
