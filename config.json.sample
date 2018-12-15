@@ -11,6 +11,7 @@
     },
 
     "infranodus": {
+        "domain": "localhost:3000",
         "default_user": ""
     },
 

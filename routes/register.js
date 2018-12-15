@@ -25,6 +25,11 @@ var validate = require('../lib/middleware/validate');
 
 var bcrypt = require('bcrypt-nodejs');
 
+var config = require('../config.json');
+
+const nodemailer = require('nodemailer');
+
+
 
 
 
@@ -42,7 +47,7 @@ exports.form = function(req, res){
 exports.recover = function(req, res){
 
       // TODO remove invitation field by default
-      res.render('recover', { title: 'InfraNodus.Com — Recover Password' , login: req.query.login, hash: req.query.hash});
+      res.render('recover', { title: 'InfraNodus.Com — Recover Password',errormsg:''});
 
 };
 
@@ -76,9 +81,15 @@ exports.reset = function(req, res, next){
     }
     newpass = validate.sanitize(newpass);
 
+    var thatstamp;
+
+    if (req.params.timestamp) {
+      thatstamp = req.params.timestamp;
+    }
+
     User.getByName(urluser, function(err, user){
 
-       if (err) return next(err);
+       if (err) console.log(err);
 
         // The user with this UID already exists?
        if (user.uid) {
@@ -90,39 +101,63 @@ exports.reset = function(req, res, next){
            // Round the time to about 1000 seconds or the 15-minutes period
            nowtime = parseInt(nowtime.slice(0,6) + '0000000');
 
-           // TODO add check the link is expired
-
            var complete_string = user.substance + user.portal + user.pepper + nowtime;
 
            //res.send({errormsg:"This username is already taken! Please, choose another one."});
            var old_hash = bcrypt.hashSync(complete_string);
 
-           if (req.params.hash && bcrypt.compareSync(complete_string, hash)) {
-
-             res.render('reset', { title: 'InfraNodus.Com — Reset Password' , login: user.substance, email: user.portal, hash: hash});
-           }
-           else if (req.body && req.body.hash && bcrypt.compareSync(complete_string, hash)) {
-
-             User.modifyPassword(urluser, newpass, function (err, answer) {
-
-                 if (err) {
-                     console.log(answer);
-                     res.send({errormsg:"There was an error when changing your password. Please, try again."});
-                 }
-
-                 else {
-
-                     res.send({moveon: '/login?login=' + data.username, errormsg:"Your password has been changed. You can now log in."});
-
+           bcrypt.compare(complete_string, hash, function(err, ress) {
+             if (err) {
+               res.render('recover', { title: 'InfraNodus.Com — Recover Password', errormsg: 'The link you provided had wrong parameters, please, copy and paste it from your email into your browser URL or try again below.'});
+             }
+             else {
+               if (req.params.hash && ress) {
+                 if (thatstamp) {
+                   if (nowtime != parseInt(thatstamp,36)) {
+                     res.render('recover', { title: 'InfraNodus.Com — Recover Password', errormsg: 'The link has expired. Please, submit your request again below:'});
+                   }
+                   else {
+                      res.render('reset', { title: 'InfraNodus.Com — Reset Password' , login: user.substance, email: user.portal, hash: hash});
+                   }
                  }
 
 
-             });
+               }
+               else if (req.body && req.body.hash && ress) {
 
-           }
-           else {
+                 User.modifyPassword(urluser, newpass, function (err, answer) {
 
-           }
+                     if (err) {
+                         console.log(answer);
+                         res.send({errormsg:"There was an error when changing your password. Please, try again."});
+                     }
+
+                     else {
+
+                         res.send({moveon: '/login?login=' + data.username, errormsg:"Your password has been changed. You can now log in."});
+
+                     }
+
+
+                 });
+
+               }
+               else {
+                 res.render('recover', { title: 'InfraNodus.Com — Recover Password',errormsg:"Something went wrong with the recovery link. Please, check your mail and copy and paste the link to your browser."});
+
+               }
+             }
+
+          });
+
+
+
+       }
+       else {
+         res.render('recover', { title: 'InfraNodus.Com — Recover Password',errormsg:"This user in that recovery URL has not been found. Please, try again."});
+
+
+
        }
 
     });
@@ -159,9 +194,34 @@ exports.generatehash = function(req, res, next){
            var hash = bcrypt.hashSync(complete_string, salt);
 
            // Generate link
-           console.log('/reset/' + user.substance + '/' + nowtime.toString(36) + '/' + hash);
+           var resetLink = '/reset/' + encodeURIComponent(user.substance) + '/' + nowtime.toString(36) + '/' + encodeURIComponent(hash);
 
-           console.log(bcrypt.compareSync(complete_string, hash)); // true)
+           // console.log(resetLink);
+           // console.log(bcrypt.compareSync(complete_string, hash));
+
+           // Send the link to the user
+           if (bcrypt.compareSync(complete_string, hash)) {
+             console.log('starting mailer');
+             const transporter = nodemailer.createTransport(config.smtpOptions);
+
+             config.mailOptions.to = user.portal;
+             config.mailOptions.subject = 'Password Recovery Link for InfraNodus.Com';
+             config.mailOptions.text = "Hello, \n\nWe have received a request to reset your password. \n\nIf you haven't made this request, please, ignore this message. If you did, please, click the link below to create a new password. \n\n Your username: " + user.substance + "\n\nYour password reset link: http://" + config.infranodus.domain + resetLink + "\n\nThank you,\n\nInfraNodus Bot";
+
+             transporter.sendMail(config.mailOptions, function(err, ress) {
+                 if (err) {
+                   console.log('there was an error: ', err);
+                   res.send({success:"True",errormsg:"Sorry, but there was a problem sending a password reset link to your email."});
+                 } else {
+                   console.log('mail sent');
+                   res.send({errormsg:"The recovery link has been sent to the e-mail associated with your username."});
+                 }
+             });
+
+           }
+
+
+
        }
        else {
          if (data.username && data.email) {

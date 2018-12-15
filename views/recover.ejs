@@ -193,6 +193,10 @@
 
     $('#username').val(login);
 
+    <% if (errormsg) { %>
+      $('#errors').html("<%=errormsg%>");
+    <% } %>
+
 
     });
 
@@ -214,7 +218,9 @@
                       if (res.errormsg) {
                         $('#errors').html(res.errormsg);
                         $('#message').html('');
-                        $('#register').prop('disabled', false);
+                        if (!res.success) {
+                          $('#register').prop('disabled', false);
+                        }
                       }
                       else if (res.moveon) {
                         window.location.href = res.moveon;
