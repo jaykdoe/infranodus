@@ -331,6 +331,7 @@
                               }
                             },
                             success: function(hostedPageId) {
+                              $('#errors').html('Successfully subscribed...');
                               console.log("checkout success");
                             //  console.log(hostedPageId);
                                // Hosted page id will be unique token for the checkout that happened
@@ -338,6 +339,7 @@
                                // and then call our retrieve hosted page api to get subscription details
                                $.post('/signup', $("#registration_form").serialize() + '&hostedPage=' + hostedPageId)
                                        .done(function(res) {
+                                         $('#errors').html('Account created...');
                                          account_created = 'success';
                                          if(window.parent.ga) {
                                               ga('send', {
@@ -348,6 +350,7 @@
                                           }
                                        })
                                        .fail(function(res) {
+                                          $('#errors').html('Account not created as something went wrong...');
                                            console.log(res);
                                        });
                             },
