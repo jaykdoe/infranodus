@@ -323,9 +323,10 @@
                                 payPage.close();
                               }
                               if (account_created == 'success') {
-                                $('#errors').html('It appears like the checkout process ended abruptly. Your account appears to have been created, so, please, <a href="/login?login=' + $('#username').val() + '">try to log in using your details</a>.');
-                                $('#message').html('');
-                                $('#register').prop('disabled', false);
+                                window.location.href = window.location.hostname + '/login?login=' + $('#username').val();
+                                // $('#errors').html('It appears like the checkout process ended abruptly. Your account appears to have been created, so, please, <a href="/login?login=' + $('#username').val() + '">try to log in using your details</a>.');
+                                // $('#message').html('');
+                                // $('#register').prop('disabled', false);
                               }
                               else {
                                 $('#errors').html('It appears like the checkout process ended abruptly. Your account may have not been created. Please, try to submit this form again using the same details.');
@@ -334,6 +335,7 @@
                               }
                             },
                             success: function(hostedPageId) {
+                              account_created = 'success';
                               // console.log("checkout success");
                               // console.log($("#registration_form").serialize());
                               // console.log(hostedPageId);
@@ -343,7 +345,6 @@
                                // and then call our retrieve hosted page api to get subscription details
                                $.post('/signup', $("#registration_form").serialize() + '&hostedPage=' + hostedPageId)
                                        .done(function(res) {
-                                         account_created = 'success';
                                          if(window.parent.ga) {
                                               ga('send', {
                                                   hitType: 'event',
