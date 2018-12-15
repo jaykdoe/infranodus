@@ -319,11 +319,8 @@
                             },
                             close: function() {
                               // console.log("checkout closed");
-                              if (payPage) {
-                                payPage.close();
-                              }
                               if (account_created == 'success') {
-                                window.location.href = window.location.hostname + '/login?login=' + $('#username').val();
+                                window.location.href = '/login?login=' + $('#username').val();
                                 // $('#errors').html('It appears like the checkout process ended abruptly. Your account appears to have been created, so, please, <a href="/login?login=' + $('#username').val() + '">try to log in using your details</a>.');
                                 // $('#message').html('');
                                 // $('#register').prop('disabled', false);
@@ -359,6 +356,11 @@
                                        });
                             },
                             step: function(value) {
+                              if (value == 'thankyou_screen') {
+                                if (payPage) {
+                                  payPage.close();
+                                }
+                              }
                               // value -> which step in checkout
                           //    $('#errors').html(value);
                             //  console.log(value);
