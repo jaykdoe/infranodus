@@ -216,7 +216,7 @@
 
     document.addEventListener("DOMContentLoaded", function() {
 
-        var cbInstance = window.Chargebee.init({site: "infranodus", enableGATracking: true, enableFBQTracking: true});
+        var cbInstance = Chargebee.init({site: "infranodus", enableGATracking: true, enableFBQTracking: true});
 
         var account_created;
 
@@ -224,7 +224,7 @@
 
         $("#register").click(function(event){
 
-
+        
           event.preventDefault();
 
           $('#register').prop('disabled', true);
@@ -233,6 +233,7 @@
 
           $.post('/signup', $("#registration_form").serialize())
                   .done(function(res) {
+
                       if (res.errormsg) {
                         $('#errors').html(res.errormsg);
                         $('#message').html('');
@@ -243,14 +244,16 @@
                       }
                       else {
                         $('#errors').html('');
+
                         cbInstance.openCheckout({
                           hostedPage: function() {
                             // Hit your end point that returns hosted page object as response
                             // This sample end point will call checkout new api
                             // https://apidocs.chargebee.com/docs/api/hosted_pages#checkout_new_subscription
                             // If you want to use paypal, go cardless and plaid, pass embed parameter as false
-                            return $.post('/signup', $("#registration_form").serialize()).then(function(result) {
-                              return result.hosted_page;
+                            return new Promise(function(resolve, reject){
+                               var obtainedResponse = res.hosted_page;
+                               resolve(obtainedResponse);
                             });
                             },
                             loaded: function() {
