@@ -214,26 +214,49 @@
 
     });
 
+
+    function isMobileDevice() {
+      return (typeof window.orientation !== "undefined") || (navigator.userAgent.indexOf('IEMobile') !== -1);
+    };
+
+    console.log();
+
     document.addEventListener("DOMContentLoaded", function() {
 
         var cbInstance = Chargebee.init({site: "infranodus", enableGATracking: true, enableFBQTracking: true});
 
         var account_created;
 
+        var popupBlocked = 0;
+
+        if (isMobileDevice()) {
+          popupBlocked = 1;
+        }
 
 
         $("#register").click(function(event){
 
-        
+
+          // That will only happen if we retriggered the click
+          if (popupBlocked == 1) {
+
+            var payPage = window.open('',"_blank");
+            payPage.document.write('Loading the subscription module...');
+
+          }
+
+
           event.preventDefault();
 
           $('#register').prop('disabled', true);
-          $('#message').html('We are now forwarding you to our payment processor...');
-
+          $('#message').html("We are now forwarding you to our payment processor... If the window doesn't open, please, <a href='javascript:void' id='reactivate'>click here to open the payment page</a>...");
+          $("#reactivate").click(function() {
+                popupBlocked = 1;
+                $('#register').click();
+          });
 
           $.post('/signup', $("#registration_form").serialize())
                   .done(function(res) {
-
                       if (res.errormsg) {
                         $('#errors').html(res.errormsg);
                         $('#message').html('');
@@ -253,7 +276,11 @@
                             // If you want to use paypal, go cardless and plaid, pass embed parameter as false
                             return new Promise(function(resolve, reject){
                                var obtainedResponse = res.hosted_page;
+                               if (popupBlocked == 1) {
+                                 payPage.location.href = obtainedResponse['url'];
+                               }
                                resolve(obtainedResponse);
+
                             });
                             },
                             loaded: function() {
@@ -268,10 +295,17 @@
                                }
                             },
                             error: function() {
-                              console.log("error");
-                              $('#errors').html('There was an error with the sign up process. Please, try again and if it doesn\'t work, <a href="http://noduslabs.com/contact/"">contact us</a>, so we can sort this out for you. Thanks!');
-                              $('#message').html('');
-                              $('#register').prop('disabled', false);
+                              if (popupBlocked == 1) {
+                                $('#errors').html('The payment link was opened in a new window. If something went wrong, you can try submitting the details again.');
+                                $('#message').html('');
+                                $('#register').prop('disabled', false);
+                              }
+                              else {
+                                console.log("error");
+                                $('#errors').html('There was an error with the sign up process. Please, try again and if it doesn\'t work, <a href="http://noduslabs.com/contact/"">contact us</a>, so we can sort this out for you. Thanks!');
+                                $('#message').html('');
+                                $('#register').prop('disabled', false);
+                              }
                             },
                             close: function() {
                               console.log("checkout closed");
@@ -287,6 +321,7 @@
                               }
                             },
                             success: function(hostedPageId) {
+
                             //  console.log(hostedPageId);
                                // Hosted page id will be unique token for the checkout that happened
                                // You can pass this hosted page id to your backend
