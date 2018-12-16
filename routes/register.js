@@ -314,6 +314,7 @@ exports.submit = function(req, res, next){
                               // embed: false,
                                 customer : {
                                   email : req.body.email,
+                                  cf_username : req.body.username,
                                 }
                               }).request(function(error,result){
                                 if(error){
