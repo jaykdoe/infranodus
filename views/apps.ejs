@@ -131,7 +131,7 @@
       // document.getElementById("newlist").href = "/<%= user.name %>/" + newcontextlong + "/edit?walkthrough=newcontext&newcontextname=" + newcontextlong;
       document.getElementById("speech").href = "/<%= user.name %>/" + newcontextlong + "/edit?speech=1&walkthrough=mic";
       document.getElementById("tldr").href = "/<%= user.name %>/tldr" + new Date().toISOString().slice(2,10).replace(/-/g,"").replace(/:/g,"") + "/edit?walkthrough=tldr";
-      document.getElementById("notes").href = "/<%= user.name %>/notes" + newcontextlong + "/edit";
+      document.getElementById("notes").href = "/<%= user.name %>/notes" + newcontextlong + "/edit?walkthrough=newcontext";
       document.getElementById("analytica").href = "/<%= user.name %>/" + newcontextlong + "/edit?walkthrough=analytics";
 
       document.getElementById("start").href = "/<%= user.name %>/" + newcontextlong + "/edit?walkthrough=default";
