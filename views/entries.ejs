@@ -275,7 +275,7 @@
                 </a>
         <div id="controls">
                 <div id="graph-reload">
-                <a href="javascript:" class="tooltip" title="choose a few nodes from the graph and click this button to find out more"  id="go_next"></a><br><a href="javascript:location.reload();" class="tooltip" title="reload the graph" id="reloadbutton"></a><br><a href="javascript:" class="tooltip" title="improve layout" id="improve-layout"></a><br><a href="javascript:" class="tooltip" title="show tutorial" id="walkthrough"></a>
+                <a href="javascript:" class="tooltip" title="choose a few nodes from the graph and click this button to find out more"  id="go_next"></a><br><a href="javascript:location.reload();" class="tooltip" title="reload the graph" id="reloadbutton"></a><br><a href="javascript:" class="tooltip" title="improve layout" id="improve-layout"></a><br><a href="javascript:" class="tooltip" title="abstract visualization" id="abstract-layout"></a><br><a href="javascript:" class="tooltip" title="show tutorial" id="walkthrough"></a>
 
         </div>
 
@@ -418,11 +418,20 @@
         voice_continues = '<%=locals.user.voice_continues%>';
     <% } %>
 
-    var abstract = getUrlVars()["abstract"];
+    var abstract;
 
     <% if (locals.user && locals.user.abstract != undefined) { %>
         abstract = '<%=locals.user.abstract%>';
     <% } %>
+
+    if (getUrlVars()["abstract"]) {
+      abstract = getUrlVars()["abstract"];
+    }
+
+    if (abstract && abstract != 'no') {
+
+      $('#abstract-layout').addClass('abstract-on');
+    }
 
 
     var walkthroughtype = 'default';
@@ -665,6 +674,7 @@ if (background == 'dark') {
   $('#go_next').addClass('go_next-dark');
   $('#reloadbutton').addClass('reloadbutton-dark');
   $('#improve-layout').addClass('improve-layout-dark');
+  $('#abstract-layout').addClass('abstract-layout-dark');
   $('#walkthrough').addClass('walkthrough-dark');
   $('#zoom-in').addClass('zoom-in-dark');
   $('#zoom-out').addClass('zoom-out-dark');
@@ -1606,6 +1616,35 @@ sigma.parsers.json(
 
                 }
 
+
+            });
+
+            $("#abstract-layout").on('click', function(e) {
+
+
+              if (!$('#abstract-layout').hasClass('abstract-on')) {
+
+                var url = window.location.href;
+                url = removeParam("abstract", url);
+                if (url.indexOf('?') > -1){
+                 url += '&abstract=yes'
+                }else{
+                 url += '?abstract=yes'
+                }
+                window.location.href = url;
+
+              }
+              else {
+                var url = window.location.href;
+                var alteredURL = removeParam("abstract", url);
+
+                if (alteredURL.indexOf('?') > -1){
+                 alteredURL += '&abstract=no'
+                }else{
+                 alteredURL += '?abstract=no'
+                }
+                window.location.href = alteredURL;
+              }
 
             });
 
@@ -7160,6 +7199,24 @@ sigma.parsers.json(
       }, false);
 
     }
+
+    function removeParam(key, sourceURL) {
+    var rtn = sourceURL.split("?")[0],
+        param,
+        params_arr = [],
+        queryString = (sourceURL.indexOf("?") !== -1) ? sourceURL.split("?")[1] : "";
+    if (queryString !== "") {
+        params_arr = queryString.split("&");
+        for (var i = params_arr.length - 1; i >= 0; i -= 1) {
+            param = params_arr[i].split("=")[0];
+            if (param === key) {
+                params_arr.splice(i, 1);
+            }
+        }
+        rtn = rtn + "?" + params_arr.join("&");
+    }
+    return rtn;
+  }
 
 
 
