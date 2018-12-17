@@ -2850,14 +2850,6 @@ sigma.parsers.json(
                  placement: "left",
                  title: "Text / Graph Analytics",
                  content: "Here you can see the main topics identified in the graph and the main keywords / nodes and click them to get more insights about the graph. You can also discover what questions to ask to make your discourse more connected.",
-                 onShow: function (tour) {
-                     $('#chat-link').click();
-                     if ($('#analytics').is(":visible")) {
-                     }
-                     else {
-                       $('#analyticsbutton').click();
-                     }
-                 }
                },
                {
                  element: "#analytics",
