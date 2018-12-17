@@ -997,7 +997,7 @@ padding: 0em 0em 1em 0em;
 
 #welcomemessage {
     position: relative;
-    
+
     left: 14px;
     bottom: 0;
     height: 100%;
@@ -1027,20 +1027,46 @@ padding: 0em 0em 1em 0em;
 .appbox {
     position: relative;
     display:flex;
-    align-items:center;
+    /* align-items:center; */
     background-color: rgba(215, 215, 215, 0.6);
     width: 110px;
     height: 110px;
     border-radius: 8px;
-    padding-top: 15px;
+    padding-top: 10px;
     padding-bottom: 15px;
     padding-left: 15px;
     padding-right: 15px;
     margin-right: 20px;
     margin-bottom: 20px;
     float: left;
+    text-align:left;
     text-decoration: none!important;
     color: #555555;!important
+}
+.appbox_image {
+  display:block;
+  margin-top: 0;
+  top: 0;
+  margin-left: auto;
+  margin-right: auto;
+  width: 48px;
+
+  text-align: left!important;
+  float:none!important;
+  clear:both!important;
+}
+.appbox_text {
+  position:absolute;
+  width: 110px;
+  bottom: 0;
+  padding-bottom: 10px;
+  padding-right: 20px;
+  font-size: 13px;
+  line-height: 16px;
+  text-align: left!important;
+  float:none!important;
+  clear:both!important;
+
 }
 
 

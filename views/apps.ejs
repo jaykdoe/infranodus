@@ -29,23 +29,24 @@
     <div id='content'>
 
         <div id='welcomemessage'>
-            Welcome to InfraNodus, <%= user.name %>. Using this platform you can visualize any text as a network graph. Try out our apps to see how it works:
+            Welcome to InfraNodus, <em><%= user.name %></em>. Using this platform you can visualize any text as a network graph. Try out some applications to see how it works:
 
         </div>
 
         <div id='maincontent'>
           <!-- TODO: add Apps to the menu -->
-          <a href="/<%= user.name %>/edit" id="newlist"><div class="appbox">Create a new context and visualise the text inside.</div></a>
-          <a href="/<%= user.name %>/edit"><div class="appbox">See all your existing contexts and ideas.</div></a>
-          <a href="/importrss"><div class="appbox">Visualize the News of the Day (or any RSS feed)</div></a>
-          <a href="/import/youtube"><div class="appbox">Visualize YouTube videos</div></a>
-          <a href="/twitter?fornode=dataviz&context=twitter" id="twitter"><div class="appbox">What’s tweeted about #dataviz right now.</div></a>
-          <a href="/<%= user.name %>/edit" id="tldr"><div class="appbox">TL;DR — get an overview of any long text!</div></a>
-          <a href="/google?fornode=text+visualization&context=google" id="google"><div class="appbox">What Google shows for “SEO” term.</div></a>
-          <a href="/<%= user.name %>/edit" id="speech"><div class="appbox">Dictaphone: speech to network. </div></a>
-          <a href="/importurl"><div class="appbox">Visualize any Web Page</div></a>
-          <a href="/import/evernote"><div class="appbox">Import Evernote Notes</div></a>
-          <a href="/import"><div class="appbox">Check out advanced Import options</div></a>
+          <a href="/<%= user.name %>/edit" id="notes"><div class="appbox"><div class="appbox_image"><img src='../images/app-notes.png'></div><div class="appbox_text">Add your notes and research ideas to see how they all connect</div></div></a>
+          <a href="/<%= user.name %>/edit" id="newlist"><div class="appbox"><div class="appbox_image"><img src='../images/app-newtext.png'></div><div class="appbox_text">Visualize any text as a graph to discover the patterns within</div></div></a>
+          <a href="/<%= user.name %>/edit" id="tldr"><div class="appbox"><div class="appbox_image"><img src='../images/app-textanalytics.png'></div><div class="appbox_text">Text network analytics: topic modeling and discourse bias</div></div></a>
+          <a href="javascript:" onclick="$('#menuLink').click();" ><div class="appbox"><div class="appbox_image"><img src='../images/app-alltext.png'></div><div class="appbox_text">List your existing context graphs or see how they all connect</div></div></a>
+          <a href="/<%= user.name %>/edit" id="speech"><div class="appbox"><div class="appbox_image"><img src='../images/app-mic.png'></div><div class="appbox_text">Speech to graph: visualize your words as a network</div></div></a>
+          <a href="/import"><div class="appbox"><div class="appbox_image"><img src='../images/app-import.png'></div><div class="appbox_text">Advanced import options: text files, PDFs, external services</div></div></a>
+          <a href="/importrss"><div class="appbox"><div class="appbox_image"><img src='../images/app-rss.png'></div><div class="appbox_text">Visualize news or any RSS feed to discover the main topics</div></div></a>
+          <a href="/import/youtube"><div class="appbox"><div class="appbox_image"><img src='../images/app-youtube.png'></div><div class="appbox_text">Visualize YouTube video captions to understand what it's about</div></div></a>
+          <a href="/twitter?fornode=dataviz&context=twitter" id="twitter"><div class="appbox"><div class="appbox_image"><img src='../images/app-twitter.png'></div><div class="appbox_text">Discover the main topics in a Twitter hashtag or username feed</div></div></a>
+          <a href="/google?fornode=text+visualization&context=google" id="google"><div class="appbox"><div class="appbox_image"><img src='../images/app-google.png'></div><div class="appbox_text">SEO analysis: discover patterns in Google search results</div></div></a>
+          <a href="/importurl"><div class="appbox"><div class="appbox_image"><img src='../images/app-wiki.png'></div><div class="appbox_text">Get an overview of any Wikipedia article or any URL page</div></div></a>
+          <a href="/import/evernote"><div class="appbox"><div class="appbox_image"><img src='../images/app-evernote.png'></div><div class="appbox_text">Import Evernote notes and see how they all connect</div></div></a>
           <div class="teaser">
             <br>
             Follow our interactive tutorial to start creating your own graphs:
@@ -129,6 +130,8 @@
       document.getElementById("newlist").href = "/<%= user.name %>/" + newcontextlong + "/edit?walkthrough=newcontext&newcontextname=" + newcontextlong;
       document.getElementById("speech").href = "/<%= user.name %>/" + newcontextlong + "/edit?speech=1&walkthrough=mic";
       document.getElementById("tldr").href = "/<%= user.name %>/tldr" + new Date().toISOString().slice(2,10).replace(/-/g,"").replace(/:/g,"") + "/edit?walkthrough=tldr";
+      document.getElementById("notes").href = "/<%= user.name %>/notes" + new Date().toISOString().slice(2,10).replace(/-/g,"").replace(/:/g,"") + "/edit?walkthrough=default";
+
       document.getElementById("start").href = "/<%= user.name %>/" + newcontextlong + "/edit?walkthrough=default";
 
       $("#addNewContext").on('tap', function(e) {
