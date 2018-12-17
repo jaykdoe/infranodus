@@ -37,16 +37,17 @@
           <!-- TODO: add Apps to the menu -->
           <a href="/<%= user.name %>/edit" id="notes"><div class="appbox"><div class="appbox_image"><img src='../images/app-notes.png'></div><div class="appbox_text">Add your notes and research ideas to see how they all connect</div></div></a>
           <a href="/<%= user.name %>/edit" id="tldr"><div class="appbox"><div class="appbox_image"><img src='../images/app-newtext.png'></div><div class="appbox_text">Visualize any text as a graph to discover the patterns within</div></div></a>
-          <a href="/<%= user.name %>/edit" id="analytics"><div class="appbox"><div class="appbox_image"><img src='../images/app-textanalytics.png'></div><div class="appbox_text">Text network analytics: topic modeling and discourse bias</div></div></a>
+          <a href="/<%= user.name %>/edit" id="analytica"><div class="appbox"><div class="appbox_image"><img src='../images/app-textanalytics.png'></div><div class="appbox_text">Text network analytics: topic modeling and discourse bias</div></div></a>
           <a href="javascript:" onclick="$('#menuLink').click();" ><div class="appbox"><div class="appbox_image"><img src='../images/app-alltext.png'></div><div class="appbox_text">List your existing context graphs or see how they all connect</div></div></a>
-          <a href="/<%= user.name %>/edit" id="speech"><div class="appbox"><div class="appbox_image"><img src='../images/app-mic.png'></div><div class="appbox_text">Speech to graph: visualize your words as a network</div></div></a>
-          <a href="/import"><div class="appbox"><div class="appbox_image"><img src='../images/app-import.png'></div><div class="appbox_text">Advanced import options: text files, PDFs, external services</div></div></a>
           <a href="/importrss"><div class="appbox"><div class="appbox_image"><img src='../images/app-rss.png'></div><div class="appbox_text">Visualize news or any RSS feed to discover the main topics</div></div></a>
           <a href="/import/youtube"><div class="appbox"><div class="appbox_image"><img src='../images/app-youtube.png'></div><div class="appbox_text">Visualize YouTube video captions to understand what it's about</div></div></a>
           <a href="/twitter?fornode=dataviz&context=twitter" id="twitter"><div class="appbox"><div class="appbox_image"><img src='../images/app-twitter.png'></div><div class="appbox_text">Discover the main topics in a Twitter hashtag or username feed</div></div></a>
           <a href="/google?fornode=text+visualization&context=google" id="google"><div class="appbox"><div class="appbox_image"><img src='../images/app-google.png'></div><div class="appbox_text">SEO analysis: discover patterns in Google search results</div></div></a>
           <a href="/importurl"><div class="appbox"><div class="appbox_image"><img src='../images/app-wiki.png'></div><div class="appbox_text">Get an overview of any Wikipedia article or any URL page</div></div></a>
           <a href="/import/evernote"><div class="appbox"><div class="appbox_image"><img src='../images/app-evernote.png'></div><div class="appbox_text">Import Evernote notes and see how they all connect</div></div></a>
+          <a href="/<%= user.name %>/edit" id="speech"><div class="appbox"><div class="appbox_image"><img src='../images/app-mic.png'></div><div class="appbox_text">Speech to graph: visualize your words as a network</div></div></a>
+          <a href="/import"><div class="appbox"><div class="appbox_image"><img src='../images/app-import.png'></div><div class="appbox_text">Advanced import options: text files, PDFs, external services</div></div></a>
+          
           <div class="teaser">
             <br>
             Follow our interactive tutorial to start creating your own graphs:
@@ -131,7 +132,7 @@
       document.getElementById("speech").href = "/<%= user.name %>/" + newcontextlong + "/edit?speech=1&walkthrough=mic";
       document.getElementById("tldr").href = "/<%= user.name %>/tldr" + new Date().toISOString().slice(2,10).replace(/-/g,"").replace(/:/g,"") + "/edit?walkthrough=tldr";
       document.getElementById("notes").href = "/<%= user.name %>/notes" + new Date().toISOString().slice(2,10).replace(/-/g,"").replace(/:/g,"") + "/edit";
-      document.getElementById("analytics").href = "/<%= user.name %>/" + newcontextlong + "/edit?walkthrough=analytics";
+      document.getElementById("analytica").href = "/<%= user.name %>/" + newcontextlong + "/edit?walkthrough=analytics";
 
       document.getElementById("start").href = "/<%= user.name %>/" + newcontextlong + "/edit?walkthrough=default";
 
