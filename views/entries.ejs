@@ -2824,6 +2824,105 @@ sigma.parsers.json(
                ]
              }
 
+             if (walkthrough == 'analytics') {
+             //  console.log(tour._options.steps);
+               tour._options.steps = [
+                 {
+                 element: "#entryform",
+                 placement: "right",
+                 title: "Text Analytics",
+                 content: "If you would like to analyze a text, please, copy and paste it here or <a href='/import'>import a file</a>.",
+               },
+               {
+               element: "#graph-container",
+               placement: "bottom",
+               title: "Navigate the Graph",
+               content: "You will then see a graph representation of this text. The most prominent topics will be shown as bigger nodes in the graph, those words, which are used in the same context will be closer to each other.",
+               },
+               {
+               element: "#graph-container",
+               placement: "left",
+               title: "Discover New Ideas",
+               content: "The gaps in the graph will show you where you could do more research or what questions to ask.",
+               },
+               {
+                 element: "#analyticsbutton",
+                 placement: "left",
+                 title: "Text / Graph Analytics",
+                 content: "Here you can see the main topics identified in the graph and the main keywords / nodes and click them to get more insights about the graph. You can also discover what questions to ask to make your discourse more connected.",
+                 onShow: function (tour) {
+                     $('#chat-link').click();
+                     if ($('#analytics').is(":visible")) {
+                     }
+                     else {
+                       $('#analyticsbutton').click();
+                     }
+                 }
+               },
+               {
+                 element: "#analytics",
+                 placement: "auto",
+                 title: "How to Analyze the Graph",
+                 content: "The top topics are identified according to Louvain community detection algorithm (Blondes et al 2008). It detects the words that co-occur more often together than others and puts them into the same community (designated with a specific color)."
+               },
+               {
+                 element: "#analytics",
+                 placement: "auto",
+                 title: "Most Influential Words",
+                 content: "The most influential words are the words in the graph that have the highest betweenness centrality — they appear most often on the shortest path between any two randomly chosen words. It means they serve as the 'crossroads' of meaning, often linking different contexts together. This is not the same as the most frequently used words, rather these words connect the different topics in this discourse. (it is also possible to use degree as the most influential words setting)"
+               },
+               {
+                 element: "#graphstats",
+                 placement: "top",
+                 title: "Graph Stats",
+                 content: "We use our own measure of <a href='https://noduslabs.com/research/visualization-text-polysingularity-network-analysis/' target='_blank'>discourse polysingularity</a> (Paranyushkin 2012, 2018) to score the discourse visualized based on the structure of the graph. <br><b>'Sparse'</b> — indicates a fragmented discourse (e.g. poetry, the beginning of a research, etc.) <br><b>'Diversified'</b> — indicates a discourse with a high level of plurality.<br><b>'Focused'</b> — prioritizes one or two topics. <br><b>'Biased'</b> — an agenda or mobilizing action present (e.g. advertising, ideology, manifesto)."
+               },
+               {
+                 element: "#menuLink",
+                 title: "Context Menu",
+                 content: "You will be able to later find your text here.",
+                 onShow: function (tour) {
+                     $('#menuLink').click();
+                 }
+               },
+               {
+                 element: "#summary",
+                 placement: "bottom",
+                 title: "Essence / Summary",
+                 content: "Click here to filter the most essential statements from the discourse. These will be the ones that contain the key terms (the main topical clusters) of the discourse as identified in the Analytics pane.",
+                 onShow: function (tour) {
+                     $('#summary').click();
+                     if ($('#analytics').is(":visible")) {
+                     }
+                     else {
+                       $('#analyticsbutton').click();
+                     }
+                 }
+               },
+               {
+                 element: "#insight",
+                 placement: "bottom",
+                 title: "Insight",
+                 content: "Click here to generate new ideas: we will show you the two topical clusters and the associated statements, which could be linked together to get a new insight into the discourse or to develop it further (depending on its structure).",
+                 onShow: function (tour) {
+                     $('#insight').click();
+                 }
+               },
+               {
+                 element: "#walkthrough",
+                 placement: "left",
+                 title: "Detailed Tutorial",
+                 content: "If, at any point, you want to see a more detailed Tutorial, click here.",
+                 onShow: function (tour) {
+                     if ($('#analytics').is(":visible")) {
+                        $('#analyticsbutton').click();
+                     }
+                     $('#overview').click();
+                 }
+               }
+               ]
+             }
+
              if (walkthroughtype=='external') {
 
                var windowsize = $(window).width();
@@ -2932,7 +3031,7 @@ sigma.parsers.json(
 
 
 
-           if (walkthrough == 'default' || walkthrough == 'newcontext' || walkthrough == "tldr" || walkthrough == "force") {
+           if (walkthrough == 'default' || walkthrough == 'newcontext' || walkthrough == 'analytics' || walkthrough == "tldr" || walkthrough == "force") {
 
              initializeWalkthrough();
 
