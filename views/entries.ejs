@@ -63,6 +63,10 @@
                  <span></span>
              </a>
 
+             <a href="javascript:" class="tooltip" title="dynamic graph" id="timer-link">
+                 <span></span>
+             </a>
+
              <div id='statements'>
 
 
@@ -695,6 +699,7 @@ if (background == 'dark') {
   $('#import-link').addClass('import-link-dark');
   $('#windowdown-link').addClass('windowdown-link-dark');
   $('#statements-link').addClass('statements-link-dark');
+  $('#timer-link').addClass('timer-link-dark');
 
   deselected_nodes_color = '#444';
 }
@@ -862,6 +867,61 @@ $("#graph-link").click(function(e) {
 
     toggle_statements();
 });
+
+
+    // Dynamic graph functionality
+
+    var dynamic_graph = 0;
+
+    $("#timer-link").click(function(e) {
+      if (dynamic_graph == 0) {
+        dynamic_graph = 1;
+        $('#timer-link').addClass('timer-link-on');
+      }
+      else {
+        dynamic_graph = 0;
+        $('#timer-link').removeClass('timer-link-on');
+        entryScroll('',true);
+      }
+
+    });
+
+    // When scroll happens if the dynamic graph is on, show which uids are visible
+    $("#entries").scroll(function() { //.box is the class of the div
+      if (dynamic_graph == 1) {
+      var ventries = [];
+      $('#entries').children(".entry").each(function(){
+          var vresult;
+          vresult = checkInView(this,true);
+          if (vresult == true) {
+              if (ventries.indexOf($(this).attr('data-uid')) == -1) {
+                  ventries.push($(this).attr('data-uid'));
+              }
+          }
+        //  result2 += " " +  checkInView($(e),true);
+       });
+
+      entryScroll(ventries);
+
+      }
+    });
+
+    function checkInView(elem,partial)
+      {
+          var container = $("#entries");
+          var contHeight = container.height();
+          var contTop = container.scrollTop();
+          var contBottom = contTop + contHeight ;
+
+          var elemTop = $(elem).offset().top - container.offset().top;
+          var elemBottom = elemTop + $(elem).height();
+
+          var isTotal = (elemTop >= 0 && elemBottom <=contHeight);
+          var isPart = ((elemTop < 0 && elemBottom > 0 ) || (elemTop > 0 && elemTop <= container.height())) && partial ;
+
+          return  isTotal  || isPart ;
+      }
+
 
     $("#statements-link").click(function(e) {
         e.preventDefault();
@@ -4824,6 +4884,62 @@ sigma.parsers.json(
 
             sigma.instances(0).refresh();
         });
+
+    }
+
+    function entryScroll (scroll_entry, undo_select) {
+
+      if (pinnedNodes.length == 0 && !undo_select) {
+
+          sigma.instances(0).graph.edges().forEach(function(e) {
+
+              if (scroll_entry.indexOf(e.statement_id) > -1) {
+                  e.color = e.originalColor;
+              }
+              else {
+                  e.color = deselected_nodes_color;
+              }
+
+          });
+
+          // Make only those nodes visible that belong to the statement selected
+
+          sigma.instances(0).graph.nodes().forEach(function(n) {
+
+              // Is there no contexts at all? Show the node.
+              for (var i = 0; i < scroll_entry.length; i++) {
+                if (nodesOfStatement[scroll_entry[i]] && (nodesOfStatement[scroll_entry[i]].indexOf(n.id) < 0))  {
+                    n.color = deselected_nodes_color;
+                    n.label = '';
+                }
+                else {
+                  if (nodesOfStatement[scroll_entry[i]] != undefined) {
+                    n.color = n.originalColor;
+                    n.label = n.originalLabel;
+                  }
+                }
+              }
+          });
+      }
+
+      else {
+
+          if (pinnedNodes.length == 0) {
+              sigma.instances(0).graph.edges().forEach(function(e) {
+                  e.color = e.originalColor;
+              });
+
+              // Make only those nodes visible that belong to the statement selected
+
+              sigma.instances(0).graph.nodes().forEach(function(n) {
+                  n.color = n.originalColor;
+                  n.label = n.originalLabel;
+              });
+          }
+
+      }
+
+      sigma.instances(0).refresh();
 
     }
 
