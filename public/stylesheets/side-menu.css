@@ -210,6 +210,40 @@ small screens.
     pointer-events: auto!important;
 }
 
+
+#statements-link {
+    position: fixed;
+    display: inline; /* show this only on small screens */
+    top: 40px;
+    left: 0; /* "#menu width" */
+    background: none;
+    text-align: left;
+    font-size: 32px; /* change this value to increase/decrease button size */
+    width: 32px;
+    height: 32px;
+    /* float: right; */
+    padding: 5px 5px;
+    z-index: 10;
+    background-image: url('../images/square.png');
+    background-repeat:no-repeat;
+    background-position:center;
+    pointer-events: auto!important;
+}
+
+.statements-link-dark {
+    opacity: 0.8;
+    background-image: url('../images/square-white.png')!important;
+}
+
+.statements-link-on {
+    background-image: url('../images/squareplus.png')!important;
+}
+
+.statements-link-on-dark {
+    opacity: 0.8;
+    background-image: url('../images/squareplus-white.png')!important;
+}
+
 .graph-link-dark {
       opacity: 0.6;
       background-image: url('../images/closewhite.png')!important;
@@ -666,14 +700,14 @@ Hides the menu at `48em`, but modify this based on your app's needs.
         height: auto;
         padding: 2.6em 2.6em;
         z-index: 11;
-        background-image: url('../images/close.png');
+        background-image: url('../images/graphnet.png');
         background-repeat:no-repeat;
         background-position:center;
     }
 
     #chat-link:hover {
         background: rgba(0,0,0,0.1);
-        background-image: url('../images/close.png');
+        background-image: url('../images/graphnet.png');
         background-repeat:no-repeat;
         background-position:center;
     }
@@ -682,13 +716,14 @@ Hides the menu at `48em`, but modify this based on your app's needs.
         /* display:none; */
     }
 
+
     /* #windowdown-link {
         right: 0;
 
     } */
 
     #entryform {
-        max-width: 280px;
+        max-width: 310px;
     }
     #analytics {
       background-color: rgba(250, 250, 250, 0.9);
@@ -704,6 +739,29 @@ Hides the menu at `48em`, but modify this based on your app's needs.
     #analyticsbutton:after {
       display:none;
     }
+
+    #analyticscaption {
+
+    display: none!important;
+
+    }
+
+    #import-link {
+
+        bottom: 10px;
+        right: 135px; /* "#menu width" */
+
+    }
+
+
+    #collaborate-link {
+
+        bottom: 10px;
+        right: 170px; /* "#menu width" */
+
+    }
+
+
 
 
 

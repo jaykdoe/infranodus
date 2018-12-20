@@ -59,7 +59,12 @@
    </div>
      <div id='content'>
 
+             <a href="javascript:" class="tooltip" title="hide the text pane" id="statements-link">
+                 <span></span>
+             </a>
+
              <div id='statements'>
+
 
                <div id='topnav'>
                  <div class='pure-menu pure-menu-open pure-menu-horizontal'>
@@ -74,10 +79,15 @@
                             <a>Insight</a>
                        </li>
 
+
+
                   </ul>
-                </div>
 
                 </div>
+
+
+                </div>
+
 
                  <div id="entries">
 
@@ -172,7 +182,7 @@
                   <a href="javascript:" class="tooltip" title="hide this pane and all text" id="graph-link">
                       <span></span>
                   </a>
-                  <a href="javascript:" class="tooltip" title="minimize this pane" id="windowdown-link">
+                  <a href="javascript:" class="tooltip" title="minimize window" id="windowdown-link">
                       <span></span>
                   </a>
                   <% if (!perceivername) { %>
@@ -684,6 +694,8 @@ if (background == 'dark') {
   $('#collaborate-link').addClass('collaborate-link-dark');
   $('#import-link').addClass('import-link-dark');
   $('#windowdown-link').addClass('windowdown-link-dark');
+  $('#statements-link').addClass('statements-link-dark');
+
   deselected_nodes_color = '#444';
 }
 
@@ -851,32 +863,38 @@ $("#graph-link").click(function(e) {
     toggle_statements();
 });
 
-    $("#windowdown-link").click(function(e) {
+    $("#statements-link").click(function(e) {
         e.preventDefault();
-        // if ((localStorage.getItem('folded') == 1)) {
-        //     $('#entryform').css({top: 'auto', 'margin-top': '0px'});
-        //     $('#entries').css({height:  $(window).height() - $('#entryform').height() - 75});
-        //     $("#entries").animate({ scrollTop: $('#entries')[0].scrollHeight }, 1000);
-        //     $('#deletecontext').show();
-        //     $('#privacy-link').show();
-        //     $('#collaborate-link').show();
-        //     $('#import-link').show();
-        //     localStorage.setItem('folded', 0);
-        // }
-        // else {
-        //     $('#entryform').css({top:  $(window).height(), 'margin-top': '-50px'});
-        //     $('#entries').css({height:  $(window).height() - 80});
-        //     $('#deletecontext').hide();
-        //     $('#privacy-link').hide();
-        //     $('#collaborate-link').hide();
-        //     $('#import-link').hide();
-        //     localStorage.setItem('folded', 1);
-        // }
+        if ((localStorage.getItem('folded') == 1)) {
+            // $('#entryform').css({top: 'auto', 'margin-top': '0px'});
+            // $('#entries').css({height:  $(window).height() - $('#entryform').height() - 75});
+            // $("#entries").animate({ scrollTop: $('#entries')[0].scrollHeight }, 1000);
+            // $('#deletecontext').show();
+            // $('#privacy-link').show();
+            // $('#collaborate-link').show();
+            // $('#import-link').show();
+            $("#entries").fadeIn();
+            $('#topnav').fadeIn();
+              $('#statements-link').removeClass('statements-link-on-dark');
+              $('#statements-link').removeClass('statements-link-on');
+            localStorage.setItem('folded', 0);
+        }
+        else {
+            $("#entries").fadeOut();
+            $('#topnav').fadeOut();
+            if (background == 'dark') {
+              $('#statements-link').addClass('statements-link-on-dark');
+            }
+            else {
+              $('#statements-link').addClass('statements-link-on');
+            }
+            localStorage.setItem('folded', 1);
+        }
 
 
 
 
-        $("#entries").fadeToggle();
+
 
     });
 
@@ -1000,7 +1018,9 @@ function toggle_statements() {
         }
     }*/
 
-    $("#statements").fadeToggle();
+   $("#statements").fadeToggle();
+
+
     if (!$("#chat-link").hasClass('chat-highlight')) {
         localStorage.setItem('graph', 1);
     }
@@ -1023,6 +1043,9 @@ function toggle_statements() {
           }
     });
     }
+
+
+
 
 
 
@@ -2602,10 +2625,19 @@ sigma.parsers.json(
                {
                  element: "#chat-link",
                  placement: "left",
-                 title: "Hide/Show Statements",
-                 content: "You can use this button to hide / show statements, so you can clearly see the graph.",
+                 title: "Hide/Show Edit Pane",
+                 content: "You can use this button to hide / show the edit pane, so you can clearly see the graph.",
                  onShow: function (tour) {
                      $('#menuLink').click();
+                     $('#chat-link').click();
+                 }
+               },
+               {
+                 element: "#statements-link",
+                 placement: "right",
+                 title: "Hide/Show Statements",
+                 content: "You can also use this button to hide the text but to leave the edit pane on.",
+                 onShow: function (tour) {
                      $('#chat-link').click();
                  }
                },
@@ -2614,9 +2646,7 @@ sigma.parsers.json(
                  placement: "left",
                  title: "This Tutorial",
                  content: "If, at any point, you want to see this tutorial again, click here.",
-                 onShow: function (tour) {
-                     $('#chat-link').click();
-                 }
+
                },
                {
                element: "#addnodeinput",
@@ -3198,13 +3228,26 @@ sigma.parsers.json(
           $('#deletecontextbutton').hide();
           $('#privacy-link').hide();
           $('#collaborate-link').hide();
+          $('#import-link').hide();
+
           $('#entries').css({height:  $(window).height() - 200});
+        });
+
+        $('#windowdown-link').click(function(e){
+          if ($('#import-link').is(":visible")) {
+            $('#finds').trigger('click');
+          }
+          else {
+            $("#adds").trigger('click');
+          }
         });
 
         $("#adds").click(function(e) {
           $('#deletecontextbutton').show();
           $('#privacy-link').show();
           $('#collaborate-link').show();
+          $('#import-link').show();
+
           $('#entries').css({height:  $(window).height() - 380});
         });
 
@@ -3444,6 +3487,19 @@ sigma.parsers.json(
                 $('#statements').fadeOut();
                 $("#chat-link").toggleClass('chat-highlight','add');
             }
+        }
+
+        if (localStorage.getItem('folded') == 1) {
+          $('#entries').fadeOut();
+          $('#topnav').fadeOut();
+          if (background == 'dark') {
+            $('#statements-link').addClass('statements-link-on-dark');
+          }
+          else {
+            $('#statements-link').addClass('statements-link-on');
+          }
+
+
         }
 
         socket.on('node click', function(msg){
@@ -4815,6 +4871,8 @@ sigma.parsers.json(
             $('#deletecontextbutton').hide();
             $('#privacy-link').hide();
             $('#collaborate-link').hide();
+            $('#import-link').hide();
+
 
 
             // Delete text from the form in case of Cancel, remove the buttons
@@ -4831,6 +4889,7 @@ sigma.parsers.json(
                 $('#deletecontextbutton').show();
                 $('#privacy-link').show();
                 $('#collaborate-link').show();
+                $('#import-link').show();
 
                 $("#entries").animate({ scrollTop: $('#entries')[0].scrollHeight }, 1000);
 
@@ -5310,7 +5369,7 @@ sigma.parsers.json(
               console.log(top_community_words);
 
 
-              $('#finds').trigger('click');
+            //  $('#finds').trigger('click');
 
 
               // Make only those edges visible that belong to the statement selected
