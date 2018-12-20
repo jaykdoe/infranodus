@@ -67,6 +67,11 @@
                  <span></span>
              </a>
 
+             <a href="javascript:" class="tooltip" title="play dynamic graph" id="watch-link">
+                 <span></span>
+             </a>
+
+
              <div id='statements'>
 
 
@@ -700,7 +705,7 @@ if (background == 'dark') {
   $('#windowdown-link').addClass('windowdown-link-dark');
   $('#statements-link').addClass('statements-link-dark');
   $('#timer-link').addClass('timer-link-dark');
-
+  $('#watch-link').addClass('watch-link-dark');
   deselected_nodes_color = '#444';
 }
 
@@ -873,6 +878,8 @@ $("#graph-link").click(function(e) {
 
     var dynamic_graph = 0;
 
+    var dynamic_watch = 0;
+
     $("#timer-link").click(function(e) {
       if (dynamic_graph == 0) {
         dynamic_graph = 1;
@@ -883,9 +890,17 @@ $("#graph-link").click(function(e) {
         dynamic_graph = 0;
         $('#timer-link').removeClass('timer-link-on');
         entryScroll('',true);
+        if (dynamic_watch == 1) {
+          $("#watch-link").trigger('click');
+        }
+
       }
 
     });
+
+
+
+
 
     // When scroll happens if the dynamic graph is on, show which uids are visible
 
@@ -913,13 +928,54 @@ $("#graph-link").click(function(e) {
       if (current_scroll == max_scroll && scroll_signal != 'bottom') {
         $(this).scrollTop(0);
         scroll_signal = 'top';
-        console.log(scroll_signal);
       }
       else if (current_scroll == 0 && scroll_signal != 'top') {
         $(this).scrollTop($(this)[0].scrollHeight);
         scroll_signal = 'bottom';
-        console.log(scroll_signal);
       }
+
+      }
+    });
+
+
+    // Dynamically watch the graph unfold
+
+
+
+    $("#watch-link").click(function(e) {
+
+      if (dynamic_watch == 0) {
+          var speed_scroll = 1000;
+          dynamic_watch = 1;
+          $('#watch-link').addClass('watch-link-on');
+
+          $("#timer-link").trigger('click');
+
+          var max_scroll = $('#entries')[0].scrollHeight - $('#entries').height();
+
+          function autoScrollUp(){
+            var current_scroll = ($('#entries').scrollTop());
+            var scroll_to = max_scroll;
+            var num_entries =  $('.entry').length;
+
+            if (current_scroll == max_scroll) {
+              $('#entries').scrollTop(0);
+              current_scroll = $('#entries').scrollTop();
+            }
+            var play_time = Math.round(((max_scroll - current_scroll)/max_scroll) * num_entries * speed_scroll);
+
+            $("#entries").animate({scrollTop: scroll_to},play_time,"linear", autoScrollUp); // and animate
+          }
+          autoScrollUp();
+
+      }
+      else  {
+        dynamic_watch = 0;
+        $('#watch-link').removeClass('watch-link-on');
+        if (dynamic_graph == 1) {
+          $("#timer-link").trigger('click');
+        }
+        $("#entries").stop();
 
       }
     });
@@ -940,6 +996,8 @@ $("#graph-link").click(function(e) {
 
           return  isTotal  || isPart ;
       }
+
+
 
 
     $("#statements-link").click(function(e) {

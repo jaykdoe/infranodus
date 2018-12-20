@@ -264,6 +264,34 @@ small screens.
     background-image: url('../images/timer-blue.png')!important;
 }
 
+#watch-link {
+    position: fixed;
+    display: inline; /* show this only on small screens */
+    top: 120px;
+    left: 0; /* "#menu width" */
+    background: none;
+    text-align: left;
+    font-size: 32px; /* change this value to increase/decrease button size */
+    width: 32px;
+    height: 32px;
+    /* float: right; */
+    padding: 5px 5px;
+    z-index: 10;
+    background-image: url('../images/watch.png');
+    background-repeat:no-repeat;
+    background-position:center;
+    pointer-events: auto!important;
+}
+
+.watch-link-on {
+    background-image: url('../images/watch-blue.png')!important;
+}
+
+.watch-link-dark {
+      opacity: 0.6;
+      background-image: url('../images/watch-white.png')!important;
+}
+
 .statements-link-on {
     background-image: url('../images/squareplus.png')!important;
 }
