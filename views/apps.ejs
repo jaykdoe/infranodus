@@ -47,6 +47,8 @@
           <a href="/import/evernote"><div class="appbox"><div class="appbox_image"><img src='../images/app-evernote.png'></div><div class="appbox_text">Import Evernote notes and see how they all connect</div></div></a>
           <a href="/<%= user.name %>/edit" id="speech"><div class="appbox"><div class="appbox_image"><img src='../images/app-mic.png'></div><div class="appbox_text">Speech to graph: visualize your words as a network</div></div></a>
           <a href="/import"><div class="appbox"><div class="appbox_image"><img src='../images/app-import.png'></div><div class="appbox_text">Advanced import options: text files, PDFs, external services</div></div></a>
+          <a href="https://noduslabs.com/category/tutorials/"><div class="appbox"><div class="appbox_image"><img src='../images/app-helpbook.png'></div><div class="appbox_text">Watch video tutorials, case studies, learn how it works</div></div></a>
+            <a href="/<%= user.name %>/edit" id="tuto"><div class="appbox"><div class="appbox_image"><img src='../images/app-tutorial.png'></div><div class="appbox_text">Step-by-step tutorial: how to add and process the text</div></div></a>
 
           <div class="teaser">
             <br>
@@ -135,6 +137,8 @@
       document.getElementById("analytica").href = "/<%= user.name %>/" + newcontextlong + "/edit?walkthrough=analytics";
 
       document.getElementById("start").href = "/<%= user.name %>/" + newcontextlong + "/edit?walkthrough=default";
+      document.getElementById("tuto").href = "/<%= user.name %>/" + newcontextlong + "/edit?walkthrough=default";
+
 
       $("#addNewContext").on('tap', function(e) {
 
