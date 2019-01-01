@@ -540,6 +540,7 @@ var maxnodes = '';
 
         <% } else if (maxnodes) { %>
             jsonpath = '/api/user/nodes/<%= context %>?maxnodes=<%= maxnodes %>';
+            maxnodes = '<%= maxnodes %>';
             addcontext = "";
 
     <% } else { %>
@@ -559,6 +560,7 @@ var maxnodes = '';
             jsonpath = '/api/public/nodes/<%= perceivername %>/<%= context %>?maxnodes=<%= maxnodes %>';
         <% } else  { %>
             <% if (locals.vieweduser && vieweduser.maxnodes) { %>
+                  maxnodes = '<%= vieweduser.maxnodes %>';
                   jsonpath = '/api/public/nodes/<%= perceivername %>/<%= context %>?maxnodes=<%= vieweduser.maxnodes %>';
             <% } else { %>
                   jsonpath = '/api/public/nodes/<%= perceivername %>/<%= context %>';
@@ -661,6 +663,10 @@ if (!graphPalette) {
 
 <% if (locals.user.customization) { %>
  customization = '<%= user.customization %>';
+<% } %>
+
+<% if (locals.user.maxnodes) { %>
+ maxnodes = '<%= user.maxnodes %>';
 <% } %>
 
 if (!background) {
