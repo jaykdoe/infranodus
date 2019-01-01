@@ -558,7 +558,11 @@ var maxnodes = '';
         <% } else if (maxnodes) { %>
             jsonpath = '/api/public/nodes/<%= perceivername %>/<%= context %>?maxnodes=<%= maxnodes %>';
         <% } else  { %>
-            jsonpath = '/api/public/nodes/<%= perceivername %>/<%= context %>';
+            <% if (locals.vieweduser && vieweduser.maxnodes) { %>
+                  jsonpath = '/api/public/nodes/<%= perceivername %>/<%= context %>?maxnodes=<%= vieweduser.maxnodes %>';
+            <% } else { %>
+                  jsonpath = '/api/public/nodes/<%= perceivername %>/<%= context %>';
+            <% } %>
     <% } %>
     <% } %>
 
