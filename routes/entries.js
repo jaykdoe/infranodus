@@ -147,7 +147,7 @@ exports.submit = function(req, res, next){
     var timestamp = new Date().getTime() * 10000;
 
     if (req.body.timestamp) {
-        timestamp = req.body.timestamp;
+        timestamp = parseInt(req.body.timestamp);
     }
 
 
