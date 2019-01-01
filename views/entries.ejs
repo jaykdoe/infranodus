@@ -636,7 +636,7 @@ var midi = '';
 // TODO for desktop browses that support webwork (not iphone): webworker: true, slowdown: 300
 var forceatlas_options = {worker: false, startingIterations: 100, scalingRatio: 0.1, slowDown: 100, strongGravityMode: true};
 
-<% if (locals.user) { %>
+<% if (locals.user && !locals.vieweduser) { %>
 var inlanguage = '<%= user.inlanguage %>';
 
 <% if (locals.user.label_threshold) { %>
@@ -651,10 +651,6 @@ midi = '<%= user.midi %>';
 most_influential = '<%= user.topnodes %>';
 <% } %>
 
-if (getUrlVars()["most_influential"] == 'bc' || getUrlVars()["most_influential"] == 'bc2' || getUrlVars()["most_influential"] == 'degree') {
-  most_influential = getUrlVars()["most_influential"];
-}
-
 if (!graphPalette) {
  graphPalette = '<%= user.palette %>';
 }
@@ -668,10 +664,29 @@ if (!background) {
 }
 
 
+<% } else { %>
 
+  <% if (locals.vieweduser) { %>
 
+  most_influential = '<%= vieweduser.topnodes %>';
+
+  in_label_threshold = '<%= vieweduser.label_threshold %>';
+
+  if (!graphPalette) {
+    graphPalette = '<%= vieweduser.palette %>';
+  }
+
+  if (!background) {
+    background = '<%= vieweduser.background %>';
+  }
+
+  <% } %>
 
 <% } %>
+
+if (getUrlVars()["most_influential"] == 'bc' || getUrlVars()["most_influential"] == 'bc2' || getUrlVars()["most_influential"] == 'degree') {
+  most_influential = getUrlVars()["most_influential"];
+}
 
 var deselected_nodes_color = '#ddd';
 
