@@ -34,9 +34,17 @@ exports.entries = function(req, res, next){
     // Set that by default the one who sees can only see their own graph, if logged in
     // TODO implement viewing public data of others
 
-    if (res.locals.user) {
-        receiver = res.locals.user.uid;
-        perceiver = res.locals.user.uid;
+    // Is there user in the URL and we know their ID already? Then the receiver will see their graph...
+    if (req.params.user && res.locals.viewuser) {
+        perceiver = res.locals.viewuser;
+    }
+
+    // Otherwise they see their own
+    else {
+        if (res.locals.user) {
+            receiver = res.locals.user.uid;
+            perceiver = res.locals.user.uid;
+        }
     }
 
     var contexts = [];
@@ -244,8 +252,6 @@ exports.nodes = function(req, res, next){
 
     var showcontexts = '';
 
-    console.log(req.user);
-
     // The one who sees the statements (hello Tengo @1Q84 #Murakami)
     var receiver = '';
     // The one who made the statements (hello Fuka-Eri @1Q84 #Murakami)
@@ -287,6 +293,7 @@ exports.nodes = function(req, res, next){
             perceiver = res.locals.user.uid;
         }
     }
+
 
     // Shall we modify the Nodes query, so we can see the contexts?
 

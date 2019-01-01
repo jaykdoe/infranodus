@@ -5049,7 +5049,7 @@ sigma.parsers.json(
 
         // Retrieve the date of the statement
         $('input[name="timestamp"]').val(e.currentTarget.dataset.timestamp);
-      
+
         $('#topmenuitems').each(function() {
             $("li", this).each(function(i) {
 
@@ -6717,7 +6717,7 @@ sigma.parsers.json(
                         '<li class="menu-item-small">&nbsp;</li>' +
                         '<li class="menu-item-divided"><a href="/import">import</a></li>' +
                         '<li class="menu-item-divided"><a href="/api/public/nodes/<%= perceivername %>/<%= context %>" target="_blank">export</a></li>' +
-                        '<li class="menu-item-small"><a href="/api/public/nodes/<%= perceivername %>/<%= context %>?gexf=1" target="_blank" download="<%= perceivername %>_<%= context %>.gexf">gexf</a> <a href="/api/public/nodes/<%= perceivername %>/<%= context %>?csv=1" target="_blank" download="<%= perceivername %>_<%= context %>.csv">csv</a> <a href="/api/public/nodes/<%= perceivername %>/<%= context %>?csvdata=1" target="_blank">csv matrix</a>  <a href="/api/user/statements/<%= context %>?textonly=1" target="_blank">text only</a> <a href="" target="_blank" id="downloadpng">PNG image</a></li>' +
+                        '<li class="menu-item-small"><a href="/api/public/nodes/<%= perceivername %>/<%= context %>?gexf=1" target="_blank" download="<%= perceivername %>_<%= context %>.gexf">gexf</a> <a href="/api/public/nodes/<%= perceivername %>/<%= context %>?csv=1" target="_blank" download="<%= perceivername %>_<%= context %>.csv">csv</a> <a href="/api/public/nodes/<%= perceivername %>/<%= context %>?csvdata=1" target="_blank">csv matrix</a>  <a href="/api/public/statements/<%= perceivername %>/<%= context %>?textonly=1" target="_blank">text only</a> <a href="" target="_blank" id="downloadpng">PNG image</a></li>' +
                         '<li class="menu-item-small">&nbsp;</li>' +
                         '<li class="menu-item-small"><a href="http://noduslabs.com/infranodus/" target="_blank">about</a></li>' +
                         '<li class="menu-item-small"><a href="http://noduslabs.com/contact/" target="_blank">contact</a></li>' +
@@ -6734,7 +6734,7 @@ sigma.parsers.json(
                         '<li class="menu-item-small">&nbsp;</li>' +
                         '<li class="menu-item-divided"><a href="/import">import</a></li>' +
                         '<li class="menu-item-divided"><a href="/api/user/nodes/<%= context %>" target="_blank">export</a></li>' +
-                        '<li class="menu-item-small"><a href="/api/user/nodes/<%= context %>?gexf=1" target="_blank" download="<%= context %>.gexf">gexf</a> <a href="/api/user/nodes/<%= context %>?csv=1" target="_blank">csv</a> <a href="/api/user/nodes/<%= context %>?csvdata=1" target="_blank">csv matrix</a> <a href="" target="_blank" id="downloadpng">PNG image</a></li>' +
+                        '<li class="menu-item-small"><a href="/api/user/nodes/<%= context %>?gexf=1" target="_blank" download="<%= context %>.gexf">gexf</a> <a href="/api/user/nodes/<%= context %>?csv=1" target="_blank">csv</a> <a href="/api/user/nodes/<%= context %>?csvdata=1" target="_blank">csv matrix</a>  <a href="/api/user/statements/<%= context %>?textonly=1" target="_blank">text only</a> <a href="" target="_blank" id="downloadpng">PNG image</a></li>' +
                         '<li class="menu-item-small"><a href="http://noduslabs.com/infranodus/" target="_blank">about</a></li>' +
                         '<li class="menu-item-small"><a href="http://noduslabs.com/contact/" target="_blank">contact</a></li>' +
                         '<li class="menu-item-small"><a href="http://github.com/noduslabs/infranodus" target="_blank">help &amp; github</a></li>';
@@ -6748,7 +6748,7 @@ sigma.parsers.json(
                         '<li class="menu-item-divided"><a href="/signup">signup</a></li>' +
                         '<li class="menu-item-small">&nbsp;</li>' +
                         '<li class="menu-item-divided"><a href="/api/public/nodes/<%= perceivername %>/<%= context %>" target="_blank">export</a></li>' +
-                        '<li class="menu-item-small"><a href="/api/public/nodes/<%= perceivername %>/<%= context %>?gexf=1" target="_blank" download="<%= context %>.gexf">gexf</a> <a href="/api/public/nodes/<%= perceivername %>/<%= context %>?csv=1" target="_blank">csv</a> <a href="/api/public/nodes/<%= perceivername %>/<%= context %>?csvdata=1" target="_blank">csv matrix</a> <a href="" target="_blank" id="downloadpng">PNG image</a></li> ' +
+                        '<li class="menu-item-small"><a href="/api/public/nodes/<%= perceivername %>/<%= context %>?gexf=1" target="_blank" download="<%= context %>.gexf">gexf</a> <a href="/api/public/nodes/<%= perceivername %>/<%= context %>?csv=1" target="_blank">csv</a> <a href="/api/public/nodes/<%= perceivername %>/<%= context %>?csvdata=1" target="_blank">csv matrix</a>  <a href="/api/public/statements/<%= perceivername %>/<%= context %>?textonly=1" target="_blank">text only</a> <a href="" target="_blank" id="downloadpng">PNG image</a></li> ' +
                         '<li class="menu-item-small">&nbsp;</li>' +
                         '<li class="menu-item-divided"><a href="/#tutorials" target="_blank">tutorials</a></li>' +
                         '<li class="menu-item-small">&nbsp;</li>' +
@@ -6760,6 +6760,8 @@ sigma.parsers.json(
                         '<li class="menu-item-small"><a href="http://github.com/noduslabs/infranodus" target="_blank">help &amp; github</a></li>';
 
             <% } %>
+
+        // THis below is a case when the user is logged in, so PERCEIVER does not exist (only RECEIVER) and we just use intternal APIs for exports
 
         <% } else { %>
             settingspane = '<li class="menu-item-small" id="settingspane"><a href="/settings">settings</a></li><br>';

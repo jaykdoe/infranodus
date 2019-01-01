@@ -118,13 +118,13 @@ app.post(
     validate.changeContextPrivacy()
 );
 
-// Internal API to get nodes and statements for user's own nodes
+// Internal API to get nodes and statements for user's own nodes - no need to check user ID
 app.get('/api/user/nodes/:context?', api.nodes);
+app.get('/api/user/statements/:context?', api.entries);
 
 // Internal API to get nodes and statements for somebody else's nodes in context
 app.get('/api/public/nodes/:user?/:context?', validate.getUserID(), validate.getContextPrivacy(), api.nodes);
-
-app.get('/api/user/statements/:context?', api.entries);
+app.get('/api/public/statements/:user?/:context?', validate.getUserID(), validate.getContextPrivacy(), api.entries);
 app.get('/api/:user/lda/:type/:context?', validate.getUserID(), api.entriesLDA);
 
 // Get connected texts through internal connector function
@@ -135,7 +135,7 @@ app.get('/api/:user/connectedcontexts/', validate.getUserID(), api.connectedcont
 
 // External API to get nodes and statements
 app.get('/api2/user/nodes/:context?', api2.nodes);
-app.get('/api2/user/statements/:context?', api2.entries);
+app.get('/api2/user/statements/:context?', validate.getUserID(), api2.entries);
 
 // For posting through API POST parameters:
 // entry[body] is the statement,
