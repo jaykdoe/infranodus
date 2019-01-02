@@ -7477,6 +7477,13 @@ sigma.parsers.json(
 
     // TODO above is ridiculously bad - fix this timing issue
 
+
+    setTimeout(function() {
+
+      downloadPNG();
+
+    },5000);
+
     //downloadPNG();
     // Download PNG (the graph isn't modified)
     function downloadPNG() {
