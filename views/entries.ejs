@@ -1588,6 +1588,7 @@ sigma.parsers.json(
             setTimeout(function() {
                 sigma.stopForceAtlas2();
                 sigma.killForceAtlas2();
+                downloadPNG();
 
             },timeout);
 
@@ -7471,18 +7472,12 @@ sigma.parsers.json(
 
       }
 
-      downloadPNG();
+
 
     }, 3000);
 
     // TODO above is ridiculously bad - fix this timing issue
 
-
-    setTimeout(function() {
-
-      downloadPNG();
-
-    },10000);
 
     //downloadPNG();
     // Download PNG (the graph isn't modified)
