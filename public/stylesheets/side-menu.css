@@ -53,7 +53,7 @@ appears on the left side of the page.
     background: #191818;
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
-    z-index: 5;
+    z-index: 3147483738;
 }
     /*
     All anchors inside the menu should be styled like this.
