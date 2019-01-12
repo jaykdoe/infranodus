@@ -119,11 +119,11 @@ app.post(
 );
 
 // Internal API to get nodes and statements for user's own nodes - no need to check user ID
-app.get('/api/user/nodes/:context?', api.nodes);
+app.get('/api/user/nodes/:context?', validate.getContextsList(), api.nodes);
 app.get('/api/user/statements/:context?', api.entries);
 
 // Internal API to get nodes and statements for somebody else's nodes in context
-app.get('/api/public/nodes/:user?/:context?', validate.getUserID(), validate.getContextPrivacy(), api.nodes);
+app.get('/api/public/nodes/:user?/:context?', validate.getUserID(), validate.getContextPrivacy(), validate.getContextsList(), api.nodes);
 app.get('/api/public/statements/:user?/:context?', validate.getUserID(), validate.getContextPrivacy(), api.entries);
 app.get('/api/:user/lda/:type/:context?', validate.getUserID(), api.entriesLDA);
 
