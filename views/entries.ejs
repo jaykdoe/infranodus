@@ -2313,7 +2313,7 @@ sigma.parsers.json(
       // This IF statement is for the case when the contextlist parameter is not passed on
       <% if (contextlist.length > 0) { %>
       <% contextlist.forEach(function(contextlabel) { %>
-        contextNames.push("<%= contextlabel %>");
+        contextNames.push("<%= contextlabel[0] %>");
       <% }); %>
       <% } %>
 

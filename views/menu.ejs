@@ -13,7 +13,7 @@
             <li class="menu-item-divided"><a href="/<%= user.name %>/edit">all contexts</a></li>
             <% if (contextlist.length > 0) { %>
             <% contextlist.forEach(function(contextlabel) { %>
-                  <li class="menu-item-divided"><a href="/<%= user.name %>/<%= contextlabel %>/edit"><%= contextlabel %></a></li>
+                  <li class="menu-item-divided"><a href="/<%= user.name %>/<%= contextlabel[0] %>/edit"><%= contextlabel[0] %></a></li>
             <% }); %>
             <% } %>
             <li>&nbsp;</li>

@@ -48,7 +48,7 @@ exports.list = function(req, res, next){
     if (res.locals.contextslist) {
 
         contextslist = res.locals.contextslist;
-        console.log("contextslist " + contextslist);
+      //  console.log(contextslist);
     }
 
     // If the user is logged in then we know the ID and the name of the user who is viewing
