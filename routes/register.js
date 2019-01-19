@@ -87,7 +87,7 @@ exports.reset = function(req, res, next){
       thatstamp = req.params.timestamp;
     }
 
-    hash = hash.replace('slashslash', '/');
+    hash = hash.replace(/slashslash/g, '/');
 
     User.getByName(urluser, function(err, user){
 
@@ -196,13 +196,13 @@ exports.generatehash = function(req, res, next){
            var hash = bcrypt.hashSync(complete_string, salt);
 
            // Generate link
-           var resetLink = '/reset/' + encodeURIComponent(user.substance) + '/' + nowtime.toString(36) + '/' + hash.replace('/','slashslash');
+           var resetLink = '/reset/' + encodeURIComponent(user.substance) + '/' + nowtime.toString(36) + '/' + hash.replace(/\//g,'slashslash');
 
            // console.log(resetLink);
            // console.log(bcrypt.compareSync(complete_string, hash));
 
            // Send the link to the user
-           if (bcrypt.compareSync(complete_string, hash.replace('slashslash','/'))) {
+           if (bcrypt.compareSync(complete_string, hash.replace(/slashslash/g,'/'))) {
              console.log('starting mailer');
              const transporter = nodemailer.createTransport(config.smtpOptions);
 
