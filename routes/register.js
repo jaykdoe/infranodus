@@ -194,7 +194,7 @@ exports.generatehash = function(req, res, next){
            var hash = bcrypt.hashSync(complete_string, salt);
 
            // Generate link
-           var resetLink = '/reset/' + encodeURIComponent(user.substance) + '/' + nowtime.toString(36) + '/' + encodeURIComponent(hash);
+           var resetLink = '/reset/' + encodeURIComponent(user.substance) + '/' + nowtime.toString(36) + '/' + hash;
 
            // console.log(resetLink);
            // console.log(bcrypt.compareSync(complete_string, hash));
