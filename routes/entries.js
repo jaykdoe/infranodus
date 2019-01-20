@@ -349,7 +349,7 @@ exports.submit = function(req, res, next){
                            }
 
                            for (t = cycleStart; t < cycleLimit; t++) {
-                              transactionQueries.push({'statement': cypherQueries[t], 'resultDataContents': [ 'row', 'graph' ]});
+                              transactionQueries.push({'statement': cypherQueries[t].query, 'params': cypherQueries[t].params, 'resultDataContents': [ 'row', 'graph' ]});
                            }
 
                            var firstanswer = {
@@ -362,7 +362,7 @@ exports.submit = function(req, res, next){
 
                           var session = neo4jdriver.session();
                         session
-                           .run(transactionQueries[key].statement)
+                           .run(transactionQueries[key].statement, transactionQueries[key].params)
                            .then(function (result) {
                             result.records.forEach(function (record) {
                               firstanswer.data = record.get('s.uid');
