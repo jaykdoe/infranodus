@@ -623,38 +623,40 @@ exports.submit = function(req, res,  next) {
 
                     for (key in result) {
                         if (result[key].lang == 'en' || result[key].lang == 'ru') {
-                        var statement = result[key].text;
-                    /*    var mentions = FlowdockText.extractMentions(statement);
-                        for (index in mentions) {
-                            statement = statement.replace(mentions[index], 'user_' + mentions[index].substr(1) + ' (http://twitter.com/' + mentions[index].substr(1) + ')');
-                        }*/
-                       /* if (twitterRequest.type == 'search/tweets') {
-                            if (searchquery.charAt(0) == '#') {
-                                statement = statement.toLowerCase().replace(twitterRequest.params.q.toLowerCase(),'_#'+searchquery.substr(1).toLowerCase());
-                            }
-                            else {
-                                statement = statement.toLowerCase().replace(twitterRequest.params.q.toLowerCase(),'_'+searchquery.substr(1).toLowerCase());
-                            }
-                        }*/
+                          if (result[key].text && result[key].text != undefined && result[key].text != 'null') {
+                          var statement = result[key].text;
+                      /*    var mentions = FlowdockText.extractMentions(statement);
+                          for (index in mentions) {
+                              statement = statement.replace(mentions[index], 'user_' + mentions[index].substr(1) + ' (http://twitter.com/' + mentions[index].substr(1) + ')');
+                          }*/
+                         /* if (twitterRequest.type == 'search/tweets') {
+                              if (searchquery.charAt(0) == '#') {
+                                  statement = statement.toLowerCase().replace(twitterRequest.params.q.toLowerCase(),'_#'+searchquery.substr(1).toLowerCase());
+                              }
+                              else {
+                                  statement = statement.toLowerCase().replace(twitterRequest.params.q.toLowerCase(),'_'+searchquery.substr(1).toLowerCase());
+                              }
+                          }*/
 
-                        statement = statement.replace(/rt /ig,' ');
+                          statement = statement.replace(/rt /ig,' ');
 
-                        if (req.body.showtwitters) {
-                            statement = '@' + result[key].user.screen_name + ' ' + statement;
-                        }
+                          if (req.body.showtwitters) {
+                              statement = '@' + result[key].user.screen_name + ' ' + statement;
+                          }
 
-                        if (req.body.excludesearchterm) {
+                          if (req.body.excludesearchterm) {
 
-                            var searchPattern = new RegExp('('+searchquery+')', 'ig');
-                            statement = statement.replace(searchPattern,' ');
+                              var searchPattern = new RegExp('('+searchquery+')', 'ig');
+                              statement = statement.replace(searchPattern,' ');
 
-                            if (twitterRequest.type == 'lists/statuses') {
-                                statement = statement.replace(/listname/ig,' ');
-                            }
-                        }
+                              if (twitterRequest.type == 'lists/statuses') {
+                                  statement = statement.replace(/listname/ig,' ');
+                              }
+                          }
 
-                        statements.push(statement);
+                          statements.push(statement);
 
+                          }
                         }
                     }
 
@@ -2319,6 +2321,9 @@ exports.submit = function(req, res,  next) {
 
                     for (var i = 0; i < resp.links.length; ++i) {
 
+
+                      if (resp.links[i].description && resp.links[i].description != 'null' && resp.links[i].description != undefined) {
+
                         var searchtext = '';
 
                         // We don't show titles because otherwise there's overload of search terms in the graph
@@ -2367,7 +2372,7 @@ exports.submit = function(req, res,  next) {
 
                         req.body.entry.body[i] = searchtext;
 
-
+                      }
                     }
 
                     entries.submit(req, res);
