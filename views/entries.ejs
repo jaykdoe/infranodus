@@ -4154,7 +4154,19 @@ sigma.parsers.json(
       var totaledgescount = 0;
 
       sigma.instances(0).graph.edges().forEach(function(e) {
-          edge_data.push({source: e.source, target: e.target});
+
+          var matche = 0;
+
+          for (var i = 0; i < edge_data.length; i++) {
+            if (edge_data[i].source == e.source && edge_data[i].target == e.target) {
+              matche = 1;
+              edge_data[i].weight = edge_data[i].weight + parseInt(e.weight);
+            }
+          }
+          if (matche == 0) {
+            edge_data.push({source: e.source, target: e.target, weight: parseInt(e.weight)});
+          }
+
           if (e.source != e.target) {
             totaledgescount = totaledgescount + 1;
           }
