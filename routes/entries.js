@@ -258,17 +258,17 @@ exports.submit = function(req, res, next){
                         }
                         else {
                             for (var i = 0; i < hashtags.length; i++) {
-                              statementName = '# ' + hashtags[i];
+                              statementName += '#' + hashtags[i] + ' ';
                             }
                             for (var i = 0; i < mentions.length; i++) {
-                              statementName = '@ ' + mentions[i];
+                              statementName += '@' + mentions[i] + ' ';
                             }
                             prepStatements.push({'text':goodStatements[s],'concepts':hashtags,'mentions':mentions,'timestamp':newtimestamp,'name':statementName,'uid':st_uid});
                         }
                     }
                     else {
                         for (var i = 0; i < mentions.length; i++) {
-                          statementName = '@ ' + mentions[i];
+                          statementName += '@' + mentions[i] + ' ';
                         }
                         prepStatements.push({'text':goodStatements[s],'concepts':hashtags,'mentions':mentions,'timestamp':newtimestamp,'name':statementName,'uid':st_uid});
                     }
