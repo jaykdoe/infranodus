@@ -623,38 +623,40 @@ exports.submit = function(req, res,  next) {
 
                     for (key in result) {
                         if (result[key].lang == 'en' || result[key].lang == 'ru') {
-                        var statement = result[key].text;
-                    /*    var mentions = FlowdockText.extractMentions(statement);
-                        for (index in mentions) {
-                            statement = statement.replace(mentions[index], 'user_' + mentions[index].substr(1) + ' (http://twitter.com/' + mentions[index].substr(1) + ')');
-                        }*/
-                       /* if (twitterRequest.type == 'search/tweets') {
-                            if (searchquery.charAt(0) == '#') {
-                                statement = statement.toLowerCase().replace(twitterRequest.params.q.toLowerCase(),'_#'+searchquery.substr(1).toLowerCase());
-                            }
-                            else {
-                                statement = statement.toLowerCase().replace(twitterRequest.params.q.toLowerCase(),'_'+searchquery.substr(1).toLowerCase());
-                            }
-                        }*/
+                          if (result[key].text && result[key].text != undefined && result[key].text != 'null') {
+                          var statement = result[key].text;
+                      /*    var mentions = FlowdockText.extractMentions(statement);
+                          for (index in mentions) {
+                              statement = statement.replace(mentions[index], 'user_' + mentions[index].substr(1) + ' (http://twitter.com/' + mentions[index].substr(1) + ')');
+                          }*/
+                         /* if (twitterRequest.type == 'search/tweets') {
+                              if (searchquery.charAt(0) == '#') {
+                                  statement = statement.toLowerCase().replace(twitterRequest.params.q.toLowerCase(),'_#'+searchquery.substr(1).toLowerCase());
+                              }
+                              else {
+                                  statement = statement.toLowerCase().replace(twitterRequest.params.q.toLowerCase(),'_'+searchquery.substr(1).toLowerCase());
+                              }
+                          }*/
 
-                        statement = statement.replace(/rt /ig,' ');
+                          statement = statement.replace(/rt /ig,' ');
 
-                        if (req.body.showtwitters) {
-                            statement = '@' + result[key].user.screen_name + ' ' + statement;
-                        }
+                          if (req.body.showtwitters) {
+                              statement = '@' + result[key].user.screen_name + ' ' + statement;
+                          }
 
-                        if (req.body.excludesearchterm) {
+                          if (req.body.excludesearchterm) {
 
-                            var searchPattern = new RegExp('('+searchquery+')', 'ig');
-                            statement = statement.replace(searchPattern,' ');
+                              var searchPattern = new RegExp('('+searchquery+')', 'ig');
+                              statement = statement.replace(searchPattern,' ');
 
-                            if (twitterRequest.type == 'lists/statuses') {
-                                statement = statement.replace(/listname/ig,' ');
-                            }
-                        }
+                              if (twitterRequest.type == 'lists/statuses') {
+                                  statement = statement.replace(/listname/ig,' ');
+                              }
+                          }
 
-                        statements.push(statement);
+                          statements.push(statement);
 
+                          }
                         }
                     }
 
@@ -812,11 +814,16 @@ exports.submit = function(req, res,  next) {
 
 
                                 var addToContexts = [];
+
                                 // Here we create dummy statements in order to create the new contexts and get the IDs for them from our Neo4J DB
 
-                                for (var m = 0; m < notebooksList.length; m++) {
-                                    addToContexts.push(S(notebooksList[m]).dasherize().chompLeft('-').camelize().s.replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()]/g,""));
-                                }
+                                // This could be a setting if we create a context for each Evernote notebook
+
+                                // for (var m = 0; m < notebooksList.length; m++) {
+                                //     addToContexts.push(S(notebooksList[m]).dasherize().chompLeft('-').camelize().s.replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()]/g,""));
+                                // }
+
+                                addToContexts.push(default_context);
 
                                 validate.getContextID(user_id, addToContexts, function(result, err) {
                                     if (err) {
@@ -867,7 +874,7 @@ exports.submit = function(req, res,  next) {
                                         context: ''
                                     },
 
-                                    contextids: [],
+                                    contextids: contexts,
                                     internal: 1,
                                     multiple: 1
                                 };
@@ -919,28 +926,28 @@ exports.submit = function(req, res,  next) {
                                         sendstring = sendstring.replace(/&quot;/g, '');
 
 
-                                        // Create container for contexts to push
-
-                                        var selcontexts = [];
-
-                                        // Create contained for intemediary context
-
-                                        var selcontexts2 = [];
-
-                                        // What's the notebook name? This will be our context
-                                        var currentcontext = S(notebooks_db[notebook_id]).dasherize().chompLeft('-').camelize().s.replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()]/g,"");
-                                        currentcontext = currentcontext.replace(/[^\w]/gi, '');
-
-                                        // Now let's find the right ID for that notebook in our database
-                                        for (var i = 0; i < contexts.length; i++) {
-                                            if (contexts[i].name == currentcontext) {
-                                                selcontexts2['uid'] = contexts[i].uid;
-                                                selcontexts2['name'] = contexts[i].name;
-                                                selcontexts.push(selcontexts2);
-                                            }
-                                        }
-
-                                        req.contextids = selcontexts;
+                                        // // Create container for contexts to push
+                                        //
+                                        // var selcontexts = [];
+                                        //
+                                        // // Create contained for intemediary context
+                                        //
+                                        // var selcontexts2 = [];
+                                        //
+                                        // // What's the notebook name? This will be our context
+                                        // var currentcontext = S(notebooks_db[notebook_id]).dasherize().chompLeft('-').camelize().s.replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+                                        // currentcontext = currentcontext.replace(/[^\w]/gi, '');
+                                        //
+                                        // // Now let's find the right ID for that notebook in our database
+                                        // for (var i = 0; i < contexts.length; i++) {
+                                        //     if (contexts[i].name == currentcontext) {
+                                        //         selcontexts2['uid'] = contexts[i].uid;
+                                        //         selcontexts2['name'] = contexts[i].name;
+                                        //         selcontexts.push(selcontexts2);
+                                        //     }
+                                        // }
+                                        //
+                                        // req.contextids = selcontexts;
 
                                         evernotes.push(sendstring);
 
@@ -2319,6 +2326,9 @@ exports.submit = function(req, res,  next) {
 
                     for (var i = 0; i < resp.links.length; ++i) {
 
+
+                      if (resp.links[i].description && resp.links[i].description != 'null' && resp.links[i].description != undefined) {
+
                         var searchtext = '';
 
                         // We don't show titles because otherwise there's overload of search terms in the graph
@@ -2367,7 +2377,7 @@ exports.submit = function(req, res,  next) {
 
                         req.body.entry.body[i] = searchtext;
 
-
+                      }
                     }
 
                     entries.submit(req, res);

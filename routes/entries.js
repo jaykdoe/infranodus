@@ -21,6 +21,8 @@ var async = require('async');
 
 var neo4jnew = require('neo4j-driver').v1;
 
+var uuid = require('node-uuid');
+
 
 
 exports.list = function(req, res, next){
@@ -153,6 +155,8 @@ exports.submit = function(req, res, next){
 
     var splitStatements = [];
     var fullstatement = '';
+    var goodStatements = [];
+    var prepStatements = [];
 
     // Retrieve the statement
     // Is the body of the statement an Array (usually sent from import)
@@ -202,7 +206,7 @@ exports.submit = function(req, res, next){
 
             }
             else {
-                for (k=0; k < splitStatements.length;k++) {
+                for (var k=0; k < splitStatements.length;k++) {
                   if (!splitStatements[k] && currenttextlength == 0) {
                       callback('Please, enter a statement');
                   }
@@ -213,49 +217,75 @@ exports.submit = function(req, res, next){
                       callback('Try to make it less than ' + max_length + ' characters, please...');
                   }
                   else {
-                      var count = k;
-                      callback(null, splitStatements[k], count);
+                      splitStatements[k] = validate.sanitize(splitStatements[k]);
+                      goodStatements.push(splitStatements[k]);
                   }
+
                 }
+                callback(null, goodStatements);
+
             }
         },
-        function(statement, count, callback){
-            statement = validate.sanitize(statement);
-            callback(null, statement, count);
-        },
-        function(statement, count, callback){
+        function(goodStatements, callback){
 
-            var hashtags = validate.getHashtags(statement, res);
+            var error;
 
-            if (req.onlymentions) {
-                hashtags = '';
-            }
-
-            var mentions = validate.getMentions(statement);
-
-            if (req.excludementions) {
-                mentions = '';
-            }
+            for (var s = 0; s < goodStatements.length; s++) {
 
 
-            if  (!hashtags && mentions.length < 1) {
-                callback('There should be at least one word, #hashtag or @mention.');
-            }
-            else {
-                if (hashtags) {
-                    if (hashtags.length >= maxhash) {
-                        callback('Please, try to use less than ' + maxhash + ' #hashtags');
-                    }
-                    else {
-                        callback(null, statement, hashtags, mentions, count);
-                    }
+                var hashtags = validate.getHashtags(goodStatements[s], res);
+
+                if (req.onlymentions) {
+                    hashtags = '';
+                }
+
+                var mentions = validate.getMentions(goodStatements[s]);
+
+                if (req.excludementions) {
+                    mentions = '';
+                }
+
+                if  (!hashtags && mentions.length < 1) {
+                  error = 'There should be at least one word, #hashtag or @mention.';
                 }
                 else {
-                    callback(null, statement, hashtags, mentions, count);
+                    var statementName = '';
+                    var newtimestamp = timestamp + (s * 2);
+                    var st_uid = uuid.v1();
+                    if (hashtags) {
+                        if (hashtags.length >= maxhash) {
+                            error = 'Please, try to use less than ' + maxhash + ' #hashtags';
+                        }
+                        else {
+                            for (var i = 0; i < hashtags.length; i++) {
+                              statementName += '#' + hashtags[i] + ' ';
+                            }
+                            for (var i = 0; i < mentions.length; i++) {
+                              statementName += '@' + mentions[i] + ' ';
+                            }
+                            prepStatements.push({'text':goodStatements[s],'concepts':hashtags,'mentions':mentions,'timestamp':newtimestamp,'name':statementName,'uid':st_uid});
+                        }
+                    }
+                    else {
+                        for (var i = 0; i < mentions.length; i++) {
+                          statementName += '@' + mentions[i] + ' ';
+                        }
+                        prepStatements.push({'text':goodStatements[s],'concepts':hashtags,'mentions':mentions,'timestamp':newtimestamp,'name':statementName,'uid':st_uid});
+                    }
                 }
-            }
+          }
+
+          // Successfully executed the above?
+
+          if (prepStatements.length > 0) {
+            callback(null, prepStatements);
+          }
+          else {
+            callback(error);
+          }
+
         },
-        function(statement, hashtags, mentions, count, callback){
+        function(prepStatements, callback){
 
             // Put all the contexts that came with the statement into a new variable
 
@@ -265,7 +295,7 @@ exports.submit = function(req, res, next){
                 for (var i = 0; i < contextids.length; i++) {
                         contexts.push(contextids[i]);
                 }
-                callback(null, statement, hashtags, contexts, mentions, count);
+                callback(null, prepStatements, contexts);
             }
             else {
                 callback('Please, select a context for this statement');
@@ -273,32 +303,26 @@ exports.submit = function(req, res, next){
 
 
         },
-        function(statement, hashtags, contexts, mentions, count, callback){
+        function(prepStatements, contexts, callback){
+
             // Then we ascribe the data that the Entry object needs in order to survive
             // We create various fields and values for that object and initialize it
 
-            var newtimestamp = timestamp + count * 2;
-
-
-            // Add new entry
+            // Create a new entry object, so we can perform actions on it
             var entry = new Entry({
                 "by_uid": res.locals.user.uid,
                 "by_id": res.locals.user.uid,
                 "by_name": res.locals.user.name,
                 "contexts": contexts,
-                "hashtags": hashtags,
-                "mentions": mentions,
-                "text": statement,
+                "statements": prepStatements,
                 "fullscan": res.locals.user.fullscan,
-                "addmentions": res.locals.user.mentions,
-                "timestamp": newtimestamp
-
+                "addmentions": res.locals.user.mentions
             });
 
 
-            callback(null, entry, statement, count);
+            callback(null, entry, prepStatements);
         }
-    ], function (err, entry, statement, count) {
+    ], function (err, entry, prepStatements) {
 
         if (err) {
 
@@ -325,50 +349,20 @@ exports.submit = function(req, res, next){
               entry.savetrans(function(cypherQuery) {
 
 
-                         cypherQueries.push(cypherQuery);
-
-                         // We have constructed the queries and now we have either the max number of them or their total number is reached - launch the searchQuery
-
-                         if ((cypherQueries.length == totalcount) || ((totalcount > maxtransactions) && (cypherQueries.length == (maxtransactions * (requestiterations + 1))))) {
-
-                           var transactionQueries = [];
-                           // by default we limit the number of Neo4J transactions by the total number of statements
-                           var cycleLimit = totalcount;
-                           // by default we start from 0
-                           var cycleStart = 0;
-
-                           // if the total number of statements is higher than max transactions
-                           if (totalcount > maxtransactions) {
-                             // we start from 0 if it's the first time we here, otherwise from where we left off last time
-                              cycleStart = maxtransactions * requestiterations;
-                            // we end at + maxtransactions
-                              cycleLimit = maxtransactions * (requestiterations + 1);
-                              if (cycleLimit > totalcount) { cycleLimit = totalcount; }
-                            // we count how many iterations we made (global parameter)
-                              requestiterations = requestiterations + 1;
-                           }
-
-                           for (t = cycleStart; t < cycleLimit; t++) {
-                              transactionQueries.push({'statement': cypherQueries[t], 'resultDataContents': [ 'row', 'graph' ]});
-                           }
-
-                           var firstanswer = {
+                          var firstanswer = {
                                           data: []
-                           }
-                           var jsonfirstanswer = '';
-
-
-                        for (var key in transactionQueries) {
+                          }
+                          var jsonfirstanswer = '';
 
                           var session = neo4jdriver.session();
                         session
-                           .run(transactionQueries[key].statement)
+                           .run(cypherQuery.query, cypherQuery.params)
                            .then(function (result) {
                             result.records.forEach(function (record) {
+                              // Change that so we can add multiple statements at once without reloading the page
                               firstanswer.data = record.get('s.uid');
                               jsonfirstanswer = JSON.stringify(firstanswer);
                             });
-                            neo4jtimes = neo4jtimes + 1;
                             session.close();
 
                             if (req.remoteUser) {
@@ -377,29 +371,26 @@ exports.submit = function(req, res, next){
                             else if (req.internal) {
                                 //next();
                                 // console.log("internal req");
-                                if (neo4jtimes == totalcount) {
-                                    neo4jdriver.close();
-                                    res.redirect(res.locals.user.name + '/' + default_context + '/edit');
-                                }
+
+                                // This was some import or multiple statements add feature and we just reload the page with results
+                                neo4jdriver.close();
+                                res.redirect(res.locals.user.name + '/' + default_context + '/edit');
 
                             }
                             else {
 
+                              // Here we deleted a statement or edited it, or deleted the whole context
                               if (req.body.delete == 'delete' || req.body.btnSubmit == 'edit' || req.body.delete == 'delete context') {
                                   if (default_context == 'undefined' || typeof default_context === 'undefined' || default_context == '') {
-                                   res.redirect('/' + res.locals.user.name + '/edit');
+                                    res.redirect('/' + res.locals.user.name + '/edit');
                                    }
                                    else {
-                                   res.redirect(res.locals.user.name + '/' + default_context + '/edit');
-
+                                     res.redirect(res.locals.user.name + '/' + default_context + '/edit');
                                    }
-
-
                               }
                               else {
-
-
                                 // The statement fit within our maxlength limits and is only one
+                                // TODO eventually could be several statements
                                 if ((splitStatements.length == 1)) {
 
                                   var receiver = res.locals.user.uid;
@@ -410,10 +401,11 @@ exports.submit = function(req, res, next){
                                   contexts.push(default_context);
                                   Entry.getNodes(receiver, perceiver, contexts, fullview, showcontexts, res, req, function(err, graph){
                                       if (err) return next(err);
-                                      // Change the result we obtained into a nice json we need
 
+                                      // Change the result we obtained into a nice json we need
+                                      // TODO eventually could be several statements sent this way so no need to reload the graph
                                       neo4jdriver.close();
-                                      res.send({entryuid: jsonfirstanswer, entrytext: statement, graph: graph});
+                                      res.send({entryuid: jsonfirstanswer, entrytext: splitStatements[0], graph: graph});
 
                                   });
 
@@ -422,22 +414,19 @@ exports.submit = function(req, res, next){
 
                                 // The statement consists of several statements and we completed all the iterations.
 
-                                else if (neo4jtimes == totalcount) {
+                                else  {
                                   console.log("reached the end");
-
                                   neo4jdriver.close();
                                   res.send({entryuid: 'multiple', entrycontent: fullstatement, successmsg: 'Please, reload this page after a few seconds to see the full graph.'});
                                 }
-
-
-
-
-                              }
+                      }
                             }
                           })
                           .catch(function (error) {
 
                                if (req.internal) {
+
+                                 // TODO Error treatment?
 
                                }
                                else {
@@ -448,10 +437,10 @@ exports.submit = function(req, res, next){
 
                            });
                            // End of FOR cycle
-                        }
 
-                        // End of IF condition
-                         }
+
+                        // End of KEEP THIS BELOW TRANSACTION QUERY IF condition
+                        // }
 
                          // savetrans ends here
               });
