@@ -26,16 +26,16 @@ exports.settings = {
     max_contexts: 5,
 
     // Max length of a statement text in Bytes
-    max_text_length: 10000,
+    max_text_length: 1000,
 
     // Max length of the total text length in Bytes
-    max_total_text_length: 300000,
+    max_total_text_length: 200000,
 
     // Min length of a statement text
     min_text_length: 1,
 
     // Max number of tags in one statement
-    max_hashtags: 5000,
+    max_hashtags: 1000,
 
     // Max nodes to show in a graph
     max_nodes: 150,
