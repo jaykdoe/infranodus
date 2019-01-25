@@ -1363,6 +1363,8 @@ sigma.parsers.json(
 
             sigma.graph.edges().forEach(function(e) {
 
+            //  console.log(e.source + ' ' + e.target + ' ' + e.weight);
+
                 var unique_edge_id = '';
 
                 // Let's see if the edge source in alphabetical order is further than its target and change places
@@ -1514,6 +1516,8 @@ sigma.parsers.json(
                             nonsuspects.push(e.target);
                         }
                 }
+
+
 
 
 
@@ -4252,7 +4256,12 @@ sigma.parsers.json(
           if (e.source != e.target) {
             totaledgescount = totaledgescount + 1;
           }
+
+
       });
+      // console.log(sigma.instances(0).graph.edges());
+      // console.log(edge_data);
+
       if (node_data.length > 0 && edge_data.length > 0) {
 
       var community = jLouvain().nodes(node_data).edges(edge_data);
@@ -5035,13 +5044,22 @@ sigma.parsers.json(
             if (!alreadyClicked && pinnedNodes.length == 0) {
 
                 sigma.instances(0).graph.edges().forEach(function(e) {
+                    var got_match = 0;
+
                     for (let item of e.statement_id) {
                         if (item == keepStatementID) {
-                            e.color = e.originalColor;
+
+                          got_match += 1;
+
                         }
-                        else {
-                            e.color = deselected_nodes_color;
-                        }
+
+                    }
+
+                    if (got_match > 0) {
+                        e.color = e.originalColor;
+                    }
+                    else {
+                        e.color = deselected_nodes_color;
                     }
                 });
 
@@ -5092,14 +5110,17 @@ sigma.parsers.json(
       if (pinnedNodes.length == 0 && !undo_select) {
 
           sigma.instances(0).graph.edges().forEach(function(e) {
-
+              var got_match = 0;
               for (let item of e.statement_id)  {
                   if (scroll_entry.indexOf(item) > -1) {
-                      e.color = e.originalColor;
+                      got_match += 1;
                   }
-                  else {
-                      e.color = deselected_nodes_color;
-                  }
+              }
+              if (got_match > 0) {
+                  e.color = e.originalColor;
+              }
+              else {
+                  e.color = deselected_nodes_color;
               }
 
           });
@@ -5696,13 +5717,17 @@ sigma.parsers.json(
 
 
                   sigma.instances(0).graph.edges().forEach(function(e) {
+                      var got_match = 0;
                       for (let item of e.statement_id) {
                         if (entries_ids.includes(item)) {
-                            e.color = e.originalColor;
+                            got_match += 1;
                         }
-                        else {
-                            e.color = deselected_nodes_color;
-                        }
+                      }
+                      if (got_match > 0) {
+                          e.color = e.originalColor;
+                      }
+                      else {
+                          e.color = deselected_nodes_color;
                       }
 
                   });
