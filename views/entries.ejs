@@ -1235,7 +1235,7 @@ function showEntries () {
 }
 
 
-// Add Cytoscape Library
+// Add Cytoscape Library - to calculate betweenness centrality for nodes and other stuff
 
 var cy = cytoscape({
     container: undefined,
@@ -1386,31 +1386,36 @@ sigma.parsers.json(
                 }
 
                 // Make an index of nodes to statement
-                if (nodesOfStatement[e.statement_id]) {
-                    if (nodesOfStatement[e.statement_id].indexOf(e.source) < 0)
-                        nodesOfStatement[e.statement_id].push(e.source);
-                    if (nodesOfStatement[e.statement_id].indexOf(e.target) < 0)
-                        nodesOfStatement[e.statement_id].push(e.target);
-                }
-                else {
-                    nodesOfStatement[e.statement_id] = [];
-                    nodesOfStatement[e.statement_id].push(e.source);
-                    nodesOfStatement[e.statement_id].push(e.target);
+                for (let item of e.statement_id) {
+                  if (nodesOfStatement[item]) {
+                      if (nodesOfStatement[item].indexOf(e.source) < 0)
+                          nodesOfStatement[item].push(e.source);
+                      if (nodesOfStatement[item].indexOf(e.target) < 0)
+                          nodesOfStatement[item].push(e.target);
+                  }
+                  else {
+                      nodesOfStatement[item] = [];
+                      nodesOfStatement[item].push(e.source);
+                      nodesOfStatement[item].push(e.target);
+                  }
                 }
 
                 if (statementsOfContext[e.edge_context]) {
-                    if (statementsOfContext[e.edge_context].indexOf(e.statement_id) < 0)
-                        statementsOfContext[e.edge_context].push(e.statement_id);
+                    for (let item of e.statement_id) {
+                      if (statementsOfContext[e.edge_context].indexOf(item) < 0) statementsOfContext[e.edge_context].push(item);
+                    }
                 }
                 else {
                     statementsOfContext[e.edge_context] = [];
-                    statementsOfContext[e.edge_context].push(e.statement_id);
+                    for (let item of e.statement_id) {
+                      statementsOfContext[e.edge_context].push(item);
+                    }
                 }
 
                 // Add to Cytoscape
                 elesnodes.push({
                     group: "edges",
-                    data: { id: unique_edge_id, source: e.source, target: e.target }
+                    data: { id: unique_edge_id, source: e.source, target: e.target, weight: e.weight }
                 });
 
                 // Add to EDGES db
@@ -2040,7 +2045,7 @@ sigma.parsers.json(
                                 target: addededges[j].target,
                                 weight: addededges[j].weight,
                                 size: addededges[j].weight,
-                                statement_id: addededges[j].statement_id,
+                                statement_id: [addededges[j].statement_id],
                                 edge_context: addededges[j].edge_context
                             });
 
@@ -2090,25 +2095,30 @@ sigma.parsers.json(
 
 
                         // Make and index of nodes to statement
-                        if (nodesOfStatement[e.statement_id]) {
-                            if (nodesOfStatement[e.statement_id].indexOf(e.source) < 0)
-                                nodesOfStatement[e.statement_id].push(e.source);
-                            if (nodesOfStatement[e.statement_id].indexOf(e.target) < 0)
-                                nodesOfStatement[e.statement_id].push(e.target);
-                        }
-                        else {
-                            nodesOfStatement[e.statement_id] = [];
-                            nodesOfStatement[e.statement_id].push(e.source);
-                            nodesOfStatement[e.statement_id].push(e.target);
+                        for (let item of e.statement_id) {
+                          if (nodesOfStatement[item]) {
+                              if (nodesOfStatement[item].indexOf(e.source) < 0)
+                                  nodesOfStatement[item].push(e.source);
+                              if (nodesOfStatement[item].indexOf(e.target) < 0)
+                                  nodesOfStatement[item].push(e.target);
+                          }
+                          else {
+                              nodesOfStatement[item] = [];
+                              nodesOfStatement[item].push(e.source);
+                              nodesOfStatement[item].push(e.target);
+                          }
                         }
 
                         if (statementsOfContext[e.edge_context]) {
-                            if (statementsOfContext[e.edge_context].indexOf(e.statement_id) < 0)
-                                statementsOfContext[e.edge_context].push(e.statement_id);
+                            for (let item of e.statement_id) {
+                            if (statementsOfContext[e.edge_context].indexOf(item) < 0) statementsOfContext[e.edge_context].push(e.statement_id);
+                            }
                         }
                         else {
                             statementsOfContext[e.edge_context] = [];
-                            statementsOfContext[e.edge_context].push(e.statement_id);
+                            for (let item of e.statement_id) {
+                              statementsOfContext[e.edge_context].push(item);
+                            }
                         }
 
                                         // Make an index of nodes to context
@@ -2128,7 +2138,7 @@ sigma.parsers.json(
                         // Add to Cytoscape
                         elesnodes.push({
                             group: "edges",
-                            data: { id: unique_edge_id, source: e.source, target: e.target }
+                            data: { id: unique_edge_id, source: e.source, target: e.target, weight: e.weight }
                         });
 
 
@@ -2250,19 +2260,20 @@ sigma.parsers.json(
                 sigma.graph.edges().forEach(function(e) {
 
                     // If a node appears in at least one statement, we add him in ToKeep list
-                    if (nodesOfStatement[e.statement_id].indexOf(e.source) > -1) {
+                  for (let item of e.statement_id) {
+                    if (nodesOfStatement[item].indexOf(e.source) > -1) {
                         nodesToKeep.push(e.source);
                     }
 
-                    if (nodesOfStatement[e.statement_id].indexOf(e.target) > -1) {
+                    if (nodesOfStatement[item].indexOf(e.target) > -1) {
                         nodesToKeep.push(e.target);
                     }
 
-                    var statePosition = statementsOfContext[e.edge_context].indexOf(e.statement_id);
+                    var statePosition = statementsOfContext[e.edge_context].indexOf(item);
                     if (statePosition < 0) {
                         statementsOfContext[e.edge_context].splice(statePosition, 1);
                     }
-
+                }
 
                 });
 
@@ -3758,7 +3769,7 @@ sigma.parsers.json(
 
                     elesnodes.push({
                         group: "edges",
-                        data: { id: unique_edge_id, source: e.source, target: e.target }
+                        data: { id: unique_edge_id, source: e.source, target: e.target, weight: e.weight }
                     });
 
 
@@ -3867,7 +3878,7 @@ sigma.parsers.json(
                                      target: edgeproc.target,
                                      weight: edgeproc.weight,
                                      size: edgeproc.weight,
-                                     statement_id: edgeproc.statement_id,
+                                     statement_id: [edgeproc.statement_id],
                                      edge_context: edgeproc.edge_context
                               });
 
@@ -3884,7 +3895,7 @@ sigma.parsers.json(
                            target: edgeproc.target,
                            weight: edgeproc.weight,
                            size: edgeproc.weight,
-                           statement_id: edgeproc.statement_id,
+                           statement_id: [edgeproc.statement_id],
                            edge_context: edgeproc.edge_context
                     });
 
@@ -3927,7 +3938,7 @@ sigma.parsers.json(
 
                       elesnodes.push({
                           group: "edges",
-                          data: { id: unique_edge_id, source: e.source, target: e.target }
+                          data: { id: unique_edge_id, source: e.source, target: e.target, weight: e.weight }
                       });
 
 
@@ -4959,14 +4970,14 @@ sigma.parsers.json(
             if (!alreadyClicked && pinnedNodes.length == 0) {
 
                 sigma.instances(0).graph.edges().forEach(function(e) {
-
-                    if (e.statement_id == keepStatementID) {
-                        e.color = e.originalColor;
+                    for (let item of e.statement_id) {
+                        if (item == keepStatementID) {
+                            e.color = e.originalColor;
+                        }
+                        else {
+                            e.color = deselected_nodes_color;
+                        }
                     }
-                    else {
-                        e.color = deselected_nodes_color;
-                    }
-
                 });
 
                 // Make only those nodes visible that belong to the statement selected
@@ -5017,11 +5028,13 @@ sigma.parsers.json(
 
           sigma.instances(0).graph.edges().forEach(function(e) {
 
-              if (scroll_entry.indexOf(e.statement_id) > -1) {
-                  e.color = e.originalColor;
-              }
-              else {
-                  e.color = deselected_nodes_color;
+              for (let item of e.statement_id)  {
+                  if (scroll_entry.indexOf(item) > -1) {
+                      e.color = e.originalColor;
+                  }
+                  else {
+                      e.color = deselected_nodes_color;
+                  }
               }
 
           });
@@ -5618,12 +5631,13 @@ sigma.parsers.json(
 
 
                   sigma.instances(0).graph.edges().forEach(function(e) {
-
-                      if (entries_ids.includes(e.statement_id)) {
-                          e.color = e.originalColor;
-                      }
-                      else {
-                          e.color = deselected_nodes_color;
+                      for (let item of e.statement_id) {
+                        if (entries_ids.includes(item)) {
+                            e.color = e.originalColor;
+                        }
+                        else {
+                            e.color = deselected_nodes_color;
+                        }
                       }
 
                   });
