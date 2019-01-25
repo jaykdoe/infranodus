@@ -352,11 +352,12 @@
 
     var urlPath = location.pathname;
 
-    // Initialize Socket.IO
+    // Initialize Socket.IO for websockets (using them for collabs but also to listen to events within the app )
     var socket = io();
 
 
     // Get URL variables in the form of an array
+    // TODO can be moved out
 
     function getUrlVars()
     {
@@ -435,10 +436,13 @@
 
     var voice_continues = getUrlVars()["voice_continues"];
 
+    // Getting the details parsed from routes/entries.js to see how to show the graph
+
     <% if (locals.user && locals.user.voice_continues != undefined && locals.user.voice_continues != '00') { %>
         voice_continues = '<%=locals.user.voice_continues%>';
     <% } %>
 
+    // Do we show abstract graph and no nodes?
     var abstract;
 
     <% if (locals.user && locals.user.abstract != undefined) { %>
@@ -454,12 +458,14 @@
       $('#abstract-layout').addClass('abstract-on');
     }
 
-
+    // Let's define some walkthrough tutorials, depending on the situation
     var walkthroughtype = 'default';
 
     <% if (perceivername) { %>
     walkthroughtype = 'external';
     <% } %>
+
+    // This identifies through the URL where the user is forwarded when he clicks on the link button on #go_next element
 
     if (go_next_url) {
         if ((go_next_url.substr(go_next_url.length - 1) == 's' || go_next_url.substr(go_next_url.length - 6) == 'search' || go_next_url.substr(go_next_url.length - 5) == 'query')) {
@@ -526,6 +532,7 @@ var addcontext = '';
 
 var maxnodes = '';
 
+// Get the setting from user DB how many max nodes we show
 <% if (maxnodes) { %>
   maxnodes = <%= maxnodes %>;
 <% } %>
@@ -638,11 +645,17 @@ var in_label_threshold = 8;
 var most_influential = 'bc';
 
 
+// This is for the option to emit and receive MIDI signals for the graph
 
 var midi = '';
 
 // TODO for desktop browses that support webwork (not iphone): webworker: true, slowdown: 300
+
+// Sigma graph layout options
 var forceatlas_options = {worker: false, startingIterations: 100, scalingRatio: 0.1, slowDown: 100, strongGravityMode: true};
+
+
+// Some settings from routes/entries.js
 
 <% if (locals.user && !locals.vieweduser) { %>
 var inlanguage = '<%= user.inlanguage %>';
@@ -702,6 +715,8 @@ if (getUrlVars()["most_influential"] == 'bc' || getUrlVars()["most_influential"]
 
 var deselected_nodes_color = '#ddd';
 
+// This is a very stupid way to change the interface color to dark if the setting is on (through URL or user settings)
+
 if (background == 'dark') {
   $('#graph-container').addClass('graph-dark');
   $('#analyticsbutton').addClass('analyticsbutton-dark');
@@ -737,6 +752,9 @@ if (background == 'dark') {
 }
 
 $('#analyticscaption').html(customization);
+
+
+// locals.user basically checks the user settings
 
 <% if (locals.user) { %>
 <% if (locals.user.midi != undefined && locals.user.midi != 'off') { %>
@@ -816,8 +834,8 @@ else {
 
 collaborate_matrix[collaborate_room] = collaborate_room + collaborate_id;
 
-console.log('room id');
-console.log(collaborate_matrix[collaborate_room]);
+// console.log('room id');
+// console.log(collaborate_matrix[collaborate_room]);
 
 if (!collaborate_invite) {
     if (collaborate_storage) {
@@ -834,7 +852,7 @@ if (!collaborate_invite) {
     localStorage.setItem("collaborate", JSON.stringify(collaborate_matrix));
 }
 
-
+    // Collaboration features realized using Socket.IO
     // On connection to server get the id of the current chat "room", which is actually the folder/URL of the current user
 
     socket.on('connect', function(){
@@ -903,6 +921,8 @@ $("#graph-link").click(function(e) {
 
     // Dynamic graph functionality
 
+    // It basically makes only the nodes / edges of the graph visible that the user is currently seeing in the statements div
+
     var dynamic_graph = 0;
 
     var dynamic_watch = 0;
@@ -926,8 +946,6 @@ $("#graph-link").click(function(e) {
       }
 
     });
-
-
 
 
 
@@ -969,8 +987,6 @@ $("#graph-link").click(function(e) {
 
     // Dynamically watch the graph unfold
 
-
-
     $("#watch-link").click(function(e) {
 
       if (dynamic_watch == 0) {
@@ -1009,6 +1025,7 @@ $("#graph-link").click(function(e) {
       }
     });
 
+    // TODO move this general function out — this is just to check which elements inside (#entries) are visible for the dynamic graph feature above
 
     function checkInView(elem,partial)
       {
@@ -1026,8 +1043,7 @@ $("#graph-link").click(function(e) {
           return  isTotal  || isPart ;
       }
 
-
-
+    // This is to show / hide entries in #statements DIV
 
     $("#statements-link").click(function(e) {
         e.preventDefault();
@@ -1060,15 +1076,11 @@ $("#graph-link").click(function(e) {
         }
 
 
-
-
-
-
     });
 
 
 
-
+    // When the document loaded, add some hooks to the submit form
 
     document.addEventListener("DOMContentLoaded", function(event) {
 
@@ -1079,6 +1091,7 @@ $("#graph-link").click(function(e) {
     });
 
 
+// What do do when the form is submitted and a new entry (text) is added?
 
 function submitFormProcess() {
 
@@ -1109,7 +1122,9 @@ function submitFormProcess() {
                         $("#statement").val('');
                         $('#statement').removeClass('loading');
                         $('#submitbutton').removeAttr('disabled');
-                        // TODO make a better fix for temporary graph
+
+                        // This below if a few statements were posted
+                        // TODO as we can now get all the s.uid back as an array this could be rewritten so no need for the condition after
                         if (res.entryuid == 'multiple') {
                             socket.emit('chat message', {postedby: postedby, entryuid: 'multiplesocket', entrytext: res.entrycontent, graph: res.graph});
                             if (res.successmsg) {
@@ -1121,7 +1136,7 @@ function submitFormProcess() {
                             },3000);
                         }
                         else {
-
+                            // Only one statement added? Initiate processing that will show it both to the user and the collaborator (if exists)
                             socket.emit('chat message', {postedby: postedby, entryuid: JSON.parse(res.entryuid).data, entrytext: res.entrytext, graph: res.graph});
                         }
 
@@ -1141,6 +1156,7 @@ function submitFormProcess() {
 
         }
         // otherwise - make a dummy post - it appears in the list but doesn't get submitted into the graph
+        // This was made before to introduce a chat feature — so the software can "talk" to the user without adding stuff into the graph
         else {
             selfPosted = '1';
             $('#statement').removeClass('loading');
@@ -1151,6 +1167,7 @@ function submitFormProcess() {
 
         return false;
     });
+
 
     $('#statement').keypress(function(e){
 
@@ -1165,7 +1182,9 @@ function submitFormProcess() {
 
 }
 
-// Hide / Show Statements DIV
+// A function to hide / Show Statements and edit pane DIVs
+
+// Has to be called with every update of the edit pane #entryform
 
 function toggle_statements() {
 
@@ -1600,7 +1619,7 @@ sigma.parsers.json(
             },timeout);
 
 
-            // Drag nodes
+            // Drag nodes function initiated, so we can drag nodes
 
             dragNodes();
 
@@ -1615,8 +1634,6 @@ sigma.parsers.json(
             // Community detect algorithm
 
             communityDetect();
-
-
 
 
             // TODO make it possible for collaboration also
@@ -1644,9 +1661,10 @@ sigma.parsers.json(
             }
 
 
+            // What happens when we click analytics pane
 
             $('#analyticsbutton').click(function(){
-
+                      // Process logic and remember settings
                      $('#analytics').toggle('slide', function(){
                        if ($('#analytics').is(":visible")) {
                          localStorage.setItem('analytics', 1);
@@ -1755,6 +1773,8 @@ sigma.parsers.json(
                 }
 
               }
+
+              // This is just to reset node drag parameter
               sigma_dragged = 0;
 
 
@@ -1800,6 +1820,8 @@ sigma.parsers.json(
                 });
             });
 
+            // This hooks ForceAtlas layout on sigma
+
             $("#improve-layout").on('click', function(e) {
                 if (sigma.isForceAtlas2Running()) {
                     sigma.stopForceAtlas2();
@@ -1815,6 +1837,8 @@ sigma.parsers.json(
 
 
             });
+
+            // What happens when we want to stop showing node labels and make the graph more Abstract
 
             $("#abstract-layout").on('click', function(e) {
 
@@ -1851,8 +1875,6 @@ sigma.parsers.json(
             $("#go_next").on('click', function(e) {
 
                 var searchQuery = pinnedNodes.join("+");
-
-
 
                 if (go_next_add) {
                     searchQuery = searchQuery + '+' + go_next_add;
@@ -1917,6 +1939,7 @@ sigma.parsers.json(
                     // TODO make it possible that those statements get submitted in both graphs
 
                     // So the user who posted is not the same who's receiving? then submit the form. If the sender didnt have the mute option
+                    // This is only for collaboration - we resubmit, otherwise it's already submitted before
                     if ((receivedby != msg.postedby) && !msg.mute) {
 
 
@@ -1971,21 +1994,28 @@ sigma.parsers.json(
                     selfPosted = null;
                 }
 
+                // So let's add that entry to the #entries DIV
+
                 $(added_entry).appendTo($('#entries')).slideDown("fast");
 
+                // Do some stupid class change for the dark theme background
                 if (background == 'dark') {
                   $('.entry').addClass('entry-dark');
                   $('.entry-text').addClass('entry-text-dark');
                 }
-
+                // Nicely scroll
                 $("#entries").animate({ scrollTop: $('#entries')[0].scrollHeight }, 1000);
 
                 //$('#entries').append(added_entry).slideUp("fast");
 
-                if ($(window).height() < 600) {
-                    document.activeElement.blur();
-                }
+                // Unfocus and reFocus again on the entry field
+                $('#statement').blur();
+                $('#statement').focus();
 
+
+                    // Add some behavior hooks again onto that element
+                    // One click will filter the nodes / edges of the statement on the graph
+                    // Doubleclick will open the edit pane
 
                     entryClick();
                     entryDoubleClick();
@@ -1997,7 +2027,7 @@ sigma.parsers.json(
                     var edges_added = [];
 
 
-
+                    // Let's add the nodes to the Sigma graph
                     for (var i = 0; i < addednodes.length; i++) {
 
                         if (nodeNames.indexOf(addednodes[i].label) == -1) {
@@ -2023,6 +2053,8 @@ sigma.parsers.json(
 
                     }
 
+                    // Let's add the edges to the Sigma graph
+
                     for (var j = 0; j < addededges.length; j++) {
 
                        if ((addededges[j].statement_id == msg.entryuid)) {
@@ -2039,13 +2071,14 @@ sigma.parsers.json(
                              unique_edge_id = addededges[j].source + '-' + addededges[j].target;
                          }
 
+
                             sigma.graph.addEdge({
                                 id: addededges[j].id,
                                 source: addededges[j].source,
                                 target: addededges[j].target,
                                 weight: addededges[j].weight,
                                 size: addededges[j].weight,
-                                statement_id: [addededges[j].statement_id],
+                                statement_id: addededges[j].statement_id,
                                 edge_context: addededges[j].edge_context
                             });
 
@@ -2056,11 +2089,13 @@ sigma.parsers.json(
 
                     }
 
+                    // Let's create a new collection for Cytoscape - used to calculate node metrics for the graph
                     var collection = cy.elements();
                     cy.remove(collection);
 
                     elesnodes = [];
 
+                    // Adding all the refreshed nodes into Cytoscape
                     sigma.graph.nodes().forEach(function(n) {
                         if (n.id == 'dummy') {
                             sigma.graph.dropNode('dummy');
@@ -2079,6 +2114,8 @@ sigma.parsers.json(
 
                     });
 
+                    // For each edge in the graph recalculate some important metrics
+                    // And update global parameters which we use to track the state of each element
                     // TODO this code duplicates from above - move into a function
                     sigma.graph.edges().forEach(function(e) {
 
@@ -2095,31 +2132,30 @@ sigma.parsers.json(
 
 
                         // Make and index of nodes to statement
-                        for (let item of e.statement_id) {
-                          if (nodesOfStatement[item]) {
-                              if (nodesOfStatement[item].indexOf(e.source) < 0)
-                                  nodesOfStatement[item].push(e.source);
-                              if (nodesOfStatement[item].indexOf(e.target) < 0)
-                                  nodesOfStatement[item].push(e.target);
+
+                          if (nodesOfStatement[e.statement_id]) {
+                              if (nodesOfStatement[e.statement_id].indexOf(e.source) < 0)
+                                  nodesOfStatement[e.statement_id].push(e.source);
+                              if (nodesOfStatement[e.statement_id].indexOf(e.target) < 0)
+                                  nodesOfStatement[e.statement_id].push(e.target);
                           }
                           else {
-                              nodesOfStatement[item] = [];
-                              nodesOfStatement[item].push(e.source);
-                              nodesOfStatement[item].push(e.target);
+                              nodesOfStatement[e.statement_id] = [];
+                              nodesOfStatement[e.statement_id].push(e.source);
+                              nodesOfStatement[e.statement_id].push(e.target);
                           }
-                        }
 
+                        // Which statements belong to which context / graph
                         if (statementsOfContext[e.edge_context]) {
-                            for (let item of e.statement_id) {
-                            if (statementsOfContext[e.edge_context].indexOf(item) < 0) statementsOfContext[e.edge_context].push(e.statement_id);
-                            }
+                              if (statementsOfContext[e.edge_context].indexOf(e.statement_id[0]) < 0) {
+                                statementsOfContext[e.edge_context].push(e.statement_id[0]);
+                              }
                         }
                         else {
                             statementsOfContext[e.edge_context] = [];
-                            for (let item of e.statement_id) {
-                              statementsOfContext[e.edge_context].push(item);
-                            }
+                            statementsOfContext[e.edge_context].push(e.statement_id[0]);
                         }
+
 
                                         // Make an index of nodes to context
                                         if (contextNodeID[e.edge_context]) {
@@ -2135,7 +2171,7 @@ sigma.parsers.json(
                                         }
 
 
-                        // Add to Cytoscape
+                        // Add to Cytoscape for betweenness centrality calculation
                         elesnodes.push({
                             group: "edges",
                             data: { id: unique_edge_id, source: e.source, target: e.target, weight: e.weight }
@@ -2155,9 +2191,12 @@ sigma.parsers.json(
 
                     //sigma.refresh();
 
+                    // Launch new layout
                     sigma.startForceAtlas2(forceatlas_options);
 
                     // MIDI activation
+
+                    // Play a note on adding nodes / edges
 
                     <% if (locals.user) { %>
                     <% if (locals.user.midi != undefined && locals.user.midi != 'off') { %>
@@ -2210,7 +2249,7 @@ sigma.parsers.json(
 
 
 
-                    // Don't run it forever not to overheat :)
+                    // Don't run ForceAtlas forever not to overheat :)
 
                     setTimeout(function() {
 
@@ -2223,9 +2262,9 @@ sigma.parsers.json(
                     // console.log(msg.graph.edges);
                     // console.log(sigma.graph.edges());
 
-                    // TODO right now it doubles
+                    // TODO right now it doubles the code above
 
-
+                    // This is for special cases where the user is on a graph, but they are adding their own stuff to this graph into a new graph, so we only show the entries that he added, not the previous ones
                     if (addcontext && interpret) {
 
                       $('.entry').hide();
@@ -2243,6 +2282,7 @@ sigma.parsers.json(
 
             });
 
+            // This is called when an entry is deleted
 
             socket.on('delete message', function(msg){
 
@@ -2255,6 +2295,7 @@ sigma.parsers.json(
 
                 nodesOfStatement[msg.entryuid] = [];
 
+                // Let's set up which nodes we will keep
                 var nodesToKeep = [];
 
                 sigma.graph.edges().forEach(function(e) {
@@ -2278,6 +2319,7 @@ sigma.parsers.json(
                 });
 
 
+                // Delete nodes from the graph that are not in nodesToKeep set above
 
                 sigma.graph.nodes().forEach(function(n) {
                     if (nodesToKeep.indexOf(n.id) < 0) {
@@ -2285,6 +2327,8 @@ sigma.parsers.json(
                     }
 
                 });
+
+                // Refresh the object and reload the layout
 
                 sigma.refresh();
 
@@ -2318,6 +2362,7 @@ sigma.parsers.json(
 
 // Auto-resize to fill content;
 
+    // This launches only when all other stuff from above have loaded
     $(document).ready(function(){
 
       // Get the context names - all the contexts that exist in the graph we just loaded
@@ -2328,15 +2373,13 @@ sigma.parsers.json(
       <% }); %>
       <% } %>
 
-
+      // Memorize which interface option the user had on last time
       if (localStorage.getItem('defaultbehavior') == 'add') {
         $('#addnode').addClass('addnode-on');
       }
       else {
         $('#searchnode').addClass('searchnode-on');
       }
-
-
 
       // Put the contexts into the menu
       populateContextMenu(contextNames);
@@ -2348,7 +2391,7 @@ sigma.parsers.json(
             delay: 1000
         });
 
-
+        // Some more settings from the URL or user settings passed from routes/entries.js and defined above in global parameters
 
         var privacyform = '';
 
@@ -2425,7 +2468,9 @@ sigma.parsers.json(
 
 
 
-
+        // So the perceiver is the one who is viewing the graph
+        // receiver is the one who created it
+        // We use it to basically identify if the user is logged in as perceiver is only passed in this case if the user who's viewing the graph is not logged in
 
         <% if (!perceivername) { %>
 
@@ -2745,10 +2790,11 @@ sigma.parsers.json(
 
 
 
-            // IMPORTANT NOTE this is the end of the cycle that shows only to editor
+        // IMPORTANT NOTE this is the end of the cycle that shows only to the editor, if the user who' viewing is logged in and viewing their own stuff
          <% } %>
 
-         // BEGIN WALKTHROUGH Module
+         // BEGIN WALKTHROUGH Module for tutorial Help
+         // TODO move this out for sure
 
          // Basic tutorial
          function initializeWalkthrough () {
@@ -3079,6 +3125,8 @@ sigma.parsers.json(
                ]
              }
 
+             // Another walkthrough option passed through the URL
+
              if (walkthrough == 'analytics') {
              //  console.log(tour._options.steps);
                tour._options.steps = [
@@ -3276,7 +3324,7 @@ sigma.parsers.json(
 
            }
 
-
+          // Which walkthrough tutorial we want to see (pass through the URL global parameter )
 
            if (walkthrough == 'default' || walkthrough == 'newcontext' || walkthrough == 'analytics' || walkthrough == "tldr" || walkthrough == "force") {
 
@@ -3290,6 +3338,7 @@ sigma.parsers.json(
                initializeWalkthrough();
            });
 
+        // Interface element to show / hide statements and edit pane
 
         $("#chat-link").click(function(e) {
             e.preventDefault();
@@ -3298,26 +3347,33 @@ sigma.parsers.json(
             graphInteraction = null;
             clearTimeout(inactiveTimeout);
 
+            // Function to process the interface based on thi actino
             toggle_statements();
 
 
         });
 
+        // What happens when we click a button to delete a selected node
         $("#deletenodes").on('click', function(e) {
           e.preventDefault;
           socket.emit('node delete', {pinnedNodes: pinnedNodes});
         });
+
+        // What happens when we click the button to remove a selected / deleted node
 
         $("#undo").on('click', function(e) {
           e.preventDefault;
           socket.emit('graph reset');
         });
 
+        // What happens if we want to pass the list of keywords we selected to the settings
+
         $("#stopsave").on('click', function(e) {
           e.preventDefault;
           window.location.href = "/settings?stopwords=" + encodeURIComponent(deletedNodes.join(' ')) + "&returncontext=" + current_context;
         });
 
+        // What happens when we add a single node from the second editor on top
 
         $("#addnode").on('click', function(e) {
           e.preventDefault();
@@ -3331,6 +3387,7 @@ sigma.parsers.json(
 
         });
 
+        // What if we search for a node in the graph using the form at the top right
 
         $("#searchnode").on('click', function(e) {
           e.preventDefault();
@@ -3340,7 +3397,7 @@ sigma.parsers.json(
           localStorage.setItem('defaultbehavior', 'search');
 
           var searchinput = $('#addnodeinput').val();
-          // TODO lemmas
+          // TODO implement lemmas search
           if (searchinput.length > 0) {
               var searchinarray = searchinput.split(' ');
               for (var key in searchinarray) {
@@ -3356,6 +3413,7 @@ sigma.parsers.json(
 
         });
 
+        // Are we viewing additional context?
         if (addcontext) {
           $('#addcontext-link').addClass('addcontext-visible');
         }
@@ -3372,7 +3430,7 @@ sigma.parsers.json(
 
         });
 
-
+        // What happens when we add a node using the small form top right?
         $('#addnodeform').submit(function(e) {
             e.preventDefault(); // to stop the form from submitting
             if ($(".searchnode-on").is(":visible")) {
@@ -3393,7 +3451,7 @@ sigma.parsers.json(
         });
 
 
-
+        // We temporarily removed this link but it will be added again later, so save the logic
         $("#imports").click(function(e) {
             // var fornode = $('#statement').val();
             // // if (pinnedNodes.length > 0) {
@@ -3403,6 +3461,8 @@ sigma.parsers.json(
             // var current_href = $(this).attr("href");
             // $(this).attr("href",current_href + '&statement=' + fornode);
         });
+
+        // In the #entryform — hook functions to actions
 
         $("#finds").click(function(e) {
           $('#deletecontextbutton').hide();
@@ -3471,7 +3531,7 @@ sigma.parsers.json(
         $("#entries").animate({ scrollTop: $('#entries')[0].scrollHeight }, 1000);
 
 
-
+        // TODO We have a very strange switcher of panels here. Needs to be changed
 
         $('#switcher-selector').on('click', 'li', function() {
 
@@ -3582,7 +3642,7 @@ sigma.parsers.json(
             }
         });
 
-
+        // Function to search the graph for the nodes selected
 
         search_graph();
 
@@ -3595,7 +3655,7 @@ sigma.parsers.json(
 
         var filteringstarted = 0;
 
-
+        // Add the hooks to the newly rendered entries again
 
         entryClick();
 
@@ -3612,11 +3672,6 @@ sigma.parsers.json(
 
         // Highlight statement if clicked once
 
-
-
-
-
-
         // Deal with each date
 
         $(".entry-date").each(function() {
@@ -3624,17 +3679,24 @@ sigma.parsers.json(
             $(this).text(convertedTime);
         });
 
-
+        // TODO move the fucntion out
         function timeConverter(UNIX_timestamp){
             var modTimestamp = UNIX_timestamp.substr(0, UNIX_timestamp.length - 4);
             var time = moment(modTimestamp, 'x').fromNow();
             return time;
         }
 
+
+        // Some more graph interface settings
+
+        // Did we receive a global setting to hide the graph?
+
         if ((hide_always || hide_edit) && !show_text) {
             toggle_statements();
             //localStorage.setItem('graph', 1);
         }
+
+        // Did we receive a global setting to hide when small only?
 
         if (hide_when_small) {
             if ($('#menuLink').is(':visible')) {
@@ -3644,6 +3706,8 @@ sigma.parsers.json(
 
         }
 
+        // Did we receive a global setting to hide the editor pane?
+
         if (hide_edit) {
           $('.editorpane').each(function() {
             $(this).hide();
@@ -3651,7 +3715,7 @@ sigma.parsers.json(
         }
 
 
-// Are we loading the page to only show the graph?
+        // Are we loading the page to only show the graph?
 
         <% if (background == '1' || background == 'graph') { %>
            // $('#finds').trigger('click');
@@ -3685,6 +3749,8 @@ sigma.parsers.json(
           ($("#timer-link").trigger('click'));
         }
 
+        // What happens when the user clicks on a node in the graph (this is caleld from sigma but processed here)
+
         socket.on('node click', function(msg){
 
               pinnedNodes = msg.pinnedNodes;
@@ -3702,6 +3768,8 @@ sigma.parsers.json(
 
         });
 
+        // When we click reset button
+
         socket.on('graph reset', function(msg){
 
               pinnedNodes = [];
@@ -3715,6 +3783,7 @@ sigma.parsers.json(
 
         });
 
+        // What happens when we delete a node
 
         socket.on('node delete', function(msg){
 
@@ -3837,6 +3906,8 @@ sigma.parsers.json(
 
         });
 
+        // What happens when we add a node ?
+
         socket.on('node add', function(msg){
               var addingNodes = msg.addingNodes;
               var stoplistNodes = msg.stoplistNodes;
@@ -3878,7 +3949,7 @@ sigma.parsers.json(
                                      target: edgeproc.target,
                                      weight: edgeproc.weight,
                                      size: edgeproc.weight,
-                                     statement_id: [edgeproc.statement_id],
+                                     statement_id: edgeproc.statement_id,
                                      edge_context: edgeproc.edge_context
                               });
 
@@ -3895,7 +3966,7 @@ sigma.parsers.json(
                            target: edgeproc.target,
                            weight: edgeproc.weight,
                            size: edgeproc.weight,
-                           statement_id: [edgeproc.statement_id],
+                           statement_id: edgeproc.statement_id,
                            edge_context: edgeproc.edge_context
                     });
 
@@ -4029,7 +4100,7 @@ sigma.parsers.json(
 
 
 
-
+    // NOTE here we start some global functions, which perhaps can be extracted if no globals are used inside
 
 
     function dragNodes () {
@@ -4585,7 +4656,7 @@ sigma.parsers.json(
 
          var recommender_tip = $(recommender).text();
 
-         $("#statement").attr("placeholder", recommender_start + recommender_tip + "?").focus().blur();
+         $("#statement").attr("placeholder", recommender_start + recommender_tip + "?").blur().focus();
 
 
 
@@ -4868,9 +4939,6 @@ sigma.parsers.json(
 
 
 
-
-
-
       var commClicked = [];
 
         top_nodes_activate();
@@ -4894,9 +4962,6 @@ sigma.parsers.json(
           filter_statements(pinnedNodes);
           sigma.instances(0).refresh();
         });
-
-
-
 
 
 
