@@ -330,7 +330,6 @@
 <script src="/javascripts/sigma/plugins/sigma.layout.forceAtlas2.min.js"></script>
 <script src="/javascripts/sigma/plugins/sigma.plugins.animate.min.js"></script>
 <script src="/javascripts/sigma/plugins/sigma.plugins.dragNodes.min.js"></script>
-<script src="/javascripts/sigma/plugins/jLouvain.js"></script>
 <script src="/javascripts/sigma/plugins/distinct-colors.min.js"></script>
 <script src="/javascripts/jquery-ui.min.js"></script>
 <script src="/javascripts/string.min.js"></script>
@@ -346,6 +345,9 @@
 <script src="/javascripts/moment.min.js"></script>
 <script type="text/javascript" src="/javascripts/jquery.tooltipster.min.js"></script>
 <script src="/javascripts/cytoscape.min.js"></script>
+<script src="/javascripts/graphology.min.js"></script>
+<script src="/javascripts/graphology-louvain-functions.js"></script>
+
 
              <script>
 ;(function(){
@@ -4229,16 +4231,23 @@ sigma.parsers.json(
 
     function communityDetect (coming_from, node_origin) {
 
+      // Construct a new Graphology graph object to calculate communities
+      const grgraph = new graphology.Graph();
+
+      // Reiterate nodes
       var node_data = [];
       sigma.instances(0).graph.nodes().forEach(function(n) {
           node_data.push(n.id);
-      });
 
+          // Add nodes into the Graphology object
+          grgraph.addNode(n.id);
+      });
 
       var edge_data = [];
 
       var totaledgescount = 0;
 
+      // Reiterate edges
       sigma.instances(0).graph.edges().forEach(function(e) {
 
           var matche = 0;
@@ -4251,6 +4260,7 @@ sigma.parsers.json(
           }
           if (matche == 0) {
             edge_data.push({source: e.source, target: e.target, weight: parseInt(e.weight)});
+
           }
 
           if (e.source != e.target) {
@@ -4259,36 +4269,62 @@ sigma.parsers.json(
 
 
       });
+
+      // Add edges into Graphology object
+      for (var i = 0; i < edge_data.length; i++) {
+        grgraph.addEdge(edge_data[i].source, edge_data[i].target, {weight: edge_data[i].weight});
+      }
       // console.log(sigma.instances(0).graph.edges());
-      // console.log(edge_data);
+
 
       if (node_data.length > 0 && edge_data.length > 0) {
 
-      var community = jLouvain().nodes(node_data).edges(edge_data);
+      // Get the graph back from Graphology with community attribute for nodes
+      var newgraph = louvain_process(grgraph);
 
-      var community_assignment_result = community();
-      var node_ids = Object.keys(community_assignment_result['communities']);
+      // Convert community codes into integers
+      var louvain_communities = {};
+      var graphology_communities = [];
 
-      //console.log('Resulting Community Data', community_assignment_result['communities']);
-      // console.log('Final Modularity', community_assignment_result['modularity']);
+      grgraph.forEachNode((node, attributes) => {
+        var tempo_comm = grgraph.getNodeAttribute(node,'community');
+        if (graphology_communities.indexOf(tempo_comm) == -1) {
+          graphology_communities.push(tempo_comm);
+        }
+        louvain_communities[node] = graphology_communities.indexOf(tempo_comm);
+      });
 
+      // Let's calculate modularity
+      var modularity_score = louvain_modularity(newgraph)
+
+      console.log('Modularity score: ');
+      console.log(modularity_score);
+
+      var node_ids = Object.keys(louvain_communities);
 
       var max_community_number = 0;
 
       var top_communities = {};
 
+      // We now add the new community integer ID to all the nodes in the Sigma graph
+
       sigma.instances(0).graph.nodes().forEach(function(n) {
-        n.community = community_assignment_result['communities'][n.id];
+
+        n.community = louvain_communities[n.id];
+
         var commune = n.community;
         if (!top_communities[commune]) {
           top_communities[commune] = []
         }
+
         top_communities[commune].push({id: n.id, name: n.originalLabel, degree: sigma.instances(0).graph.degree(n.id), bc: bc_nodes_map[n.id]});
-        max_community_number = max_community_number < community_assignment_result['communities'][n.id] ? community_assignment_result['communities'][n.id]: max_community_number;
+
+        max_community_number = max_community_number < louvain_communities[n.id] ? louvain_communities[n.id]: max_community_number;
+
       });
 
-    //  console.log(max_community_number);
-
+      console.log('Total communities: ');
+      console.log(parseInt(max_community_number + 1));
 
 
          var topp_communities = {};
@@ -4412,6 +4448,7 @@ sigma.parsers.json(
 
          var toppbc_nodes = topbc_nodes.slice(0,4);
 
+         console.log('Top betweenness centrality nodes:')
          console.log(toppbc_nodes);
 
          most_inf_nodes = toppbc_nodes;
@@ -4574,7 +4611,7 @@ sigma.parsers.json(
 
                       for (var j = 0; j < data[i].length; j++) {
                         //console.log(nodeIDs[data[i][j].term]);
-                        items.push('<div class="inlinesquare ' + community_assignment_result['communities'][nodeIDs[data[i][j].term]] + '"></div> <a href="#" class="top_nodes">' + data[i][j].term + '</a> &nbsp;');
+                        items.push('<div class="inlinesquare ' + louvain_communities[nodeIDs[data[i][j].term]] + '"></div> <a href="#" class="top_nodes">' + data[i][j].term + '</a> &nbsp;');
                         if (j == (data[i].length - 1)) {
                           items.push('<br>')
                         }
@@ -4593,7 +4630,7 @@ sigma.parsers.json(
 
                         for (var j = 0; j < data[i].length; j++) {
                           //console.log(nodeIDs[data[i][j].term]);
-                          items.push('<div class="inlinesquare ' + community_assignment_result['communities'][nodeIDs[data[i][j].term]] + '"></div> <a href="#" class="top_nodes">' + data[i][j].term + '</a> &nbsp;');
+                          items.push('<div class="inlinesquare ' + louvain_communities[nodeIDs[data[i][j].term]] + '"></div> <a href="#" class="top_nodes">' + data[i][j].term + '</a> &nbsp;');
                           if (j == (data[i].length - 1)) {
                             items.push('<br>')
                           }
@@ -4865,6 +4902,7 @@ sigma.parsers.json(
 
     }
 
+     console.log('Distribution of top nodes across the communities: ')
      console.log(bc_dist);
 
      var bc_dist_string = bc_dist.join('');
@@ -4883,13 +4921,13 @@ sigma.parsers.json(
 
      var num_nodes_component = ((top_components[0].nodes().length / totalnodescount).toFixed(2)*100).toFixed(0);
 
-     if ((community_assignment_result['modularity'] > 0.65 && diversityindex < 50) && ((bc_entropy >= 1.5) || (bc_entropy == 0 && toppbc_nodes[0].bc == 0) || (bc_entropy == 0 && num_nodes_component < 40))) {
+     if ((modularity_score > 0.65 && diversityindex < 50) && ((bc_entropy >= 1.5) || (bc_entropy == 0 && toppbc_nodes[0].bc == 0) || (bc_entropy == 0 && num_nodes_component < 40))) {
         diversity_score = 'Dispersed';
      }
-     else if ((community_assignment_result['modularity'] > 0.4 && diversityindex < 50) && ((bc_entropy >= 1.5) || (bc_entropy == 0 && toppbc_nodes[0].bc == 0) || (bc_entropy == 0 && num_nodes_component < 40))) {
+     else if ((modularity_score > 0.4 && diversityindex < 50) && ((bc_entropy >= 1.5) || (bc_entropy == 0 && toppbc_nodes[0].bc == 0) || (bc_entropy == 0 && num_nodes_component < 40))) {
         diversity_score = 'Diversified';
      }
-     else if ((community_assignment_result['modularity'] < 0.4 && community_assignment_result['modularity'] > 0.2 && bc_entropy >= 0.5) || ((community_assignment_result['modularity'] > 0.4 && diversityindex >= 50)  && bc_entropy >= 0.5) || (community_assignment_result['modularity'] > 0.4 && diversityindex < 50 && bc_entropy > 0.5)) {
+     else if ((modularity_score < 0.4 && modularity_score > 0.2 && bc_entropy >= 0.5) || ((modularity_score > 0.4 && diversityindex >= 50)  && bc_entropy >= 0.5) || (modularity_score > 0.4 && diversityindex < 50 && bc_entropy > 0.5)) {
         diversity_score = 'Focused';
      }
      else {
@@ -4900,7 +4938,7 @@ sigma.parsers.json(
 
 
      diversitytext +=  ' <br><div class="headline">Discourse structure: <i>' + diversity_score + '</i> &nbsp;&nbsp;[<a href="https://noduslabs.com/research/visualization-text-polysingularity-network-analysis/" target="_blank">?</a>]</div><br>';
-     diversitytext += community_assignment_result['modularity'].toFixed(2) + ' modularity, ';
+     diversitytext += modularity_score.toFixed(2) + ' modularity, ';
      diversitytext +=  diversityindex + '% of words in the top topic ';
 
      diversitytext += '(total ' + all_communities.length + ' topics), ';
