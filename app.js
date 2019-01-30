@@ -150,6 +150,7 @@ app.post('/api2/post',
 app.get('/settings', pass.ensureAuthenticated, validate.getContextsList(), settings.render);
 app.post('/settings', pass.ensureAuthenticated, settings.modify);
 app.get('/import', pass.ensureAuthenticated, validate.getContextsList(), imports.render);
+app.get('/import/files', pass.ensureAuthenticated, validate.getContextsList(), imports.renderFiles);
 app.get('/google', pass.ensureAuthenticated, validate.getContextsList(), imports.renderGoogle);
 app.get('/import/youtube', pass.ensureAuthenticated, validate.getContextsList(), imports.renderYouTube);
 app.get('/import/evernote', pass.ensureAuthenticated, validate.getContextsList(), imports.renderEvernote);

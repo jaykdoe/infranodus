@@ -152,6 +152,15 @@ exports.renderYouTube = function(req, res) {
 
 };
 
+exports.renderFiles = function(req, res) {
+        var contextslist = [];
+        if (res.locals.contextslist) {
+            contextslist = res.locals.contextslist;
+        }
+        res.render('importfiles', { title: 'Import a PDF, TXT or CSV file', evernote: '', context: req.query.context, notebooks: '', contextlist: contextslist, fornode: req.query.fornode });
+
+};
+
 exports.renderApps = function(req, res) {
         // Did we get a list of all the contexts for this user / entries list?
         var contextslist = [];
