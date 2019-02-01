@@ -15,6 +15,8 @@
 
 var User = require('../lib/user');
 
+const CSVParse = require('csv-parse');
+
 var Twit = require('twit');
 var FlowdockText = require("flowdock-text");
 
@@ -1380,81 +1382,129 @@ exports.submit = function(req, res,  next) {
 
         console.log(req.files.uploadedFile.type);
 
+        var filetype = req.files.uploadedFile.type;
+
         var process_type = 'classes';
 
         // Is the file uploaded and is it a text / html one?
-        if (req.files && (req.files.uploadedFile.type == 'text/html' || req.files.uploadedFile.type == 'text/plain' || req.files.uploadedFile.type == 'application/pdf') ) {
+        if (req.files && (filetype == 'text/html' || filetype == 'text/plain' || filetype == 'application/pdf' || filetype == 'text/csv') ) {
 
             // Import parameters
+
+            // Which field tells InfraNodus which column has the different "contexts"
             var titlefield = '';
 
             if (req.body.titlefield && req.body.titlefield.length > 0) {
-                titlefield = '.' + req.body.titlefield;
+                if (req.files.uploadedFile.type == 'text/csv') {
+                  titlefield = req.body.titlefield;
+                }
+                else {
+                  titlefield = '.' + req.body.titlefield;
+                }
             }
 
 
-
-            var processfield = '.highlight';
+            // Which field tells InfraNodus which data to import
+            var processfield = '';
 
             if (req.body.processfield) {
+              if (req.files.uploadedFile.type == 'text/csv') {
+                processfield = req.body.processfield;
+              }
+              else {
                 processfield = '.' + req.body.processfield;
+              }
             }
 
             var filecontents = ''
+
+            var addToContexts = [];
+
             // Read that file
 
-
-
             fs.readFile(req.files.uploadedFile.path, function (err, data) {
-                if (err) throw err;
 
-                if ( req.files.uploadedFile.type != 'application/pdf') {
+              if (err) throw err;
+
+              // It's not a PDF right? Then convert to string UTF8 encoding
+              if (filetype != 'application/pdf') {
                   filecontents = data.toString('utf8');
-               }
-               else {
+              }
+              else {
                   filecontents = data;
-               }
+              }
+
+              var filedata = [];
+              // Are we dealing with a CSV file? Parse it as JSON
+              if (filetype == 'text/csv') {
+
+                      CSVParse(filecontents, {
+                      trim: true,
+                      skip_empty_lines: true
+                      })
+                      // Use the readable stream api
+                      .on('readable', function(){
+                      let record
+                      while (record = this.read()) {
+                        filedata.push(record)
+                      }
+                      })
+                      // When we are done, test that the parsed output matched what expected
+                    .on('end', function(){
+                      if (titlefield && titlefield.length > 0) {
+                          for (var key in titlefield) {
+                            addToContexts.push(titlefield[key]);
+                          }
+                      }
+                      processFile(titlefield, processfield, filecontents, filedata, filetype, addToContexts);
+                    })
+              }
+              else if (filetype == 'text/html')  {
+
+                      // Load DIVs in the file contents
+                      var $ = cheerio.load(filecontents);
+
+                      // Is there any DIVs with the class .title in that file? This is how we check if it's an Amazon file
+                      if (titlefield && $(titlefield) && $(titlefield).length) {
+
+                          $(titlefield).each(function (index) {
+
+                              // Get the Amazon book names
+                              // TODO or any classnames
+                              var bookname = $(this).text();
+
+                              // Translate the book name into the context name
+                              var currentcontext = S(bookname).dasherize().chompLeft('-').camelize().s.replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+                              currentcontext = currentcontext.replace(/[^\w]/gi, '');
+                              currentcontext = currentcontext.substr(0,12);
+
+                              addToContexts.push(currentcontext);
+
+                          });
+                       }
+
+                      processFile(titlefield, processfield, filecontents, filedata, filetype, addToContexts);
+              }
+              else {
+
+                var currentcontext = S(importContext).dasherize().chompLeft('-').camelize().s.replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+                currentcontext = currentcontext.replace(/[^\w]/gi, '');
+                currentcontext = currentcontext.substr(0,12);
+                addToContexts.push(importContext);
+                processFile(titlefield, processfield, filecontents, filedata, filetype, addToContexts);
+              }
 
 
 
-                // Load DIVs in the file contents
-                var $ = cheerio.load(filecontents);
 
+              function processFile(titlefield, processfield, filecontents, filedata, filetype, addToContexts) {
 
-                // Now step by step...
-                async.waterfall([
+              // Now step by step...
+              async.waterfall([
 
                     function(callback){
 
-                        var addToContexts = [];
-
-                        // Is there any DIVs with the class .title in that file? This is how we check if it's an Amazon file
-                        // TODO add another check for other type of files
-
-                        if (titlefield && $(titlefield).length) {
-                            $(titlefield).each(function (index) {
-
-
-                                // Get the book names
-                                var bookname = $(this).text();
-
-
-                                // Translate the book name into the context name
-                                var currentcontext = S(bookname).dasherize().chompLeft('-').camelize().s.replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()]/g,"");
-                                currentcontext = currentcontext.replace(/[^\w]/gi, '');
-                                currentcontext = currentcontext.substr(0,12);
-
-                                addToContexts.push(currentcontext);
-
-                            });
-                         }
-                        else  {
-                            var currentcontext = S(importContext).dasherize().chompLeft('-').camelize().s.replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()]/g,"");
-                            currentcontext = currentcontext.replace(/[^\w]/gi, '');
-                            currentcontext = currentcontext.substr(0,12);
-                            addToContexts.push(importContext);
-                        }
-
+                        // First, let's extract the ID of every context (if they exist, if not, create)
 
                         validate.getContextID(user_id, addToContexts, function(result, err) {
 
@@ -1478,20 +1528,12 @@ exports.submit = function(req, res,  next) {
                         });
 
 
-
-
                     },
                     function(contexts, callback){
 
                         // Do import fields exist?
-                        if ($(processfield).length) {
+                        if (filetype == 'text/plain' || filetype == 'application/pdf' || filetype == 'text/csv' || filetype == 'text/html') {
                             callback(null,contexts);
-                        }
-                        // TODO or PDF
-                        else if (req.files.uploadedFile.type == 'text/plain' || req.files.uploadedFile.type == 'application/pdf') {
-                          process_type = 'book';
-                          console.log('processing book');
-                          callback(null,contexts);
                         }
 
                         else {
@@ -1501,7 +1543,8 @@ exports.submit = function(req, res,  next) {
 
 
                     }
-                ], function (err, contexts) {
+                  ],
+                   function (err, contexts) {
 
                     if (err) {
 
@@ -1514,90 +1557,93 @@ exports.submit = function(req, res,  next) {
 
                         // Separate Amazon highlights file into blocks by the books
 
-
-                        if (process_type != 'book') {
+                        if (filetype == 'text/html') {
 
                           console.log("Processing file by classes");
+
+                          // Which classes we use to split the statements?
+                          // TODO add some other splitters
                           var books = filecontents.split("bookMain yourHighlightsHeader");
 
                           var numHighlights = 0;
 
-                        for (var i = 0; i < books.length; i++) {
+                          for (var i = 0; i < books.length; i++) {
 
-                            var current_book = books[i];
-                            var $$ = cheerio.load(current_book);
+                              var current_book = books[i];
+                              var $$ = cheerio.load(current_book);
 
-                            // Get the name of the book
-                            var bookname = '';
+                              // Get the name of the book
+                              var bookname = '';
 
-                            if (titlefield && $$(titlefield).length) {
-                                bookname = $$(titlefield).first().text();
-                            }
-                            else {
-                                bookname = importContext;
-                            }
+                              if (titlefield && $$(titlefield).length) {
+                                  bookname = $$(titlefield).first().text();
+                              }
+                              else {
+                                  bookname = importContext;
+                              }
 
+                              // Convert it to the context name
+                              // TODO this repeats the function above from validate.ContextID so make sure not to change it if the above is not changed also
+                              var currentcontext = S(bookname).dasherize().chompLeft('-').camelize().s.replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+                                  currentcontext = currentcontext.replace(/[^\w]/gi, '');
+                                  currentcontext = currentcontext.substr(0,12);
 
+                              $$(processfield).each(function (index) {
 
-                            // Convert it to the context name
-                            // TODO this repeats the function above from validate.ContextID so make sure not to change it if the above is not changed also
-                            var currentcontext = S(bookname).dasherize().chompLeft('-').camelize().s.replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()]/g,"");
-                                currentcontext = currentcontext.replace(/[^\w]/gi, '');
-                                currentcontext = currentcontext.substr(0,12);
-
-
-                            $$(processfield).each(function (index) {
-
-                                // Get the book names
-                                var highlight = $(this).text();
+                                  // Get the book names
+                                  var highlight = $(this).text();
 
 
-                                // Check the corresponding context ID for the book name
-                                var addingcontexts = [];
+                                  // Check the corresponding context ID for the book name
+                                  var addingcontexts = [];
 
-                                for (var j = 0; j < contexts.length; j++) {
-                                     if (contexts[j].name == currentcontext) {
-                                          addingcontexts.push(contexts[j]);
-                                     }
-                                }
+                                  for (var j = 0; j < contexts.length; j++) {
+                                       if (contexts[j].name == currentcontext) {
+                                            addingcontexts.push(contexts[j]);
+                                       }
+                                  }
 
-                                // Only add a statement if it's below the max limit
-                                if (numHighlights < limit) {
-                                     saveHighlight(highlight, addingcontexts);
-                                }
+                                  // Only add a statement if it's below the max limit
+                                  if (numHighlights < limit) {
+                                       saveHighlight(highlight, addingcontexts);
+                                  }
 
-                                numHighlights++;
+                                  numHighlights++;
 
-                            });
+                              });
 
 
-                        }
+                          }
                         }
                         // if it's a book
-                        else {
+                        else if (filetype == 'text/plain' || filetype == 'application/pdf') {
 
-
-
-                          console.log("Processing file as a whole");
+                            console.log("Processing file as a whole");
                             var bookname = '';
+
+                            // Give the context graph a new name (passed by the user)
                             bookname = importContext;
 
+                            // Fix it just in case as it'll be a URL after
                             var currentcontext = S(bookname).dasherize().chompLeft('-').camelize().s.replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()]/g,"");
                                 currentcontext = currentcontext.replace(/[^\w]/gi, '');
                                 currentcontext = currentcontext.substr(0,12);
 
-                                // Check the corresponding context ID for the book name
-                                var addingcontexts = [];
+                           // Check the corresponding context ID for the book name
+                            var addingcontexts = [];
 
-                                for (var j = 0; j < contexts.length; j++) {
+                            for (var j = 0; j < contexts.length; j++) {
                                      if (contexts[j].name == currentcontext) {
                                           addingcontexts.push(contexts[j]);
                                      }
-                                }
+                            }
 
-                                if (req.files.uploadedFile.type == 'application/pdf') {
-                                  //PDF cases
+                            if (filetype == 'application/pdf') {
+
+                                  //PDF processing special case
                                   var PDFtextfull = '';
+
+                                  // Parse PDF
                                   new pdfreader.PdfReader().parseBuffer(filecontents, function(err, item){
                                     if (err)
                                       callback(err);
@@ -1614,47 +1660,17 @@ exports.submit = function(req, res,  next) {
                                       }
                                   });
 
-                                }
-                                else {
+                            }
+
+                            // Standard text file
+                            else {
 
                                   saveFileAtOnce(filecontents, addingcontexts);
 
-                                  }
-
-
-
+                            }
 
 
                         }
-
-
-
-                        function saveFileAtOnce(fullfiletext, contexts) {
-
-
-
-                                // and finally create an object to send this entry with the right context
-
-                                var req = {
-                                    body:  {
-                                        entry: {
-                                            body: fullfiletext
-                                        },
-                                        context: ''
-                                    },
-
-                                    contextids: contexts
-                                };
-
-
-                               entries.submit(req,res);
-
-
-                        }
-
-
-
-
 
                         // Move on to the next one
                         res.error('Importing the content... Please, reload this page in 30 seconds...');
@@ -1666,22 +1682,45 @@ exports.submit = function(req, res,  next) {
                         }
 
                     }
-                });
 
-                // delete file
-                fs.unlink(req.files.uploadedFile.path, function (err) {
-                    if (err) throw err;
-                    console.log('successfully deleted ' + req.files.path);
                 });
+              }
+
+
             });
         }
 
+        // Did not recognive the filetype
         else {
             res.error('Sorry, but InfraNodus does not recognize this kind of content yet. Add a feature request on GitHub and we will look into it.');
             res.redirect('back');
         }
 
+        // delete file
+        fs.unlink(req.files.uploadedFile.path, function (err) {
+            if (err) throw err;
+            console.log('successfully deleted ' + req.files.path);
+        });
 
+
+        function saveFileAtOnce(fullfiletext, contexts) {
+
+                // and finally create an object to send this entry with the right context
+
+                var req = {
+                    body:  {
+                        entry: {
+                            body: fullfiletext
+                        },
+                        context: ''
+                    },
+
+                    contextids: contexts
+                };
+
+               entries.submit(req,res);
+
+        }
 
     }
 

@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><%= title %></title>
+    <link rel='stylesheet' href='/stylesheets/jquery.textcomplete.css' />
+    <link rel="stylesheet" href="/stylesheets/side-menu.css">
+    <link rel="stylesheet" href="/stylesheets/jquery-ui.min.css">
+    <link rel='stylesheet' href='/stylesheets/style.css' />
+
+
+
+</head>
+<body>
+<% include statsabove %>
+<div id="layout">
+    <!-- Menu toggle -->
+    <a href="#menu" id="menuLink" class="menu-link">
+        <!-- Hamburger icon -->
+        <span></span>
+    </a>
+
+    <% include menu %>
+
+
+
+
+    <div id='content'>
+
+        <div id='welcomemessage'>
+
+            Import any data to your graph from the following sources:
+            <% include messages %>
+
+            <form action='/import' name='submitform' id="submitform" method='post' enctype="multipart/form-data" class='pure-form pure-form-stacked'>
+                <br>
+                Please, upload your file:
+
+                <div id="filebox">
+                    <input type="file" name="uploadedFile" />
+<br>&nbsp;<br>
+                    <label for="file1" class="pure-radio">
+                        <input id="file1" type="radio" name="filetype" value="amazon">
+                        import Amazon Kindle Highlights (<a href="/images/amazon-import.jpg" target="_blank">help</a>)
+                    </label>
+
+                    <label for="file2" class="pure-radio">
+                        <input id="file2" type="radio" name="filetype" value="zettel">
+                        import Zettelnotes file
+                    </label>
+
+                    <label for="file3" class="pure-radio">
+                        <input id="file3" type="radio" name="filetype" value="other" checked>
+                        other filetype: PDF, TXT
+                        <br>max 90Kb of text, <a href="https://noduslabs.com/contact/">contact us</a> for longer)
+                    </label>
+
+                    <label for="file4" class="pure-radio">
+                        <input id="file4" type="radio" name="filetype" value="csv">
+                        from a CSV file
+                        <br>max 90Kb of text, <a href="https://noduslabs.com/contact/">contact us</a> for longer)
+                    </label>
+
+                    <br>
+                    <div id="titlefieldcaption">
+                        Separate into contexts based on html class<br>
+                        or leave empty to import everything in one.
+                    </div>
+                        <input type="text" name="titlefield" id="titlefield" value=""/>
+
+                    <br>
+                    <div id="processfieldcaption">
+                        Statements to import are in the class
+                    </div>
+                        <input type="text" name="processfield" id="processfield" value=""/>
+
+
+                </div>
+
+
+                <br>&nbsp;<br>
+                Save in context:
+                <br>
+                <input type='text' name='context' value='<% if (context) { %><%= context %><% } else { %>imported<% } %>'/>
+                <br>
+
+
+
+                <br>
+
+
+                <input type="hidden" id="selectedContexts" name="selectedContexts" value="">
+                <input type="hidden" name="statementid" value="">
+                <input type="hidden" name="source" value="file">
+                &nbsp;<br>
+                <input type='submit' name="submit" value="save" class="pure-button pure-button-primary">
+
+            </form>   &nbsp;<br>&nbsp;<br>
+
+
+
+
+
+        </div>
+
+        <div id="graph-container"></div>
+
+
+    </div>
+
+
+
+
+</div>
+
+
+<script src="/javascripts/jquery.min.js"></script>
+<script src="/javascripts/jquery-ui.min.js"></script>
+<script src="/javascripts/string.min.js"></script>
+<script src="/javascripts/underscore-min.js"></script>
+<script src="/javascripts/jquery.textcomplete.js"></script>
+<script src='/javascripts/jquery.autosize.js'></script>
+<script src="/javascripts/ui.js"></script>
+<script src="/javascripts/jquery.mobile-events.min.js"></script>
+
+
+<script>
+    ;(function(){
+
+
+
+        $('form#submitform').submit(function(){
+            $(this).find('input[type=submit]').attr('disabled', 'disabled');
+        });
+
+
+        var radioButtons3 = $("[name=filetype]"); // get both radiobuttons
+
+        $("#processfield").hide();
+        $("#titlefield").hide();
+        $("#processfieldcaption").hide();
+
+        $("#titlefieldcaption").hide();
+
+        // Later we can add more functions here
+        radioButtons3.change(function () {
+            if ($(this).val() == "zettel") {
+              $("#processfield").show();
+              $("#titlefield").show();
+              $("#processfieldcaption").show();
+
+              $("#titlefieldcaption").show();
+              $("#processfield").val('zettelcontent');
+              $("#titlefield").val('');
+              $("#processfieldcaption").html('Statements to import are in the class:');
+              $("#titlefieldcaption").html('Separate into contexts based on html class or leave empty to import everything in one:');
+
+
+            }
+            else if ($(this).val() == "amazon")
+            {
+              $("#processfield").show();
+              $("#titlefield").show();
+              $("#processfieldcaption").show();
+
+              $("#titlefieldcaption").show();
+                $("#processfield").val('highlight');
+                $("#titlefield").val('title');
+
+
+            }
+            else if ($(this).val() == "other")
+            {
+              $("#processfield").hide();
+              $("#titlefield").hide();
+              $("#processfieldcaption").hide();
+
+              $("#titlefieldcaption").hide();
+                $("#processfield").val('');
+                $("#titlefield").val('');
+
+            }
+            else if ($(this).val() == "csv")
+            {
+              $("#processfield").show();
+              $("#titlefield").show();
+              $("#titlefield").val('');
+              $("#processfieldcaption").show();
+              $("#titlefieldcaption").show();
+              $("#processfieldcaption").html('Import data from these columns (comma-separated, leave empty to import all data from all the columns):');
+              $("#titlefieldcaption").html('Separate the imported data into different graphs and name them after this column (leave empty to import all in one graph):');
+              $("#processfield").val('');
+
+
+            }
+        });
+
+
+
+    })();
+    $("#addNewContext").on('tap', function(e) {
+
+        $("#addcontextinput").css("visibility", "visible");
+        $("#add").css("visibility", "visible");
+        $("#addcontextname").focus();
+
+
+    });
+
+    $('#addcontextinput').submit(function(e) {
+        e.preventDefault(); // to stop the form from submitting
+        if ($('#addcontextname').val().length > 0) {
+            var contextredirect = $('#addcontextname').val();
+            contextredirect = contextredirect.replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+            contextredirect = contextredirect.replace(/[^\w]/gi, '');
+            window.location.href = "/<%= user.name %>/" + contextredirect + '/edit';
+        }
+
+    });
+
+</script>
+
+
+
+
+<% include statsbelow %>
+</body>
+</html>
