@@ -1420,6 +1420,13 @@ exports.submit = function(req, res,  next) {
 
             var addToContexts = [];
 
+            var requestedContext = 'imported';
+
+            if (req.body.context) {
+              requestedContext = req.body.context;
+            }
+            requestedContext = processContext(requestedContext);
+
             // Read that file
 
             fs.readFile(req.files.uploadedFile.path, function (err, data) {
@@ -1435,12 +1442,16 @@ exports.submit = function(req, res,  next) {
               }
 
               var filedata = [];
+
+              var parsedata = [];
+
               // Are we dealing with a CSV file? Parse it as JSON
               if (filetype == 'text/csv') {
-
                       CSVParse(filecontents, {
                       trim: true,
-                      skip_empty_lines: true
+                      columns: true,
+                      skip_empty_lines: true,
+                      delimiter: ';'
                       })
                       // Use the readable stream api
                       .on('readable', function(){
@@ -1450,14 +1461,74 @@ exports.submit = function(req, res,  next) {
                       }
                       })
                       // When we are done, test that the parsed output matched what expected
-                    .on('end', function(){
-                      if (titlefield && titlefield.length > 0) {
-                          for (var key in titlefield) {
-                            addToContexts.push(titlefield[key]);
-                          }
-                      }
-                      processFile(titlefield, processfield, filecontents, filedata, filetype, addToContexts);
-                    })
+                      .on('error', function(err){
+                        console.error(err.message);
+                        res.error(err.message);
+                        res.redirect('back');
+                      })
+                      .on('end', function(){
+
+                        // Do we have any limits as to which columns we are adding?
+                        var processfields = [];
+                        if (processfield && processfield.length > 0) {
+                          processfields = processfield.split(',');
+                        }
+
+                        // Iterate through results
+
+
+                        for (var key in filedata) {
+
+                            var statements = '';
+
+                            // Now for each column in results
+                            for (var column in filedata[key]) {
+                                    if (processfields.length > 0) {
+                                      for (var field in processfields) {
+                                          if (column == processfields[field]) {
+                                            statements += filedata[key][column] + ' ';
+                                          }
+                                      }
+
+                                    }
+                                    else {
+                                      if (titlefield && titlefield.length > 0) {
+                                        if (column != titlefield) {
+                                          statements += filedata[key][column] + ' ';
+                                        }
+                                      }
+                                      else {
+                                        statements += filedata[key][column] + ' ';
+                                      }
+                                    }
+                            }
+
+                            // Do we have a context field setting? Create an array in parsedata with it
+                            if (titlefield && titlefield.length > 0) {
+                                  if (filedata[key][titlefield]) {
+                                      var proccon = processContext(titlefield + '_' + filedata[key][titlefield]);
+                                      if (!parsedata[proccon]) {
+                                          parsedata[proccon] = [];
+                                      }
+                                  }
+                                  parsedata[proccon].push(statements);
+                            }
+                            // Else we create an object with the default setting
+                            else {
+                                  if (!parsedata[requestedContext]) {
+                                      parsedata[requestedContext] = [];
+                                  }
+                                  parsedata[requestedContext].push(statements);
+                            }
+
+
+                        }
+
+                        console.log(parsedata);
+
+                      //  processFile(titlefield, processfield, filecontents, parsedata, filetype);
+
+                      })
               }
               else if (filetype == 'text/html')  {
 
@@ -1618,7 +1689,7 @@ exports.submit = function(req, res,  next) {
                         // if it's a book
                         else if (filetype == 'text/plain' || filetype == 'application/pdf') {
 
-                            console.log("Processing file as a whole");
+
                             var bookname = '';
 
                             // Give the context graph a new name (passed by the user)
@@ -1670,6 +1741,11 @@ exports.submit = function(req, res,  next) {
                             }
 
 
+                        }
+
+                        else if (filetype == 'text/csv') {
+                          console.log('heres what we extracted');
+                          console.log(filedata);
                         }
 
                         // Move on to the next one
@@ -2469,6 +2545,13 @@ exports.submit = function(req, res,  next) {
            entries.submit(req,res);
 
 
+    }
+
+    function processContext(context) {
+      var requestedContext = S(context).dasherize().chompLeft('-').camelize().s.replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+      requestedContext = requestedContext.replace(/[^\w]/gi, '');
+      requestedContext = requestedContext.substr(0,12);
+      return requestedContext;
     }
 
 
