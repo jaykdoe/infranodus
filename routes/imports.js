@@ -1386,6 +1386,8 @@ exports.submit = function(req, res,  next) {
 
         var process_type = 'classes';
 
+
+
         // Is the file uploaded and is it a text / html one?
         if (req.files && (filetype == 'text/html' || filetype == 'text/plain' || filetype == 'application/pdf' || filetype == 'text/csv') ) {
 
@@ -1456,11 +1458,19 @@ exports.submit = function(req, res,  next) {
 
               // Are we dealing with a CSV file? Parse it as JSON
               if (filetype == 'text/csv') {
+                      var delimiter
+                      if (req.body.delimiter.length == 1) {
+                        delimiter = req.body.delimiter;
+                      }
+                      else {
+                        delimtier = ';';
+                      }
                       CSVParse(filecontents, {
                       trim: true,
                       columns: true,
                       skip_empty_lines: true,
-                      delimiter: ';'
+                      skip_lines_with_error: true,
+                      delimiter: delimiter
                       })
                       // Use the readable stream api
                       .on('readable', function(){
