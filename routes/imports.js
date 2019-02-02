@@ -1386,10 +1386,13 @@ exports.submit = function(req, res,  next) {
 
         var process_type = 'classes';
 
-
+        if (req.files.uploadedFile.size > max_total_length) {
+          res.error('Sorry, this file exceeds the maximum of ' + max_total_length + ' bytes. You can contact us directly to process longer files.');
+          res.redirect('back');
+        }
 
         // Is the file uploaded and is it a text / html one?
-        if (req.files && (filetype == 'text/html' || filetype == 'text/plain' || filetype == 'application/pdf' || filetype == 'text/csv') ) {
+        if (req.files && req.files.uploadedFile.size < max_total_length && (filetype == 'text/html' || filetype == 'text/plain' || filetype == 'application/pdf' || filetype == 'text/csv') ) {
 
             // Import parameters
 
@@ -1798,8 +1801,11 @@ exports.submit = function(req, res,  next) {
 
         // Did not recognive the filetype
         else {
-            res.error('Sorry, but InfraNodus does not recognize this kind of content yet. Add a feature request on GitHub and we will look into it.');
-            res.redirect('back');
+
+            if (req.files.uploadedFile.size < max_total_length) {
+              res.error('Sorry, but InfraNodus does not recognize this kind of content yet. Add a feature request on GitHub and we will look into it.');
+              res.redirect('back');
+            }
         }
 
         // delete file
