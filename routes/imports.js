@@ -1418,13 +1418,22 @@ exports.submit = function(req, res,  next) {
 
             var filecontents = ''
 
-            var addToContexts = [];
 
-            var requestedContext = 'imported';
+            var requestedContext = '';
 
-            if (req.body.context) {
-              requestedContext = req.body.context;
+            if (req.body.context.length > 0) {
+              requestedContext = importContext;
             }
+            else {
+              if (filetype == 'text/csv' && titlefield.length > 0) {
+                // Do nothing
+              }
+              else {
+                res.error('Please, specify which graph / context you want to save the text in.');
+                res.redirect('back');
+              }
+            }
+
             requestedContext = processContext(requestedContext);
 
             // Read that file
@@ -1476,7 +1485,6 @@ exports.submit = function(req, res,  next) {
 
                         // Iterate through results
 
-
                         for (var key in filedata) {
 
                             var statements = '';
@@ -1512,21 +1520,22 @@ exports.submit = function(req, res,  next) {
                                       }
                                   }
                                   parsedata[proccon].push(statements);
-                            }
-                            // Else we create an object with the default setting
-                            else {
-                                  if (!parsedata[requestedContext]) {
-                                      parsedata[requestedContext] = [];
-                                  }
-                                  parsedata[requestedContext].push(statements);
+
+
                             }
 
+                            if (requestedContext.length > 0) {
+                              if (!parsedata[requestedContext]) {
+                                  parsedata[requestedContext] = [];
+                              }
+                              parsedata[requestedContext].push(statements);
+                            }
 
                         }
 
-                        console.log(parsedata);
+                        // console.log(parsedata);
 
-                      //  processFile(titlefield, processfield, filecontents, parsedata, filetype);
+                        processFile(titlefield, processfield, filecontents, parsedata, filetype);
 
                       })
               }
@@ -1545,30 +1554,33 @@ exports.submit = function(req, res,  next) {
                               var bookname = $(this).text();
 
                               // Translate the book name into the context name
-                              var currentcontext = S(bookname).dasherize().chompLeft('-').camelize().s.replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()]/g,"");
-                              currentcontext = currentcontext.replace(/[^\w]/gi, '');
-                              currentcontext = currentcontext.substr(0,12);
+                              var currentcontext = processContext(bookname);
 
-                              addToContexts.push(currentcontext);
+                              if (!parsedata[currentcontext]) {
+                                parsedata[currentcontext] = [];
+                              }
 
                           });
                        }
 
-                      processFile(titlefield, processfield, filecontents, filedata, filetype, addToContexts);
+                      processFile(titlefield, processfield, filecontents, parsedata, filetype);
               }
               else {
 
-                var currentcontext = S(importContext).dasherize().chompLeft('-').camelize().s.replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()]/g,"");
-                currentcontext = currentcontext.replace(/[^\w]/gi, '');
-                currentcontext = currentcontext.substr(0,12);
-                addToContexts.push(importContext);
-                processFile(titlefield, processfield, filecontents, filedata, filetype, addToContexts);
+                var currentcontext = processContext(importContext);
+
+                if (!parsedata[currentcontext]) {
+                  parsedata[currentcontext] = [];
+                }
+
+                processFile(titlefield, processfield, filecontents, parsedata, filetype);
+
               }
 
 
 
 
-              function processFile(titlefield, processfield, filecontents, filedata, filetype, addToContexts) {
+              function processFile(titlefield, processfield, filecontents, parsedata, filetype) {
 
               // Now step by step...
               async.waterfall([
@@ -1576,6 +1588,12 @@ exports.submit = function(req, res,  next) {
                     function(callback){
 
                         // First, let's extract the ID of every context (if they exist, if not, create)
+
+                        var addToContexts = [];
+
+                        for (var key in parsedata) {
+                          addToContexts.push(key);
+                        }
 
                         validate.getContextID(user_id, addToContexts, function(result, err) {
 
@@ -1655,9 +1673,7 @@ exports.submit = function(req, res,  next) {
 
                               // Convert it to the context name
                               // TODO this repeats the function above from validate.ContextID so make sure not to change it if the above is not changed also
-                              var currentcontext = S(bookname).dasherize().chompLeft('-').camelize().s.replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()]/g,"");
-                                  currentcontext = currentcontext.replace(/[^\w]/gi, '');
-                                  currentcontext = currentcontext.substr(0,12);
+                              var currentcontext = processContext(bookname);
 
                               $$(processfield).each(function (index) {
 
@@ -1690,25 +1706,6 @@ exports.submit = function(req, res,  next) {
                         else if (filetype == 'text/plain' || filetype == 'application/pdf') {
 
 
-                            var bookname = '';
-
-                            // Give the context graph a new name (passed by the user)
-                            bookname = importContext;
-
-                            // Fix it just in case as it'll be a URL after
-                            var currentcontext = S(bookname).dasherize().chompLeft('-').camelize().s.replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()]/g,"");
-                                currentcontext = currentcontext.replace(/[^\w]/gi, '');
-                                currentcontext = currentcontext.substr(0,12);
-
-                           // Check the corresponding context ID for the book name
-                            var addingcontexts = [];
-
-                            for (var j = 0; j < contexts.length; j++) {
-                                     if (contexts[j].name == currentcontext) {
-                                          addingcontexts.push(contexts[j]);
-                                     }
-                            }
-
                             if (filetype == 'application/pdf') {
 
                                   //PDF processing special case
@@ -1720,7 +1717,7 @@ exports.submit = function(req, res,  next) {
                                       callback(err);
                                     else if (!item) {
 
-                                      saveFileAtOnce(PDFtextfull, addingcontexts);
+                                      saveFileAtOnce(PDFtextfull, contexts);
 
                                       callback();
 
@@ -1736,7 +1733,7 @@ exports.submit = function(req, res,  next) {
                             // Standard text file
                             else {
 
-                                  saveFileAtOnce(filecontents, addingcontexts);
+                                  saveFileAtOnce(filecontents, contexts);
 
                             }
 
@@ -1744,15 +1741,38 @@ exports.submit = function(req, res,  next) {
                         }
 
                         else if (filetype == 'text/csv') {
-                          console.log('heres what we extracted');
-                          console.log(filedata);
+
+
+
+                          for (var graph in parsedata) {
+
+                             var addingstatements = '';
+
+                             // Check the corresponding context ID for the book name
+                             var addingcontexts = [];
+
+                             for (var j = 0; j < contexts.length; j++) {
+                                      if (contexts[j].name == graph) {
+                                           addingcontexts.push(contexts[j]);
+                                      }
+                             }
+
+                             // Put together all statements from that context into one graph
+                             for (var st in parsedata[graph]) {
+                               addingstatements += parsedata[graph][st] + '\n\n';
+                             }
+
+                             saveFileAtOnce(addingstatements, addingcontexts);
+
+                          }
+
                         }
 
                         // Move on to the next one
                         res.error('Importing the content... Please, reload this page in 30 seconds...');
 
-                        if (titlefield.length == 0 && importContext) {
-                            res.redirect(res.locals.user.name + '/' + importContext + '/edit');
+                        if (requestedContext.length > 0) {
+                            res.redirect(res.locals.user.name + '/' + requestedContext + '/edit');
                         } else {
                             res.redirect(res.locals.user.name + '/edit');
                         }

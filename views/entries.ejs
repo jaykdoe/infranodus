@@ -430,6 +430,8 @@
 
     var interpret = getUrlVars()["interpret"];
 
+    var highlight = getUrlVars()["highlight"];
+
     var missing = getUrlVars()["missing"];
 
     var add_statement = getUrlVars()["statement"];
@@ -1291,6 +1293,8 @@ sigma.classes.graph.addMethod('neighbors', function(nodeId) {
 // Initialize JSON parser for SIGMA visualization
 
 var color_addcontext = '#666666'; // #cccccc
+
+var highlight_addcontext = '#0089e0';
 
 var default_label_color = '#000000';
 
@@ -4830,16 +4834,28 @@ sigma.parsers.json(
               else {
                 if (!missing) {
                   if (contextNodeID[addcontext].indexOf(n.id) > -1 && contextNodeID[current_context].indexOf(n.id) == -1) {
-                      n.originalColor = color_addcontext;
-                      n.color = color_addcontext;
+                      if (highlight) {
+                        n.originalColor = highlight_addcontext;
+                        n.color = highlight_addcontext;
+                      }
+                      else {
+                        n.originalColor = color_addcontext;
+                        n.color = color_addcontext;
+                      }
                       addcontextcount = addcontextcount + 1;
                       addcontext_nodes.push({id: n.id, label: n.originalLabel, size: n.size, community: n.community});
                   }
                 }
                 else {
                   if (contextNodeID[addcontext].indexOf(n.id) == -1 && contextNodeID[current_context].indexOf(n.id) > -1) {
-                      n.originalColor = color_addcontext;
-                      n.color = color_addcontext;
+                      if (highlight) {
+                        n.originalColor = highlight_addcontext;
+                        n.color = highlight_addcontext;
+                      }
+                      else {
+                        n.originalColor = color_addcontext;
+                        n.color = color_addcontext;
+                      }
                       addcontextcount = addcontextcount + 1;
                       addcontext_nodes.push({id: n.id, label: n.originalLabel, size: n.size, community: n.community});
 
