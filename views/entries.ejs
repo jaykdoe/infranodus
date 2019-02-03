@@ -4814,7 +4814,25 @@ sigma.parsers.json(
         if (contextNodeID[addcontext] && contextNodeID[current_context]) {
               if (interpret) {
                 if (contextNodeID[current_context].indexOf(n.id) > -1) {
-                    n.originalColor = '#90909f';
+
+                    if (!highlight) {
+                      n.originalColor = '#90909f';
+
+                      if (pinnedNodes.indexOf(n.label) == -1) {
+                        if (selectedNodes.length > 0){
+                          if (selectedNodes.indexOf(n.originalLabel) > -1) {
+                          }
+                        }
+                        else {
+                        n.color = '#90909f';
+                        }
+                      }
+                    }
+                }
+                else {
+                  // This shows intersecting nodes 
+                  if (highlight) {
+                    n.originalColor = highlight_addcontext;
 
                     if (pinnedNodes.indexOf(n.label) == -1) {
                       if (selectedNodes.length > 0){
@@ -4822,9 +4840,10 @@ sigma.parsers.json(
                         }
                       }
                       else {
-                      n.color = '#90909f';
+                      n.color = highlight_addcontext;
                       }
                     }
+                  }
                 }
                 if (contextNodeID[addcontext].indexOf(n.id) > -1 && contextNodeID[current_context].indexOf(n.id) == -1) {
                     addcontextcount = addcontextcount + 1;

@@ -1393,6 +1393,8 @@ exports.submit = function(req, res,  next) {
 
         var contextmentions = req.body.contextmentions;
 
+        var removeduplicates = req.body.removeduplicates;
+
         // Is the file uploaded and is it a text / html one?
         if (req.files && req.files.uploadedFile.size < max_total_length && (filetype == 'text/html' || filetype == 'text/plain' || filetype == 'application/pdf' || filetype == 'text/csv') ) {
 
@@ -1556,7 +1558,14 @@ exports.submit = function(req, res,  next) {
                               if (!parsedata[requestedContext]) {
                                   parsedata[requestedContext] = [];
                               }
-                              parsedata[requestedContext].push(statements);
+                              if (removeduplicates) {
+                                if (parsedata[requestedContext].indexOf(statements) == -1) {
+                                  parsedata[requestedContext].push(statements);
+                                }
+                              }
+                              else {
+                                parsedata[requestedContext].push(statements);
+                              }
                             }
 
                         }

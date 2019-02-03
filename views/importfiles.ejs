@@ -61,7 +61,11 @@
                     </label>
 
                     <label for="contextmentions" class="pure-checkbox" id="contextmentionscaption">
-                        <input id="contextmentions" type="checkbox" name="contextmentions" value="1"> Do not separate into graphs, instead add the contexts at the statements<br>
+                        <input id="contextmentions" type="checkbox" name="contextmentions" value="1"> Do not separate into graphs, instead add the value found in column above to with the @sign<br>
+                    </label>
+
+                    <label for="removeduplicates" class="pure-checkbox" id="removeduplicatescaption">
+                        <input id="removeduplicates" type="checkbox" name="removeduplicates" value="1"> Do not add duplicate statements<br>
                     </label>
 
                     <label for="titlefield" class="pure-radio" id="processfieldcaption">
@@ -145,6 +149,9 @@
         $("#delimiterfield").hide();
         $("#contextmentions").hide();
         $("#contextmentionscaption").hide();
+        $("#removeduplicates").hide();
+        $("#removeduplicatescaption").hide();
+
 
         $("#titlefieldcaption").hide();
 
@@ -199,9 +206,9 @@
               $("#titlefieldcaption").show();
               $("#contextmentions").show();
               $("#contextmentionscaption").show();
-
+              $("#removeduplicates").show();
+              $("#removeduplicatescaption").show();
               $("#processfield").val('');
-
 
             }
         });
