@@ -1391,6 +1391,8 @@ exports.submit = function(req, res,  next) {
           res.redirect('back');
         }
 
+        var contextmentions = req.body.contextmentions;
+
         // Is the file uploaded and is it a text / html one?
         if (req.files && req.files.uploadedFile.size < max_total_length && (filetype == 'text/html' || filetype == 'text/plain' || filetype == 'application/pdf' || filetype == 'text/csv') ) {
 
