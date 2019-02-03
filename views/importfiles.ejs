@@ -60,7 +60,9 @@
                         <input type="text" name="titlefield" id="titlefield" value=""/>
                     </label>
 
-
+                    <label for="contextmentions" class="pure-checkbox" id="contextmentionscaption">
+                        <input id="contextmentions" type="checkbox" name="contextmentions" value="1"> Do not separate into graphs, instead add the contexts at the statements<br>
+                    </label>
 
                     <label for="titlefield" class="pure-radio" id="processfieldcaption">
                         <br>
@@ -75,6 +77,9 @@
 
                         <input type="text" name="delimiter" id="delimiterfield" value=";"/>
                       </label>
+
+
+
                 <br>&nbsp;<br>
                 Save in context:
                 <br>
@@ -138,6 +143,8 @@
         $("#processfieldcaption").hide();
         $("#delimiter").hide();
         $("#delimiterfield").hide();
+        $("#contextmentions").hide();
+        $("#contextmentionscaption").hide();
 
         $("#titlefieldcaption").hide();
 
@@ -190,6 +197,8 @@
               $("#titlefield").val('');
               $("#processfieldcaption").show();
               $("#titlefieldcaption").show();
+              $("#contextmentions").show();
+              $("#contextmentionscaption").show();
 
               $("#processfield").val('');
 
