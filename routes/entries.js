@@ -284,6 +284,7 @@ exports.submit = function(req, res, next){
             callback(error);
           }
 
+
         },
         function(prepStatements, callback){
 
@@ -318,7 +319,6 @@ exports.submit = function(req, res, next){
                 "fullscan": res.locals.user.fullscan,
                 "addmentions": res.locals.user.mentions
             });
-
 
             callback(null, entry, prepStatements);
         }

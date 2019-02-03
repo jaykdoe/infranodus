@@ -1510,12 +1510,24 @@ exports.submit = function(req, res,  next) {
                                             statements += filedata[key][column] + ' ';
                                           }
                                       }
+                                      if (contextmentions && titlefield && titlefield.length > 0) {
+                                        if (column == titlefield) {
+                                          statements += '@' + processContext(titlefield + '_' + filedata[key][column]) + ' ';
+                                        }
+                                      }
 
                                     }
                                     else {
                                       if (titlefield && titlefield.length > 0) {
-                                        if (column != titlefield) {
-                                          statements += filedata[key][column] + ' ';
+                                        if (contextmentions) {
+                                          if (column == titlefield) {
+                                            statements += '@' + processContext(titlefield + '_' + filedata[key][column]) + ' ';
+                                          }
+                                        }
+                                        else {
+                                          if (column != titlefield) {
+                                            statements += filedata[key][column] + ' ';
+                                          }
                                         }
                                       }
                                       else {
@@ -1526,14 +1538,15 @@ exports.submit = function(req, res,  next) {
 
                             // Do we have a context field setting? Create an array in parsedata with it
                             if (titlefield && titlefield.length > 0) {
-                                  if (filedata[key][titlefield]) {
-                                      var proccon = processContext(titlefield + '_' + filedata[key][titlefield]);
-                                      if (!parsedata[proccon]) {
-                                          parsedata[proccon] = [];
-                                      }
+                                  if (!contextmentions) {
+                                    if (filedata[key][titlefield]) {
+                                        var proccon = processContext(titlefield + '_' + filedata[key][titlefield]);
+                                        if (!parsedata[proccon]) {
+                                            parsedata[proccon] = [];
+                                        }
+                                    }
+                                    parsedata[proccon].push(statements);
                                   }
-                                  parsedata[proccon].push(statements);
-
 
                             }
 
