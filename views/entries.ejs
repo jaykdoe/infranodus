@@ -608,6 +608,9 @@ var polysingularity_score = 0;
 // Whats the clicked nodes in the graph
 var clickedNodes = [];
 
+// What are the shown nodes on the graph;
+var shownNodes = [];
+
 // Inactivity timeout
 var inactiveTimeout = null;
 
@@ -1747,7 +1750,8 @@ sigma.parsers.json(
 
                     }
 
-                    // console.log("node clicked, now will filter for nodes " + pinnedNodes);
+                    console.log("Pinned nodes: " + pinnedNodes);
+                    console.log("Spliced nodes: " + splicedNodes);
                     socket.emit('node click', {pinnedNodes: pinnedNodes, splicedNodes: splicedNodes, nodeLabel: nodeLabel, pinnedIndex: pinnedIndex});
 
 
@@ -3764,7 +3768,11 @@ sigma.parsers.json(
         socket.on('node click', function(msg){
 
               pinnedNodes = msg.pinnedNodes;
+              console.log("Pinned nodes:");
+              console.log(pinnedNodes);
               splicedNodes = msg.splicedNodes;
+              console.log("Spliced nodes:");
+              console.log(splicedNodes);
               var pinnedIndex = msg.pinnedIndex;
 
               // Are we clicking the node that was clicked already? Then show all divs
@@ -4830,7 +4838,7 @@ sigma.parsers.json(
                     }
                 }
                 else {
-                  // This shows intersecting nodes 
+                  // This shows intersecting nodes
                   if (highlight) {
                     n.originalColor = highlight_addcontext;
 
@@ -4890,7 +4898,9 @@ sigma.parsers.json(
       // console.log(nodesfirstcom);
       // console.log(nodessecondcom);
       // console.log(totalnodescount);
-      // console.log(top_communities);
+
+      console.log('Top communities:')
+      console.log(topp_communities);
 
      addcontext_nodes = _.sortBy(addcontext_nodes, 'size').reverse();
 
@@ -4915,6 +4925,9 @@ sigma.parsers.json(
      var bc_dist = [];
 
      // For every top BC node
+     console.log("All the different communities in the graph:")
+     console.log(all_communities);
+
 
     for (var bcid in toppbc_nodes) {
        if (toppbc_nodes[bcid].bc > 0) {
@@ -4937,7 +4950,7 @@ sigma.parsers.json(
 
     }
 
-     console.log('Distribution of top nodes across the communities: ')
+     console.log('Distribution of top nodes across all the communities: ')
      console.log(bc_dist);
 
      var bc_dist_string = bc_dist.join('');
@@ -6138,180 +6151,201 @@ sigma.parsers.json(
     function filter_statements(pinnedNodes, origin) {
 
 
-        var showingsomething = 0;
-
         var visibleentries = visibleentries_original;
+
 
         // Hide the sentences that don't contain the terms
 
         if (origin != 'stopwords') {
 
-        // TODO redo this because to do so much for every statement is crazy PRIORITY
+           if (pinnedNodes.length == 0) {
+             $(".entry").fadeIn(500);
+           }
+           else {
 
-        $(".entry").each(function(){
+          // TODO redo this because to do so much for every statement is crazy PRIORITY
 
-            var currentDiv = $(this).attr('data-uid');
+              $(".entry").each(function(){
 
-            // Retrieve the statement text from the entry, clean from html
-            var originaltext = $(this).children('.entry-text').html();
+                  var currentDiv = $(this).attr('data-uid');
 
-            // Make an array from sentences of that text
-            var sentences = originaltext.split(/[.|!|?]\s/gi);
+                  // Retrieve the statement text from the entry, clean from html
+                  var originaltext = $(this).children('.entry-text').html();
 
-            var searchlemmas = [];
+                  var nodesfound = 0;
 
+                  var searchlemmas = [];
 
-            // START Check what sentences contain the node clicked
+                  var entry_match = [];
 
-            var startmark = sentences.length; // How many sentences are inside
+                  // START Check what entries contain the node clicked
 
-            for (var i = 0; i < sentences.length; i++) {
+                    // SEARCH MOD
+                      /*for (var z = 0; z < sentences_lemmas.length; z++) {
+                          sentences_lemmas[z] = window.jstemmer(sentences_lemmas[z]);
+                      }
+      */
+                  // Check how many of the nodes are found in this entry
 
-                // What language is the sentence?
-                var sentence_cyrillic = sentences[i].match(/[а-яА-Я]/);
+                  for (var j = 0; j < pinnedNodes.length; j++) {
 
-                var nodesfound = 0;
+                        // Is the search term cyrillic?
+                        var search_cyrillic = pinnedNodes[j].match(/[а-яА-Я]/);
 
-                // Transform the sentence into a series of morphemes
-                var sentences_lemmas = sentences[i].split(' ');
+                        // SEARCHMOD
+                        // var search_lemma = window.jstemmer(pinnedNodes[j]);
 
-                // SEARCH MOD
-                /*for (var z = 0; z < sentences_lemmas.length; z++) {
-                    sentences_lemmas[z] = window.jstemmer(sentences_lemmas[z]);
-                }
-*/
+                        var search_lemma = pinnedNodes[j];
 
-                var sentences_lemmas_string = sentences_lemmas.join(' ');
+                        searchlemmas.push(search_lemma);
 
-                // Check how many of the nodes are found in This 1 Sentence i
-
-                for (var j = 0; j < pinnedNodes.length; j++) {
-
-                    // Is the search term cyrillic?
-                    var search_cyrillic = pinnedNodes[j].match(/[а-яА-Я]/);
-
-                    // SEARCHMOD
-                    // var search_lemma = window.jstemmer(pinnedNodes[j]);
-
-                    var search_lemma = pinnedNodes[j];
-
-                    searchlemmas.push(search_lemma);
-
-                    if (sentences_lemmas_string.toLowerCase().indexOf(search_lemma.toLowerCase()) > -1) {
-                        nodesfound = nodesfound + 1;
-                    }
-                    else if (sentence_cyrillic != null && search_cyrillic != null)  {
-                        if (sentences_lemmas_string.toLowerCase().indexOf(search_lemma.toLowerCase().slice(0,-1)) > -1) {
+                        // Did we find the node in the entry?
+                        if (originaltext.toLowerCase().indexOf(search_lemma.toLowerCase()) > -1) {
                             nodesfound = nodesfound + 1;
+                            // Did we find all the different nodes in the entry?
+                            if (nodesfound == pinnedNodes.length && entry_match.indexOf(currentDiv) == -1) {
+                              entry_match.push(currentDiv);
+                            }
                         }
+                        else if (search_cyrillic != null)  {
+                            // TODO what is this logic?
+                            if (originaltext.toLowerCase().indexOf(search_lemma.toLowerCase().slice(0,-1)) > -1) {
+                                nodesfound = nodesfound + 1;
+                                if (nodesfound == pinnedNodes.length && entry_match.indexOf(currentDiv) == -1) {
+                                  entry_match.push(currentDiv);
+                                }
+                            }
+                        }
+                }
+
+                // All the pinned nodes are not found in the entry
+                if (entry_match.length == 0) {
+
+                    // Hide this entry
+                    $(this).fadeOut(500);
+
+                    // Set the counter
+                    visibleentries = visibleentries - 1;
+
+                    // We finished iterating through all the entries and nothing is shown
+                    // Then launch a different logic
+
+                    if (visibleentries == 0) {
+
+
+                        // #1 Logic for intersections
+
+                        var lastNode = pinnedNodes[pinnedNodes.length - 1];
+
+                        var nnodes = sigma.instances(0).graph.neighbors(nodeIDs[lastNode]);
+
+                        var selectedNNodes = [];
+
+                        // We create an array from neighbors that looks like toKeep one
+
+                        for (var key in nnodes) {
+                            selectedNNodes.push(nnodes[key].label);
+                        }
+
+                        var overlapNodes = [];
+                        overlapNodes = _.intersection(selectedNNodes, selectedNodes);
+
+
+
+                        var nodeIDs_reversed = _.invert(nodeIDs);
+
+
+                        $(".entry").each(function(){
+                            var matchedentry = 0;
+                            var currentDiv = $(this).attr('data-uid');
+
+                            // For each node present in this statement:
+                            for (var item in nodesOfStatement[currentDiv]) {
+                              var nmarker = nodesOfStatement[currentDiv][item];
+
+                              // Does this node belong to the Overlap nodes AND at the same time
+                              if (overlapNodes.indexOf(nodeIDs_reversed[nmarker]) > -1) {
+                                for (var node in nodesOfStatement[currentDiv]) {
+                                  var n2marker = nodesOfStatement[currentDiv][node];
+                                  if (pinnedNodes.indexOf(nodeIDs_reversed[n2marker]) > -1 || lastNode == nodeIDs_reversed[n2marker]) {
+                                    matchedentry = 1;
+                                  }
+                                }
+                              }
+                            }
+                            if (matchedentry == 1) {
+                                $(this).fadeIn(500);
+                                visibleentries = visibleentries + 1;
+                            }
+                        });
+
+
+                        if (visibleentries == 0) {
+
+                            $('.entry').fadeIn(500);
+                            // #2 Logic
+                            // This is if we want to remove the node before the last one.
+
+                            // timesfiltered = timesfiltered + 1;
+                            // var posnodes = pinnedNodes.length - timesfiltered - 1;
+
+                            var posnodes = 0;
+
+                            // Final nodes to search
+
+                            splicedNodes = [];
+
+                            // First all of them
+
+                            for (var k = 0; k < pinnedNodes.length; k++) {
+                                splicedNodes[k] = pinnedNodes[k];
+                            }
+
+                            // Remove the one we can't find (the very first one of the bunch)
+
+                            splicedNodes.splice(posnodes, 1);
+
+                            // Save that one also into the list of the nodes we removed
+
+                            notfoundNodes.push(pinnedNodes[posnodes]);
+
+                            // This is for alert
+                            // var r = confirm('No link between ' + pinnedNodes + '.\nShow entries just with ' + splicedNodes + '?');
+
+                            // This is for plain message
+                            // $('#messages').html('No entries contain "' + pinnedNodes.join(' and ') + '".<br>Showing entries that contain "' + splicedNodes.join(' and ') + '" only:<br>&nbsp;');
+
+                            // Get the pinnedNodes back to a good shape
+                            pinnedNodes = [];
+                            for (var l = 0; l < splicedNodes.length; l++) {
+                                pinnedNodes[l] = splicedNodes[l];
+                            }
+
+                            // Relaunch the function with the newly cleared list of pinnedNodes
+
+                            filter_statements(pinnedNodes, origin);
+                      }
+
                     }
-
+                // END OF not found any entries with the nodes clicked
                 }
 
-                // At least one node not found? Mark it as non matched
-
-                if (nodesfound >= pinnedNodes.length) {
-                    sentences[i] = sentences[i] + '.';
-                }
+                // FOUND something with the nodes clicked
                 else {
-                    sentences[i] = '<div class="nonmatched-sentence">' + sentences[i] + '.</div>';
-                    startmark = startmark - 1;
+
+                    // Populate statement with a new text
+
+                  //  $(this).children('.entry-text').html(newtext);
+
+                    // $(this).find('.nonmatched-sentence').fadeOut(500); this is only if we want to fade non-matched sentences - see above also
+
+
+
                 }
 
 
-            }
-
-            // Make a new text from the filtered sentences
-            var newtext = '';
-
-            if (startmark == sentences.length) {
-                newtext = originaltext;
-                // $(this).find('.entry-menu').fadeOut(500);
-                showingsomething = showingsomething + 1;
-            }
-
-            else {
-                newtext = originaltext; // sentences.join(' '); if we want to hide non-matched sentences
-                // $(this).find('.entry-menu').fadeIn(500);
-                if (startmark != 0) {
-                    showingsomething = showingsomething + 1;
-                }
-            }
-
-            if (startmark == 0) {
-
-                $(this).fadeOut(500);
-
-                visibleentries = visibleentries - 1;
-
-                // This will get activated only if the iterative search didn't give any results
-
-                if (visibleentries == 0 && showingsomething == 0) {
-
-                    $('.entry').fadeIn(500);
-
-                    timesfiltered = timesfiltered + 1;
-
-                    // This is if we want to remove the node before the last one.
-                    // var posnodes = pinnedNodes.length - timesfiltered - 1;
-
-                    var posnodes = 0;
-                    var lastnode = pinnedNodes.length - 1;
-
-                    // Final nodes to search
-
-                    splicedNodes = [];
-
-
-                    // First all of them
-
-                    for (var k = 0; k < pinnedNodes.length; k++) {
-                        splicedNodes[k] = pinnedNodes[k];
-                    }
-
-                    // Remove the one we can't find (the very first one of the bunch)
-
-                    splicedNodes.splice(posnodes, 1);
-
-                    // Save that one also into the list of the nodes we removed
-
-                    notfoundNodes.push(pinnedNodes[posnodes]);
-
-                    // This is for alert
-                    // var r = confirm('No link between ' + pinnedNodes + '.\nShow entries just with ' + splicedNodes + '?');
-
-                    // This is for plain message
-                    // $('#messages').html('No entries contain "' + pinnedNodes.join(' and ') + '".<br>Showing entries that contain "' + splicedNodes.join(' and ') + '" only:<br>&nbsp;');
-
-                    // Get the pinnedNodes back to a good shape
-                    pinnedNodes = [];
-                    for (var l = 0; l < splicedNodes.length; l++) {
-                        pinnedNodes[l] = splicedNodes[l];
-                    }
-
-                    // Relaunch the function with the newly cleared list of pinnedNodes
-
-                    filter_statements(pinnedNodes, origin);
-
-                }
-            // END OF not found any entries with the nodes clicked
-            }
-
-            // FOUND something with the nodes clicked
-            else {
-
-                // Populate statement with a new text
-
-                $(this).children('.entry-text').html(newtext);
-
-                // $(this).find('.nonmatched-sentence').fadeOut(500); this is only if we want to fade non-matched sentences - see above also
-
-
-
-            }
-
-
-        });
+            });
+          }
 
 
 
@@ -7139,17 +7173,19 @@ sigma.parsers.json(
 
             var toKeep = [];
 
+            var toKeepPinned = [];
+
             var toKeepMap = [];
 
 
             // Debug: show which nodes are clicked
+            console.log("Pinned nodes clicked:");
+            console.log(pins);
 
-            //console.log(pins);
 
             // Are any nodes at all selected on the graph?
 
             if (pins.length > 0) {
-
 
                 // Reiterate for each pinned node
 
@@ -7190,20 +7226,20 @@ sigma.parsers.json(
                         if (pins[i] == pinSearch) {
 
 
-
                             // The ID of the current node is...
                             var nodeId = n.id;
 
                             // Its neighbors are...
                             var nnodes = sigma.instances(0).graph.neighbors(nodeId);
 
-                            var nnodesArray = []
+                            var nnodesArray = [];
 
                             // We create an array from neighbors that looks like toKeep one
 
-                            for (key in nnodes) {
+                            for (var key in nnodes) {
                                 nnodesArray.push(nnodes[key]);
                             }
+
 
                             // If that's not the first iteration, we only keep intersection of both
 
@@ -7214,9 +7250,7 @@ sigma.parsers.json(
                                 toKeep = nnodesArray;
                             }
 
-                            // add the node itself to keep
-                            toKeep.push(n);
-
+                            toKeepPinned.push(n);
 
 
                         }
@@ -7227,8 +7261,13 @@ sigma.parsers.json(
 
                 // Make array of nodes to keep unique to avoid duplicates
 
+
+
                 toKeep = _.uniq(toKeep);
 
+                toKeep = _.union(toKeep,toKeepPinned);
+
+                console.log("Keeping the nodes:");
                 console.log(toKeep);
 
                 selectedNodes = [];
