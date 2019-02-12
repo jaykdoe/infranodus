@@ -1924,6 +1924,8 @@ sigma.parsers.json(
 
             socket.on('chat message', function(msg){
 
+                visibleentries_original = visibleentries_original + 1;
+
                 var perceivedby = '';
 
                 <% if (receivername) { %>
@@ -2060,6 +2062,9 @@ sigma.parsers.json(
                             });
                             nodeNames.push(addednodes[i].label);
                             nodes_added.push(addednodes[i]);
+                            if (!nodeIDs[addednodes[i].label]) {
+                              nodeIDs[addednodes[i].label] = addednodes[i].id;
+                            }
 
 
                         }
@@ -4010,6 +4015,16 @@ sigma.parsers.json(
                                         group: "nodes",
                                         data: { id: n.id, name: n.label}
                                     });
+
+                                    // Adding a node to the nodeIDs
+                                    var key = n.label;
+                                    if (!nodeIDs[key]) {
+                                        nodeIDs[key] = n.id;
+                                    }
+                                    if (nodeNames.indexOf(key) == -1) {
+                                        nodeNames.push(key);
+                                    }
+
                 });
 
                 sigma.instances(0).graph.edges().forEach(function(e) {
@@ -6150,22 +6165,28 @@ sigma.parsers.json(
 
     function filter_statements(pinnedNodes, origin) {
 
-
         var visibleentries = visibleentries_original;
 
+        var nodeIDs_reversed = _.invert(nodeIDs);
+        console.log('nodeIDs_reversed');
+        console.log(nodeIDs_reversed);
 
         // Hide the sentences that don't contain the terms
 
         if (origin != 'stopwords') {
 
-           if (pinnedNodes.length == 0) {
-             $(".entry").fadeIn(500);
-           }
-           else {
+             if (pinnedNodes.length == 0) {
 
-          // TODO redo this because to do so much for every statement is crazy PRIORITY
+               $(".entry").fadeIn(500);
 
-              $(".entry").each(function(){
+             }
+
+             else {
+
+              console.log('nodesofstatement');
+              console.log(nodesOfStatement);
+
+               $(".entry").each(function(){
 
                   var currentDiv = $(this).attr('data-uid');
 
@@ -6174,52 +6195,25 @@ sigma.parsers.json(
 
                   var nodesfound = 0;
 
-                  var searchlemmas = [];
+                  var matched1entry = 0;
 
-                  var entry_match = [];
+                  // For each node present in this statement:
+                  for (var item in nodesOfStatement[currentDiv]) {
 
-                  // START Check what entries contain the node clicked
+                    var nmarker = nodesOfStatement[currentDiv][item]; //
 
-                    // SEARCH MOD
-                      /*for (var z = 0; z < sentences_lemmas.length; z++) {
-                          sentences_lemmas[z] = window.jstemmer(sentences_lemmas[z]);
+                    // Is this node in pinnedNodes?
+                    if (pinnedNodes.indexOf(nodeIDs_reversed[nmarker]) > -1) {
+                      nodesfound = nodesfound + 1;
+                      if (nodesfound == pinnedNodes.length) {
+                          matched1entry = 1;
                       }
-      */
-                  // Check how many of the nodes are found in this entry
 
-                  for (var j = 0; j < pinnedNodes.length; j++) {
-
-                        // Is the search term cyrillic?
-                        var search_cyrillic = pinnedNodes[j].match(/[а-яА-Я]/);
-
-                        // SEARCHMOD
-                        // var search_lemma = window.jstemmer(pinnedNodes[j]);
-
-                        var search_lemma = pinnedNodes[j];
-
-                        searchlemmas.push(search_lemma);
-
-                        // Did we find the node in the entry?
-                        if (originaltext.toLowerCase().indexOf(search_lemma.toLowerCase()) > -1) {
-                            nodesfound = nodesfound + 1;
-                            // Did we find all the different nodes in the entry?
-                            if (nodesfound == pinnedNodes.length && entry_match.indexOf(currentDiv) == -1) {
-                              entry_match.push(currentDiv);
-                            }
-                        }
-                        else if (search_cyrillic != null)  {
-                            // TODO what is this logic?
-                            if (originaltext.toLowerCase().indexOf(search_lemma.toLowerCase().slice(0,-1)) > -1) {
-                                nodesfound = nodesfound + 1;
-                                if (nodesfound == pinnedNodes.length && entry_match.indexOf(currentDiv) == -1) {
-                                  entry_match.push(currentDiv);
-                                }
-                            }
-                        }
-                }
+                    }
+                  }
 
                 // All the pinned nodes are not found in the entry
-                if (entry_match.length == 0) {
+                if (matched1entry == 0) {
 
                     // Hide this entry
                     $(this).fadeOut(500);
@@ -6250,10 +6244,10 @@ sigma.parsers.json(
                         var overlapNodes = [];
                         overlapNodes = _.intersection(selectedNNodes, selectedNodes);
 
+                        // TODO we always should have ONLY entries with one intersection and at least one of the pinned
+                        // This breaks when we start navigating in the graph and have 3 pinned items — in this case no neighbors and it breaks
 
-
-                        var nodeIDs_reversed = _.invert(nodeIDs);
-
+                        // Also some problems with deselection
 
                         $(".entry").each(function(){
                             var matchedentry = 0;
@@ -6400,7 +6394,7 @@ sigma.parsers.json(
 
                         htmlNodes = htmlNodes + '<div class="tagsend"></div></ul>';
 
-                      //  notfoundNodes = [];
+                        //  notfoundNodes = [];
 
                         $('#pinnednodeslist').html(htmlNodes);
 
