@@ -3724,6 +3724,11 @@ sigma.parsers.json(
                 toggle_statements();
                 //localStorage.setItem('graph', 1);
             }
+            if (!show_analytics) {
+              $('#analytics').hide();
+              $('#analyticsbutton').removeClass('analytics-on');
+              $('#analyticscaption').show();
+            }
 
         }
 
