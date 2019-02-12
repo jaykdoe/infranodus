@@ -3724,11 +3724,11 @@ sigma.parsers.json(
                 toggle_statements();
                 //localStorage.setItem('graph', 1);
             }
-            if (!show_analytics) {
-              $('#analytics').hide();
-              $('#analyticsbutton').removeClass('analytics-on');
-              $('#analyticscaption').show();
-            }
+
+            $('#analytics').hide();
+            $('#analyticsbutton').removeClass('analytics-on');
+            $('#analyticscaption').show();
+
 
         }
 
@@ -4726,7 +4726,7 @@ sigma.parsers.json(
 
          }
 
-         if ((hide_always || hide_edit) && !show_analytics) {
+         if ((hide_always || hide_edit || hide_when_small) && !show_analytics) {
            $('#analytics').hide();
            $('#analyticsbutton').removeClass('analytics-on');
            $('#analyticscaption').show();
