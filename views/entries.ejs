@@ -597,6 +597,8 @@ var deletedNodes = [];
 
 var selectedNodes = [];
 
+var global_totalnodes = 0;
+
 // These are for Summary / Insight functionality
 
 var most_inf_nodes = [];
@@ -1750,8 +1752,8 @@ sigma.parsers.json(
 
                     }
 
-                    console.log("Pinned nodes: " + pinnedNodes);
-                    console.log("Spliced nodes: " + splicedNodes);
+                    // console.log("Pinned nodes: " + pinnedNodes);
+                    // console.log("Spliced nodes: " + splicedNodes);
                     socket.emit('node click', {pinnedNodes: pinnedNodes, splicedNodes: splicedNodes, nodeLabel: nodeLabel, pinnedIndex: pinnedIndex});
 
 
@@ -4232,7 +4234,7 @@ sigma.parsers.json(
         if ((most_influential == 'bc' || most_influential == 'bc2') && topbc_nodes[0].bc > 0) {
           if (bcmap[n.id] == 0) { bcscore = bcmin } else { bcscore = bcmap[n.id] }
           n.size = Math.round(normalize(bcscore, bcmin, bcmax, 5, 35));
-          n.bc = currentbc;
+          n.bc = bcmap[n.id];
         }
         else {
           n.size = sigma.instances(0).graph.degree(n.id);
@@ -4244,7 +4246,7 @@ sigma.parsers.json(
 
       //sigma.instances(0).refresh();
 
-
+      console.log('Top betweenness centrality nodes:');
       console.log(topbc_nodes);
 
       //console.log(_.first(_.sortBy(bcmap,'degree').reverse(),3);
@@ -4914,6 +4916,8 @@ sigma.parsers.json(
       // console.log(nodessecondcom);
       // console.log(totalnodescount);
 
+      global_totalnodes = totalnodescount;
+
       console.log('Top communities:')
       console.log(topp_communities);
 
@@ -5038,7 +5042,6 @@ sigma.parsers.json(
      $('#graphstats').html(diversitytext);
 
      //sigma.instances(0).refresh;
-
 
 
      //console.log(top_communities);
@@ -6168,8 +6171,6 @@ sigma.parsers.json(
         var visibleentries = visibleentries_original;
 
         var nodeIDs_reversed = _.invert(nodeIDs);
-        console.log('nodeIDs_reversed');
-        console.log(nodeIDs_reversed);
 
         // Hide the sentences that don't contain the terms
 
@@ -6400,8 +6401,14 @@ sigma.parsers.json(
 
         $(".entry").removeHighlight();
 
+
         for (var i=0; i<pinnedNodes.length; i++) {
-            $(".entry").highlight(pinnedNodes[i]);
+            if (pinnedNodes[i].match(/[а-яА-Я]/)) {
+              $(".entry").highlight(window.jstemmer(pinnedNodes[i]));
+            }
+            else {
+              $(".entry").highlight(pinnedNodes[i]);
+            }
 
         }
 
@@ -7170,8 +7177,8 @@ sigma.parsers.json(
 
 
             // Debug: show which nodes are clicked
-            console.log("Pinned nodes clicked:");
-            console.log(pins);
+            // console.log("Pinned nodes clicked:");
+            // console.log(pins);
 
 
             // Are any nodes at all selected on the graph?
@@ -7258,8 +7265,11 @@ sigma.parsers.json(
 
                 toKeep = _.union(toKeep,toKeepPinned);
 
-                console.log("Keeping the nodes:");
-                console.log(toKeep);
+
+                // console.log("Keeping the nodes:");
+                // console.log(toKeep);
+
+                console.log(toKeep.length + ' nodes selected out of ' + global_totalnodes + ' (' + (toKeep.length/global_totalnodes).toFixed(2)*100 + '%)')
 
                 selectedNodes = [];
                 for (var irr in toKeep) {
@@ -7307,6 +7317,10 @@ sigma.parsers.json(
 
                         if (pins.indexOf(pinSearch) > -1) {
                                 n.color = '#0089e0';
+
+                                if (n.originalLabel == toKeepPinned[toKeepPinned.length-1].label) {
+                                    console.log('The node "' + n.originalLabel + '" has ' + n.size + ' edges (degree), betweenness centrality: ' + n.bc + ', belongs to ' + n.community + ' community.');
+                                }
 
                             }
                             else {
