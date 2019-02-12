@@ -3719,7 +3719,8 @@ sigma.parsers.json(
 
         // Did we receive a global setting to hide when small only?
 
-        if (hide_when_small) {
+        if (hide_when_small && $(window).width() < 600) {
+
             if ($('#menuLink').is(':visible')) {
                 toggle_statements();
                 //localStorage.setItem('graph', 1);
