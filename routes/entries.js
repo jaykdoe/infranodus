@@ -190,6 +190,8 @@ exports.submit = function(req, res, next){
 
     var neo4jtimes = 0;
 
+    var entryName = '';
+
 
 
 
@@ -264,6 +266,7 @@ exports.submit = function(req, res, next){
                               statementName += '@' + mentions[i] + ' ';
                             }
                             prepStatements.push({'text':goodStatements[s],'concepts':hashtags,'mentions':mentions,'timestamp':newtimestamp,'name':statementName,'uid':st_uid});
+                            entryName = statementName;
                         }
                     }
                     else {
@@ -405,7 +408,7 @@ exports.submit = function(req, res, next){
                                       // Change the result we obtained into a nice json we need
                                       // TODO eventually could be several statements sent this way so no need to reload the graph
                                       neo4jdriver.close();
-                                      res.send({entryuid: jsonfirstanswer, entrytext: splitStatements[0], graph: graph});
+                                      res.send({entryuid: jsonfirstanswer, entryname: entryName, entrytext: splitStatements[0], graph: graph});
 
                                   });
 

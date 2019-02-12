@@ -1934,7 +1934,7 @@ sigma.parsers.json(
 
                 var posted_by = msg.postedby;
 
-                var added_entry =  "<div class='entry' style='display: none;' data-uid='" + msg.entryuid + "'><p class='entry-text'>" + msg.entrytext + "</p><p class='entry-date'>by " + posted_by + " at " + moment().format('hh:mm:ss') + "</p><div class='separator'>&nbsp;</div><div id='" + msg.entryuid + "' class='hidden'></div></div>";
+                var added_entry =  "<div class='entry' style='display: none;' data-uid='" + msg.entryuid + "' data-hashtags='" + msg.entryname + "'><p class='entry-text'>" + msg.entrytext + "</p><p class='entry-date'>by " + posted_by + " at " + moment().format('hh:mm:ss') + "</p><div class='separator'>&nbsp;</div><div id='" + msg.entryuid + "' class='hidden'></div></div>";
 
                 // if the message is not self-posted and also if the poster of the message is not the same as the guy logged in (in case there's two logins simultaneously)
                 if (!selfPosted && perceivedby != posted_by) {
@@ -6182,9 +6182,6 @@ sigma.parsers.json(
              }
 
              else {
-
-              console.log('nodesofstatement');
-              console.log(nodesOfStatement);
 
                $(".entry").each(function(){
 
