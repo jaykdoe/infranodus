@@ -395,7 +395,7 @@ a:hover.app-more-link {
     background-color: rgba(255, 255, 255, 0);
     max-width: 340px;
     padding-left: 50px;
-    z-index: 1;
+    z-index: 5;
 /*    pointer-events: none;*/
 }
 
@@ -439,6 +439,7 @@ a:hover.app-more-link {
     padding-bottom: 20px;
     padding-left: 10px;
     margin-left: -10px;
+    z-index: 2!important;
 
 }
 
@@ -551,6 +552,95 @@ button {
   -webkit-box-shadow: 0 3px 15px rgba(0,0,0,.16);
 
 
+}
+
+#biasindex {
+  position: fixed;
+  bottom: 39px;
+  width: 170px;
+  height: 15px;
+  right: 180px; /* "#menu width" */
+  font-size: 14px; /* change this value to increase/decrease button size */
+  /* width: 2em;
+   height: auto;*/
+  z-index: 1!important;
+  display: flex;
+
+}
+
+.slidercaption {
+  top: 1px;
+  position: relative;
+  width: 75px;
+
+  color: #666666;
+  font-size: 13px;
+}
+
+.slidercontainer {
+  position: relative;
+
+  width: 95px;
+  float: left;
+}
+
+.slider {
+  position: relative;
+
+  -webkit-appearance: none;
+  width: 95px;
+  height: 20px;
+  background: #d3d3d3;
+  outline: none;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+
+}
+
+.slider:hover {
+  opacity: 1;
+}
+
+.slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: #999999;
+  cursor: pointer;
+}
+
+.slider::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: #4CAF50;
+  cursor: pointer;
+}
+
+.biasedslider::-webkit-slider-thumb {
+    background-color: #FF2300;
+}
+.biasedslider::-moz-range-thumb {
+    background-color: #FF2300;
+}
+.focusedslider::-webkit-slider-thumb {
+    background-color: #FFF633;
+}
+.focusedslider::-moz-range-thumb {
+    background-color: #FFF633;
+}
+.diversedslider::-webkit-slider-thumb {
+    background-color: #8DFF00;
+}
+.diversedslider::-moz-range-thumb {
+    background-color: #8DFF00;
+}
+.dispersedslider::-webkit-slider-thumb {
+    background-color: #24FF66;
+}
+.dispersedslider::-moz-range-thumb {
+    background-color: #24FF66;
 }
 
 .analyticsbutton-dark {

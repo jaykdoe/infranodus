@@ -120,6 +120,8 @@
 
              </div>
 
+
+
              <div id="entryform" class="editorpane">
 
 
@@ -282,6 +284,11 @@
 
         <div id="graph-container"></div>
 
+        <div id="biasindex" class="tooltip" title="discourse structure: dispersed > diverse > focused > biased (interconnected)"><div class="slidercaption">&nbsp;bias level: </div>
+        <div class="slidercontainer">
+        <input type="range" min="1" max="100" value="50" class="slider" disabled id="biasRange">
+        </div></div>
+
         <div id="messages">
         <% if (!perceivername) { %>
           <a href="javascript:" id="addnode" class="tooltip editorpane" title="add a node in the graph"></a>
@@ -315,10 +322,16 @@
                     <span></span>
                 </a>
             <% } %>
+
             <a href="javascript:" class="tooltip editorpane" title="graph analytics" id="analyticsbutton"><div id="analyticscaption"></div></a>
       </div>
 
+
+
+
+
     </div>
+
 
 
 
@@ -2386,6 +2399,9 @@ sigma.parsers.json(
     // This launches only when all other stuff from above have loaded
     $(document).ready(function(){
 
+
+
+
       // Get the context names - all the contexts that exist in the graph we just loaded
       // This IF statement is for the case when the contextlist parameter is not passed on
       <% if (contextlist.length > 0) { %>
@@ -2953,6 +2969,12 @@ sigma.parsers.json(
                  content: "We use our own measure of <a href='https://noduslabs.com/research/visualization-text-polysingularity-network-analysis/' target='_blank'>discourse polysingularity</a> (Paranyushkin 2012, 2018) to score the discourse visualized based on the structure of the graph. <br><b>'Sparse'</b> — indicates a fragmented discourse (e.g. poetry, the beginning of a research, etc.) <br><b>'Diversified'</b> — indicates a discourse with a high level of plurality.<br><b>'Focused'</b> — prioritizes one or two topics. <br><b>'Biased'</b> — an agenda or mobilizing action present (e.g. advertising, ideology, manifesto)."
                },
                {
+                 element: "#biasindex",
+                 placement: "top",
+                 title: "Bias Level",
+                 content: "This measures the level of bias in graph: if it consists of disjointed islands it's 'dispersed'; if those islands are interconnected, there are several topics within, it's 'diversified'; if most of the nodes are in one topic it's 'focused', if it's tightly interconnected and there are no distinct topical clusters, it's 'biased'. Read more about the methology in our <a href='https://noduslabs.com/research/visualization-text-polysingularity-network-analysis/' target='_blank'>Identifying the Discourse Bias</a> (Paranyushkin 2018) article in Towards Data Science."
+               },
+               {
                  element: "#graph-container",
                  placement: "bottom",
                  title: "Discover New Ideas",
@@ -3194,6 +3216,12 @@ sigma.parsers.json(
                  content: "We use our own measure of <a href='https://noduslabs.com/research/visualization-text-polysingularity-network-analysis/' target='_blank'>discourse polysingularity</a> (Paranyushkin 2012, 2018) to score the discourse visualized based on the structure of the graph. <br><b>'Sparse'</b> — indicates a fragmented discourse (e.g. poetry, the beginning of a research, etc.) <br><b>'Diversified'</b> — indicates a discourse with a high level of plurality.<br><b>'Focused'</b> — prioritizes one or two topics. <br><b>'Biased'</b> — an agenda or mobilizing action present (e.g. advertising, ideology, manifesto)."
                },
                {
+                 element: "#biasindex",
+                 placement: "top",
+                 title: "Bias Level",
+                 content: "This measures the level of bias in graph: if it consists of disjointed islands it's 'dispersed'; if those islands are interconnected, there are several topics within, it's 'diversified'; if most of the nodes are in one topic it's 'focused', if it's tightly interconnected and there are no distinct topical clusters, it's 'biased'. Read more about the methology in our <a href='https://noduslabs.com/research/visualization-text-polysingularity-network-analysis/' target='_blank'>Identifying the Discourse Bias</a> (Paranyushkin 2018) article in Towards Data Science."
+               },
+               {
                  element: "#menuLink",
                  title: "Context Menu",
                  content: "You will be able to later find your text here.",
@@ -3311,6 +3339,12 @@ sigma.parsers.json(
                  placement: "top",
                  title: "Graph Stats",
                  content: "We use our own measure of <a href='https://noduslabs.com/research/visualization-text-polysingularity-network-analysis/' target='_blank'>discourse polysingularity</a> (Paranyushkin 2012, 2018) to score the discourse visualized based on the structure of the graph. <br><b>'Sparse'</b> — indicates a fragmented discourse (e.g. poetry, the beginning of a research, etc.) <br><b>'Diversified'</b> — indicates a discourse with a high level of plurality.<br><b>'Focused'</b> — prioritizes one or two topics. <br><b>'Biased'</b> — an agenda or mobilizing action present (e.g. advertising, ideology, manifesto)."
+               },
+               {
+                 element: "#biasindex",
+                 placement: "top",
+                 title: "Bias Level",
+                 content: "This measures the level of bias in graph: if it consists of disjointed islands it's 'dispersed'; if those islands are interconnected, there are several topics within, it's 'diversified'; if most of the nodes are in one topic it's 'focused', if it's tightly interconnected and there are no distinct topical clusters, it's 'biased'. Read more about the methology in our <a href='https://noduslabs.com/research/visualization-text-polysingularity-network-analysis/' target='_blank'>Identifying the Discourse Bias</a> (Paranyushkin 2018) article in Towards Data Science."
                },
                {
                element: "#graph-container",
@@ -4996,15 +5030,24 @@ sigma.parsers.json(
 
      if ((modularity_score > 0.65 && diversityindex < 50) && ((bc_entropy >= 1.5) || (bc_entropy == 0 && toppbc_nodes[0].bc == 0) || (bc_entropy == 0 && num_nodes_component < 40))) {
         diversity_score = 'Dispersed';
+        document.getElementById("biasRange").value = "1";
+        $('#biasRange').addClass('dispersedslider');
      }
      else if ((modularity_score > 0.4 && diversityindex < 50) && ((bc_entropy >= 1.5) || (bc_entropy == 0 && toppbc_nodes[0].bc == 0) || (bc_entropy == 0 && num_nodes_component < 40))) {
         diversity_score = 'Diversified';
+        document.getElementById("biasRange").value = "33";
+        $('#biasRange').addClass('diversedslider');
+
      }
      else if ((modularity_score < 0.4 && modularity_score > 0.2 && bc_entropy >= 0.5) || ((modularity_score > 0.4 && diversityindex >= 50)  && bc_entropy >= 0.5) || (modularity_score > 0.4 && diversityindex < 50 && bc_entropy > 0.5)) {
         diversity_score = 'Focused';
+        document.getElementById("biasRange").value = "67";
+        $('#biasRange').addClass('focusedslider');
      }
      else {
         diversity_score = 'Biased';
+        document.getElementById("biasRange").value = "100";
+        $('#biasRange').addClass('biasedslider');
      }
      // Set global parameter
      polysingularity_score = diversity_score;
