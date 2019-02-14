@@ -1461,12 +1461,12 @@ exports.submit = function(req, res,  next) {
 
               var filedata = [];
 
-              var parsedata = [];
+              var parsedata = {};
 
               // Are we dealing with a CSV file? Parse it as JSON
               if (filetype == 'text/csv') {
-                      var delimiter
-                      if (req.body.delimiter.length == 1) {
+                      var delimiter;
+                      if (req.body.delimiter && req.body.delimiter.length == 1) {
                         delimiter = req.body.delimiter;
                       }
                       else {
@@ -1548,8 +1548,10 @@ exports.submit = function(req, res,  next) {
                                         if (!parsedata[proccon]) {
                                             parsedata[proccon] = [];
                                         }
+                                        parsedata[proccon].push(statements);
                                     }
-                                    parsedata[proccon].push(statements);
+                                  
+
                                   }
 
                             }
@@ -1570,9 +1572,11 @@ exports.submit = function(req, res,  next) {
 
                         }
 
+
                         // console.log(parsedata);
 
                         processFile(titlefield, processfield, filecontents, parsedata, filetype);
+
 
                       })
               }
@@ -1629,7 +1633,9 @@ exports.submit = function(req, res,  next) {
                         var addToContexts = [];
 
                         for (var key in parsedata) {
-                          addToContexts.push(key);
+
+                            addToContexts.push(key);
+
                         }
 
                         validate.getContextID(user_id, addToContexts, function(result, err) {
@@ -1671,6 +1677,8 @@ exports.submit = function(req, res,  next) {
                     }
                   ],
                    function (err, contexts) {
+
+                    var something_added = 0;
 
                     if (err) {
 
@@ -1743,10 +1751,13 @@ exports.submit = function(req, res,  next) {
                         else if (filetype == 'text/plain' || filetype == 'application/pdf') {
 
 
+
                             if (filetype == 'application/pdf') {
 
                                   //PDF processing special case
                                   var PDFtextfull = '';
+
+                                  something_added += 1;
 
                                   // Parse PDF
                                   new pdfreader.PdfReader().parseBuffer(filecontents, function(err, item){
@@ -1754,23 +1765,40 @@ exports.submit = function(req, res,  next) {
                                       callback(err);
                                     else if (!item) {
 
-                                      saveFileAtOnce(PDFtextfull, contexts);
+                                      if (PDFtextfull.length > 0) {
 
-                                      callback();
+                                        saveFileAtOnce(PDFtextfull, contexts);
+                                        callback();
+
+                                      }
+                                      else {
+                                        res.error('Sorry, we could not extract text from this file. Try another convertor and then simply copy/paste it into InfraNodus.');
+                                        res.redirect('back');
+                                      }
 
                                       }
                                     else if (item.text) {
                                       PDFtextfull += item.text + ' \r\n';
 
                                       }
+
                                   });
 
                             }
 
                             // Standard text file
                             else {
+                              if (filecontents.length > 0) {
 
                                   saveFileAtOnce(filecontents, contexts);
+                                  something_added += 1;
+                              }
+                              else {
+
+                                  res.error('Sorry, we could not extract any text from this file. Try to simply copy/paste it into InfraNodus.');
+                                  res.redirect('back');
+
+                              }
 
                             }
 
@@ -1781,37 +1809,57 @@ exports.submit = function(req, res,  next) {
 
 
 
+
                           for (var graph in parsedata) {
 
-                             var addingstatements = '';
+                            if (parsedata[graph].length > 0) {
 
-                             // Check the corresponding context ID for the book name
-                             var addingcontexts = [];
+                               var addingstatements = '';
 
-                             for (var j = 0; j < contexts.length; j++) {
-                                      if (contexts[j].name == graph) {
-                                           addingcontexts.push(contexts[j]);
-                                      }
+                               // Check the corresponding context ID for the book name
+                               var addingcontexts = [];
+
+                               for (var j = 0; j < contexts.length; j++) {
+                                        if (contexts[j].name == graph) {
+                                             addingcontexts.push(contexts[j]);
+                                        }
+                               }
+
+                               // Put together all statements from that context into one graph
+                               for (var st in parsedata[graph]) {
+                                 if (parsedata[graph][st].length > 0) {
+                                   addingstatements += parsedata[graph][st] + '\n\n';
+                                 }
+                               }
+
+                               if (addingstatements.length > 0) {
+                                 saveFileAtOnce(addingstatements, addingcontexts);
+                                 something_added += 1;
+                               }
+
+
+
+
                              }
 
-                             // Put together all statements from that context into one graph
-                             for (var st in parsedata[graph]) {
-                               addingstatements += parsedata[graph][st] + '\n\n';
-                             }
 
-                             saveFileAtOnce(addingstatements, addingcontexts);
-
+                          }
+                          if (something_added == 0) {
+                            res.error('Sorry, we could not extract data from this file. Try to choose another delimiter or select a specific column.');
+                            res.redirect('back');
                           }
 
                         }
 
-                        // Move on to the next one
-                        res.error('Importing the content... Please, reload this page in 30 seconds...');
+                        if (something_added > 0) {
+                          // Move on to the next one
+                          res.error('Importing the content... Please, reload this page in 30 seconds...');
 
-                        if (requestedContext.length > 0) {
-                            res.redirect(res.locals.user.name + '/' + requestedContext + '/edit');
-                        } else {
-                            res.redirect(res.locals.user.name + '/edit');
+                          if (requestedContext.length > 0) {
+                              res.redirect(res.locals.user.name + '/' + requestedContext + '/edit');
+                          } else {
+                              res.redirect(res.locals.user.name + '/edit');
+                          }
                         }
 
                     }

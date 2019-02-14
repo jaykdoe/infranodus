@@ -229,7 +229,7 @@ exports.submit = function(req, res, next){
             }
         },
         function(goodStatements, callback){
-
+            
             var error;
 
             for (var s = 0; s < goodStatements.length; s++) {
