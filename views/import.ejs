@@ -332,16 +332,16 @@
                     filebox.hide();
 
                 }
-                else if( $(this).val() === "file" ) { // this time, we do need to check the value
-                    filebox.show();
-                    $("#searchtermbox").hide();
-                    $("#limitgkg").hide();
-                    $("#extracttwitter").hide();
-                    $("#importsettings").hide();
-                    $("#googlesearch").hide();
-                      $("#emailbox").hide();
-
-                }
+                // else if( $(this).val() === "file" ) { // this time, we do need to check the value
+                //     filebox.show();
+                //     $("#searchtermbox").hide();
+                //     $("#limitgkg").hide();
+                //     $("#extracttwitter").hide();
+                //     $("#importsettings").hide();
+                //     $("#googlesearch").hide();
+                //       $("#emailbox").hide();
+                //
+                // }
                 else if ($(this).val() === "evernote") {
                     window.location.href = "/evernote_oauth";
                     $("#limitgkg").hide();
@@ -362,6 +362,13 @@
                     addparams = '?context=<%= context %>';
                   <% } %>
                     window.location.href = "/importrss" + addparams;
+                }
+                else if ($(this).val() == "file") {
+                  var addparams = '';
+                  <% if (context) { %>
+                    addparams = '?context=<%= context %>';
+                  <% } %>
+                    window.location.href = "/import/files" + addparams;
                 }
                 else if ($(this).val() === "url") {
                   var addparams = '';
