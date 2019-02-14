@@ -208,28 +208,42 @@ exports.submit = function(req, res, next){
 
             }
             else {
-                for (var k=0; k < splitStatements.length;k++) {
-                  if (!splitStatements[k] && currenttextlength == 0) {
-                      callback('Please, enter a statement');
-                  }
-                  else if (splitStatements[k].length <= min_length && currenttextlength <= min_length) {
-                      callback('A statement must have more than ' + min_length + ' characters');
-                  }
-                  else if (splitStatements[k].length > max_length) {
-                      callback('Try to make it less than ' + max_length + ' characters, please...');
-                  }
-                  else {
-                      splitStatements[k] = validate.sanitize(splitStatements[k]);
-                      goodStatements.push(splitStatements[k]);
+                if (splitStatements.length > 0) {
+
+
+                  for (var k=0; k < splitStatements.length;k++) {
+
+                    if (!splitStatements[k] && currenttextlength == 0) {
+                        callback('Please, enter a statement');
+                    }
+                    else if (splitStatements[k].length <= min_length && currenttextlength <= min_length) {
+                        callback('A statement must have more than ' + min_length + ' characters');
+                    }
+                    else if (splitStatements[k].length > max_length) {
+                        callback('Try to make it less than ' + max_length + ' characters, please...');
+                    }
+                    else {
+                        splitStatements[k] = validate.sanitize(splitStatements[k]);
+                        goodStatements.push(splitStatements[k]);
+                    }
+
                   }
 
+                  if (goodStatements.length > 0) {
+                    callback(null, goodStatements);
+                  }
+
+
+
                 }
-                callback(null, goodStatements);
+                else {
+                  callback('Please, enter a longer text to visualize it as a graph...');
+                }
 
             }
         },
         function(goodStatements, callback){
-            
+
             var error;
 
             for (var s = 0; s < goodStatements.length; s++) {
@@ -281,6 +295,7 @@ exports.submit = function(req, res, next){
           // Successfully executed the above?
 
           if (prepStatements.length > 0) {
+
             callback(null, prepStatements);
           }
           else {
