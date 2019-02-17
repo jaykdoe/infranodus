@@ -32,7 +32,7 @@ exports.settings = {
     max_total_text_length: 300000,
 
     // Min length of a statement text
-    min_text_length: 2,
+    min_text_length: 0,
 
     // Max number of tags in one statement
     max_hashtags: 1000,
@@ -159,6 +159,28 @@ fs.readFile( __dirname + '/public/files/stopwords_es_es.txt', function (err, dat
     }
 
     exports.stopwords_es = data.toString().split("\n");
+
+});
+
+// Get a list of stopwords for Swedish
+
+fs.readFile( __dirname + '/public/files/stopwords_sv_sv.txt', function (err, data) {
+    if (err) {
+        throw err;
+    }
+
+    exports.stopwords_sv = data.toString().split("\n");
+
+});
+
+// Get a list of stopwords for Portugese
+
+fs.readFile( __dirname + '/public/files/stopwords_pt_pt.txt', function (err, data) {
+    if (err) {
+        throw err;
+    }
+
+    exports.stopwords_pt = data.toString().split("\n");
 
 });
 

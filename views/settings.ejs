@@ -38,39 +38,48 @@
                     <legend>settings for user <i><%= user.name %></i></legend>
                     <br>
 
-                    Text input language
+                    Text input language and lemmatization<br>
                     <label for="inlanguage" class="pure-input">
+                      We will convert your words to lemmas (taken &#8594; take) based on the dictionary below:
                       <select id="inlanguage" name="inlanguage">
                       <option value="auto" <% if (user.inlanguage=='auto' || user.inlanguage == undefined) { %> selected <% } %>>Auto-Detect</option>
+                      <option value="zz" <% if (user.inlanguage=='zz') { %> selected <% } %>>Do not detect</option>
+                      <option disabled>-- Recommended: --</option>
                       <option value="en" <% if (user.inlanguage=='en') { %> selected <% } %>>English</option>
                       <option value="ru" <% if (user.inlanguage=='ru') { %> selected <% } %>>Russian</option>
                       <option value="fr" <% if (user.inlanguage=='fr') { %> selected <% } %>>French</option>
                       <option value="de" <% if (user.inlanguage=='de') { %> selected <% } %>>German</option>
+                      <option disabled>-- For researchers only: --</option>
+                      <option value="ep" <% if (user.inlanguage=='ep') { %> selected <% } %>>English (Porter Stemmer)</option>
+                      <option value="pp" <% if (user.inlanguage=='pp') { %> selected <% } %>>Portugese (Porter Stemmer)</option>
+                      <option value="sp" <% if (user.inlanguage=='sp') { %> selected <% } %>>Spanish (Porter Stemmer)</option>
+                      <option value="vp" <% if (user.inlanguage=='vp') { %> selected <% } %>>Swedish (Porter Stemmer)</option>
                       </select>
+
                     </label>
                     <br>
 
                     Words connect into graph, when they are
                     <label for="wordscan-edit-1" class="pure-radio">
                         <input id="wordscan-edit-1" type="radio" name="fullscan" value="0" <% if (user.fullscan=='0') { %> checked <% } %>>
-                        next to each other
+                        next to each other (bigrams)
                     </label>
 
                     <label for="wordscan-edit-2" class="pure-radio">
                         <input id="wordscan-edit-2" type="radio" name="fullscan" value="1" <% if (user.fullscan=='1') { %> checked <% } %>>
-                        near each other
+                        near each other (4-grams)
                     </label>
                     <br>
 
                     Graph view shows only
                     <label for="wordscan-view1" class="pure-radio">
                         <input id="wordscan-view1" type="radio" name="fullview" value="0" <% if (user.fullview=='0') { %> checked <% } %>>
-                        "next to" connections
+                        "next to" connections (bigrams)
                     </label>
 
                     <label for="wordscan-view2" class="pure-radio">
                         <input id="wordscan-view2" type="radio" name="fullview" value="1" <% if (user.fullview=='1') { %> checked <% } %>>
-                        "near" connections
+                        "near" connections (4-grams + bigrams)
                     </label>
                     <br>
 
@@ -154,7 +163,7 @@
 
                     <label for="morphemes2" class="pure-radio">
                         <input id="morphemes2" type="radio" name="morphemes" value="1" <% if (user.morphemes=='1') { %> checked <% } %>>
-                        be lemmatized (#bits -> #bit)
+                        be lemmatized (#bits &#8594; #bit)
                     </label>
                     <br>
 
