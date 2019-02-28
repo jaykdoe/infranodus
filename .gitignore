@@ -3,3 +3,8 @@
 config.json
 views/statsabove.ejs
 views/statsbelow.ejs
+
+# NPM
+node_modules
+npm-debug.log*
+
