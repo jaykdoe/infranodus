@@ -13,80 +13,86 @@
  *
  */
 
-
-exports.notfound = function(req, res){
+exports.notfound = function(req, res) {
     res.status(404).format({
-        html: function(){
-            res.render('404');
+        html: function() {
+            res.render('404')
         },
-        json: function(){
-            res.send({ message: 'We did not find what you were looking for :(' });
+        json: function() {
+            res.send({
+                message: 'We did not find what you were looking for :(',
+            })
         },
         xml: function() {
-            res.write('<error>\n');
-            res.write(' <message>We did not find what you were looking for :(</message>\n');
-            res.end('</error>\n');
+            res.write('<error>\n')
+            res.write(
+                ' <message>We did not find what you were looking for :(</message>\n'
+            )
+            res.end('</error>\n')
         },
-        text: function(){
-            res.send('We did not find what you were looking for :(\n');
-        }
-    });
-};
+        text: function() {
+            res.send('We did not find what you were looking for :(\n')
+        },
+    })
+}
 
-
-
-exports.error = function(err, req, res, next){
-    console.error(err.stack);
-    var msg;
+exports.error = function(err, req, res, next) {
+    console.error(err.stack)
+    var msg
 
     switch (err.type) {
         case 'database':
-            msg = 'Server Unavailable';
-            res.statusCode = 503;
-            break;
+            msg = 'Server Unavailable'
+            res.statusCode = 503
+            break
 
         case 'neo4j':
-            msg = 'Error in Neo4J Query';
-            res.statusCode = 400;
-            break;
+            msg = 'Error in Neo4J Query'
+            res.statusCode = 400
+            break
 
         default:
-            msg = 'Internal Server Error';
-            res.statusCode = 500;
+            msg = 'Internal Server Error'
+            res.statusCode = 500
     }
 
     res.format({
-        html: function(){
-            res.render('5xx', { msg: msg, status: res.statusCode });
+        html: function() {
+            res.render('5xx', { msg: msg, status: res.statusCode })
         },
 
-        json: function(){
-            res.send({ error: msg });
+        json: function() {
+            res.send({ error: msg })
         },
 
-        text: function(){
-            res.send(msg + '\n');
-        }
-    });
-};
+        text: function() {
+            res.send(msg + '\n')
+        },
+    })
+}
 
-
-exports.badrequest = function(req, res){
+exports.badrequest = function(req, res) {
     res.status(400).format({
-        html: function(){
-            res.render('400');
+        html: function() {
+            res.render('400')
         },
-        json: function(){
-            res.send({ message: 'Bad request, probably our database did not understand what you asked for...' });
+        json: function() {
+            res.send({
+                message:
+                    'Bad request, probably our database did not understand what you asked for...',
+            })
         },
         xml: function() {
-            res.write('<error>\n');
-            res.write(' <message>Bad request, probably our database did not understand what you asked for:(</message>\n');
-            res.end('</error>\n');
+            res.write('<error>\n')
+            res.write(
+                ' <message>Bad request, probably our database did not understand what you asked for:(</message>\n'
+            )
+            res.end('</error>\n')
         },
-        text: function(){
-            res.send('Bad request, probably our database did not understand what you asked for:(\n');
-        }
-    });
-};
-
+        text: function() {
+            res.send(
+                'Bad request, probably our database did not understand what you asked for:(\n'
+            )
+        },
+    })
+}
