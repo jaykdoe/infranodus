@@ -1,0 +1,19 @@
+{
+  "tabWidth": 4,
+  "semi": false,
+  "singleQuote": true,
+  "trailingComma": "es5",
+  "printWidth": 80,
+  "useTabs": false,
+  "parser": "babylon",
+  "overrides": [
+    {
+      "files": "package.json",
+      "options": {
+        "parser": "json",
+        "tabWidth": 2,
+        "printWidth": 1000
+      }
+    }
+  ]
+}
