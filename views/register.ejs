@@ -342,12 +342,19 @@
                                // and then call our retrieve hosted page api to get subscription details
                                $.post('/signup', $("#registration_form").serialize() + '&hostedPage=' + hostedPageId)
                                        .done(function(res) {
+
                                          if(window.parent.ga) {
                                               ga('send', {
                                                   hitType: 'event',
                                                   eventCategory: 'InfraNodus',
                                                   eventAction: 'Subscribed'
                                               });
+                                          }
+                                          if (res.moveon) {
+                                            if (payPage) {
+                                              payPage.close();
+                                            }
+                                            window.location.href = res.moveon;
                                           }
                                        })
                                        .fail(function(res) {
@@ -356,17 +363,17 @@
                                        });
                             },
                             step: function(value) {
-                              if (value == 'thankyou_screen') {
-
-                                if (payPage) {
-                                  payPage.close();
-                                }
-                                window.location.href = '/login?login=' + $('#username').val();
-
-                              }
+                              // if (value == 'thankyou_screen') {
+                              //
+                              //   if (payPage) {
+                              //     payPage.close();
+                              //   }
+                              //   window.location.href = '/login?login=' + $('#username').val();
+                              //
+                              // }
                               // value -> which step in checkout
                           //    $('#errors').html(value);
-                            //  console.log(value);
+                              console.log(value);
                               if(window.parent.ga) {
                                    ga('send', {
                                        hitType: 'event',

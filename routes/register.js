@@ -276,7 +276,7 @@ exports.submit = function(req, res, next){
              console.log(response.content.subscription.status);
              if (response.content.subscription.status == 'in_trial' || response.content.subscription.status == 'active') {
                create_user();
-
+               res.send({moveon: '/login?login=' + data.username});
              }
              else {
                res.send({errormsg:"Your subscription is not active, you have to renew it or create a new one."});
