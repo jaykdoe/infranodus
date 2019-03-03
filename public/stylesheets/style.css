@@ -569,10 +569,10 @@ button {
 }
 
 .slidercaption {
-  top: 1px;
+  top: -7px;
   position: relative;
   width: 75px;
-
+  line-height: 15px;
   color: #666666;
   font-size: 13px;
 }

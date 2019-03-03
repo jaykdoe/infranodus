@@ -284,7 +284,7 @@
 
         <div id="graph-container"></div>
 
-        <div id="biasindex" class="tooltip" title="discourse structure: dispersed > diverse > focused > biased (interconnected)"><div class="slidercaption">&nbsp;bias level: </div>
+        <div id="biasindex" class="tooltip" title="shows how diversified the discourse network structure is: biased > focused > diverse > dispersed"><div class="slidercaption">network diversity level: </div>
         <div class="slidercontainer">
         <input type="range" min="1" max="100" value="50" class="slider" disabled id="biasRange">
         </div></div>
@@ -5030,22 +5030,22 @@ sigma.parsers.json(
 
      if ((modularity_score > 0.65 && diversityindex < 50) && ((bc_entropy >= 1.5) || (bc_entropy == 0 && toppbc_nodes[0].bc == 0) || (bc_entropy == 0 && num_nodes_component < 40))) {
         diversity_score = 'Dispersed';
-        document.getElementById("biasRange").value = "1";
+        document.getElementById("biasRange").value = "100";
         $('#biasRange').attr('class', 'slider dispersedslider');
      }
      else if ((modularity_score > 0.4 && diversityindex < 50) && ((bc_entropy >= 1.5) || (bc_entropy == 0 && toppbc_nodes[0].bc == 0) || (bc_entropy == 0 && num_nodes_component < 40))) {
         diversity_score = 'Diversified';
-        document.getElementById("biasRange").value = "33";
+        document.getElementById("biasRange").value = "67";
         $('#biasRange').attr('class', 'slider diversedslider');
      }
      else if ((modularity_score < 0.4 && modularity_score > 0.2 && bc_entropy >= 0.5) || ((modularity_score > 0.4 && diversityindex >= 50)  && bc_entropy >= 0.5) || (modularity_score > 0.4 && diversityindex < 50 && bc_entropy > 0.5)) {
         diversity_score = 'Focused';
-        document.getElementById("biasRange").value = "67";
+        document.getElementById("biasRange").value = "33";
         $('#biasRange').attr('class', 'slider focusedslider');
      }
      else {
         diversity_score = 'Biased';
-        document.getElementById("biasRange").value = "100";
+        document.getElementById("biasRange").value = "1";
         $('#biasRange').attr('class', 'slider biasedslider');
      }
      // Set global parameter
