@@ -8,6 +8,7 @@
   },
   "scripts": {
     "start": "node app.js",
+    "start:watch": "nodemon app.js",
     "prettier:cfg": "prettier --write",
     "prettier": "npm run prettier:cfg '{.,{routes,lib}/**}/*.{js, json}' '!./package.json'"
   },
@@ -50,6 +51,7 @@
     "youtube-dl": "^1.12.2"
   },
   "devDependencies": {
+    "nodemon": "^1.18.10",
     "prettier": "1.14.3"
   }
 }
