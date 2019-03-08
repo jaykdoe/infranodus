@@ -1,36 +1,6 @@
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimal-ui">
-    <title><%= title %></title>
-    <script src="/javascripts/jquery.min.js"></script>
-    <link rel='stylesheet' href='/stylesheets/jquery.textcomplete.css' />
-    <link rel="stylesheet" href="/stylesheets/jquery-ui.min.css">
-    <link rel='stylesheet' href='/stylesheets/style.css' />
-    <link rel="stylesheet" href="/stylesheets/side-menu.css">
-    <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
-    <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
-    <link rel='stylesheet' href='/stylesheets/jquery.taghandler.css' />
-    <link rel='stylesheet' href='/stylesheets/jquery.content-panel-switcher.css' />
-    <script src="/javascripts/jquery.content-panel-switcher.js"></script>
-    <link rel="stylesheet" type="text/css" href="/stylesheets/tooltipster.css" />
-    <link rel="stylesheet" type="text/css" href="/stylesheets/tooltipster-noir.css" />
-    <% if (speech) { %>
-    <script src="/javascripts/talkify.min.js"></script>
-    <%  } %>
-    <% if (locals.user) { %>
-        <% if (locals.user.midi != undefined && locals.user.midi != 'off') { %>
-    <script src="/javascripts/webmidi.min.js"></script>
-          <%  } %>
-    <%  } %>
-    <link rel="stylesheet" href="/stylesheets/bootstrap-tour-standalone.min.css" />
-    <script src="/javascripts/bootstrap-tour-standalone.min.js"></script>
-
-
-
-
-</head>
+<%- include('components/entries/header') %>
 <body>
 <% include statsabove %>
 <div id="layout">
@@ -54,233 +24,23 @@
             &nbsp;<br><br>
 
         <% } else { %>
-            <% include menu %>
+            <%- include('components/common/menu', {contextlist:contextlist}); %>
 
         <% } %>
         </div>
    </div>
      <div id='content'>
 
-             <a href="javascript:" class="tooltip" title="hide the text pane" id="statements-link">
+             <!-- <a href="javascript:" class="tooltip" title="hide the text pane" id="statements-link">
                  <span></span>
-             </a>
+             </a> -->
+            <% menuTooltips.forEach(function(tooltip) { %>
+                <%- include('components/common/tooltip', {title: tooltip.title, id:tooltip.id}); %>
+            <% }) %>
 
-             <a href="javascript:" class="tooltip" title="dynamic graph" id="timer-link">
-                 <span></span>
-             </a>
+            <%- include('components/entries/StatementSidePanel/index',
+                {entries, perceivername, addcontext, user, context, contextpublic, url, urltitle}); %>
 
-             <a href="javascript:" class="tooltip" title="play dynamic graph" id="watch-link">
-                 <span></span>
-             </a>
-
-
-             <div id='statements'>
-
-
-               <div id='topnav'>
-                 <div class='pure-menu pure-menu-open pure-menu-horizontal'>
-                   <ul id='topnav_items'>
-                        <li id="summary">
-                             <a>Essence</a>
-                        </li>
-                       <li  id="overview" class="pure-menu-selected-top">
-                           <a>Overview</a>
-                       </li>
-                       <li id="insight">
-                            <a>Insight</a>
-                       </li>
-
-
-
-                  </ul>
-
-                </div>
-
-
-                </div>
-
-
-                 <div id="entries">
-
-                     <div id="explanation"></div>
-
-                     <% entries.forEach(function(entry) { %>
-                     <div class='entry' data-uid='<%= entry.uid %>' data-timestamp='<%= entry.timestamp %>' data-hashtags='<%= entry.name %>'>
-                         <p class='entry-text'><%- entry.text %></p>
-                         <p class='entry-date'><%= entry.timestamp %></p>
-                         <p class='entry-menu'>&nbsp;&nbsp;&nbsp;<a class="app-link-menu" href="#">show filtered</a></p>
-                         <div class='separator'>&nbsp;</div>
-                         <div id='<%= entry.uid %>' class='hidden'></div>
-                     </div>
-                     <% }) %>
-
-
-                     <% include messages %>
-                     <div id="warnings"></div>
-
-             </div>
-
-
-
-             <div id="entryform" class="editorpane">
-
-
-
-
-       <% if (!perceivername) { %>
-
-            <div id='switcher-selector' class='pure-menu pure-menu-open pure-menu-horizontal' style="background: none;">
-                <ul id="topmenuitems">
-
-
-                    <% if (!addcontext) {%>
-                      <li>
-                          <a id="finds" class="switcher set1">find</a>
-                      </li>
-                    <li class="pure-menu-selected-top">
-                        <a id="adds" class="switcher set1">edit</a>
-                    </li>
-                    <li>
-                        <a id="imports" href="/<%= user.name %>/meta_<%= context %>/edit?addcontext=<%= context %>&interpret=1">interpret</a>
-                    </li>
-                    <% } else { %>
-
-                      <li>
-                          <a id="imports" href="/<%= user.name %>/<%= addcontext %>/edit">original</a>
-                      </li>
-                      <li class="pure-menu-selected-top">
-                          <a id="adds" class="switcher set1">interpret</a>
-                      </li>
-                      <li>
-                          <a id="finds" href="/<%= user.name %>/<%= context %>/edit">result</a>
-                      </li>
-
-
-
-                    <% } %>
-
-
-
-                </ul>
-
-                <br>&nbsp;<br>
-
-            </div>
-
-
-            <% } else {  %>
-
-              <div id='switcher-selector' class='pure-menu pure-menu-open pure-menu-horizontal' style="background: none;">
-                  <ul id="topmenuitems">
-
-                        <li class="pure-menu-selected-top">
-                            <a href="javascript:">find</a>
-                        </li>
-                      <li>
-                          <a href="edit">edit</a>
-                      </li>
-                      <li>
-                          <a href="/import">import</a>
-                      </li>
-
-                  </ul>
-
-                  <br>&nbsp;<br>
-
-              </div>
-
-            <% }  %>
-
-
-                  <a href="javascript:" class="tooltip" title="hide this pane and all text" id="graph-link">
-                      <span></span>
-                  </a>
-                  <a href="javascript:" class="tooltip" title="minimize window" id="windowdown-link">
-                      <span></span>
-                  </a>
-                  <% if (!perceivername) { %>
-                    <a href="/import" id="import-link" class="tooltip" title="import from external sources">
-                        <!-- Import icon -->
-                        <span></span>
-                    </a>
-                  <a href="javascript:" id="collaborate-link">
-                      <!-- Collaborate icon -->
-                      <span></span>
-                  </a>
-                  <% } %>
-
-                  <% if (contextpublic && context && !perceivername) { %>
-                  <a href="javascript:" id="privacy-link" class="is-public">
-                      <!-- Share icon -->
-                      <span></span>
-                  </a>
-                  <% } else if (!perceivername && context) { %>
-                  <a href="javascript:" id="privacy-link">
-                      <!-- Share icon -->
-                      <span></span>
-                  </a>
-                  <% } %>
-
-                  <% if ((context) && (!perceivername)) { %>
-                  <form action='/post' name='deletecontext' id="deletecontext" method='post' class='pure-form' onsubmit="return confirm('Deleting the context will delete all the statements inside. Are you sure?');">
-
-                      <input type="hidden" name="context" value="<%= context %>">
-                      <input type="hidden" id="selectedContexts" name="selectedContexts" value="">
-                      <input type="hidden" name="statementid" value="">
-                      &nbsp;<br>
-                      <input type='submit' id="deletecontextbutton" name="delete" value="delete context">
-
-                  </form>
-                  <% } %>
-
-
-
-
-
-
-                  <!-- the panel to show content -->
-
-            <div id="switcher-panel"></div>
-
-            <!-- form to add, later do import here -->
-            <% if (!perceivername) { %>
-            <div id="adds-content" class="switcher-content set1 show">
-            <% } else { %>
-            <div id="adds-content" class="switcher-content set1">
-            <% } %>
-                <form action='/post' name='submitform' id="submitform" method='post' class='pure-form'>
-
-                        <textarea columns="40" rows="4" name='entry[body]' id="statement" placeholder='type in some words or #hashtags to see how they connect'><% if (url) { %><%= urltitle %> <%= url %><% } %></textarea>
-                        <div id="addToContextsLabel">in context:</div>
-                        <ul id="addToContexts"></ul>
-                        <input type="hidden" id="addedContexts" name="addedContexts">
-                        <input type="hidden" id="context" name="context" value="<%= context %>">
-                        <input type="hidden" id="selectedContexts" name="selectedContexts" value="">
-                        <input type="hidden" id="statementid" name="statementid" value="">
-                        <input type="hidden" name="timestamp" value="">
-                        &nbsp;<br>
-                        <input type='submit' id="submitbutton" name="btnSubmit" value="save" class="pure-button pure-button-primary">
-
-                </form>
-
-            </div>
-
-
-
-            <!-- form to find -->
-            <% if (perceivername) { %>
-                <div id="finds-content" class="switcher-content set1 show">
-            <% } else { %>
-                <div id="finds-content" class="switcher-content set1">
-            <% } %>
-                <form class="pure-form" id="searchform">
-                    <input type="text" id="search" size="14" maxlength="20" class="pure-input" placeholder="search...">
-                    &nbsp;&nbsp;
-                    <input type='submit' name="submit" value=">" class="pure-button pure-button-primary">
-             </form>
-            </div>
-          </div>
-        </div>
 
         <div id="graph-container"></div>
 
@@ -338,29 +98,7 @@
 
 </div>
 
-<script src="/javascripts/sigma/sigma.min.js"></script>
-<script src="/javascripts/sigma/plugins/sigma.parsers.json.min.js"></script>
-<script src="/javascripts/sigma/plugins/sigma.layout.forceAtlas2.min.js"></script>
-<script src="/javascripts/sigma/plugins/sigma.plugins.animate.min.js"></script>
-<script src="/javascripts/sigma/plugins/sigma.plugins.dragNodes.min.js"></script>
-<script src="/javascripts/sigma/plugins/distinct-colors.min.js"></script>
-<script src="/javascripts/jquery-ui.min.js"></script>
-<script src="/javascripts/string.min.js"></script>
-<script src="/javascripts/underscore-min.js"></script>
-<script src="/javascripts/jquery.textcomplete.js"></script>
-<script src='/javascripts/jquery.autosize.js'></script>
-<script src="/javascripts/ui.js"></script>
-<script src="/javascripts/jquery.mobile-events.min.js"></script>
-<script src="/javascripts/jquery.highlight-4.js"></script>
-<script src="/javascripts/bundle-stemmer.js"></script>
-<script src="/javascripts/jquery.taghandler.js"></script>
-<script src="/socket.io/socket.io.js"></script>
-<script src="/javascripts/moment.min.js"></script>
-<script type="text/javascript" src="/javascripts/jquery.tooltipster.min.js"></script>
-<script src="/javascripts/cytoscape.min.js"></script>
-<script src="/javascripts/graphology.min.js"></script>
-<script src="/javascripts/graphology-louvain-functions.js"></script>
-
+<%- include('dependencies/entries') %>
 
              <script>
 ;(function(){
@@ -3591,7 +3329,7 @@ sigma.parsers.json(
         $('#switcher-selector').on('click', 'li', function() {
 
 
-            $('#topmenuitems').each(function() {
+            $('#statementInputMenu').each(function() {
                 $("li", this).each(function(i) {
                     $(this).removeClass('pure-menu-selected-top');
                 });
@@ -5341,7 +5079,7 @@ sigma.parsers.json(
         // Retrieve the date of the statement
         $('input[name="timestamp"]').val(e.currentTarget.dataset.timestamp);
 
-        $('#topmenuitems').each(function() {
+        $('#statementInputMenu').each(function() {
             $("li", this).each(function(i) {
 
                 $(this).removeClass('pure-menu-selected-top');
