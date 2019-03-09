@@ -958,14 +958,14 @@ $("#graph-link").click(function(e) {
 
     $("#timer-link").click(function(e) {
       if (dynamic_graph == 0) {
-        localStorage.setItem('timer',1);
+        //localStorage.setItem('timer',1);
         dynamic_graph = 1;
         $('#timer-link').addClass('timer-link-on');
         $('#entries').scrollTop($('#entries').scrollTop() + 1);
       }
       else {
         dynamic_graph = 0;
-        localStorage.setItem('timer',0);
+        //localStorage.setItem('timer',0);
         $('#timer-link').removeClass('timer-link-on');
         entryScroll('',true);
         if (dynamic_watch == 1) {
@@ -1021,9 +1021,12 @@ $("#graph-link").click(function(e) {
       if (dynamic_watch == 0) {
           var speed_scroll = 1000;
           dynamic_watch = 1;
+
           $('#watch-link').addClass('watch-link-on');
 
-          $("#timer-link").trigger('click');
+          if (dynamic_graph == 0) {
+            $("#timer-link").trigger('click');
+          }
 
           var max_scroll = $('#entries')[0].scrollHeight - $('#entries').height();
 
@@ -1046,9 +1049,6 @@ $("#graph-link").click(function(e) {
       else  {
         dynamic_watch = 0;
         $('#watch-link').removeClass('watch-link-on');
-        if (dynamic_graph == 1) {
-          $("#timer-link").trigger('click');
-        }
         $("#entries").stop();
 
       }
@@ -2234,7 +2234,6 @@ sigma.parsers.json(
                     //sigma.refresh();
 
                     // Launch new layout
-                    console.log('adding stuff and atlas is ' + forcedatlas_running);
                     if (forcedatlas_running) {
                       $('#improve-layout').trigger('click');
                       setTimeout(function() {
