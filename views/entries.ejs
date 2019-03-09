@@ -737,6 +737,8 @@ if (getUrlVars()["most_influential"] == 'bc' || getUrlVars()["most_influential"]
 
 var deselected_nodes_color = '#ddd';
 
+var forcedatlas_running = false;
+
 // This is a very stupid way to change the interface color to dark if the setting is on (through URL or user settings)
 
 if (background == 'dark') {
@@ -770,7 +772,12 @@ if (background == 'dark') {
   $('#statements-link').addClass('statements-link-dark');
   $('#timer-link').addClass('timer-link-dark');
   $('#watch-link').addClass('watch-link-dark');
-  deselected_nodes_color = '#444';
+  if (graphPalette == 'contrast') {
+      deselected_nodes_color = '#555';
+  }
+  else {
+      deselected_nodes_color = '#444';
+  }
 }
 
 $('#analyticscaption').html(customization);
@@ -1856,12 +1863,13 @@ sigma.parsers.json(
                     sigma.stopForceAtlas2();
                     sigma.killForceAtlas2();
                     $('#improve-layout').removeClass('layout-on');
+                    forcedatlas_running = false;
                 }
                 else {
                   // sigma.configForceAtlas2({scalingRatio: 0.1});
                   sigma.startForceAtlas2(forceatlas_options);
                   $('#improve-layout').addClass('layout-on');
-
+                  forcedatlas_running = true;
                 }
 
 
@@ -2226,7 +2234,22 @@ sigma.parsers.json(
                     //sigma.refresh();
 
                     // Launch new layout
-                    sigma.startForceAtlas2(forceatlas_options);
+                    console.log('adding stuff and atlas is ' + forcedatlas_running);
+                    if (forcedatlas_running) {
+                      $('#improve-layout').trigger('click');
+                      setTimeout(function() {
+                        $('#improve-layout').trigger('click');
+                      }, 500);
+                    }
+                    else {
+                      sigma.startForceAtlas2(forceatlas_options);
+                      setTimeout(function() {
+
+                          sigma.stopForceAtlas2();
+                          sigma.killForceAtlas2();
+
+                      }, 3000);
+                    }
 
                     // MIDI activation
 
@@ -2283,14 +2306,6 @@ sigma.parsers.json(
 
 
 
-                    // Don't run ForceAtlas forever not to overheat :)
-
-                    setTimeout(function() {
-
-                        sigma.stopForceAtlas2();
-                        sigma.killForceAtlas2();
-
-                    }, 3000);
 
                     //console.log(newnodes);
                     // console.log(msg.graph.edges);
@@ -4783,6 +4798,16 @@ sigma.parsers.json(
     else if (graphPalette == 'mono') {
     // subdued chromo
         var palette = new DistinctColors({count: max_community_number + 1, lightMin: 40, lightMax: 60, chromaMin: 2, chromaMax: 8});
+    //
+    }
+    else if (graphPalette == 'contrast') {
+    // subdued chromo
+        if (background == 'dark') {
+        var palette = new DistinctColors({count: max_community_number + 1, lightMin: 75, lightMax: 95, chromaMin: 1, chromaMax: 8});
+        }
+        else {
+        var palette = new DistinctColors({count: max_community_number + 1, lightMin: 40, lightMax: 60, chromaMin: 1, chromaMax: 2});
+        }
     //
     }
     // good chromo
