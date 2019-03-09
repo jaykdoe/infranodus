@@ -983,34 +983,42 @@ $("#graph-link").click(function(e) {
     var scroll_signal;
 
     $("#entries").scroll(function() { //.box is the class of the div
-      if (dynamic_graph == 1) {
-      var ventries = [];
-      $('#entries').children(".entry").each(function(){
-          var vresult;
-          vresult = checkInView(this,true);
-          if (vresult == true) {
-              if (ventries.indexOf($(this).attr('data-uid')) == -1) {
-                  ventries.push($(this).attr('data-uid'));
+
+          if (dynamic_graph == 1) {
+          var ventries = [];
+          $('#entries').children(".entry").each(function(){
+              var vresult;
+              vresult = checkInView(this,true);
+              if (vresult == true) {
+                  if (ventries.indexOf($(this).attr('data-uid')) == -1) {
+                      ventries.push($(this).attr('data-uid'));
+                  }
               }
+
+            //  result2 += " " +  checkInView($(e),true);
+           });
+
+          entryScroll(ventries);
+
+
+          if (!$(this).is(':animated')) {
+
+            var current_scroll = ($(this).scrollTop());
+            var max_scroll = $(this)[0].scrollHeight - $(this).height();
+
+            if (current_scroll == max_scroll && scroll_signal != 'bottom') {
+              $(this).scrollTop(0);
+              scroll_signal = 'top';
+            }
+            else if (current_scroll == 0 && scroll_signal != 'top') {
+              $(this).scrollTop($(this)[0].scrollHeight);
+              scroll_signal = 'bottom';
+            }
+
           }
-        //  result2 += " " +  checkInView($(e),true);
-       });
 
-      entryScroll(ventries);
+          }
 
-      var current_scroll = ($(this).scrollTop());
-      var max_scroll = $(this)[0].scrollHeight - $(this).height();
-
-      if (current_scroll == max_scroll && scroll_signal != 'bottom') {
-        $(this).scrollTop(0);
-        scroll_signal = 'top';
-      }
-      else if (current_scroll == 0 && scroll_signal != 'top') {
-        $(this).scrollTop($(this)[0].scrollHeight);
-        scroll_signal = 'bottom';
-      }
-
-      }
     });
 
 
@@ -2043,7 +2051,12 @@ sigma.parsers.json(
                   $('.entry-text').addClass('entry-text-dark');
                 }
                 // Nicely scroll
-                $("#entries").animate({ scrollTop: $('#entries')[0].scrollHeight }, 1000);
+
+
+
+
+
+
 
                 //$('#entries').append(added_entry).slideUp("fast");
 
@@ -2058,6 +2071,21 @@ sigma.parsers.json(
 
                     entryClick();
                     entryDoubleClick();
+
+
+                    if (dynamic_watch == 1 && dynamic_graph == 1) {
+                      $('#watch-link').trigger('click');
+
+                      setTimeout(function() {
+                        $("#entries").animate({ scrollTop: $('#entries')[0].scrollHeight }, 1000);
+                      }, 500);
+                      setTimeout(function() {
+                        $('#watch-link').trigger('click');
+                      }, 4000);
+                    }
+                    else {
+                      $("#entries").animate({ scrollTop: $('#entries')[0].scrollHeight }, 1000);
+                    }
 
                     var addednodes = msg.graph.nodes;
                     var addededges = msg.graph.edges;
@@ -2324,6 +2352,7 @@ sigma.parsers.json(
                         });
 
                       }
+
 
                   }
 
