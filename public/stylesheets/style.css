@@ -568,6 +568,49 @@ button {
 
 }
 
+#livetext {
+  position: fixed;
+  top: 80px;
+  text-align: right;
+  width: 200px;
+  height: 15px;
+  right: 132px; /* "#menu width" */
+  font-size: 14px; /* change this value to increase/decrease button size */
+  line-height: 15px;
+  /* width: 2em;
+   height: auto;*/
+  z-index: 1!important;
+  color: #666666;
+  font-size: 13px;
+  float:right;
+  padding-right: 20px;
+  display: inline-block;
+
+}
+#livetext em {
+  color: #444444;
+}
+
+#livetext span {
+  height: 15px;
+  margin-bottom: -4px;
+  width: 2px;
+  color: #666666;
+  background: #666666;
+  opacity: 0;
+  display: inline-block;
+  animation: blink 0.5s linear infinite alternate;
+}
+
+@keyframes blink {
+  50% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
 .slidercaption {
   top: -7px;
   position: relative;

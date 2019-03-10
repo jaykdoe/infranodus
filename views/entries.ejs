@@ -289,6 +289,8 @@
         <input type="range" min="1" max="100" value="50" class="slider" disabled id="biasRange">
         </div></div>
 
+        <div id="livetext"></div>
+
         <div id="messages">
         <% if (!perceivername) { %>
           <a href="javascript:" id="addnode" class="tooltip editorpane" title="add a node in the graph"></a>
@@ -990,7 +992,7 @@ $("#graph-link").click(function(e) {
 
             var ventries = [];
 
-            
+
               $('#entries').children(".entry").each(function(){
                   var vresult;
                   vresult = checkInView(this,true);
@@ -1146,6 +1148,13 @@ function submitFormProcess() {
         $('#statement').addClass('loading');
 
         $('#submitbutton').attr('disabled', 'disabled');
+
+        if ($('#livetext').html().length > 0 && voice_continues) {
+          $('#livetext').html($('#statement').val() + '<br><em>saving into the graph...</em><span></span>');
+          setTimeout(function(){
+              $('#livetext').html('<em>waiting...</em>' + ' <span></span>');
+          }, 3000);
+        }
 
         // We will set a user for posting. If the posting user does not equal the user who's watching the graph, we force-add the statement into theirs (provided they collaborate)
         var postedby = '';
@@ -2644,6 +2653,7 @@ sigma.parsers.json(
                     localStorage.setItem('microphone', 0);
                     $('#microphone-link').toggleClass('microphone-on', 'remove');
                     recognition.abort();
+                    $('#livetext').html('');
                 }
                 else {
                     localStorage.setItem('microphone', 1);
@@ -2729,6 +2739,7 @@ sigma.parsers.json(
                     // }
 
                     // Kick off the Speech to Text recognition process
+                    $('#livetext').html('<em>waiting...</em>' + ' <span></span>');
                     recognition.start();
 
                     // Set up
@@ -2751,6 +2762,7 @@ sigma.parsers.json(
                         }
                         voiceresult = previoustalk + event.results[0][0].transcript;
                         $('#statement').val(voiceresult);
+                        $('#livetext').html(voiceresult + '<span></span>');
 
                         console.log(event.resultIndex);
                         for (var i = event.resultIndex; i < event.results.length; ++i) {
@@ -2763,6 +2775,7 @@ sigma.parsers.json(
                                 if (offtherecord == 'on') {
                                     voiceresult = previoustalk;
                                     $('#statement').val(voiceresult);
+                                    $('#livetext').html(voiceresult + '<span></span>');
                                     if (lastword == 'on the record') {
                                       offtherecord = '';
                                     }
@@ -2775,21 +2788,26 @@ sigma.parsers.json(
                                   voiceresult = previoustalk.replace(reg,wordis);
                                   previoustalk = voiceresult + ' ';
                                   $('#statement').val(voiceresult);
+                                  $('#livetext').html(voiceresult + '<span></span>');
                                   voicecorrect = '';
                                 }
                                 else {
                                   if (voiceresult.length > 2) {
                                       if (!voice_continues) {
-
+                                        $('#livetext').html(voiceresult + '<br><em>saving into the graph...</em> <span></span>');
                                         setTimeout(function(){
                                             $('#submitbutton').trigger('click');
                                         }, 1000);
+                                        setTimeout(function(){
+                                            $('#livetext').html('<em>waiting...</em>' + ' <span></span>');
+                                        }, 3000);
                                       }
                                       else {
                                         if (lastword == voice_continues) {
                                           voiceresult = previoustalk;
                                           previoustalk = '';
                                           $('#statement').val(voiceresult);
+                                          $('#livetext').html(voiceresult + '<span></span>');
                                           setTimeout(function(){
                                               $('#submitbutton').trigger('click');
                                           }, 1000);
@@ -2797,22 +2815,26 @@ sigma.parsers.json(
                                         else if (lastword == 'improve layout') {
                                           voiceresult = previoustalk;
                                           $('#statement').val(voiceresult);
+                                          $('#livetext').html(voiceresult + '<span></span>');
                                           $('#improve-layout').trigger('click');
                                         }
                                         else if (lastword == 'off the record') {
                                           voiceresult = previoustalk;
                                           $('#statement').val(voiceresult);
+                                          $('#livetext').html(voiceresult + '<span></span>');
                                           offtherecord = 'on';
                                         }
                                         else if (lastword == 'correct') {
                                           voiceresult = previoustalk;
                                           $('#statement').val(voiceresult);
+                                          $('#livetext').html(voiceresult + '<span></span>');
                                           voicecorrect = 'on';
                                         }
                                         else if (lastword == 'erase') {
                                           voiceresult = previoustalk_last;
                                           previoustalk = previoustalk_last;
                                           $('#statement').val(voiceresult);
+                                          $('#livetext').html(voiceresult + '<span></span>');
                                         }
                                         else if (lastword == 'new line') {
                                           previoustalk_last = previoustalk;
