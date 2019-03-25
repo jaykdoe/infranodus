@@ -1,0 +1,214 @@
+WEBVTT
+Kind: captions
+Language: en
+
+00:00:00.120 --> 00:00:02.760
+OK, let's go over functions
+in Python and
+
+00:00:02.760 --> 00:00:04.710
+how to define a function.
+
+00:00:04.710 --> 00:00:08.260
+So here's a small snippet of
+code that defines a function.
+
+00:00:08.260 --> 00:00:10.470
+You can see that every function
+in Python starts with
+
+00:00:10.470 --> 00:00:11.780
+the word def.
+
+00:00:11.780 --> 00:00:14.736
+And then you have the function
+name followed by parentheses
+
+00:00:14.736 --> 00:00:17.270
+and any arguments you want
+passed to the function.
+
+00:00:17.270 --> 00:00:18.710
+And then there's a colon.
+
+00:00:18.710 --> 00:00:21.440
+So in this case, I've actually
+created a function that
+
+00:00:21.440 --> 00:00:23.060
+analyzes a little list.
+
+00:00:23.060 --> 00:00:25.840
+I have a list here that's got
+some fruit in it, apple,
+
+00:00:25.840 --> 00:00:27.510
+orange, grape, kiwi,
+orange, apple.
+
+00:00:27.510 --> 00:00:29.570
+You can see there are
+some repeated items.
+
+00:00:29.570 --> 00:00:32.250
+And I want to analyze how
+many times each item
+
+00:00:32.250 --> 00:00:34.590
+appears in this list.
+
+00:00:34.590 --> 00:00:38.270
+So to do that, I'm going to
+initialize a dictionary inside
+
+00:00:38.270 --> 00:00:40.830
+this function as an
+empty dictionary.
+
+00:00:40.830 --> 00:00:43.430
+And then have a look at
+each item in my list.
+
+00:00:43.430 --> 00:00:46.520
+And then I'm going to increment
+a counter inside the
+
+00:00:46.520 --> 00:00:49.850
+dictionary for the key using the
+item in the list as a key
+
+00:00:49.850 --> 00:00:51.920
+into the dictionary, into
+the hash table.
+
+00:00:51.920 --> 00:00:54.210
+I'm just to increment it by one
+and then at the end I'm
+
+00:00:54.210 --> 00:00:56.960
+going to return the dictionary
+and then we can print it out.
+
+00:00:56.960 --> 00:00:58.540
+So here's the main
+body of the code.
+
+00:00:58.540 --> 00:01:02.480
+It calls analyze list with the
+argument being this list of
+
+00:01:02.480 --> 00:01:05.890
+fruit and then prints out the
+resulting dictionary.
+
+00:01:05.890 --> 00:01:08.370
+Let's see what happens
+when we run this.
+
+00:01:08.370 --> 00:01:11.610
+All right, so when we run
+this, we get an error.
+
+00:01:11.610 --> 00:01:13.150
+So why is that?
+
+00:01:13.150 --> 00:01:16.570
+It says here that key
+apple is undefined.
+
+00:01:16.570 --> 00:01:18.550
+So let's look back at our code
+and try to figure out where we
+
+00:01:18.550 --> 00:01:19.680
+get that error.
+
+00:01:19.680 --> 00:01:23.530
+So it turns out that the issue
+is, you can't access an item
+
+00:01:23.530 --> 00:01:25.790
+from a dictionary prior
+to setting it.
+
+00:01:25.790 --> 00:01:28.710
+And the first time we find an
+item in the list like apple,
+
+00:01:28.710 --> 00:01:32.470
+and then we try to set count
+of apple equal to count of
+
+00:01:32.470 --> 00:01:35.450
+apple plus 1, we are
+dereferencing something that
+
+00:01:35.450 --> 00:01:36.700
+is undefined.
+
+00:01:36.700 --> 00:01:38.210
+So how do we fix this?
+
+00:01:38.210 --> 00:01:39.240
+Pretty straightforward.
+
+00:01:39.240 --> 00:01:41.360
+We check to see if it's
+in there or not.
+
+00:01:41.360 --> 00:01:45.670
+So if item in counts, then
+we can increment by one.
+
+00:01:45.670 --> 00:01:49.180
+Else, we're going to set
+it equal to one.
+
+00:01:49.180 --> 00:01:50.210
+And that should fix it.
+
+00:01:50.210 --> 00:01:51.460
+Let's see if it does.
+
+00:01:51.460 --> 00:01:52.330
+I've saved it.
+
+00:01:52.330 --> 00:01:53.530
+Go to that window.
+
+00:01:53.530 --> 00:01:54.570
+And run it once again.
+
+00:01:54.570 --> 00:01:57.510
+And this time it completes and
+it prints out the resulting
+
+00:01:57.510 --> 00:01:58.250
+dictionary.
+
+00:01:58.250 --> 00:02:01.340
+It says that orange appears
+twice, kiwi once, grape once,
+
+00:02:01.340 --> 00:02:03.240
+and apple twice.
+
+00:02:03.240 --> 00:02:06.720
+And if we look back at our code,
+you can see that orange
+
+00:02:06.720 --> 00:02:09.264
+does appear twice, and apple
+appears twice, and grape
+
+00:02:09.264 --> 00:02:11.090
+appears once, and kiwi
+appears once.
+
+00:02:11.090 --> 00:02:13.070
+So it looks correct to me.
+
+00:02:13.070 --> 00:02:15.540
+And that's how you define a
+function inside Python.
+

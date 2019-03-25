@@ -51,3 +51,23 @@
 
 <%- include('../../../common/tooltip', {title:"hide this pane and all text", id:"graph-link"}); %>
 <%- include('../../../common/tooltip', {title:"minimize window", id:"windowdown-link"}); %>
+
+<script>
+
+function findsButton() {
+    return {
+        onClick: function(onClick){
+            $('#finds').on('click', onClick)
+        }
+    }
+}
+
+function editButton() {
+    return {
+        onClick: function(onClick){
+            $('#adds').on('click', onClick)
+        }
+    }
+}
+
+</script>

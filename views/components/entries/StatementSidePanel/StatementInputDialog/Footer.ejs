@@ -34,3 +34,57 @@
         <input type='submit' id="deletecontextbutton" name="delete" value="delete context">
     </form>
 <% } %>
+
+<script>
+function privacyLinkButton() {
+    return {
+        hide: function(){
+            $('#privacy-link').hide();
+         
+        },
+        show: function () {
+            $('#privacy-link').show();
+        }
+    }
+}
+
+function deleteContextButton() {
+    return {
+        hide: function(){
+            $('#deletecontextbutton').hide();
+         
+        },
+        show: function () {
+            $('#deletecontextbutton').show()
+        }
+    }
+}
+
+
+function collaborateButton() {
+    return {
+        hide: function(){
+            $('#collaborate-link').hide();
+         
+        },
+        show: function () {
+            $('#collaborate-link').show();
+        }
+    }
+}
+
+function importLinkButton() {
+    return {
+        hide: function(){
+            $('#import-link').hide();
+         
+        },
+        show: function () {
+            $('#import-link').show();
+        }
+    }
+}
+
+
+
+</script>

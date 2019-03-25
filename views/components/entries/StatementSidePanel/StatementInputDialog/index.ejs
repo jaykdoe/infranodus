@@ -9,3 +9,55 @@
     <%- include('./Body',
         {perceivername, url, urltitle}); %>
 </div>
+
+<script>
+
+var currentStatementSidePanelMode = "EDIT"
+
+function updateStatementSidePanel() {
+    if(currentStatementSidePanelMode === "EDIT") switchToEdit()
+    if(currentStatementSidePanelMode === "SEARCH") switchToSearch()
+}
+
+function switchToSearch() {
+    changeEntriesHeight(300)
+    hideFooter()
+}
+
+function switchToEdit() {
+    changeEntriesHeight(200)
+    showFooter()
+}
+
+function changeEntriesHeight(height) {
+    entries().fillSpace(height);
+}
+
+function hideFooter(){
+    deleteContextButton().hide()
+    privacyLinkButton().hide()
+    collaborateButton().hide();
+    importLinkButton().hide();
+}
+
+function showFooter(){
+    deleteContextButton().show()
+    privacyLinkButton().show()
+    collaborateButton().show();
+    importLinkButton().show();
+}
+
+function changeModeTo(mode) {
+    currentStatementSidePanelMode = mode
+    updateStatementSidePanel()
+}
+
+function changeModeToSearch() {changeModeTo('SEARCH')}
+function changeModeToEdit() {changeModeTo('EDIT')}
+
+findsButton().onClick(changeModeToSearch);
+editButton().onClick(changeModeToEdit);
+
+
+
+</script>

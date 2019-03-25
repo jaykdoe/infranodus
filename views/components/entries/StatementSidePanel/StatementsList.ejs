@@ -12,3 +12,13 @@
     <div id="warnings"></div>
 
 </div>
+
+<script>
+function entries() {
+    return {
+        fillSpace: function(heightToReduce){
+            $('#entries').css({height:  $(window).height() - heightToReduce});
+        }
+    }
+}
+</script>
