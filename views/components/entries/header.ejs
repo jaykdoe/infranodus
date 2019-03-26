@@ -3,6 +3,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimal-ui">
     <title><%= title %></title>
     <script src="/javascripts/jquery.min.js"></script>
+    <script>
+            <% if (perceivername) { %>
+                const viewType = 'external';
+            <% } else { %> 
+                const viewType = 'internal';
+            <% } %> 
+
+            // What are the concepts displayed - the opposite of above
+            var nodeNames = [];
+            
+    </script>
     <link rel='stylesheet' href='/stylesheets/jquery.textcomplete.css' />
     <link rel="stylesheet" href="/stylesheets/jquery-ui.min.css">
     <link rel='stylesheet' href='/stylesheets/style.css' />
@@ -10,8 +21,6 @@
     <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32.png">
     <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16.png">
     <link rel='stylesheet' href='/stylesheets/jquery.taghandler.css' />
-    <link rel='stylesheet' href='/stylesheets/jquery.content-panel-switcher.css' />
-    <script src="/javascripts/jquery.content-panel-switcher.js"></script>
     <link rel="stylesheet" type="text/css" href="/stylesheets/tooltipster.css" />
     <link rel="stylesheet" type="text/css" href="/stylesheets/tooltipster-noir.css" />
     <% if (speech) { %>

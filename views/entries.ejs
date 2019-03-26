@@ -255,8 +255,6 @@
 // Create node ID - Name index for filtering
 var nodeIDs = {};
 
-// What are the concepts displayed - the opposite of above
-var nodeNames = [];
 
 // Let's record all the unique edges we've got
 var edgesList = [];
@@ -3279,8 +3277,7 @@ sigma.parsers.json(
             return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
         }
 
-        // Activate content switcher Set1 and set delay time for fade
-        jcps.fader(0, '#switcher-panel', '.set1');
+        
 
         var uproll = $('#entryform').height();
 
@@ -3363,28 +3360,11 @@ sigma.parsers.json(
             }
 
 
-            // Autocomplete for search input
-            $("#search").autocomplete({
-                source: nodeNames,
-                minLength: 1,
-                delay: 500,
-                messages: {
-                    noResults: '',
-                    results: function() {}
-                },
-                select: function(event, ui) {
-
-                    var filter = ui.item.value;
+       
 
 
 
-                }
-
-            });
-
-
-
-            search_graph();
+           
 
 
         });

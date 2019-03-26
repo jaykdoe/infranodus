@@ -1,14 +1,14 @@
 
 
 <% if (!perceivername) { %>
-    <div id='switcher-selector' class='pure-menu pure-menu-open pure-menu-horizontal' style="background: none;">
+    <div class='pure-menu pure-menu-open pure-menu-horizontal' style="background: none;">
         <ul class="statementInputMenu">
             <% if (!addcontext) {%>
                 <li>
-                    <a id="finds" class="switcher set1">find</a>
+                    <a id="finds">find</a>
                 </li>
                 <li class="pure-menu-selected-top">
-                    <a id="adds" class="switcher set1">edit</a>
+                    <a id="adds">edit</a>
                 </li>
                 <li>
                     <a id="interpret">interpret</a>
@@ -19,7 +19,7 @@
                     <a id="original" href="/<%= user.name %>/<%= addcontext %>/edit">original</a>
                 </li>
                 <li class="pure-menu-selected-top">
-                    <a id="adds" class="switcher set1">interpret</a>
+                    <a id="adds">interpret</a>
                 </li>
                 <li>
                     <a id="finds" href="/<%= user.name %>/<%= context %>/edit">result</a>
@@ -29,7 +29,7 @@
         <br>&nbsp;<br>
     </div>
 <% } else {  %>
-    <div id='switcher-selector' class='pure-menu pure-menu-open pure-menu-horizontal' style="background: none;">
+    <div class='pure-menu pure-menu-open pure-menu-horizontal' style="background: none;">
         <ul class="statementInputMenu">
             <li class="pure-menu-selected-top">
                 <a href="javascript:">find</a>

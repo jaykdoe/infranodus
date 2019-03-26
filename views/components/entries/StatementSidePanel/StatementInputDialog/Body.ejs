@@ -1,11 +1,5 @@
- <div id="switcher-panel"></div>
-
-<!-- form to add, later do import here -->
-<% if (!perceivername) { %>
-    <div id="adds-content" class="switcher-content set1 show">
-<% } else { %>
-    <div id="adds-content" class="switcher-content set1">
-<% } %>
+ 
+    <div id="edit-panel">
         <form action='/post' name='submitform' id="submitform" method='post' class='pure-form'>
 
                 <textarea columns="40" rows="4" name='entry[body]' id="statement" placeholder='type in some words or #hashtags to see how they connect'><% if (url) { %><%= urltitle %> <%= url %><% } %></textarea>
@@ -22,18 +16,39 @@
         </form>
     </div>
 
-
-
-<!-- form to find -->
-<!-- TODO: put if statements into class or remove it completely -->
-<% if (perceivername) { %>
-    <div id="finds-content" class="switcher-content set1 show">
-<% } else { %>
-    <div id="finds-content" class="switcher-content set1">
-<% } %>
+    <div id="search-panel">
         <form class="pure-form" id="searchform">
             <input type="text" id="search" size="14" maxlength="20" class="pure-input" placeholder="search...">
             &nbsp;&nbsp;
             <input type='submit' name="submit" value=">" class="pure-button pure-button-primary">
         </form>
     </div>
+
+    <script>
+    
+    function searchForm() {
+        return {
+            autofill: function() {
+                // Autocomplete for search input
+                $("#search").autocomplete({
+                    source: nodeNames,
+                    minLength: 1,
+                    delay: 500,
+                    messages: {
+                        noResults: '',
+                        results: function() {}
+                    },
+                    select: function(event, ui) {
+
+                        var filter = ui.item.value;
+
+                    }
+
+                });
+               // TODO add search_graph(); after this action 
+            }
+        }
+    }
+
+
+    </script>

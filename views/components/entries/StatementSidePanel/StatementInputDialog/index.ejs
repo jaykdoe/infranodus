@@ -14,6 +14,12 @@
 
 var currentStatementSidePanelMode = "EDIT"
 
+if (viewType == 'external') {    
+    currentStatementSidePanelMode = "SEARCH"
+}
+
+changeModeTo(currentStatementSidePanelMode);
+
 function updateStatementSidePanel() {
     if(currentStatementSidePanelMode === "EDIT") switchToEdit()
     if(currentStatementSidePanelMode === "SEARCH") switchToSearch()
@@ -22,12 +28,18 @@ function updateStatementSidePanel() {
 
 function switchToSearch() {
     switchStatementMenu('finds');
+    sidePanelContent().hide('#edit-panel');
+    sidePanelContent().show('#search-panel');
+    searchForm().autofill();
     changeEntriesHeight(200)
     hideFooter()
 }
 
 function switchToEdit() {
     switchStatementMenu('adds');
+    sidePanelContent().hide('#search-panel');
+    sidePanelContent().show('#edit-panel');
+    // TODO: get the logic from entries.ejs starting from (topmenuaction == 'adds') {
     changeEntriesHeight(400)
     showFooter()
 }
@@ -44,6 +56,10 @@ function switchToInterpret() {
 
 function changeEntriesHeight(height) {
     entries().fillSpace(height);
+}
+
+function changeSidePanelHeight(height) {
+    sidePanel().resize(height);
 }
 
 function switchStatementMenu(element) {
@@ -86,6 +102,17 @@ findsButton().onClick(changeModeToSearch);
 editButton().onClick(changeModeToEdit);
 interpretButton().onClick(changeModeToInterpret);
 minimizeButton().onClick(togglePanel);
+
+function sidePanelContent() {
+    return {
+        show: function(element){
+            $(element).show();
+        },
+        hide: function(element){
+            $(element).hide();
+        }
+    }
+}
 
 
 
