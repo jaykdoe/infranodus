@@ -3,6 +3,7 @@
 config.json
 views/statsabove.ejs
 views/statsbelow.ejs
+lib/sandbox
 
 # NPM
 node_modules
