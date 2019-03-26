@@ -11,12 +11,12 @@
                     <a id="adds" class="switcher set1">edit</a>
                 </li>
                 <li>
-                    <a id="imports" href="/<%= user.name %>/meta_<%= context %>/edit?addcontext=<%= context %>&interpret=1">interpret</a>
+                    <a id="interpret">interpret</a>
                 </li>
             <% } else { %>
 
                 <li>
-                    <a id="imports" href="/<%= user.name %>/<%= addcontext %>/edit">original</a>
+                    <a id="original" href="/<%= user.name %>/<%= addcontext %>/edit">original</a>
                 </li>
                 <li class="pure-menu-selected-top">
                     <a id="adds" class="switcher set1">interpret</a>
@@ -66,6 +66,14 @@ function editButton() {
     return {
         onClick: function(onClick){
             $('#adds').on('click', onClick)
+        }
+    }
+}
+
+function interpretButton() {
+    return {
+        onClick: function(onClick){
+            $('#interpret').on('click', onClick)
         }
     }
 }

@@ -99,6 +99,7 @@
 </div>
 
 <%- include('dependencies/entries') %>
+<%- include('components/common/index') %>
 
              <script>
 ;(function(){
@@ -3255,16 +3256,7 @@ sigma.parsers.json(
             // $(this).attr("href",current_href + '&statement=' + fornode);
         });
 
-        // In the #entryform — hook functions to actions
-
-        // $("#finds").click(function(e) {
-        //   $('#deletecontextbutton').hide();
-        //   $('#privacy-link').hide();
-        //   $('#collaborate-link').hide();
-        //   $('#import-link').hide();
-
-        //   $('#entries').css({height:  $(window).height() - 200});
-        // });
+    
 
         $('#windowdown-link').click(function(e){
           if ($('#import-link').is(":visible")) {
@@ -3275,14 +3267,7 @@ sigma.parsers.json(
           }
         });
 
-        // $("#adds").click(function(e) {
-        //   $('#deletecontextbutton').show();
-        //   $('#privacy-link').show();
-        //   $('#collaborate-link').show();
-        //   $('#import-link').show();
-
-        //   $('#entries').css({height:  $(window).height() - 380});
-        // });
+ 
 
         $("#import-link").click(function(e) {
 

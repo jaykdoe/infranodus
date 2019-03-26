@@ -17,16 +17,27 @@ var currentStatementSidePanelMode = "EDIT"
 function updateStatementSidePanel() {
     if(currentStatementSidePanelMode === "EDIT") switchToEdit()
     if(currentStatementSidePanelMode === "SEARCH") switchToSearch()
+    if(currentStatementSidePanelMode === "INTERPRET") switchToInterpret()
 }
 
 function switchToSearch() {
-    changeEntriesHeight(300)
+    changeEntriesHeight(200)
     hideFooter()
 }
 
 function switchToEdit() {
-    changeEntriesHeight(200)
+    changeEntriesHeight(400)
     showFooter()
+}
+
+function switchToInterpret() {
+    // create a new graph
+    // add the current (old) context
+    // add interpretation functionality 
+        // a. remove all visible entries from the "old" context
+        // b. switch the way both graph intersection is colored
+    // open the page with the parameters above
+    navigation().redirect('/<%= user.name %>/meta_<%= context %>/edit?addcontext=<%= context %>&interpret=1');
 }
 
 function changeEntriesHeight(height) {
@@ -54,9 +65,11 @@ function changeModeTo(mode) {
 
 function changeModeToSearch() {changeModeTo('SEARCH')}
 function changeModeToEdit() {changeModeTo('EDIT')}
+function changeModeToInterpret() {changeModeTo('INTERPRET')}
 
 findsButton().onClick(changeModeToSearch);
 editButton().onClick(changeModeToEdit);
+interpretButton().onClick(changeModeToInterpret);
 
 
 
