@@ -3258,16 +3258,6 @@ sigma.parsers.json(
 
     
 
-        $('#windowdown-link').click(function(e){
-          if ($('#import-link').is(":visible")) {
-            $('#finds').trigger('click');
-          }
-          else {
-            $("#adds").trigger('click');
-          }
-        });
-
- 
 
         $("#import-link").click(function(e) {
 
@@ -3314,14 +3304,7 @@ sigma.parsers.json(
         $('#switcher-selector').on('click', 'li', function() {
 
 
-            $('#statementInputMenu').each(function() {
-                $("li", this).each(function(i) {
-                    $(this).removeClass('pure-menu-selected-top');
-                });
-            });
-
-            this.className = 'pure-menu-selected-top';
-
+        
 
             var topmenuaction = $(this).children(":first").attr('id');
 

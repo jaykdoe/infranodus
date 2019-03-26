@@ -2,7 +2,7 @@
 
 <% if (!perceivername) { %>
     <div id='switcher-selector' class='pure-menu pure-menu-open pure-menu-horizontal' style="background: none;">
-        <ul id="statementInputMenu">
+        <ul class="statementInputMenu">
             <% if (!addcontext) {%>
                 <li>
                     <a id="finds" class="switcher set1">find</a>
@@ -30,7 +30,7 @@
     </div>
 <% } else {  %>
     <div id='switcher-selector' class='pure-menu pure-menu-open pure-menu-horizontal' style="background: none;">
-        <ul id="statementInputMenu">
+        <ul class="statementInputMenu">
             <li class="pure-menu-selected-top">
                 <a href="javascript:">find</a>
             </li>
@@ -74,6 +74,31 @@ function interpretButton() {
     return {
         onClick: function(onClick){
             $('#interpret').on('click', onClick)
+        }
+    }
+}
+
+function minimizeButton() {
+    return {
+        onClick: function(onClick){
+            $('#windowdown-link').on('click', onClick)
+        }
+    }
+}
+
+function statementMenu() {
+    return {
+        switch: function(element){
+            $('.statementInputMenu').each(function() {
+                $("li", this).each(function() {
+                    const currentId = $(this).find('a').attr('id');
+                    const currentText = $(this).find('a').text();
+                    $(this).removeClass('pure-menu-selected-top');
+                    if (currentId == element || currentText == element) {
+                        $(this).addClass('pure-menu-selected-top');
+                    }
+                });
+            });
         }
     }
 }

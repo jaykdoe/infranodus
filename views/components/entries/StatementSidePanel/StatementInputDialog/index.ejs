@@ -21,11 +21,13 @@ function updateStatementSidePanel() {
 }
 
 function switchToSearch() {
+    switchStatementMenu('finds');
     changeEntriesHeight(200)
     hideFooter()
 }
 
 function switchToEdit() {
+    switchStatementMenu('adds');
     changeEntriesHeight(400)
     showFooter()
 }
@@ -42,6 +44,10 @@ function switchToInterpret() {
 
 function changeEntriesHeight(height) {
     entries().fillSpace(height);
+}
+
+function switchStatementMenu(element) {
+    statementMenu().switch(element);
 }
 
 function hideFooter(){
@@ -66,10 +72,20 @@ function changeModeTo(mode) {
 function changeModeToSearch() {changeModeTo('SEARCH')}
 function changeModeToEdit() {changeModeTo('EDIT')}
 function changeModeToInterpret() {changeModeTo('INTERPRET')}
+function togglePanel() {
+    if (currentStatementSidePanelMode === 'SEARCH') {
+        currentStatementSidePanelMode = 'EDIT'
+    }
+    else if (currentStatementSidePanelMode === 'EDIT') {
+        currentStatementSidePanelMode = 'SEARCH';
+    }
+    changeModeTo(currentStatementSidePanelMode);
+}
 
 findsButton().onClick(changeModeToSearch);
 editButton().onClick(changeModeToEdit);
 interpretButton().onClick(changeModeToInterpret);
+minimizeButton().onClick(togglePanel);
 
 
 
