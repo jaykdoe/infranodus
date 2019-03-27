@@ -58,8 +58,6 @@ else if (go_next_site == 'twitter') {
         forwardTo = 'http://twitter.com/search?q=';
 }
 
-
-
 graphButton().onClick(toggleStatementSidePanel);
 goNextButton().onClick(externalNavigation);
 
@@ -78,6 +76,15 @@ function goNextButton() {
         }
     }
 }
+
+function improveLayoutButton() {
+    return {
+        onClick: function(onClick) {
+             $('#improve-layout').on('click', onClick)
+        }
+    }
+}
+
 
 function externalNavigation() {
     
