@@ -31,13 +31,25 @@
    </div>
      <div id='content'>
 
-             <!-- <a href="javascript:" class="tooltip" title="hide the text pane" id="statements-link">
-                 <span></span>
-             </a> -->
-            <% menuTooltips.forEach(function(tooltip) { %>
-                <%- include('components/common/tooltip', {title: tooltip.title, id:tooltip.id}); %>
-            <% }) %>
+            <a href="javascript:" id="addcontext-link" class="tooltip editorpane" title="compare to context">
+                <!-- Addcontext icon -->
+                <span></span>
+            </a>
 
+            <a href="javascript:" class="tooltip" title="hide the text pane" id="statements-link">
+                 <span></span>
+             </a> 
+           
+            <a href="javascript:" class="tooltip" title="make graph dynamic" id="timer-link">
+                 <span></span>
+             </a> 
+           
+             <a href="javascript:" class="tooltip" title="play dynamic graph" id="watch-link">
+                 <span></span>
+             </a> 
+
+             <a href="javascript:" class="tooltip" title="show tutorial" id="walkthrough"></a>
+           
             <%- include('components/entries/StatementSidePanel/index',
                 {entries, perceivername, addcontext, user, context, contextpublic, url, urltitle}); %>
 
@@ -61,16 +73,6 @@
 
          <div id="analytics"></div>
 
-            <% if (!perceivername) { %>
-                <a href="javascript:" id="microphone-link" class="tooltip editorpane" title="voice to text on/off">
-                    <!-- Microphone icon -->
-                    <span></span>
-                </a>
-                <a href="javascript:" id="addcontext-link" class="tooltip editorpane" title="compare to context">
-                    <!-- Addcontext icon -->
-                    <span></span>
-                </a>
-            <% } %>
 
             <a href="javascript:" class="tooltip editorpane" title="graph analytics" id="analyticsbutton"><div id="analyticscaption"></div></a>
       </div>

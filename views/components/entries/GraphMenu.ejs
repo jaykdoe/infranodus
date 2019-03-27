@@ -4,13 +4,22 @@
 </a>
 <div id="controls">
 <div id="graph-reload">
-<a href="javascript:" class="tooltip" title="choose a few nodes from the graph and click this button to find out more"  id="go_next"></a><br><a href="javascript:location.reload();" class="tooltip" title="reload the graph" id="reloadbutton"></a><br><a href="javascript:" class="tooltip" title="improve layout" id="improve-layout"></a><br><a href="javascript:" class="tooltip" title="abstract visualization" id="abstract-layout"></a><br><a href="javascript:" class="tooltip" title="show tutorial" id="walkthrough"></a>
+<a href="javascript:" class="tooltip" title="choose a few nodes from the graph and click this button to find out more"  id="go_next"></a><br><a href="javascript:location.reload();" class="tooltip" title="reload the graph" id="reloadbutton"></a><br><a href="javascript:" class="tooltip" title="improve layout" id="improve-layout"></a><br><a href="javascript:" class="tooltip" title="abstract visualization" id="abstract-layout"></a>
 
 </div>
 
 <div id="graph-tools">
 <a href="javascript:" class="tooltip" title="zoom in" id="zoom-in"></a><br><a href="javascript:" class="tooltip" title="zoom out" id="zoom-out"></a>
 </div>
+
+
+<% if (!perceivername) { %>
+    <a href="javascript:" id="microphone-link" class="tooltip editorpane" title="voice to text on/off">
+        <!-- Microphone icon -->
+        <span></span>
+    </a>
+    
+<% } %>
 
 <script>
 

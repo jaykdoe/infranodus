@@ -104,7 +104,6 @@ exports.list = function(req, res, next) {
         }
 
         res.render('entries', {
-            menuTooltips: getTooltips(),
             title:
                 'InfraNodus.Com — Text Network Visualization and Discourse Analysis',
             entries: entries,
@@ -125,21 +124,6 @@ exports.list = function(req, res, next) {
         })
     })
 }
-
-const getTooltips = () => [
-    {
-        title: 'dynamic graph',
-        id: 'timer-link',
-    },
-    {
-        title: 'play dynamic graph',
-        id: 'watch-link',
-    },
-    {
-        title: 'hide the text pane',
-        id: 'statements-link',
-    },
-]
 
 exports.form = function(req, res) {
     res.render('post', { title: 'Post' })
