@@ -40,10 +40,12 @@
 
         <div id="graph-container"></div>
 
-        <div id="biasindex" class="tooltip" title="discourse structure: dispersed > diverse > focused > biased (interconnected)"><div class="slidercaption">&nbsp;bias level: </div>
+        <div id="biasindex" class="tooltip" title="shows how diversified the discourse network structure is: biased > focused > diverse > dispersed"><div class="slidercaption">network diversity level: </div>
         <div class="slidercontainer">
         <input type="range" min="1" max="100" value="50" class="slider" disabled id="biasRange">
         </div></div>
+
+        <div id="livetext"></div>
 
         <div id="messages">
         <% if (!perceivername) { %>
@@ -401,6 +403,10 @@ if (getUrlVars()["most_influential"] == 'bc' || getUrlVars()["most_influential"]
 
 var deselected_nodes_color = '#ddd';
 
+var forcedatlas_running = false;
+
+var adding_entry = false;
+
 // This is a very stupid way to change the interface color to dark if the setting is on (through URL or user settings)
 
 if (background == 'dark') {
@@ -434,7 +440,12 @@ if (background == 'dark') {
   $('#statements-link').addClass('statements-link-dark');
   $('#timer-link').addClass('timer-link-dark');
   $('#watch-link').addClass('watch-link-dark');
-  deselected_nodes_color = '#444';
+  if (graphPalette == 'contrast') {
+      deselected_nodes_color = '#555';
+  }
+  else {
+      deselected_nodes_color = '#444';
+  }
 }
 
 $('#analyticscaption').html(customization);
@@ -605,14 +616,14 @@ if (!collaborate_invite) {
 
     $("#timer-link").click(function(e) {
       if (dynamic_graph == 0) {
-        localStorage.setItem('timer',1);
+        //localStorage.setItem('timer',1);
         dynamic_graph = 1;
         $('#timer-link').addClass('timer-link-on');
         $('#entries').scrollTop($('#entries').scrollTop() + 1);
       }
       else {
         dynamic_graph = 0;
-        localStorage.setItem('timer',0);
+        //localStorage.setItem('timer',0);
         $('#timer-link').removeClass('timer-link-on');
         entryScroll('',true);
         if (dynamic_watch == 1) {
@@ -630,34 +641,47 @@ if (!collaborate_invite) {
     var scroll_signal;
 
     $("#entries").scroll(function() { //.box is the class of the div
-      if (dynamic_graph == 1) {
-      var ventries = [];
-      $('#entries').children(".entry").each(function(){
-          var vresult;
-          vresult = checkInView(this,true);
-          if (vresult == true) {
-              if (ventries.indexOf($(this).attr('data-uid')) == -1) {
-                  ventries.push($(this).attr('data-uid'));
+
+          if (dynamic_graph == 1) {
+
+            var ventries = [];
+
+
+              $('#entries').children(".entry").each(function(){
+                  var vresult;
+                  vresult = checkInView(this,true);
+                  if (vresult == true) {
+                      if (ventries.indexOf($(this).attr('data-uid')) == -1) {
+                          ventries.push($(this).attr('data-uid'));
+                      }
+                  }
+
+                //  result2 += " " +  checkInView($(e),true);
+               });
+
+              entryScroll(ventries);
+
+
+
+              if (!$(this).is(':animated')) {
+
+                var current_scroll = ($(this).scrollTop());
+                var max_scroll = $(this)[0].scrollHeight - $(this).height();
+
+                if (current_scroll == max_scroll && scroll_signal != 'bottom') {
+                  $(this).scrollTop(0);
+                  scroll_signal = 'top';
+                }
+                else if (current_scroll == 0 && scroll_signal != 'top') {
+                  $(this).scrollTop($(this)[0].scrollHeight);
+                  scroll_signal = 'bottom';
+                }
+
               }
+
+
           }
-        //  result2 += " " +  checkInView($(e),true);
-       });
 
-      entryScroll(ventries);
-
-      var current_scroll = ($(this).scrollTop());
-      var max_scroll = $(this)[0].scrollHeight - $(this).height();
-
-      if (current_scroll == max_scroll && scroll_signal != 'bottom') {
-        $(this).scrollTop(0);
-        scroll_signal = 'top';
-      }
-      else if (current_scroll == 0 && scroll_signal != 'top') {
-        $(this).scrollTop($(this)[0].scrollHeight);
-        scroll_signal = 'bottom';
-      }
-
-      }
     });
 
 
@@ -668,9 +692,12 @@ if (!collaborate_invite) {
       if (dynamic_watch == 0) {
           var speed_scroll = 1000;
           dynamic_watch = 1;
+
           $('#watch-link').addClass('watch-link-on');
 
-          $("#timer-link").trigger('click');
+          if (dynamic_graph == 0) {
+            $("#timer-link").trigger('click');
+          }
 
           var max_scroll = $('#entries')[0].scrollHeight - $('#entries').height();
 
@@ -693,9 +720,6 @@ if (!collaborate_invite) {
       else  {
         dynamic_watch = 0;
         $('#watch-link').removeClass('watch-link-on');
-        if (dynamic_graph == 1) {
-          $("#timer-link").trigger('click');
-        }
         $("#entries").stop();
 
       }
@@ -778,6 +802,13 @@ function submitFormProcess() {
         $('#statement').addClass('loading');
 
         $('#submitbutton').attr('disabled', 'disabled');
+
+        if ($('#livetext').html().length > 0 && voice_continues) {
+          $('#livetext').html($('#statement').val() + '<br><em>saving into the graph...</em><span></span>');
+          setTimeout(function(){
+              $('#livetext').html('<em>waiting...</em>' + ' <span></span>');
+          }, 3000);
+        }
 
         // We will set a user for posting. If the posting user does not equal the user who's watching the graph, we force-add the statement into theirs (provided they collaborate)
         var postedby = '';
@@ -1510,12 +1541,13 @@ sigma.parsers.json(
                     sigma.stopForceAtlas2();
                     sigma.killForceAtlas2();
                     $('#improve-layout').removeClass('layout-on');
+                    forcedatlas_running = false;
                 }
                 else {
                   // sigma.configForceAtlas2({scalingRatio: 0.1});
                   sigma.startForceAtlas2(forceatlas_options);
                   $('#improve-layout').addClass('layout-on');
-
+                  forcedatlas_running = true;
                 }
 
 
@@ -1662,7 +1694,12 @@ sigma.parsers.json(
                   $('.entry-text').addClass('entry-text-dark');
                 }
                 // Nicely scroll
-                $("#entries").animate({ scrollTop: $('#entries')[0].scrollHeight }, 1000);
+
+
+
+
+
+
 
                 //$('#entries').append(added_entry).slideUp("fast");
 
@@ -1677,6 +1714,22 @@ sigma.parsers.json(
 
                     entryClick();
                     entryDoubleClick();
+
+
+                    adding_entry = true;
+                    if (dynamic_watch == 1 && dynamic_graph == 1) {
+                      $('#watch-link').trigger('click');
+                      setTimeout(function() {
+                        $("#entries").animate({ scrollTop: $('#entries')[0].scrollHeight }, 1000);
+                      }, 500);
+                      setTimeout(function() {
+                        adding_entry = false;
+                        $('#watch-link').trigger('click');
+                      }, 4000);
+                    }
+                    else {
+                      $("#entries").animate({ scrollTop: $('#entries')[0].scrollHeight }, 1000);
+                    }
 
                     var addednodes = msg.graph.nodes;
                     var addededges = msg.graph.edges;
@@ -1853,7 +1906,21 @@ sigma.parsers.json(
                     //sigma.refresh();
 
                     // Launch new layout
-                    sigma.startForceAtlas2(forceatlas_options);
+                    if (forcedatlas_running) {
+                      $('#improve-layout').trigger('click');
+                      setTimeout(function() {
+                        $('#improve-layout').trigger('click');
+                      }, 500);
+                    }
+                    else {
+                      sigma.startForceAtlas2(forceatlas_options);
+                      setTimeout(function() {
+
+                          sigma.stopForceAtlas2();
+                          sigma.killForceAtlas2();
+
+                      }, 3000);
+                    }
 
                     // MIDI activation
 
@@ -1910,14 +1977,6 @@ sigma.parsers.json(
 
 
 
-                    // Don't run ForceAtlas forever not to overheat :)
-
-                    setTimeout(function() {
-
-                        sigma.stopForceAtlas2();
-                        sigma.killForceAtlas2();
-
-                    }, 3000);
 
                     //console.log(newnodes);
                     // console.log(msg.graph.edges);
@@ -1937,6 +1996,7 @@ sigma.parsers.json(
                         });
 
                       }
+
 
                   }
 
@@ -2220,6 +2280,7 @@ sigma.parsers.json(
                     localStorage.setItem('microphone', 0);
                     $('#microphone-link').toggleClass('microphone-on', 'remove');
                     recognition.abort();
+                    $('#livetext').html('');
                 }
                 else {
                     localStorage.setItem('microphone', 1);
@@ -2305,6 +2366,7 @@ sigma.parsers.json(
                     // }
 
                     // Kick off the Speech to Text recognition process
+                    $('#livetext').html('<em>waiting...</em>' + ' <span></span>');
                     recognition.start();
 
                     // Set up
@@ -2327,6 +2389,7 @@ sigma.parsers.json(
                         }
                         voiceresult = previoustalk + event.results[0][0].transcript;
                         $('#statement').val(voiceresult);
+                        $('#livetext').html(voiceresult + '<span></span>');
 
                         console.log(event.resultIndex);
                         for (var i = event.resultIndex; i < event.results.length; ++i) {
@@ -2339,6 +2402,7 @@ sigma.parsers.json(
                                 if (offtherecord == 'on') {
                                     voiceresult = previoustalk;
                                     $('#statement').val(voiceresult);
+                                    $('#livetext').html(voiceresult + '<span></span>');
                                     if (lastword == 'on the record') {
                                       offtherecord = '';
                                     }
@@ -2351,21 +2415,26 @@ sigma.parsers.json(
                                   voiceresult = previoustalk.replace(reg,wordis);
                                   previoustalk = voiceresult + ' ';
                                   $('#statement').val(voiceresult);
+                                  $('#livetext').html(voiceresult + '<span></span>');
                                   voicecorrect = '';
                                 }
                                 else {
                                   if (voiceresult.length > 2) {
                                       if (!voice_continues) {
-
+                                        $('#livetext').html(voiceresult + '<br><em>saving into the graph...</em> <span></span>');
                                         setTimeout(function(){
                                             $('#submitbutton').trigger('click');
                                         }, 1000);
+                                        setTimeout(function(){
+                                            $('#livetext').html('<em>waiting...</em>' + ' <span></span>');
+                                        }, 3000);
                                       }
                                       else {
                                         if (lastword == voice_continues) {
                                           voiceresult = previoustalk;
                                           previoustalk = '';
                                           $('#statement').val(voiceresult);
+                                          $('#livetext').html(voiceresult + '<span></span>');
                                           setTimeout(function(){
                                               $('#submitbutton').trigger('click');
                                           }, 1000);
@@ -2373,22 +2442,26 @@ sigma.parsers.json(
                                         else if (lastword == 'improve layout') {
                                           voiceresult = previoustalk;
                                           $('#statement').val(voiceresult);
+                                          $('#livetext').html(voiceresult + '<span></span>');
                                           $('#improve-layout').trigger('click');
                                         }
                                         else if (lastword == 'off the record') {
                                           voiceresult = previoustalk;
                                           $('#statement').val(voiceresult);
+                                          $('#livetext').html(voiceresult + '<span></span>');
                                           offtherecord = 'on';
                                         }
                                         else if (lastword == 'correct') {
                                           voiceresult = previoustalk;
                                           $('#statement').val(voiceresult);
+                                          $('#livetext').html(voiceresult + '<span></span>');
                                           voicecorrect = 'on';
                                         }
                                         else if (lastword == 'erase') {
                                           voiceresult = previoustalk_last;
                                           previoustalk = previoustalk_last;
                                           $('#statement').val(voiceresult);
+                                          $('#livetext').html(voiceresult + '<span></span>');
                                         }
                                         else if (lastword == 'new line') {
                                           previoustalk_last = previoustalk;
@@ -4348,6 +4421,16 @@ sigma.parsers.json(
         var palette = new DistinctColors({count: max_community_number + 1, lightMin: 40, lightMax: 60, chromaMin: 2, chromaMax: 8});
     //
     }
+    else if (graphPalette == 'contrast') {
+    // subdued chromo
+        if (background == 'dark') {
+        var palette = new DistinctColors({count: max_community_number + 1, lightMin: 75, lightMax: 95, chromaMin: 1, chromaMax: 8});
+        }
+        else {
+        var palette = new DistinctColors({count: max_community_number + 1, lightMin: 40, lightMax: 60, chromaMin: 1, chromaMax: 2});
+        }
+    //
+    }
     // good chromo
     else {
         var palette = new DistinctColors({count: max_community_number + 1, lightMin: 70, chromaMin: 60, samples: 100});
@@ -4593,22 +4676,22 @@ sigma.parsers.json(
 
      if ((modularity_score > 0.65 && diversityindex < 50) && ((bc_entropy >= 1.5) || (bc_entropy == 0 && toppbc_nodes[0].bc == 0) || (bc_entropy == 0 && num_nodes_component < 40))) {
         diversity_score = 'Dispersed';
-        document.getElementById("biasRange").value = "1";
+        document.getElementById("biasRange").value = "100";
         $('#biasRange').attr('class', 'slider dispersedslider');
      }
      else if ((modularity_score > 0.4 && diversityindex < 50) && ((bc_entropy >= 1.5) || (bc_entropy == 0 && toppbc_nodes[0].bc == 0) || (bc_entropy == 0 && num_nodes_component < 40))) {
         diversity_score = 'Diversified';
-        document.getElementById("biasRange").value = "33";
+        document.getElementById("biasRange").value = "67";
         $('#biasRange').attr('class', 'slider diversedslider');
      }
      else if ((modularity_score < 0.4 && modularity_score > 0.2 && bc_entropy >= 0.5) || ((modularity_score > 0.4 && diversityindex >= 50)  && bc_entropy >= 0.5) || (modularity_score > 0.4 && diversityindex < 50 && bc_entropy > 0.5)) {
         diversity_score = 'Focused';
-        document.getElementById("biasRange").value = "67";
+        document.getElementById("biasRange").value = "33";
         $('#biasRange').attr('class', 'slider focusedslider');
      }
      else {
         diversity_score = 'Biased';
-        document.getElementById("biasRange").value = "100";
+        document.getElementById("biasRange").value = "1";
         $('#biasRange').attr('class', 'slider biasedslider');
      }
      // Set global parameter
@@ -4706,6 +4789,8 @@ sigma.parsers.json(
 
 
     function entryClick () {
+
+
 
         $(".entry").on('click', function(e) {
             if (e.target.className == 'app-link-menu') {

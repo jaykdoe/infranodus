@@ -277,106 +277,69 @@ exports.submit = function(req, res, next) {
         if (err) return next(err)
 
         // The user with this UID already exists?
-        if (user.uid) {
-            res.send({
-                errormsg:
-                    'This username is already taken! Please, choose another one.',
-            })
-        }
+       if (user.uid) {
+           res.send({errormsg:"This username is already taken! Please, choose another one."});
+       }
 
-        // Ok, doesn't exist. Did the user accept the privacy policy?
-        else if (data.consent != 'yes') {
-            res.send({ errormsg: 'Please, accept our privacy policy.' })
-        } else if (data.hostedPage) {
-            //  console.log('hosted page initiated');
+       // Ok, doesn't exist. Did the user accept the privacy policy?
+       else if (data.consent != 'yes') {
+           res.send({errormsg:"Please, accept our privacy policy."});
+       }
 
-            User.checkHostedPage(data.hostedPage, function(err, response) {
-                if (err) {
-                    console.log(err)
-                    res.send({
-                        errormsg:
-                            'Your subscription is not active, you have to renew it or create a new one.',
-                    })
-                } else {
-                    console.log(response.content.customer.email)
-                    console.log(response.content.subscription.status)
-                    if (
-                        response.content.subscription.status == 'in_trial' ||
-                        response.content.subscription.status == 'active'
-                    ) {
-                        create_user({ ...data, session })
-                    } else {
-                        res.send({
-                            errormsg:
-                                'Your subscription is not active, you have to renew it or create a new one.',
-                        })
-                    }
-                }
-            })
-        }
+       else if (data.hostedPage) {
+      //  console.log('hosted page initiated');
 
-        // Ok, now on to the account creation
-        else {
-            // Do we have a setting for the invitation code and the user submitted it but it's not right?
+         User.checkHostedPage(data.hostedPage, function(err, response) {
+           if (err) {
+             console.log(err);
+             res.send({errormsg:"Your subscription is not active, you have to renew it or create a new one."});
+           }
+           else {
+             console.log(response.content.customer.email);
+             console.log(response.content.subscription.status);
+             if (response.content.subscription.status == 'in_trial' || response.content.subscription.status == 'active') {
+               create_user();
+               res.send({moveon: '/login?login=' + data.username});
+             }
+             else {
+               res.send({errormsg:"Your subscription is not active, you have to renew it or create a new one."});
+             }
+           }
+         });
 
-            if (
-                options.invite.length > 0 &&
-                data.invite.length > 0 &&
-                data.invite != options.invite
-            ) {
-                res.send({
-                    errormsg:
-                        'Please, enter the correct invitation code or leave the field empty to create an account.',
-                })
-            }
+       }
 
-            // As there's no invitation code or it's not right, let's proceed to create a subscription for the user
-            else {
-                if (
-                    data.invite.length == 0 &&
-                    options.chargebee &&
-                    options.chargebee.site &&
-                    options.chargebee.api_key
-                ) {
-                    // here we call for ChargeBee
-                    var chargebee_site = options.chargebee.site
-                    var chargebee_api = options.chargebee.api_key
-                    var chargebee_plan = 'infranodus-access'
-                    var redirecturl =
-                        options.chargebee.redirect_url +
-                        '?login=' +
-                        data.username
+       // Ok, now on to the account creation
+       else {
 
-                    chargebee.configure({
-                        site: chargebee_site,
-                        api_key: chargebee_api,
-                    })
-                    chargebee.hosted_page
-                        .checkout_new({
-                            subscription: {
-                                plan_id: chargebee_plan,
-                            },
-                            // redirect_url : redirecturl,
-                            // embed: false,
-                            customer: {
-                                email: req.body.email,
-                                cf_username: req.body.username,
-                            },
-                        })
-                        .request(function(error, result) {
-                            if (error) {
-                                //handle error
-                                console.log(error)
-                                if (error.error_code == 'wrong_format') {
-                                    res.send({
-                                        errormsg:
-                                            "Your e-mail is in the wrong format. Please, make sure it's correct and try to submit this form again.",
-                                    })
-                                } else {
-                                    res.send({
-                                        errormsg:
-                                            "There was a problem passing your details to the payment processing gateway. Please, check your internet connection and try again or <a href='http://noduslabs.com/contact/'>contact us</a> and let us know about this problem, so we can resolve it for you. Thanks!",
-                                    })
+         // Do we have a setting for the invitation code and the user submitted it but it's not right?
+
+         if (options.invite.length > 0 && data.invite.length > 0 && data.invite != options.invite) {
+             res.send({errormsg:"Please, enter the correct invitation code or leave the field empty to create an account."});
+         }
+
+         // As there's no invitation code or it's not right, let's proceed to create a subscription for the user
+         else {
+
+           if (data.invite.length == 0 && options.chargebee && options.chargebee.site && options.chargebee.api_key ) {
+
+                            // here we call for ChargeBee
+                            var chargebee_site = options.chargebee.site;
+                            var chargebee_api = options.chargebee.api_key;
+                            var chargebee_plan = 'infranodus-access';
+                            var redirecturl = options.chargebee.redirect_url + '?login=' + data.username;
+
+                            chargebee.configure({site : chargebee_site,
+                            api_key : chargebee_api});
+                            chargebee.hosted_page.checkout_new({
+                                subscription : {
+                                  plan_id : chargebee_plan
+                                },
+                              // redirect_url : redirecturl,
+                              // embed: false,
+                                customer : {
+                                  email : req.body.email,
+                                  cf_username : req.body.username,
                                 }
                             } else {
                                 console.log(result)

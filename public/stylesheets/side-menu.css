@@ -283,13 +283,16 @@ small screens.
     pointer-events: auto!important;
 }
 
-.watch-link-on {
-    background-image: url('../images/watch-blue.png')!important;
-}
+
 
 .watch-link-dark {
       opacity: 0.6;
       background-image: url('../images/watch-white.png')!important;
+}
+
+.watch-link-on {
+    opacity: 0.8;
+    background-image: url('../images/watch-blue.png')!important;
 }
 
 .statements-link-on {
