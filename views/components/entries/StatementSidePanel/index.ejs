@@ -5,3 +5,39 @@
 <%- include('./StatementInputDialog/index',
     {perceivername, addcontext, user, context, contextpublic, url, urltitle}); %>
 </div>
+
+
+<script>
+
+function toggleStatementSidePanel() {
+
+    $("#statements").fadeToggle();
+
+    if (!$("#chat-link").hasClass('chat-highlight')) {
+        localStorage.setItem('graph', 1);
+    }
+    else {
+        localStorage.setItem('graph', 0);
+    }
+
+    $("#chat-link").toggleClass('chat-highlight');
+
+    if (!localStorage.getItem('analytics')) {
+
+        $('#analytics').toggle('slide', function(){
+
+            if ($('#analytics').is(":visible")) {
+                    $('#analyticsbutton').addClass('analytics-on');
+                    $('#analyticscaption').hide();         
+            }
+            else {
+                    $('#analyticsbutton').removeClass('analytics-on');
+                    $('#analyticscaption').show();           
+            }
+
+        });
+    }
+
+}
+
+</script>

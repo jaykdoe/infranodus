@@ -102,6 +102,7 @@ findsButton().onClick(changeModeToSearch);
 editButton().onClick(changeModeToEdit);
 interpretButton().onClick(changeModeToInterpret);
 minimizeButton().onClick(togglePanel);
+closeStatementMenuButton().onClick(hideStatements);
 
 function sidePanelContent() {
     return {
@@ -112,6 +113,10 @@ function sidePanelContent() {
             $(element).hide();
         }
     }
+}
+
+function hideStatements() {
+    toggleStatementSidePanel();
 }
 
 

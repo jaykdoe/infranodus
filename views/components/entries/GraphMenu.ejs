@@ -1,0 +1,27 @@
+<a href="javascript:" id="chat-link" class="tooltip" title="show / hide the text">
+    <!-- Chat icon -->
+    <span></span>
+</a>
+<div id="controls">
+<div id="graph-reload">
+<a href="javascript:" class="tooltip" title="choose a few nodes from the graph and click this button to find out more"  id="go_next"></a><br><a href="javascript:location.reload();" class="tooltip" title="reload the graph" id="reloadbutton"></a><br><a href="javascript:" class="tooltip" title="improve layout" id="improve-layout"></a><br><a href="javascript:" class="tooltip" title="abstract visualization" id="abstract-layout"></a><br><a href="javascript:" class="tooltip" title="show tutorial" id="walkthrough"></a>
+
+</div>
+
+<div id="graph-tools">
+<a href="javascript:" class="tooltip" title="zoom in" id="zoom-in"></a><br><a href="javascript:" class="tooltip" title="zoom out" id="zoom-out"></a>
+</div>
+
+<script>
+
+
+graphButton().onClick(toggleStatementSidePanel);
+
+function graphButton() {
+    return {
+        onClick: function(onClick){
+            $('#chat-link').on('click', onClick)
+        }
+    }
+}
+</script>

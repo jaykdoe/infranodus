@@ -86,6 +86,14 @@ function minimizeButton() {
     }
 }
 
+function closeStatementMenuButton() {
+    return {
+        onClick: function(onClick){
+            $('#graph-link').on('click', onClick)
+        }
+    }
+}
+
 function statementMenu() {
     return {
         switch: function(element){

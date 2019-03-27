@@ -57,19 +57,8 @@
           <form action="" method="" class="pure-form" id="addnodeform"><input type="text" id="addnodeinput" size="10" placeholder="#node_name" class="pure-input"></form>
           <div id="pinnedlist"><a href="javascript:" id="undo" class="tooltip" title="remove selected nodes and reset graph" ></a><a href="javascript:" id="deletenodes" class="tooltip" title="remove selected nodes from the graph"></a><div id="pinnednodeslist"></div><div id="stopnodeslist"></div><a href="javascript:" id="stopsave" class="tooltip" title="save to permanent stopwords"></a></div></div>
 
-                <a href="javascript:" id="chat-link" class="tooltip" title="show / hide the text">
-                    <!-- Chat icon -->
-                    <span></span>
-                </a>
-        <div id="controls">
-                <div id="graph-reload">
-                <a href="javascript:" class="tooltip" title="choose a few nodes from the graph and click this button to find out more"  id="go_next"></a><br><a href="javascript:location.reload();" class="tooltip" title="reload the graph" id="reloadbutton"></a><br><a href="javascript:" class="tooltip" title="improve layout" id="improve-layout"></a><br><a href="javascript:" class="tooltip" title="abstract visualization" id="abstract-layout"></a><br><a href="javascript:" class="tooltip" title="show tutorial" id="walkthrough"></a>
+          <%- include('components/entries/GraphMenu') %>
 
-        </div>
-
-        <div id="graph-tools">
-                <a href="javascript:" class="tooltip" title="zoom in" id="zoom-in"></a><br><a href="javascript:" class="tooltip" title="zoom out" id="zoom-out"></a>
-         </div>
          <div id="analytics"></div>
 
             <% if (!perceivername) { %>
@@ -665,17 +654,7 @@ if (!collaborate_invite) {
 
 
 
-// The button to hide / show statements
 
-$("#graph-link").click(function(e) {
-    e.preventDefault();
-
-    // The user clicked on the graph icon, so we reset his graph interaction activity for timeout later
-    graphInteraction = null;
-    clearTimeout(inactiveTimeout);
-
-    toggle_statements();
-});
 
 
     // Dynamic graph functionality
@@ -3130,20 +3109,7 @@ sigma.parsers.json(
                initializeWalkthrough();
            });
 
-        // Interface element to show / hide statements and edit pane
-
-        $("#chat-link").click(function(e) {
-            e.preventDefault();
-
-            // The user clicked on the graph icon, so we reset his graph interaction activity for timeout later
-            graphInteraction = null;
-            clearTimeout(inactiveTimeout);
-
-            // Function to process the interface based on thi actino
-            toggle_statements();
-
-
-        });
+        
 
         // What happens when we click a button to delete a selected node
         $("#deletenodes").on('click', function(e) {
