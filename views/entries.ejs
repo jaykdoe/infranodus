@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html>
 <%- include('components/entries/header') %>
+<%- include('components/common/index') %>
 <body>
 <% include statsabove %>
 <div id="layout">
@@ -31,24 +32,7 @@
    </div>
      <div id='content'>
 
-            <a href="javascript:" id="addcontext-link" class="tooltip editorpane" title="compare to context">
-                <!-- Addcontext icon -->
-                <span></span>
-            </a>
-
-            <a href="javascript:" class="tooltip" title="hide the text pane" id="statements-link">
-                 <span></span>
-             </a> 
-           
-            <a href="javascript:" class="tooltip" title="make graph dynamic" id="timer-link">
-                 <span></span>
-             </a> 
-           
-             <a href="javascript:" class="tooltip" title="play dynamic graph" id="watch-link">
-                 <span></span>
-             </a> 
-
-             <a href="javascript:" class="tooltip" title="show tutorial" id="walkthrough"></a>
+          <%- include('components/entries/StatementMenu'); %>
            
             <%- include('components/entries/StatementSidePanel/index',
                 {entries, perceivername, addcontext, user, context, contextpublic, url, urltitle}); %>
@@ -90,7 +74,7 @@
 </div>
 
 <%- include('dependencies/entries') %>
-<%- include('components/common/index') %>
+
 
              <script>
 ;(function(){
@@ -104,18 +88,7 @@
     // Get URL variables in the form of an array
     // TODO can be moved out
 
-    function getUrlVars()
-    {
-        var vars = [], hash;
-        var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
-        for(var i = 0; i < hashes.length; i++)
-        {
-            hash = hashes[i].split('=');
-            vars.push(hash[0]);
-            vars[hash[0]] = hash[1];
-        }
-        return vars;
-    }
+ 
 
 
 
@@ -132,14 +105,6 @@
      */
 
     var forwardTo = 'https://www.google.com/search?q=';
-
-    var go_next_url = getUrlVars()["go_next_url"];
-
-    var go_next_site = getUrlVars()["go_next_site"];
-
-    var go_next_add = getUrlVars()["go_next_add"];
-
-    var go_next_override = getUrlVars()["go_next_override"];
 
     var link_hashtags = getUrlVars()["link_hashtags"];
 
@@ -212,30 +177,7 @@
     walkthroughtype = 'external';
     <% } %>
 
-    // This identifies through the URL where the user is forwarded when he clicks on the link button on #go_next element
-
-    if (go_next_url) {
-        if ((go_next_url.substr(go_next_url.length - 1) == 's' || go_next_url.substr(go_next_url.length - 6) == 'search' || go_next_url.substr(go_next_url.length - 5) == 'query')) {
-           go_next_url = go_next_url + '=';
-        }
-        forwardTo = go_next_url;
-    }
-    else if (go_next_site == 'soundcloud') {
-        forwardTo = 'https://soundcloud.com/search?q=';
-    }
-    else if (go_next_site == 'youtube') {
-        forwardTo = 'https://www.youtube.com/results?search_query=';
-    }
-    else if (go_next_site == 'wikipedia') {
-        forwardTo = 'https://wikipedia.org/wiki/Special:Search?search=';
-    }
-    else if (go_next_site == 'amazon') {
-        forwardTo = 'http://www.amazon.com/s/field-keywords=';
-    }
-    else if (go_next_site == 'twitter') {
-        forwardTo = 'http://twitter.com/search?q=';
-    }
-
+    
     // For collaboration - Socket.IO chat
     var collaborate_invite = getUrlVars()["collaborate"];
 
@@ -1619,34 +1561,7 @@ sigma.parsers.json(
 
             // Forward from the graph function
 
-            $("#go_next").on('click', function(e) {
-
-                var searchQuery = pinnedNodes.join("+");
-
-                if (go_next_add) {
-                    searchQuery = searchQuery + '+' + go_next_add;
-                }
-
-                if (searchQuery.length > 0 || go_next_add) {
-
-                    if (go_next_override) {
-                        if (pinnedNodes.length > go_next_override) {
-                            window.open('http://google.com/search?q=' + searchQuery,'_blank');
-                        }
-                       else {
-                            window.open(forwardTo + searchQuery,'_blank');
-                        }
-                    } else {
-                        window.open(forwardTo + searchQuery,'_blank');
-                    }
-                }
-                else {
-                    alert("Click this after you select a few nodes to find them on the web.");
-                }
-
-
-
-            });
+           
 
 
 
