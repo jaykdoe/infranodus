@@ -21,4 +21,16 @@
         return vars;
     }
 
+    function normalize(enteredValue, minEntry, maxEntry, normalizedMin, normalizedMax) {
+      var mx;
+      if ((enteredValue-minEntry) == 0) { mx = 0 } else {
+        mx = (Math.log1p((enteredValue-minEntry))/(Math.log1p(maxEntry-minEntry)));
+      }
+      var preshiftNormalized = mx*(normalizedMax-normalizedMin);
+      var shiftedNormalized = preshiftNormalized + normalizedMin;
+
+      return shiftedNormalized;
+
+    }
+
 </script>

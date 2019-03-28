@@ -1,0 +1,138 @@
+<script>
+
+var hide_always = getUrlVars()["hide_always"];
+
+var hide_edit = getUrlVars()["hide_edit"];
+
+var show_text = getUrlVars()["show_text"];
+
+var show_analytics = getUrlVars()["analytics"];
+
+var hide_when_small = getUrlVars()["hide_when_small"];
+
+var language = getUrlVars()["language"];
+      // Autofill initialized only after Sigma above loaded and populated all the nodes
+
+var urlPath = location.pathname;
+
+// Initialize Socket.IO for websockets (using them for collabs but also to listen to events within the app )
+var socket = io();
+
+function autofill(nodeNames,contextNames) {
+
+    // console.log(nodeNames);
+
+    $('#statement').textcomplete([
+        { // hashtags-concepts
+            words: nodeNames,
+            match: /\B#(\w*)$/,
+            search: function (term, callback) {
+                callback($.map(this.words, function (word) {
+                    return word.indexOf(term) === 0 ? word : null;
+                }));
+            },
+            index: 1,
+            replace: function (word) {
+
+                return '#' + word + ' ';
+
+            }
+        },
+        { // html
+            mentions: contextNames,
+            match: /\B@(\w*)$/,
+            search: function (term, callback) {
+                callback($.map(this.mentions, function (mention) {
+                    return mention.indexOf(term) === 0 ? mention : null;
+                }));
+            },
+            index: 1,
+            replace: function (mention) {
+                return '@' + mention + ' ';
+            }
+        },
+        { // hashtags-concepts
+            words: nodeNames,
+            match: /\b(\w{2,})$/,
+            search: function (term, callback) {
+                callback($.map(this.words, function (word) {
+                    return word.indexOf(term) === 0 ? word : null;
+                }));
+            },
+            index: 1,
+            replace: function (word) {
+
+                    return word + ' ';
+
+            }
+        }
+
+    ]);
+
+
+
+
+
+    $('#addcontext').textcomplete([
+        { // html
+            mentions: contextNames,
+            match: /\b(\w{2,})$/,
+            search: function (term, callback) {
+                callback($.map(this.mentions, function (mention) {
+                    return mention.indexOf(term) === 0 ? mention : null;
+                }));
+            },
+            index: 1,
+            replace: function (mention) {
+                window.open("?addcontext=" + mention, "_self");
+                return '@' + mention + '';
+            }
+        }
+    ]);
+}
+
+function shannon(data) {
+
+    // Create a dictionary of character frequencies and iterate over it.
+    function process(s, evaluator) {
+    var h = Object.create(null), k;
+    s.split('').forEach(function(c) {
+        h[c] && h[c]++ || (h[c] = 1); });
+    if (evaluator) for (k in h) evaluator(k, h[k]);
+    return h;
+    };
+
+    // Measure the entropy of a string in bits per symbol.
+
+    // Measure the entropy of a string in total bits.
+    function bits (s) {
+    return entropy(s) * s.length;
+    }
+
+
+    var sum = 0,len = data.length;
+    process(data, function(k, f) {
+    var p = f/len;
+    sum -= p * Math.log(p) / Math.log(2);
+    });
+
+    return sum;
+
+}
+
+
+    // Download PNG (the graph isn't modified)
+    function downloadPNG() {
+      var canvaspng = document.querySelector('.sigma-scene');
+
+      document.querySelector('#downloadpng').href = canvaspng.toDataURL();
+      document.querySelector('#downloadpng').download = current_user + '_' + current_context + '.png';
+
+      document.querySelector('#downloadpng').addEventListener('click', function(ev) {
+        document.querySelector('#downloadpng').href = canvaspng.toDataURL();
+        document.querySelector('#downloadpng').download = current_user + '_' + current_context + '.png';
+      }, false);
+
+    }
+
+</script>

@@ -60,6 +60,7 @@ else if (go_next_site == 'twitter') {
 
 graphButton().onClick(toggleStatementSidePanel);
 goNextButton().onClick(externalNavigation);
+improveLayoutButton().onClick(adjustGraphLayout);
 
 function graphButton() {
     return {
@@ -84,6 +85,12 @@ function improveLayoutButton() {
         }
     }
 }
+
+function adjustGraphLayout() {
+    sigmaGraph().adjustLayout();
+}
+
+
 
 
 function externalNavigation() {

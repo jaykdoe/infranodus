@@ -20,7 +20,14 @@
             var selectedNodes = [];
 
             var forwardTo = 'https://www.google.com/search?q=';
-        
+
+            // Get current context
+            var path = window.location.pathname;
+            var current_context = '<%= context %>';
+            var current_user = path.replace(/^\/([^\/]*).*$/, '$1');
+            var hostsite = window.location.host;
+
+           
             
     </script>
     <link rel='stylesheet' href='/stylesheets/jquery.textcomplete.css' />
