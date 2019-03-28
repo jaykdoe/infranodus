@@ -61,6 +61,9 @@ else if (go_next_site == 'twitter') {
 graphButton().onClick(toggleStatementSidePanel);
 goNextButton().onClick(externalNavigation);
 improveLayoutButton().onClick(adjustGraphLayout);
+abstractLayoutButton().onLoad();
+abstractLayoutButton().onClick(abstractGraphLayout);
+
 
 function graphButton() {
     return {
@@ -86,11 +89,26 @@ function improveLayoutButton() {
     }
 }
 
+function abstractLayoutButton() {
+    return {
+        onClick: function(onClick) {
+             $('#abstract-layout').on('click', onClick)
+        },
+        onLoad: function() {
+            if (abstract && abstract != 'no') {
+                $('#abstract-layout').addClass('abstract-on');  
+            }
+        }
+    }
+}
+
 function adjustGraphLayout() {
     sigmaGraph().adjustLayout();
 }
 
-
+function abstractGraphLayout() {
+    sigmaGraph().abstractLayout();
+}
 
 
 function externalNavigation() {

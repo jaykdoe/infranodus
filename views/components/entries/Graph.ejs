@@ -57,9 +57,7 @@ if (getUrlVars()["abstract"]) {
       abstract = getUrlVars()["abstract"];
 }
 
-if (abstract && abstract != 'no') {
-      $('#abstract-layout').addClass('abstract-on');
-}
+
 
 // default label threshold
 var in_label_threshold = 8;
@@ -660,37 +658,7 @@ sigma.parsers.json(
 
     
 
-            // What happens when we want to stop showing node labels and make the graph more Abstract
-
-            $("#abstract-layout").on('click', function(e) {
-
-
-              if (!$('#abstract-layout').hasClass('abstract-on')) {
-
-                var url = window.location.href;
-                url = removeParam("abstract", url);
-                if (url.indexOf('?') > -1){
-                 url += '&abstract=yes'
-                }else{
-                 url += '?abstract=yes'
-                }
-                window.location.href = url;
-
-              }
-              else {
-                var url = window.location.href;
-                var alteredURL = removeParam("abstract", url);
-
-                if (alteredURL.indexOf('?') > -1){
-                 alteredURL += '&abstract=no'
-                }else{
-                 alteredURL += '?abstract=no'
-                }
-                window.location.href = alteredURL;
-              }
-
-            });
-
+            
 
             // Forward from the graph function
 
@@ -2379,6 +2347,38 @@ function sigmaGraph() {
                   $('#improve-layout').addClass('layout-on');
                   forcedatlas_running = true;
             }
+        },
+        abstractLayout: function() {
+
+            // What happens when we want to stop showing node labels and make the graph more Abstract
+            console.log('abstractLayout')
+             if (!$('#abstract-layout').hasClass('abstract-on')) {
+                console.log('doesnt hav abstract layout');
+                var url = window.location.href;
+                url = removeParam("abstract", url);
+                if (url.indexOf('?') > -1){
+                    url += '&abstract=yes'
+                }else{
+                    url += '?abstract=yes'
+                }
+                window.location.href = url;
+
+            }
+            else {
+                console.log(' hav abstract layout');
+                var url = window.location.href;
+                var alteredURL = removeParam("abstract", url);
+
+                if (alteredURL.indexOf('?') > -1){
+                    alteredURL += '&abstract=no'
+                }else{
+                    alteredURL += '?abstract=no'
+                }
+                window.location.href = alteredURL;
+            }
+
+
+
         }
     }
 }
