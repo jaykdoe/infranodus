@@ -478,7 +478,8 @@ small screens.
     height: auto;
     padding: 2.6em 2.6em;
     z-index: 11;
-    background-image: url('../images/chat.png');
+    /* background-image: url('../images/chat.png'); */
+    background-image: url('../images/graphnet.png');
     background-repeat:no-repeat;
     background-position:center;
 }

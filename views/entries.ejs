@@ -640,43 +640,6 @@ if (!collaborate_invite) {
           return  isTotal  || isPart ;
       }
 
-    // This is to show / hide entries in #statements DIV
-
-    $("#statements-link").click(function(e) {
-        e.preventDefault();
-        if ((localStorage.getItem('folded') == 1)) {
-            // $('#entryform').css({top: 'auto', 'margin-top': '0px'});
-            // $('#entries').css({height:  $(window).height() - $('#entryform').height() - 75});
-            // $("#entries").animate({ scrollTop: $('#entries')[0].scrollHeight }, 1000);
-            // $('#deletecontext').show();
-            // $('#privacy-link').show();
-            // $('#collaborate-link').show();
-            // $('#import-link').show();
-            // $("#entries").fadeIn();
-            $("#entries").css('z-index','5');
-            $("#entries").css('visibility','visible');
-            $('#topnav').fadeIn();
-              $('#statements-link').removeClass('statements-link-on-dark');
-              $('#statements-link').removeClass('statements-link-on');
-            localStorage.setItem('folded', 0);
-        }
-        else {
-            //$("#entries").fadeOut();
-            $("#entries").css('z-index','-2'); 
-            $("#entries").css('visibility','hidden');
-            $('#topnav').fadeOut();
-            if (background == 'dark') {
-              $('#statements-link').addClass('statements-link-on-dark');
-            }
-            else {
-              $('#statements-link').addClass('statements-link-on');
-            }
-            localStorage.setItem('folded', 1);
-        }
-
-
-    });
-
 
 
     // When the document loaded, add some hooks to the submit form

@@ -19,6 +19,13 @@
 
 
 <script>
+
+toggleStatementsButton().onClick(toggleStatements);
+
+function toggleStatements() {  
+    entries().toggle();
+}
+
 function toggleStatementsButton() {
     return {
         onClick: function(onClick){

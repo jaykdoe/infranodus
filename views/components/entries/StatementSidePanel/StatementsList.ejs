@@ -18,6 +18,28 @@ function entries() {
     return {
         fillSpace: function(heightToReduce){
             $('#entries').css({height:  $(window).height() - heightToReduce});
+        },
+        toggle: function() {
+            if ((localStorage.getItem('folded') == 1)) {
+                $("#entries").css('z-index','5');
+                $("#entries").css('visibility','visible');
+                $('#topnav').fadeIn();
+                $('#statements-link').removeClass('statements-link-on-dark');
+                $('#statements-link').removeClass('statements-link-on');
+                localStorage.setItem('folded', 0);
+            }
+            else {
+                $("#entries").css('z-index','-2'); 
+                $("#entries").css('visibility','hidden');
+                $('#topnav').fadeOut();
+                if (background == 'dark') {
+                    $('#statements-link').addClass('statements-link-on-dark');
+                }
+                else {
+                    $('#statements-link').addClass('statements-link-on');
+                }
+                localStorage.setItem('folded', 1);
+            }
         }
     }
 }
