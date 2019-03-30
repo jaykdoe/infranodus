@@ -25,6 +25,17 @@ if (!background) {
     background = '<%= user.background %>';
 }
 
+
+var walkthrough = getUrlVars()["walkthrough"];
+
+
+// Let's define some walkthrough tutorials, depending on the situation
+var walkthroughtype = 'default';
+
+<% if (perceivername) { %>
+    walkthroughtype = 'external';
+<% } %>
+
 // Some settings from routes/entries.js
 
 <% if (locals.user && !locals.vieweduser) { %>

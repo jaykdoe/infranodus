@@ -516,7 +516,7 @@ small screens.
     display: none;
     opacity: 1;
     position: fixed;
-    top: 240px;
+    top: 200px;
     left: 0;
     font-size: 8px; /* change this value to increase/decrease button size */
     width: 32px;
@@ -593,7 +593,6 @@ small screens.
   width: 2em;
   height: 25px;
   right: 0; /* "#menu width" */
-  font-size: 8px; /* change this value to increase/decrease button size */
   /* width: 2em;
    height: auto;*/
   padding: 0em 2.5em;
@@ -609,26 +608,25 @@ small screens.
 }
 
 #walkthrough {
-  position: fixed;
-  top: 200px;
-  font-size: 32px; /* change this value to increase/decrease button size */
-  width: 32px;
-  height: 32px;
-  left: 0; /* "#menu width" */
-  padding: 5px 5px;
-  z-index: 11;
-  background: none;
-  text-align: left;
-  background-image: url('../images/question.png');
-  background-repeat:no-repeat;
-  background-position:center;
-}
-
-.walkthrough-dark {
-  opacity: 0.6;
-  background-image: url('../images/question-white.png')!important;
-
-}
+    position: fixed;
+    top: 280px;
+    font-size: 8px; /* change this value to increase/decrease button size */
+    width: 2em;
+    height: 25px;
+    right: 0; /* "#menu width" */
+    padding: 0em 2.5em;
+    z-index: 11;
+    background: none;
+    background-image: url('../images/question.png');
+    background-repeat:no-repeat;
+    background-position:center;
+  }
+  
+  .walkthrough-dark {
+    opacity: 0.6;
+    background-image: url('../images/question-white.png')!important;
+  
+  }
 
 .microphone-on {
     opacity: 1!important;

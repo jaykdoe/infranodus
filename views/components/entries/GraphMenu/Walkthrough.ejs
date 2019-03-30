@@ -1,0 +1,561 @@
+<script>
+
+
+     // Which walkthrough tutorial we want to see (pass through the URL global parameter )
+
+     if (walkthrough == 'default' || walkthrough == 'newcontext' || walkthrough == 'analytics' || walkthrough == "tldr" || walkthrough == "force") {
+
+            initializeWalkthrough();
+
+    }
+ // BEGIN WALKTHROUGH Module for tutorial Help
+         // TODO move this out for sure
+
+         // Basic tutorial
+
+         
+         function initializeWalkthrough () {
+           // Instance the tour
+             var tour = new Tour({
+               storage: false,
+               steps: [
+               {
+                 element: "#entryform",
+                 orphan: true,
+                 placement: "top",
+                 title: "Welcome to InfraNodus",
+                 content: "You can start typing your ideas and notes here. Press Enter or Save to submit. They will be visualized as a graph.",
+                 onNext: function (tour) {
+                     $('#statement').val('Every word you type is a node in a graph. When the words cooccur together, they are connected.');
+                 }
+               },
+               {
+                 element: "#statement",
+                 placement: "top",
+                 title: "Add a Statement...",
+                 content: "You can add this statement or edit and add your own. Then press the SAVE button...",
+                 onNext: function (tour) {
+                     $('#statement').val('');
+                 }
+               },
+               {
+                 element: ".entry:first",
+                 orphan: true,
+                 placement: "auto",
+                 title: "See the Statements",
+                 content: "You will then see this statement appear here. To edit it, double-click it."
+               },
+               {
+                 element: "#statement",
+                 placement: "top",
+                 title: "Delete Statements",
+                 content: "If you double-clicked the statement, it appears here. Then simply click the Delete icon below the statement and it will be removed. You can also Edit and click Edit. Or Cancel."
+               },
+               {
+                 element: "#import-link",
+                 placement: "top",
+                 title: "Import Statements",
+                 content: "You can also import any data from a PDF / TXT file, a URL (inc Wikipedia), RSS Feeds, Twitter, Google search results, your notes, etc."
+               },
+               {
+                 element: "#menuLink",
+                 title: "Context Menu",
+                 content: "You can navigate using this menu here. Here you can choose another context (list / graph / set), add a new one, or see all of them at once.",
+                 onShow: function (tour) {
+                     $('#menuLink').click();
+                 }
+               },
+               {
+                 element: "#chat-link",
+                 placement: "left",
+                 title: "Hide/Show Edit Pane",
+                 content: "You can use this button to hide / show the edit pane, so you can clearly see the graph.",
+                 onShow: function (tour) {
+                     $('#menuLink').click();
+                     $('#chat-link').click();
+                 }
+               },
+               {
+                 element: "#statements-link",
+                 placement: "right",
+                 title: "Hide/Show Statements",
+                 content: "You can also use this button to hide the text but to leave the edit pane on.",
+                 onShow: function (tour) {
+                     $('#chat-link').click();
+                 }
+               },
+               {
+                 element: "#walkthrough",
+                 placement: "left",
+                 title: "This Tutorial",
+                 content: "If, at any point, you want to see this tutorial again, click here.",
+
+               },
+               {
+               element: "#addnodeinput",
+               placement: "bottom",
+               title: "Search in Graph",
+               content: "You can also use this search field to look for the nodes in the graph. Once you find the nodes, they will appear below. You can click the 'delete' button to remove them from the graph.",
+               },
+               {
+               element: "#addnode",
+               placement: "bottom",
+               title: "Add a Node",
+               content: "You can use this field to quickly add a node in the graph.",
+               },
+               {
+                 element: "#microphone-link",
+                 orphan: true,
+                 placement: "left",
+                 title: "Voice to Text Input",
+                 content: "If you use Chrome browser, you can also turn on Voice to Text input. Great for interviews and when you're lazy to type. English, French, German and Russian."
+               },
+               {
+                 element: "#graph-container",
+                 placement: "top",
+                 title: "Use the Graph",
+                 content: "You can click on the nodes on the graph to see what they're connected to and to filter the statements, which contain them."
+               },
+               {
+                 element: "#analyticsbutton",
+                 placement: "left",
+                 title: "Text / Graph Analytics",
+                 content: "Here you can see the main topics identified in the graph and the main keywords / nodes and click them to get more insights about the graph. You can also discover what questions to ask to make your discourse more connected.",
+                 onShow: function (tour) {
+                     $('#chat-link').click();
+                     if ($('#analytics').is(":visible")) {
+                     }
+                     else {
+                       $('#analyticsbutton').click();
+                     }
+                 }
+               },
+               {
+                 element: "#analytics",
+                 placement: "auto",
+                 title: "How to Analyze the Graph",
+                 content: "The top topics are identified according to Louvain community detection algorithm (Blondes et al 2008). It detects the words that co-occur more often together than others and puts them into the same community (designated with a specific color)."
+               },
+               {
+                 element: "#analytics",
+                 placement: "auto",
+                 title: "Most Influential Words",
+                 content: "The most influential words are the words in the graph that have the highest betweenness centrality — they appear most often on the shortest path between any two randomly chosen words. It means they serve as the 'crossroads' of meaning, often linking different contexts together. This is not the same as the most frequently used words, rather these words connect the different topics in this discourse. (it is also possible to use degree as the most influential words setting)"
+               },
+               {
+                 element: "#graphstats",
+                 placement: "top",
+                 title: "Graph Stats",
+                 content: "We use our own measure of <a href='https://noduslabs.com/research/visualization-text-polysingularity-network-analysis/' target='_blank'>discourse polysingularity</a> (Paranyushkin 2012, 2018) to score the discourse visualized based on the structure of the graph. <br><b>'Sparse'</b> — indicates a fragmented discourse (e.g. poetry, the beginning of a research, etc.) <br><b>'Diversified'</b> — indicates a discourse with a high level of plurality.<br><b>'Focused'</b> — prioritizes one or two topics. <br><b>'Biased'</b> — an agenda or mobilizing action present (e.g. advertising, ideology, manifesto)."
+               },
+               {
+                 element: "#biasindex",
+                 placement: "top",
+                 title: "Bias Level",
+                 content: "This measures the level of bias in graph: if it consists of disjointed islands it's 'dispersed'; if those islands are interconnected, there are several topics within, it's 'diversified'; if most of the nodes are in one topic it's 'focused', if it's tightly interconnected and there are no distinct topical clusters, it's 'biased'. Read more about the methology in our <a href='https://noduslabs.com/research/visualization-text-polysingularity-network-analysis/' target='_blank'>Identifying the Discourse Bias</a> (Paranyushkin 2018) article in Towards Data Science."
+               },
+               {
+                 element: "#graph-container",
+                 placement: "bottom",
+                 title: "Discover New Ideas",
+                 content: "You can also discover new ideas if you look for the gaps inside the graph.",
+                 onShow: function (tour) {
+                     $('#chat-link').click();
+                 }
+               },
+               {
+                 element: "#go_next",
+                 placement: "left",
+                 title: "Search the Web",
+                 content: "Once you select a few nodes in the graph, you can click this to search them on the web.",
+                 onShow: function (tour) {
+                   if ($('#analytics').is(":visible")) {
+                      $('#analyticsbutton').click();
+                   }
+                 }
+               },
+               {
+                 element: "#collaborate-link",
+                 title: "Collaborate",
+                 placement: "top",
+                 content: "You can invite somebody to collaborate and to work with you on this graph. Click on this button to copy and paste the URL and then send it to your collaborators."
+               },
+               {
+                 element: "#privacy-link",
+                 title: "Privacy / Embed",
+                 placement: "top",
+                 content: "All your data is private by default and cannot be seen by anybody. You can make this graph public and then embed it on any other html page. Just click this button and then copy and paste the URL or the embed code."
+               },
+               {
+                 element: "#settingspane",
+                 title: "Settings Pane",
+                 content: "Here you can log out, adjust the settings, and export your graph in any format for further visualization using Gephi or any other software.",
+                 onShow: function (tour) {
+                     $('#menuLink').click();
+                 }
+               },
+               {
+                 element: "#addNewContext",
+                 title: "Add a New Context",
+                 content: "You can add a new context here (click, type in the new name and click Enter to save). Think of contexts as lists or folders. You can store different notes there or you can organize them by hashtags."
+               },
+               {
+                 element: "#improve-layout",
+                 title: "Improve Graph Layout",
+                 placement: "left",
+                 content: "You can use this button to improve the graph's layout.",
+                 onShow: function (tour) {
+                     $('#menuLink').click();
+                 }
+               },
+               {
+                 element: "#abstract-layout",
+                 title: "Show Abstract Layout",
+                 placement: "left",
+                 content: "Click this button to see an abstract representation of the graph."
+               },
+               {
+                 element: "#graph-tools",
+                 placement: "left",
+                 title: "Zoom In / Zoom Out",
+                 content: "Use these buttons to zoom in and zoom out (or scroll your trackpad or pinch your iPad/iPhone)"
+               },
+               {
+                 element: "#reloadbutton",
+                 placement: "left",
+                 title: "Reload Graph",
+                 content: "If, at any point, something goes wrong, you can always click this to reload the graph."
+               },
+               {
+                 element: "#summary",
+                 placement: "bottom",
+                 title: "Essence / Summary",
+                 content: "Click here to filter the most essential statements from the discourse. These will be the ones that contain the key terms (the main topical clusters) of the discourse as identified in the Analytics pane.",
+                 onShow: function (tour) {
+                     $('#summary').click();
+                     if ($('#analytics').is(":visible")) {
+                     }
+                     else {
+                       $('#analyticsbutton').click();
+                     }
+                 }
+               },
+               {
+                 element: "#insight",
+                 placement: "bottom",
+                 title: "Insight",
+                 content: "Click here to generate new ideas: we will show you the two topical clusters and the associated statements, which could be linked together to get a new insight into the discourse or to develop it further (depending on its structure).",
+                 onShow: function (tour) {
+                     $('#insight').click();
+                 }
+               },
+               {
+                 element: "#walkthrough",
+                 placement: "left",
+                 title: "Interactive Help",
+                 content: "When you want to see this guide again, click here.",
+                 onShow: function (tour) {
+                     if ($('#analytics').is(":visible")) {
+                        $('#analyticsbutton').click();
+                     }
+                     $('#overview').click();
+                 }
+               }
+
+             ]});
+
+             // New context tutorial? Do not show it if it's been shown before
+             if (walkthrough == 'newcontext' || walkthrough == 'tldr') {
+               tour._options.storage = window.localStorage;
+             }
+
+             if (walkthrough == 'tldr') {
+             //  console.log(tour._options.steps);
+               tour._options.steps = [
+                 {
+                 element: "#entryform",
+                 placement: "right",
+                 title: "Visualizing a Long Text",
+                 content: "If you would like to visualize a long text, copy and paste it here and click Save. You will probably need to wait for about 20-60 seconds. If nothign happens, you can try to reload the page after. We currently can handle about 150K max.",
+               },
+               {
+               element: "#graph-container",
+               placement: "bottom",
+               title: "Navigate the Graph",
+               content: "You will then see a graph representation of this text. The most prominent topics will be shown as bigger nodes in the graph, those words, which are used in the same context will be closer to each other.",
+               },
+               {
+               element: "#graph-container",
+               placement: "top",
+               title: "Search through Text",
+               content: "You can then click on the nodes in the graph to find the parts of the text that you find interesting.",
+               },
+               {
+               element: "#graph-container",
+               placement: "left",
+               title: "Discover New Ideas",
+               content: "The gaps in the graph will show you where you could do more research or what questions to ask.",
+               },
+               {
+               element: "#graph-container",
+               placement: "left",
+               title: "Discover New Ideas",
+               content: "The gaps in the graph will show you where you could do more research or what questions to ask.",
+               },
+               {
+                 element: "#menuLink",
+                 title: "Context Menu",
+                 content: "You will be able to later find your text here.",
+                 onShow: function (tour) {
+                     $('#menuLink').click();
+                 }
+               },
+               {
+                 element: "#summary",
+                 placement: "bottom",
+                 title: "Essence / Summary",
+                 content: "Click here to filter the most essential statements from the discourse. These will be the ones that contain the key terms (the main topical clusters) of the discourse as identified in the Analytics pane.",
+                 onShow: function (tour) {
+                     $('#summary').click();
+                     if ($('#analytics').is(":visible")) {
+                     }
+                     else {
+                       $('#analyticsbutton').click();
+                     }
+                 }
+               },
+               {
+                 element: "#insight",
+                 placement: "bottom",
+                 title: "Insight",
+                 content: "Click here to generate new ideas: we will show you the two topical clusters and the associated statements, which could be linked together to get a new insight into the discourse or to develop it further (depending on its structure).",
+                 onShow: function (tour) {
+                     $('#insight').click();
+                 }
+               },
+               {
+                 element: "#walkthrough",
+                 placement: "left",
+                 title: "Detailed Tutorial",
+                 content: "If, at any point, you want to see a more detailed Tutorial, click here.",
+                 onShow: function (tour) {
+                     if ($('#analytics').is(":visible")) {
+                        $('#analyticsbutton').click();
+                     }
+                     $('#overview').click();
+                 }
+               }
+               ]
+             }
+
+             // Another walkthrough option passed through the URL
+
+             if (walkthrough == 'analytics') {
+             //  console.log(tour._options.steps);
+               tour._options.steps = [
+                 {
+                 element: "#entryform",
+                 placement: "right",
+                 title: "Text Analytics",
+                 content: "If you would like to analyze a text, please, copy and paste it here or <a href='/import'>import a file</a>.",
+               },
+               {
+               element: "#graph-container",
+               placement: "bottom",
+               title: "Navigate the Graph",
+               content: "You will then see a graph representation of this text. The most prominent topics will be shown as bigger nodes in the graph, those words, which are used in the same context will be closer to each other.",
+               },
+               {
+               element: "#graph-container",
+               placement: "left",
+               title: "Discover New Ideas",
+               content: "The gaps in the graph will show you where you could do more research or what questions to ask.",
+               },
+               {
+                 element: "#analyticsbutton",
+                 placement: "left",
+                 title: "Text / Graph Analytics",
+                 content: "Here you can see the main topics identified in the graph and the main keywords / nodes and click them to get more insights about the graph. You can also discover what questions to ask to make your discourse more connected.",
+               },
+               {
+                 element: "#analytics",
+                 placement: "auto",
+                 title: "How to Analyze the Graph",
+                 content: "The top topics are identified according to Louvain community detection algorithm (Blondes et al 2008). It detects the words that co-occur more often together than others and puts them into the same community (designated with a specific color)."
+               },
+               {
+                 element: "#analytics",
+                 placement: "auto",
+                 title: "Most Influential Words",
+                 content: "The most influential words are the words in the graph that have the highest betweenness centrality — they appear most often on the shortest path between any two randomly chosen words. It means they serve as the 'crossroads' of meaning, often linking different contexts together. This is not the same as the most frequently used words, rather these words connect the different topics in this discourse. (it is also possible to use degree as the most influential words setting)"
+               },
+               {
+                 element: "#graphstats",
+                 placement: "top",
+                 title: "Graph Stats",
+                 content: "We use our own measure of <a href='https://noduslabs.com/research/visualization-text-polysingularity-network-analysis/' target='_blank'>discourse polysingularity</a> (Paranyushkin 2012, 2018) to score the discourse visualized based on the structure of the graph. <br><b>'Sparse'</b> — indicates a fragmented discourse (e.g. poetry, the beginning of a research, etc.) <br><b>'Diversified'</b> — indicates a discourse with a high level of plurality.<br><b>'Focused'</b> — prioritizes one or two topics. <br><b>'Biased'</b> — an agenda or mobilizing action present (e.g. advertising, ideology, manifesto)."
+               },
+               {
+                 element: "#biasindex",
+                 placement: "top",
+                 title: "Bias Level",
+                 content: "This measures the level of bias in graph: if it consists of disjointed islands it's 'dispersed'; if those islands are interconnected, there are several topics within, it's 'diversified'; if most of the nodes are in one topic it's 'focused', if it's tightly interconnected and there are no distinct topical clusters, it's 'biased'. Read more about the methology in our <a href='https://noduslabs.com/research/visualization-text-polysingularity-network-analysis/' target='_blank'>Identifying the Discourse Bias</a> (Paranyushkin 2018) article in Towards Data Science."
+               },
+               {
+                 element: "#menuLink",
+                 title: "Context Menu",
+                 content: "You will be able to later find your text here.",
+                 onShow: function (tour) {
+                     $('#menuLink').click();
+                 }
+               },
+               {
+                 element: "#summary",
+                 placement: "bottom",
+                 title: "Essence / Summary",
+                 content: "Click here to filter the most essential statements from the discourse. These will be the ones that contain the key terms (the main topical clusters) of the discourse as identified in the Analytics pane.",
+                 onShow: function (tour) {
+                     $('#summary').click();
+                     if ($('#analytics').is(":visible")) {
+                     }
+                     else {
+                       $('#analyticsbutton').click();
+                     }
+                 }
+               },
+               {
+                 element: "#insight",
+                 placement: "bottom",
+                 title: "Insight",
+                 content: "Click here to generate new ideas: we will show you the two topical clusters and the associated statements, which could be linked together to get a new insight into the discourse or to develop it further (depending on its structure).",
+                 onShow: function (tour) {
+                     $('#insight').click();
+                 }
+               },
+               {
+                 element: "#walkthrough",
+                 placement: "left",
+                 title: "Detailed Tutorial",
+                 content: "If, at any point, you want to see a more detailed Tutorial, click here.",
+                 onShow: function (tour) {
+                     if ($('#analytics').is(":visible")) {
+                        $('#analyticsbutton').click();
+                     }
+                     $('#overview').click();
+                 }
+               }
+               ]
+             }
+
+             if (walkthroughtype=='external') {
+
+               var windowsize = $(window).width();
+               if (windowsize <= 460) {
+                  if (!$("#statements").is(":hidden")) {
+                        $('#statements').hide();
+                  }
+
+               }
+
+               tour._options.steps = [
+               {
+               element: "#graph-container",
+               placement: "bottom",
+               title: "Welcome to InfraNodus",
+               content: "Here you can see network visualization of the text on the left. The most prominent topics are shown as the bigger nodes in the graph. The words, which are more often used in the same context will be closer to each other. The different colors will show the topical clusters that belong together.",
+               onShow: function (tour) {
+                   $('#analytics').hide();
+               }
+               },
+               {
+               element: "#graph-container",
+               placement: "top",
+               title: "Search through Text",
+               content: "You can then click on the nodes in the graph to find the parts of the text that you find interesting.",
+               },
+               {
+               element: "#addnodeinput",
+               placement: "bottom",
+               title: "Search in Graph",
+               content: "You can also use this search field to look for the nodes in the graph. Once you find the nodes, they will appear below. You can click the 'delete' button to remove them from the graph.",
+               },
+               {
+                 element: "#chat-link",
+                 placement: "left",
+                 title: "Hide/Show Statements",
+                 content: "You can use this button to hide / show statements, so you can clearly see the graph.",
+                 onShow: function (tour) {
+                     $('#chat-link').click();
+                 }
+               },
+               {
+                 element: "#analyticsbutton",
+                 placement: "left",
+                 title: "Text / Graph Analytics",
+                 content: "Here you can see the main topics identified in the graph and the main keywords / nodes and click them to get more insights about the graph. You can also discover what questions to ask to make your discourse more connected.",
+                 onShow: function (tour) {
+                     $('#chat-link').click();
+                     if ($('#analytics').is(":visible")) {
+                     }
+                     else {
+                       $('#analyticsbutton').click();
+                     }
+                 }
+               },
+               {
+                 element: "#analytics",
+                 placement: "auto",
+                 title: "How to Analyze the Graph",
+                 content: "The top topics are identified according to Louvain community detection algorithm (Blondes et al 2008). It detects the words that co-occur more often together than others and puts them into the same community (designated with a specific color)."
+               },
+               {
+                 element: "#analytics",
+                 placement: "auto",
+                 title: "Most Influential Words",
+                 content: "The most influential words are the words in the graph that have the highest betweenness centrality — they appear most often on the shortest path between any two randomly chosen words. It means they serve as the 'crossroads' of meaning, often linking different contexts together. This is not the same as the most frequently used words, rather these words connect the different topics in this discourse. (it is also possible to use degree as the most influential words setting)"
+               },
+               {
+                 element: "#graphstats",
+                 placement: "top",
+                 title: "Graph Stats",
+                 content: "We use our own measure of <a href='https://noduslabs.com/research/visualization-text-polysingularity-network-analysis/' target='_blank'>discourse polysingularity</a> (Paranyushkin 2012, 2018) to score the discourse visualized based on the structure of the graph. <br><b>'Sparse'</b> — indicates a fragmented discourse (e.g. poetry, the beginning of a research, etc.) <br><b>'Diversified'</b> — indicates a discourse with a high level of plurality.<br><b>'Focused'</b> — prioritizes one or two topics. <br><b>'Biased'</b> — an agenda or mobilizing action present (e.g. advertising, ideology, manifesto)."
+               },
+               {
+                 element: "#biasindex",
+                 placement: "top",
+                 title: "Bias Level",
+                 content: "This measures the level of bias in graph: if it consists of disjointed islands it's 'dispersed'; if those islands are interconnected, there are several topics within, it's 'diversified'; if most of the nodes are in one topic it's 'focused', if it's tightly interconnected and there are no distinct topical clusters, it's 'biased'. Read more about the methology in our <a href='https://noduslabs.com/research/visualization-text-polysingularity-network-analysis/' target='_blank'>Identifying the Discourse Bias</a> (Paranyushkin 2018) article in Towards Data Science."
+               },
+               {
+               element: "#graph-container",
+               placement: "bottom",
+               title: "Discover the New Ideas",
+               content: "The gaps in the graph will show you where you could do more research or what questions to ask."
+               },
+               {
+                 element: "#walkthrough",
+                 placement: "left",
+                 title: "Detailed Tutorial",
+                 content: "If, at any point, you want to see a this Tutorial again, click here.",
+                 onShow: function (tour) {
+                   if ($('#analytics').is(":visible")) {
+                      $('#analyticsbutton').click();
+                   }
+                 }
+               },
+               {
+                 element: "#menuLink",
+                 title: "Create Your Own Graphs",
+                 content: "To create your own text network visualizations, you can create a new account on <a href='https://infranodus.com'>InfraNodus.Com</a>.",
+               }
+               ]
+             }
+
+             // Initialize the tour
+             tour.init();
+
+             // Start the tour
+             tour.start();
+
+           }
+</script>

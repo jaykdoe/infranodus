@@ -63,6 +63,7 @@ goNextButton().onClick(externalNavigation);
 improveLayoutButton().onClick(adjustGraphLayout);
 abstractLayoutButton().onLoad();
 abstractLayoutButton().onClick(abstractGraphLayout);
+tutorialButton().onClick(activateTutorial);
 
 
 function graphButton() {
@@ -87,6 +88,19 @@ function improveLayoutButton() {
              $('#improve-layout').on('click', onClick)
         }
     }
+}
+
+function tutorialButton() {
+    return {
+        onClick: function(onClick) {
+            $('#walkthrough').on('click', onClick)
+        }
+    }
+}
+
+function activateTutorial() {
+    walkthrough = 'default';
+    initializeWalkthrough();
 }
 
 function abstractLayoutButton() {
