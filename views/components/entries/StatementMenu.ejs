@@ -16,3 +16,14 @@
      </a> 
 
      <a href="javascript:" class="tooltip" title="show tutorial" id="walkthrough"></a>
+
+
+<script>
+function toggleStatementsButton() {
+    return {
+        onClick: function(onClick){
+            $('#statements-link').on('click', onClick)
+        }
+    }
+}
+</script>

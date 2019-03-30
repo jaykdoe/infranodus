@@ -422,9 +422,13 @@ a:hover.app-more-link {
 
 #entries {
     position: relative;
+    top: 0;
+    left: 0;
+    padding-left: 50px;
     padding-top: 0px;
     height: 100%;
-    max-width: inherit;
+    z-index: 5;
+    max-width: 340px;
     -webkit-overflow-scrolling: touch;
     overflow: scroll;
 }

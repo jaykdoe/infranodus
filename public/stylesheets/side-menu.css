@@ -175,6 +175,9 @@ small screens.
 
 
        #topnav  {
+         top: 0;
+         left: 0;
+         padding-left: 50px;
          padding-top: 1px;
          padding-bottom: 15px;
        }
