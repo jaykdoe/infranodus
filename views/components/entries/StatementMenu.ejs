@@ -21,6 +21,12 @@
 <script>
 
 toggleStatementsButton().onClick(toggleStatements);
+addContextButton().onClick(addContext);
+
+// Are we viewing additional context?
+if (addcontext) {
+     $('#addcontext-link').addClass('addcontext-visible');
+}
 
 function toggleStatements() {  
     if (checkEntriesMode().visibility() == 'VISIBLE') {
@@ -31,6 +37,16 @@ function toggleStatements() {
     }
 }
 
+function addContext() {
+    if ($(".addcontext-on").is(":visible")) {
+              $('#addcontext-link').removeClass('addcontext-on');
+          }
+    else {
+              $('#addcontext-link').addClass('addcontext-on');
+    }
+
+}
+
 function toggleStatementsButton() {
     return {
         onClick: function(onClick){
@@ -38,4 +54,13 @@ function toggleStatementsButton() {
         }
     }
 }
+
+function addContextButton() {
+    return {
+        onClick: function(onClick){
+            $('#addcontext-link').on('click', onClick)
+        }
+    }
+}
+
 </script>

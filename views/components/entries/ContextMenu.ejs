@@ -1,0 +1,199 @@
+<script src="/javascripts/ui.js"></script>
+<script>
+function addContextTriggers() {
+
+    // TODO Add case for clicking viewAll, so it doesn't reload the page, but simply removes all filters
+
+    // Find @Contexts and make them filter statements when clicked
+
+        var contextsToFilter = [];
+
+
+        $(".app-context-link").click(function(e) {
+            e.preventDefault();
+            var that = this;
+            setTimeout(function() {
+                var dblclick = parseInt($(that).data('double'), 10);
+                if (dblclick > 0) {
+                    $(that).data('double', dblclick-1);
+                } else {
+                    if (e.shiftKey || ($(".addcontext-on").is(":visible"))) {
+                      shiftClick.call(that, e);
+                    }
+                    else {
+                      singleClick.call(that, e);
+                    }
+                }
+            }, 300);
+        }).dblclick(function(e) {
+                    $(this).data('double', 2);
+                    doubleClick.call(this, e);
+                });
+
+
+        // If double click on the menu, open it
+
+        function singleClick (e) {
+
+            window.location = e.target.href;
+
+        }
+
+        // If shift click on the menu, open comparison with other context
+
+        function shiftClick (e) {
+
+            window.location = e.target.href + '?addcontext=' + current_context;
+
+        }
+
+        // If double click on a link, open it
+
+        $(".app-url-link").on('click tap', function(e) {
+
+              e.stopPropagation();
+
+        });
+
+
+
+        // If only one click, filter it
+
+        function doubleClick (e) {
+
+                var triggeredFromStatement = null;
+
+                var addFilter = null;
+
+                var removeFilter = null;
+
+                // Extract filter label
+                var filter = $(e.target).text();
+
+                // Remove the first @ in case it's @mentions clicked from the statements
+                if (filter.charAt(0) == '@') {
+                    filter = filter.substr(1);
+                    triggeredFromStatement = 1;
+                }
+
+                // Some tricks to make context switch from statements emulate menu items behavior
+                if (triggeredFromStatement) {
+
+                    // If the context is clicked inside the statement, we're just dealing with that event, not others
+                    e.stopPropagation();
+
+                    $(".menu-item-divided").each(function() {
+                         if (S($(this).html()).stripTags().s == filter) {
+                             if ($(this).hasClass('pure-menu-selected')) {
+                                 $(this).removeClass('pure-menu-selected');
+                                 removeFilter = 1;
+                             }
+                             else {
+                                 $(this).addClass('pure-menu-selected');
+                                 addFilter = 1;
+                             }
+                         }
+
+                    });
+                }
+
+                // Index of that filter in our current contextsToFilter array
+                var filterIndex = contextsToFilter.indexOf(filter);
+
+                // Toggle menu highlights
+                if ($(this).hasClass('pure-menu-selected') || removeFilter) {
+
+
+                    // The context is to be removed
+                    if (!removeFilter) {
+                        $(this).removeClass('pure-menu-selected');
+                    }
+
+                    // Does it exist in the list of contexts to filter?
+                    if (filterIndex > -1) {
+                        contextsToFilter.splice(filterIndex, 1);
+                    }
+
+                    //TODO WTF is that?
+                  /*  // Let's remove the nodes that belong to the removed context from the contextNodes
+                    contextNodeID[to_remove_clean].forEach(function(element){
+                        var index = $.inArray(element, contextNodes);
+                        if (index>=0) contextNodes.splice(index, 1);
+                    });*/
+
+
+                     // Create context query for jQuery
+                    var contextstring = '';
+
+                    if (contextsToFilter.length >= 0) {
+                        contextstring += ".entry:contains('@"+contextsToFilter[0]+"')";
+
+                        for (var l=1;l<contextsToFilter.length;++l) {
+                            contextstring += ", .entry:contains('@"+contextsToFilter[l]+"')";
+                        }
+
+                        $('.entry').addClass('hidden');
+                        $(contextstring).removeClass('hidden');
+
+                    }
+                    else {
+                        $('.entry').removeClass('hidden');
+                    }
+
+
+                    if (contextsToFilter.length < 1 && !$('#listall').hasClass('pure-menu-selected') && !(current_context)) {
+                        $('#listall').addClass('pure-menu-selected');
+                    }
+
+                }
+                else {
+                    if (!addFilter) {
+                        $(this).addClass('pure-menu-selected');
+                    }
+
+                    // Add this context to a list of contextToFilter
+                    if (filterIndex < 0) {
+                        contextsToFilter.push(filter);
+                    }
+
+                    // Show only those that have the context
+
+                    var contextstring = '';
+                    if (contextsToFilter.length >= 0) {
+                        contextstring += ".entry:contains('@"+contextsToFilter[0]+"')";
+
+                        for (var l=1;l<contextsToFilter.length;++l) {
+                            contextstring += ", .entry:contains('@"+contextsToFilter[l]+"')";
+                        }
+
+                        $('.entry').addClass('hidden');
+                        $(contextstring).removeClass('hidden');
+
+                    }
+                    else {
+                        $('.entry').removeClass('hidden');
+                    }
+
+
+                    if ($('#listall').hasClass('pure-menu-selected')) {
+                        $('#listall').removeClass('pure-menu-selected');
+                    }
+
+
+                }
+
+                console.log(contextsToFilter);
+
+                // Add contexts into the submission form
+                document.getElementById('selectedContexts').value = contextsToFilter.join(',');
+
+                console.log(document.getElementById('selectedContexts').value);
+
+                // Add some remove @context functionality
+                renderGraph(contextsToFilter);
+
+         }
+
+    }
+
+</script>

@@ -11,12 +11,71 @@ var show_analytics = getUrlVars()["analytics"];
 var hide_when_small = getUrlVars()["hide_when_small"];
 
 var language = getUrlVars()["language"];
-      // Autofill initialized only after Sigma above loaded and populated all the nodes
+
+var graphPalette = getUrlVars()["palette"];
+
+var interpret = getUrlVars()["interpret"];
+
 
 var urlPath = location.pathname;
 
+var background = getUrlVars()["background"];
+
+if (!background) {
+    background = '<%= user.background %>';
+}
+
+// Some settings from routes/entries.js
+
+<% if (locals.user && !locals.vieweduser) { %>
+var inlanguage = '<%= user.inlanguage %>';
+
+    <% if (locals.user.label_threshold) { %>
+    in_label_threshold = '<%= user.label_threshold %>';
+    <% } %>
+
+    <% if (locals.user.midi) { %>
+    midi = '<%= user.midi %>';
+    <% } %>
+
+    if (!graphPalette) {
+    graphPalette = '<%= user.palette %>';
+    }
+
+    <% if (locals.user.customization) { %>
+    customization = '<%= user.customization %>';
+    <% } %>
+
+    <% if (locals.user.maxnodes) { %>
+    maxnodes = '<%= user.maxnodes %>';
+    <% } %>
+
+
+<% } else { %>
+
+  <% if (locals.vieweduser) { %>
+
+    most_influential = '<%= vieweduser.topnodes %>';
+
+    in_label_threshold = '<%= vieweduser.label_threshold %>';
+
+    if (!graphPalette) {
+        graphPalette = '<%= vieweduser.palette %>';
+    }
+
+    if (!background) {
+        background = '<%= vieweduser.background %>';
+    }
+
+  <% } %>
+
+<% } %>
+
+
 // Initialize Socket.IO for websockets (using them for collabs but also to listen to events within the app )
 var socket = io();
+
+// Autofill initialized only after Sigma above loaded and populated all the nodes
 
 function autofill(nodeNames,contextNames) {
 

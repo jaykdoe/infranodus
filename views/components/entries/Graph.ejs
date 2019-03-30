@@ -40,11 +40,6 @@ var jsonpath = '';
 <% } %>
 <% } %>
 
-var background = getUrlVars()["background"];
-
-if (!background) {
- background = '<%= user.background %>';
-}
 
 // Do we show abstract graph and no nodes?
 var abstract;
@@ -132,9 +127,6 @@ var top_components = [];
 var edgesList = [];
 
 var community_of_node = [];
-
-
-var graphPalette = getUrlVars()["palette"];
 
 
 var sigma_dragged = 0;
