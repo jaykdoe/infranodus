@@ -322,6 +322,8 @@ sigma.parsers.json(
             var suspects = [];
             var nonsuspects = [];
 
+            var nodeIDs_rev = _.invert(nodeIDs);
+
             sigma.graph.edges().forEach(function(e) {
 
                 // If an edge has a context prefix, one of its nodes is a context, but we don't know which yet
@@ -348,12 +350,12 @@ sigma.parsers.json(
                         }
                 }
 
-
-
-
-
+                // TODO remove that, this is just to check data consistentency
+                e.sourcename = nodeIDs_rev[e.source];
+                e.targetname = nodeIDs_rev[e.target];
             });
 
+    
             // Find the difference between two arrays above, so we get contexts only
             var contextids = _.difference(suspects, nonsuspects);
 
@@ -459,6 +461,8 @@ sigma.parsers.json(
             dragNodes();
 
             // Betweenness Centrality Calculation using Cytoscape
+
+            // console.log(elesnodes);
             eles = cy.add(elesnodes);
 
 
@@ -1206,8 +1210,15 @@ sigma.parsers.json(
     function betweennessCentrality (eles) {
 
       var collection = cy.elements();
+      // console.log(eles);
+      // console.log(collection);
 
-      var bc = eles.bc({directed: true});
+      var bc = eles.bc({
+          weight: function(edges) {
+              return edges.data('weight');
+          },
+          directed: true
+      });
 
       var bcmin = 1;
       var bcmax = 0;
@@ -1241,7 +1252,12 @@ sigma.parsers.json(
 
       bc_nodes_map = bcmap;
 
-      topbc_nodes = _.sortBy(topbc_nodes, 'bc').reverse().slice(0,5);
+      topbc_nodes = _.sortBy(topbc_nodes, 'bc').reverse();
+
+      console.log('Top betweenness centrality nodes:');
+      console.log(topbc_nodes);
+
+      topbc_nodes = topbc_nodes.slice(0,5);
 
 
       sigma.instances(0).graph.nodes().forEach(function(n) {
@@ -1260,8 +1276,6 @@ sigma.parsers.json(
 
       //sigma.instances(0).refresh();
 
-      console.log('Top betweenness centrality nodes:');
-      console.log(topbc_nodes);
 
       //console.log(_.first(_.sortBy(bcmap,'degree').reverse(),3);
       // console.log(bcmin);
@@ -1276,7 +1290,7 @@ sigma.parsers.json(
         function communityDetect (coming_from, node_origin) {
 
 // Construct a new Graphology graph object to calculate communities
-const grgraph = new graphology.Graph();
+const grgraph = new graphology.Graph({type: 'directed'});
 
 // Reiterate nodes
 var node_data = [];
@@ -1297,6 +1311,7 @@ sigma.instances(0).graph.edges().forEach(function(e) {
     var matche = 0;
 
     for (var i = 0; i < edge_data.length; i++) {
+        // replace && with || for undirected graph
       if (edge_data[i].source == e.source && edge_data[i].target == e.target) {
         matche = 1;
         edge_data[i].weight = edge_data[i].weight + parseInt(e.weight);
