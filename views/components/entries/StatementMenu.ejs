@@ -23,7 +23,12 @@
 toggleStatementsButton().onClick(toggleStatements);
 
 function toggleStatements() {  
-    entries().toggle();
+    if (checkEntriesMode().visibility() == 'VISIBLE') {
+        entries().hide();
+    }
+    else if (checkEntriesMode().visibility() == 'HIDDEN') {
+        entries().show();
+    }
 }
 
 function toggleStatementsButton() {

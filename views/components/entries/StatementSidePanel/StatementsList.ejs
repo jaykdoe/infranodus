@@ -14,32 +14,64 @@
 </div>
 
 <script>
+
+var currentEntriesPanelMode = "VISIBLE"
+
+if (localStorage.getItem('folded') == 1) {
+    currentEntriesPanelMode = "HIDDEN"
+    changeEntriesModeTo(currentEntriesPanelMode);
+}    
+        
+function changeEntriesModeTo(mode) {
+    currentEntriesPanelMode = mode
+    updateEntriesPanel()
+}
+
+function checkEntriesMode() {
+    return {
+        visibility: function() {
+            if ($("#entries").css('visibility') == 'hidden') {
+                    return 'HIDDEN'
+            }
+            else if ($("#entries").css('visibility') == 'visible') {
+                    return 'VISIBLE'
+            }
+        }
+    }    
+}
+
+function updateEntriesPanel() {
+    if(currentEntriesPanelMode === "HIDDEN") entries().hide();
+    if(currentEntriesPanelMode === "VISIBLE") entries().show();
+}
+
 function entries() {
     return {
         fillSpace: function(heightToReduce){
             $('#entries').css({height:  $(window).height() - heightToReduce});
         },
-        toggle: function() {
-            if ((localStorage.getItem('folded') == 1)) {
+        show: function() {
                 $("#entries").css('z-index','5');
                 $("#entries").css('visibility','visible');
                 $('#topnav').fadeIn();
+                localStorage.setItem('folded', 0);
+                // TODO move color to another function
                 $('#statements-link').removeClass('statements-link-on-dark');
                 $('#statements-link').removeClass('statements-link-on');
-                localStorage.setItem('folded', 0);
-            }
-            else {
+        },
+        hide: function() {
                 $("#entries").css('z-index','-2'); 
                 $("#entries").css('visibility','hidden');
                 $('#topnav').fadeOut();
+                localStorage.setItem('folded', 1);
+                // TODO move color to another function
                 if (background == 'dark') {
                     $('#statements-link').addClass('statements-link-on-dark');
                 }
                 else {
                     $('#statements-link').addClass('statements-link-on');
                 }
-                localStorage.setItem('folded', 1);
-            }
+                
         }
     }
 }

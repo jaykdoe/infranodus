@@ -2205,19 +2205,6 @@ var highlight_addcontext = '#0089e0';
             }
         }
 
-        if (localStorage.getItem('folded') == 1) {
-          $("#entries").css('visibility','hidden');
-          $("#entries").css('z-index','-2!important');
-          $('#topnav').fadeOut();
-          if (background == 'dark') {
-            $('#statements-link').addClass('statements-link-on-dark');
-          }
-          else {
-            $('#statements-link').addClass('statements-link-on');
-          }
-
-
-        }
         if (localStorage.getItem('timer') == 1) {
           ($("#timer-link").trigger('click'));
         }

@@ -9,10 +9,27 @@
 
 <script>
 
+function checkStatementsPanelMode() {
+    return {
+        visibility: function() {
+            if ($("#statements").is(":visible")) {
+                    return 'VISIBLE'
+            }
+            else {
+                    return 'HIDDEN'
+            }
+        }
+    }    
+}
+
 function toggleStatementSidePanel() {
 
+    if (checkStatementsPanelMode().visibility() == checkEntriesMode().visibility()) {
+        toggleStatements();
+    }
     $("#statements").fadeToggle();
-
+    
+    
     if (!$("#chat-link").hasClass('chat-highlight')) {
         localStorage.setItem('graph', 1);
     }
