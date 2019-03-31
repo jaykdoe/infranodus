@@ -1332,7 +1332,7 @@ sigma.parsers.json(
         function communityDetect (coming_from, node_origin) {
 
 // Construct a new Graphology graph object to calculate communities
-const grgraph = new graphology.Graph({type: 'directed'});
+const grgraph = new graphology.Graph({type: 'undirected'});
 
 // Reiterate nodes
 var node_data = [];
@@ -1354,7 +1354,7 @@ sigma.instances(0).graph.edges().forEach(function(e) {
 
     for (var i = 0; i < edge_data.length; i++) {
         // replace && with || for undirected graph
-      if (edge_data[i].source == e.source && edge_data[i].target == e.target) {
+      if ((edge_data[i].source == e.source && edge_data[i].target == e.target) || (edge_data[i].target == e.source && edge_data[i].source == e.target)) {
         matche = 1;
         edge_data[i].weight = edge_data[i].weight + parseInt(e.weight);
       }
@@ -1377,8 +1377,23 @@ for (var i = 0; i < edge_data.length; i++) {
 }
 // console.log(sigma.instances(0).graph.edges());
 
+console.log('stats')
+console.log(node_data);
+console.log(edge_data);
+console.log(grgraph);
 
 if (node_data.length > 0 && edge_data.length > 0) {
+
+var community = jLouvain().nodes(node_data).edges(edge_data);
+var community_assignment_result = community();
+var node_ids = Object.keys(community_assignment_result['communities']);
+var com_ass = {};
+for (var key in community_assignment_result['communities']) {
+    com_ass[nodeIDs_rev[key]] = community_assignment_result['communities'][key];
+}
+// console.log('Resulting Community Data', community_assignment_result['communities']);
+console.log('Resulting Louvain Community Data', com_ass);
+console.log('Final Louvain Modularity', community_assignment_result['modularity']);
 
 // Get the graph back from Graphology with community attribute for nodes
 var newgraph = louvain_process(grgraph);
@@ -1398,9 +1413,13 @@ grgraph.forEachNode((node, attributes) => {
 // Let's calculate modularity
 var modularity_score = louvain_modularity(newgraph)
 
-console.log('Modularity score: ');
+console.log('Graphology modularity score: ');
 console.log(modularity_score);
-
+var com_ass2 = {};
+for (var key in louvain_communities) {
+    com_ass2[nodeIDs_rev[key]] = louvain_communities[key];
+}
+console.log(com_ass2);
 var node_ids = Object.keys(louvain_communities);
 
 var max_community_number = 0;
