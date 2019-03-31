@@ -90,6 +90,8 @@ var forceatlas_options = {worker: false, startingIterations: 100, scalingRatio: 
 // Create node ID - Name index for filtering
 var nodeIDs = {};
 
+var nodeIDs_rev = {};
+
 // Initial graph model saved
 var nodesDB = [];
 var edgesDB = [];
@@ -178,6 +180,7 @@ sigma.parsers.json(
                     group: "nodes",
                     data: { id: nodes[i].id, name: nodes[i].label}
                 });
+               
 
             }
 
@@ -262,6 +265,8 @@ sigma.parsers.json(
                     data: { id: unique_edge_id, source: e.source, target: e.target, weight: e.weight }
                 });
 
+               
+
                 // Add to EDGES db
                 edgesDB.push(e);
 
@@ -314,7 +319,9 @@ sigma.parsers.json(
             var suspects = [];
             var nonsuspects = [];
 
-            var nodeIDs_rev = _.invert(nodeIDs);
+            nodeIDs_rev = _.invert(nodeIDs);
+
+            var jsGraphEdges = [];
 
             sigma.graph.edges().forEach(function(e) {
 
@@ -345,7 +352,26 @@ sigma.parsers.json(
                 // TODO remove that, this is just to check data consistentency
                 e.sourcename = nodeIDs_rev[e.source];
                 e.targetname = nodeIDs_rev[e.target];
+
+                 // Add to jsnetworkx
+
+                 var edge_params = {
+                     weight: e.weight,
+                     sourcename: e.sourcename,
+                     targetname: e.targetname                     
+                 };
+
+                 var edge_object = [e.source, e.target, edge_params];
+                 
+                 jsGraphEdges.push(edge_object);
+                 
+                 
             });
+
+            var jsG = new jsnx.DiGraph();
+            jsG.addEdgesFrom(jsGraphEdges);
+
+            // console.log(jsG.edges(true));
 
     
             // Find the difference between two arrays above, so we get contexts only
@@ -460,7 +486,7 @@ sigma.parsers.json(
 
             //console.log(eles.nodes().length);
 
-            betweennessCentrality(eles);
+            betweennessCentrality(eles, jsG);
 
             // Community detect algorithm
 
@@ -1199,11 +1225,16 @@ sigma.parsers.json(
 
     var bc_nodes_map;
 
-    function betweennessCentrality (eles) {
+    function betweennessCentrality (eles, jsG) {
 
       var collection = cy.elements();
       // console.log(eles);
       // console.log(collection);
+
+      var jsbc = jsnx.betweennessCentrality(jsG, {normalized: true, weight: 'weight', endpoints: true});
+      var bc_jsx = jsbc._stringValues;
+      
+      
 
       var bc = eles.bc({
           weight: function(edges) {
@@ -1219,6 +1250,7 @@ sigma.parsers.json(
 
       topbc_nodes = [];
 
+      if (!jsG) {
       for (var i = 0; i < cy.nodes().length; i++) {
 
           var nn = eles.getElementById(cy.nodes()[i].data('id'));
@@ -1241,7 +1273,25 @@ sigma.parsers.json(
           }
 
       }
+    }
+    else {
+        for (key in bc_jsx) {
+            var currentbc = bc_jsx[key];
+            topbc_nodes.push({key: key, label: nodeIDs_rev[key], bc: bc_jsx[key]});
+            bcmap[key] = bc_jsx[key];
 
+            if (bcmin > currentbc && currentbc != 0) {
+                bcmin = currentbc;
+            }
+            else {
+                bcmin = 0.00001
+            }
+
+            if (bcmax < currentbc) {
+                bcmax = currentbc;
+            }
+        }
+    }
       bc_nodes_map = bcmap;
 
       topbc_nodes = _.sortBy(topbc_nodes, 'bc').reverse();
