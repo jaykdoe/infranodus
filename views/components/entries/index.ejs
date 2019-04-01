@@ -1,5 +1,9 @@
 <script>
 
+
+// Initialize Socket.IO for websockets (using them for collabs but also to listen to events within the app )
+var socket = io();
+
 var hide_always = getUrlVars()["hide_always"];
 
 var hide_edit = getUrlVars()["hide_edit"];
@@ -83,12 +87,48 @@ var inlanguage = '<%= user.inlanguage %>';
 <% } %>
 
 
-// Initialize Socket.IO for websockets (using them for collabs but also to listen to events within the app )
-var socket = io();
+// Socket.IO chat collaborate
+
+// This matrix relates each URL path to each unique chat that can happen within that room
+
+var collaborate_matrix = {};
+
+var collaborate_room = urlPath + '/';
+
+var collaborate_id = '';
+
+var collaborate_content = '';
+
+var collaborate_message = '';
+
+var collaborate_html = '';
+
+var collaborate_storage = JSON.parse(localStorage.getItem("collaborate"));
 
 
+ // Collaboration features realized using Socket.IO
+    // On connection to server get the id of the current chat "room", which is actually the folder/URL of the current user
 
+    socket.on('connect', function(){
+        console.log('connected');
+        socket.emit('login', {user: current_user, context: current_context, id: collaborate_matrix[collaborate_room]});
+    });
 
+     // When we click reset button
+
+ socket.on('graph reset', function(msg){
+     
+
+     pinnedNodes = [];
+     splicedNodes = [];
+     notfoundNodes = [];
+     
+     $('.entry').fadeIn(400);
+     
+     // Filter statements and select nodes on the graph
+     filter_statements(pinnedNodes);
+     
+     });
 
 // Autofill initialized only after Sigma above loaded and populated all the nodes
 

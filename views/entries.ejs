@@ -204,23 +204,6 @@ var graphOnly = null;
 var selfPosted = null;
 
 
-// Socket.IO chat collaborate
-
-// This matrix relates each URL path to each unique chat that can happen within that room
-
-var collaborate_matrix = {};
-
-var collaborate_room = urlPath + '/';
-
-var collaborate_id = '';
-
-var collaborate_content = '';
-
-var collaborate_message = '';
-
-var collaborate_html = '';
-
-var collaborate_storage = JSON.parse(localStorage.getItem("collaborate"));
 
 
 
@@ -388,13 +371,7 @@ if (!collaborate_invite) {
     localStorage.setItem("collaborate", JSON.stringify(collaborate_matrix));
 }
 
-    // Collaboration features realized using Socket.IO
-    // On connection to server get the id of the current chat "room", which is actually the folder/URL of the current user
-
-    socket.on('connect', function(){
-        console.log('connected');
-        socket.emit('login', {user: current_user, context: current_context, id: collaborate_matrix[collaborate_room]});
-    });
+   
 
 
     socket.on('startChat', function(data){

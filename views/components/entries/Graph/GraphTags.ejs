@@ -19,20 +19,7 @@ function resetGraph() {
     socket.emit('graph reset');
 }
 
- // When we click reset button
 
- socket.on('graph reset', function(msg){
-
-pinnedNodes = [];
-splicedNodes = [];
-notfoundNodes = [];
-
-$('.entry').fadeIn(400);
-
-// Filter statements and select nodes on the graph
-filter_statements(pinnedNodes);
-
-});
 
 
 
