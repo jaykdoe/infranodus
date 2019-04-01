@@ -96,21 +96,6 @@ if (getUrlVars()["most_influential"] == 'bc' || getUrlVars()["most_influential"]
 var forceatlas_options = {worker: false, startingIterations: 100, scalingRatio: 0.1, slowDown: 100, strongGravityMode: true};
 
 
-// Create node ID - Name index for filtering
-var nodeIDs = {};
-
-var nodeIDs_rev = {};
-
-// Initial graph model saved
-var nodesDB = [];
-var edgesDB = [];
-
-// Create context-node index for filtering
-var contextNodeID = [];
-
-// Create statement-node index for filtering
-var nodesOfStatement = [];
-
 // What are the concepts present in the graph?
 var contextNames = [];
 

@@ -111,6 +111,22 @@ var color_context = '#666';
 var forcedatlas_running = false;
 
 
+// Create node ID - Name index for filtering
+var nodeIDs = {};
+
+var nodeIDs_rev = {};
+
+// Initial graph model saved
+var nodesDB = [];
+var edgesDB = [];
+
+// Create context-node index for filtering
+var contextNodeID = [];
+
+// Create statement-node index for filtering
+var nodesOfStatement = [];
+
+
  // Collaboration features realized using Socket.IO
     // On connection to server get the id of the current chat "room", which is actually the folder/URL of the current user
 
@@ -136,70 +152,74 @@ var forcedatlas_running = false;
      });
 
 
-      // This is called when an entry is deleted
+// This is called when an entry is deleted
 
-      socket.on('delete message', function(msg){
+socket.on('delete message', function(msg){
+
+    $('[data-uid="' + msg.entryuid + '"]').fadeOut();
+
+    $("#statement").val('');
+
+    // When searched for nodes in that statement, nothing will appear.
+
+    nodesOfStatement[msg.entryuid] = [];
+
+    // Let's set up which nodes we will keep
+    var nodesToKeep = [];
+
+    sigma.instances(0).graph.edges().forEach(function(e) {
+
+            // If a node appears in at least one statement, we add him in ToKeep list
+        for (let item of e.statement_id) {
+            if (nodesOfStatement[item].indexOf(e.source) > -1) {
+                nodesToKeep.push(e.source);
+            }
+
+            if (nodesOfStatement[item].indexOf(e.target) > -1) {
+                nodesToKeep.push(e.target);
+            }
+
+            var statePosition = statementsOfContext[e.edge_context].indexOf(item);
+            if (statePosition < 0) {
+                statementsOfContext[e.edge_context].splice(statePosition, 1);
+            }
+
+            if (item == msg.entryuid) {
+                sigma.instances(0).graph.dropEdge(e.id);
+            }
+            
+        }
+
+    });
 
 
-$('[data-uid="' + msg.entryuid + '"]').fadeOut();
+    sigma.instances(0).graph.nodes().forEach(function(n) {
+        if (nodesToKeep.indexOf(n.id) < 0) {
+            sigma.instances(0).graph.dropNode(n.id);
+        }
 
-$("#statement").val('');
+    });
 
-// When searched for nodes in that statement, nothing will appear.
+ 
 
-nodesOfStatement[msg.entryuid] = [];
+    // Refresh the object and reload the layout
 
-// Let's set up which nodes we will keep
-var nodesToKeep = [];
+    sigma.instances(0).refresh();
 
-sigma.instances(0).graph.edges().forEach(function(e) {
+    sigma.instances(0).startForceAtlas2(forceatlas_options);
 
-    // If a node appears in at least one statement, we add him in ToKeep list
-  for (let item of e.statement_id) {
-    if (nodesOfStatement[item].indexOf(e.source) > -1) {
-        nodesToKeep.push(e.source);
-    }
+    // Don't run it forever not to overheat :)
 
-    if (nodesOfStatement[item].indexOf(e.target) > -1) {
-        nodesToKeep.push(e.target);
-    }
+    setTimeout(function() {
 
-    var statePosition = statementsOfContext[e.edge_context].indexOf(item);
-    if (statePosition < 0) {
-        statementsOfContext[e.edge_context].splice(statePosition, 1);
-    }
-}
+        sigma.instances(0).stopForceAtlas2();
+        sigma.instances(0).killForceAtlas2();
 
-});
+    }, 3000);
 
-
-// Delete nodes from the graph that are not in nodesToKeep set above
-
-sigma.instances(0).graph.nodes().forEach(function(n) {
-    if (nodesToKeep.indexOf(n.id) < 0) {
-        sigma.instances(0).graph.dropNode(n.id);
-    }
-
-});
-
-// Refresh the object and reload the layout
-
-sigma.instances(0).refresh();
-
-sigma.instances(0).startForceAtlas2(forceatlas_options);
-
-// Don't run it forever not to overheat :)
-
-setTimeout(function() {
-
-    sigma.instances(0).stopForceAtlas2();
-    sigma.instances(0).killForceAtlas2();
-
-}, 3000);
-
-//console.log(newnodes);
-// console.log(msg.graph.edges);
-// console.log(sigma.graph.edges());
+    //console.log(newnodes);
+    // console.log(msg.graph.edges);
+    // console.log(sigma.graph.edges());
 
 
 });
