@@ -1,0 +1,104 @@
+<div id="graphTags">
+    <div id="pinnedlist"><a href="javascript:" id="undo" class="tooltip" title="remove selected nodes and reset graph" ></a><a href="javascript:" id="deletenodes" class="tooltip" title="remove selected nodes from the graph"></a><div id="pinnednodeslist"></div><div id="stopnodeslist"></div><a href="javascript:" id="stopsave" class="tooltip" title="save to permanent stopwords"></a></div>
+</div>
+
+<script>
+
+
+undoButton().onClick(resetGraph);
+
+function undoButton() {
+    return {
+        onClick: function(onClick){
+            $('#undo').on('click', onClick)
+        }
+    }
+}
+
+function resetGraph() {
+    socket.emit('graph reset');
+}
+
+ // When we click reset button
+
+ socket.on('graph reset', function(msg){
+
+pinnedNodes = [];
+splicedNodes = [];
+notfoundNodes = [];
+
+$('.entry').fadeIn(400);
+
+// Filter statements and select nodes on the graph
+filter_statements(pinnedNodes);
+
+});
+
+
+
+    function addTagTriggers() {
+
+
+$(".tags").on('click', function(e) {
+
+    e.preventDefault();
+
+    var remove_node = e.target.innerText;
+
+    // Is the clicked node in the pinnedNodes list
+    var pinnedIndex = pinnedNodes.indexOf(remove_node);
+
+    // Yes, it is, remove it and push it into the notfoundNodes list
+
+    if (pinnedIndex > -1) {
+
+            pinnedNodes.splice(pinnedIndex,1);
+
+          //  notfoundNodes.push(remove_node);
+
+    }
+
+
+    // TODO this is very fuzzy logic here bad bad
+
+    // Is there any nodes that were clicked before but not displayed on the graph?
+    // Yes, more than 1
+    if (splicedNodes.length > 1) {
+        // Add them into the pinned
+        pinnedNodes = [];
+        for (var p = 0; p < splicedNodes.length; p++ ){
+            pinnedNodes[p] = splicedNodes[p];
+        }
+    }
+
+
+    // Only one
+    else if (splicedNodes.length == 1) {
+        pinnedNodes = [];
+        pinnedNodes[0] = splicedNodes[0];
+        splicedNodes = [];
+    }
+
+
+    if (deletedNodes.indexOf(remove_node) > -1) {
+        socket.emit('node add', {addingNodes: remove_node, stoplistNodes: deletedNodes});
+    }
+    else {
+
+    // console.log("node clicked, now will filter for nodes " + pinnedNodes);
+
+          $('.entry').fadeIn(400);
+
+          filter_statements(pinnedNodes);
+
+
+    }
+
+
+
+
+
+});
+
+}
+</script>

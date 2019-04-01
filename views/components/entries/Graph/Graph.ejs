@@ -134,6 +134,9 @@ var community_of_node = [];
 var sigma_dragged = 0;
 
 
+var deselected_nodes_color = '#ddd';
+
+
 sigma.parsers.json(
         jsonpath,
         {
@@ -356,7 +359,7 @@ sigma.parsers.json(
                  // Add to jsnetworkx
 
                  var edge_params = {
-                     weight: e.weight,
+                     weight: 1/e.weight,
                      sourcename: e.sourcename,
                      targetname: e.targetname                     
                  };
@@ -369,6 +372,8 @@ sigma.parsers.json(
             });
 
             var jsG = new jsnx.DiGraph();
+            // jsG = jsnx.convertToUndirected(jsG);
+           
             jsG.addEdgesFrom(jsGraphEdges);
 
             // console.log(jsG.edges(true));
@@ -1231,7 +1236,7 @@ sigma.parsers.json(
       // console.log(eles);
       // console.log(collection);
 
-      var jsbc = jsnx.betweennessCentrality(jsG, {normalized: true, weight: 'weight', endpoints: true});
+      var jsbc = jsnx.betweennessCentrality(jsG, {normalized: true, weight: 'weight'});
       var bc_jsx = jsbc._stringValues;
       
       
@@ -1377,10 +1382,9 @@ for (var i = 0; i < edge_data.length; i++) {
 }
 // console.log(sigma.instances(0).graph.edges());
 
-console.log('stats')
-console.log(node_data);
-console.log(edge_data);
-console.log(grgraph);
+// console.log(node_data);
+// console.log(edge_data);
+// console.log(grgraph);
 
 if (node_data.length > 0 && edge_data.length > 0) {
 
@@ -1413,13 +1417,13 @@ grgraph.forEachNode((node, attributes) => {
 // Let's calculate modularity
 var modularity_score = louvain_modularity(newgraph)
 
-console.log('Graphology modularity score: ');
-console.log(modularity_score);
 var com_ass2 = {};
 for (var key in louvain_communities) {
     com_ass2[nodeIDs_rev[key]] = louvain_communities[key];
 }
-console.log(com_ass2);
+console.log('Resulting Graphology Community Data', com_ass2);
+console.log('Graphology modularity score:', modularity_score);
+
 var node_ids = Object.keys(louvain_communities);
 
 var max_community_number = 0;
@@ -2457,6 +2461,282 @@ function sigmaGraph() {
 
         }
     }
+}
+
+
+function filter_graph(pins, origin){
+
+
+var toKeep = [];
+
+var toKeepPinned = [];
+
+var toKeepMap = [];
+
+
+// Debug: show which nodes are clicked
+// console.log("Pinned nodes clicked:");
+// console.log(pins);
+
+
+// Are any nodes at all selected on the graph?
+
+if (pins.length > 0) {
+
+    // Reiterate for each pinned node
+
+    for (var i = 0; i < pins.length; i ++) {
+
+        // Now we reiterate through every node in the graph
+
+        sigma.instances(0).graph.nodes().filter(function(n) {
+
+            var pinSearch = '';
+
+            // Lemmataze search query if we're coming from search box
+
+            // SEARCHMOD
+           /* if (origin == 'search') {
+
+                var nodeLemma = window.jstemmer(n.originalLabel);
+
+
+                if (nodeLemma.length > 0) {
+                    pinSearch = nodeLemma;
+                }
+                else {
+                    pinSearch = n.originalLabel;
+                }
+            }
+
+            // This means the user clicked on the tag or on the graph, so we use that exact parameter to search
+
+            else {
+                pinSearch = n.originalLabel;
+            }*/
+
+            pinSearch = n.originalLabel;
+
+            // Is the current node of the graph one of the ones that was clicked before?
+
+            if (pins[i] == pinSearch) {
+
+
+                // The ID of the current node is...
+                var nodeId = n.id;
+
+                // Its neighbors are...
+                var nnodes = sigma.instances(0).graph.neighbors(nodeId);
+
+                var nnodesArray = [];
+
+                // We create an array from neighbors that looks like toKeep one
+
+                for (var key in nnodes) {
+                    nnodesArray.push(nnodes[key]);
+                }
+
+
+                // If that's not the first iteration, we only keep intersection of both
+
+                if (i > 0) {
+                    toKeep = _.intersection(toKeep, nnodesArray);
+                }
+                else {
+                    toKeep = nnodesArray;
+                }
+
+                toKeepPinned.push(n);
+
+
+            }
+
+        });
+
+    }
+
+    // Make array of nodes to keep unique to avoid duplicates
+
+
+
+    toKeep = _.uniq(toKeep);
+
+    toKeep = _.union(toKeep,toKeepPinned);
+
+
+    // console.log("Keeping the nodes:");
+    // console.log(toKeep);
+
+    console.log(toKeep.length + ' nodes selected out of ' + global_totalnodes + ' (' + (toKeep.length/global_totalnodes).toFixed(2)*100 + '%)')
+
+    selectedNodes = [];
+    for (var irr in toKeep) {
+      selectedNodes.push(toKeep[irr].label);
+    }
+
+
+    // Now convert this to an array that will be understood by the functions below
+
+    for (key in toKeep) {
+        toKeepMap[toKeep[key].id] = toKeep[key];
+    }
+
+
+    // For each node in the graph
+
+    sigma.instances(0).graph.nodes().forEach(function(n) {
+
+        if (toKeepMap[n.id])  {
+
+            var pinSearch = '';
+
+            // Lemmataze search query if we're coming from search box
+            // SEARCHMOD
+           /* if (origin == 'search') {
+                var nodeLemma = window.jstemmer(n.originalLabel);
+
+
+                if (nodeLemma.length > 0) {
+                    pinSearch = nodeLemma;
+                }
+                else {
+                    pinSearch = n.originalLabel;
+                }
+            }
+
+            // This means the user clicked on the tag or on the graph, so we use that exact parameter to search
+
+            else {
+                pinSearch = n.originalLabel;
+            }*/
+
+            pinSearch = n.originalLabel;
+
+
+            if (pins.indexOf(pinSearch) > -1) {
+                    n.color = '#0089e0';
+
+                    if (n.originalLabel == toKeepPinned[toKeepPinned.length-1].label) {
+                        console.log('The node "' + n.originalLabel + '" has ' + n.size + ' edges (degree), betweenness centrality: ' + n.bc + ', belongs to ' + n.community + ' community.');
+                    }
+
+                }
+                else {
+                    n.color = n.originalColor;
+
+                }
+                n.label = n.originalLabel;
+
+        }
+            else  {
+                n.color = deselected_nodes_color;
+                n.label = '';
+            }
+
+    });
+
+    sigma.instances(0).graph.edges().forEach(function(e) {
+            if (toKeepMap[e.source] && toKeepMap[e.target]) {
+                e.color = e.originalColor;
+            }
+            else {
+                e.color = deselected_nodes_color;
+            }
+    });
+
+
+
+}
+
+// No nodes are selected (or all are deselected) - show the whole graph
+
+else {
+    console.log('deselecting the graph');
+
+    sigma.instances(0).graph.nodes().forEach(function(n) {
+
+
+       n.color = n.originalColor;
+       n.label = n.originalLabel;
+
+       n.marked = 0;
+
+
+
+    });
+
+    sigma.instances(0).graph.edges().forEach(function(e) {
+
+       e.color = e.originalColor;
+
+    });
+
+    // Remove all selections
+    selectedNodes = [];
+
+
+    // We show the whole graph above so scroll down to all the statements
+    $("#entries").animate({ scrollTop: $('#entries')[0].scrollHeight }, 1000);
+
+
+}
+
+// Since the data has been modified, we need to
+// call the refresh method to make the colors
+// update effective.
+
+sigma.instances(0).refresh();
+
+<% if (locals.user) { %>
+<% if (locals.user.midi != undefined && locals.user.midi != 'off') { %>
+
+
+console.log('using MIDI data ' + midi);
+console.log('playing MIDI device:');
+console.log(output);
+
+var timecode = 0;
+
+var note_node = midi.substr(10,2);
+if (note_node.substr(1,1) == '0') {
+  note_node = note_node.substr(0,1) + '1';
+}
+
+var note_edge = midi.substr(12,2);
+if (note_edge.substr(1,1) == '0') {
+  note_edge = note_edge.substr(0,1) + '1';
+}
+
+
+
+for (var m = 0; m < pins.length; m++) {
+
+
+    setTimeout(function () {
+      output.playNote(note_node, parseInt(midi.substr(0,2)));
+      output.stopNote(note_node, parseInt(midi.substr(0,2)), {time: "+500"});
+      console.log('playing a node note ' + note_node + ' at ' + timecode + ' on channel ' + parseInt(midi.substr(0,2)));
+    }, timecode);
+    timecode = getRandomInt(0,parseInt(midi.substr(6,4)));
+}
+
+var timecodea = 0;
+
+for (var ed = 0; ed < toKeep.length; ed++) {
+
+    setTimeout(function () {
+      output.playNote(note_edge, parseInt(midi.substr(2,2)));
+      output.stopNote(note_edge, parseInt(midi.substr(2,2)), {time: "+500"});
+      console.log('playing an edge note ' + note_edge + ' at ' + timecodea + ' on ' + parseInt(midi.substr(2,2)));
+    }, timecodea);
+      timecodea = getRandomInt(0,parseInt(midi.substr(6,4)));
+
+}
+
+<% } %>
+<% } %>
+
+
 }
 
 

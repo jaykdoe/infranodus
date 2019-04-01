@@ -280,7 +280,19 @@ a:hover.app-more-link {
     font: 17px 'IstokWeb-Bold',sans-serif;
     color: #4b9dff;
     margin-right: 20px;
+    z-index: 1;
     clear: both;
+}
+
+#graphTags {
+    position: fixed;
+    top: 36px;
+    right: 50px;
+    text-align: right;
+    font: 17px 'IstokWeb-Bold',sans-serif;
+    color: #4b9dff;
+    z-index: 1;
+    margin-right: 20px;
 }
 
 
