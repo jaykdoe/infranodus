@@ -5,3 +5,794 @@
     <div class='separator'>&nbsp;</div>
     <div id='<%= entry.uid %>' class='hidden'></div>
 </div>
+
+
+<script>
+
+function entryClick () {
+
+        $(".entry").on('click', function(e) {
+            if (e.target.className == 'app-link-menu') {
+
+                if ($(this).find('.app-link-menu').text() == 'hide filtered') {
+                    $(this).find('.nonmatched-sentence').fadeOut(400);
+                    $(this).find('.app-link-menu').text('show filtered');
+                }
+                else {
+                    $(this).find('.nonmatched-sentence').fadeTo(400, '0.4');
+                    $(this).find('.app-link-menu').text('hide filtered');
+                }
+
+            }
+
+            // A parameter to check if we're taking off the flag
+
+            var alreadyClicked = null;
+
+            // Make all entries semitrasparent
+
+            if (pinnedNodes.length == 0) {
+
+                $(".entry").each(function() {
+                    if ($(this).css('opacity') < 1) {
+                        $(this).css('opacity', '1');
+                        alreadyClicked = 1;
+                    }
+                    else {
+                        $(this).css('opacity', '0.3');
+                    }
+                });
+
+                // The one clicked is not transparent
+
+                $(this).css('opacity','1');
+
+            }
+
+
+
+            var keepStatementID = e.currentTarget.dataset.uid;
+
+
+            console.log(keepStatementID);
+
+            // Make only those edges visible that belong to the statement selected
+
+            if (!alreadyClicked && pinnedNodes.length == 0) {
+
+                sigma.instances(0).graph.edges().forEach(function(e) {
+                    var got_match = 0;
+
+                    for (let item of e.statement_id) {
+                        if (item == keepStatementID) {
+
+                        got_match += 1;
+
+                        }
+
+                    }
+
+                    if (got_match > 0) {
+                        e.color = e.originalColor;
+                    }
+                    else {
+                        e.color = deselected_nodes_color;
+                    }
+                });
+
+                // Make only those nodes visible that belong to the statement selected
+
+                sigma.instances(0).graph.nodes().forEach(function(n) {
+
+                    // Is there no contexts at all? Show the node.
+                    if (nodesOfStatement[keepStatementID].indexOf(n.id) < 0)  {
+                        n.color = deselected_nodes_color;
+                        n.label = '';
+                    }
+                    else {
+                        n.color = n.originalColor;
+                        n.label = n.originalLabel;
+                    }
+                });
+            }
+            else if (e.target.className == 'app-link-menu') {
+
+                // Do nothing
+
+            }
+            else {
+
+                if (pinnedNodes.length == 0) {
+                    sigma.instances(0).graph.edges().forEach(function(e) {
+                        e.color = e.originalColor;
+                    });
+
+                    // Make only those nodes visible that belong to the statement selected
+
+                    sigma.instances(0).graph.nodes().forEach(function(n) {
+                        n.color = n.originalColor;
+                        n.label = n.originalLabel;
+                    });
+                }
+
+            }
+
+            sigma.instances(0).refresh();
+        });
+
+}
+
+
+function entryScroll (scroll_entry, undo_select) {
+
+        if (pinnedNodes.length == 0 && !undo_select) {
+
+            sigma.instances(0).graph.edges().forEach(function(e) {
+                var got_match = 0;
+                for (let item of e.statement_id)  {
+                    if (scroll_entry.indexOf(item) > -1) {
+                        got_match += 1;
+                    }
+                }
+                if (got_match > 0) {
+                    e.color = e.originalColor;
+                }
+                else {
+                    e.color = deselected_nodes_color;
+                }
+
+            });
+
+            // Make only those nodes visible that belong to the statement selected
+
+            sigma.instances(0).graph.nodes().forEach(function(n) {
+
+                // Is there no contexts at all? Show the node.
+                for (var i = 0; i < scroll_entry.length; i++) {
+                if (nodesOfStatement[scroll_entry[i]] && (nodesOfStatement[scroll_entry[i]].indexOf(n.id) < 0))  {
+                    n.color = deselected_nodes_color;
+                    n.label = '';
+                }
+                else {
+                    if (nodesOfStatement[scroll_entry[i]] != undefined) {
+                    n.color = n.originalColor;
+                    n.label = n.originalLabel;
+                    }
+                }
+                }
+            });
+        }
+
+        else {
+
+            if (pinnedNodes.length == 0) {
+                sigma.instances(0).graph.edges().forEach(function(e) {
+                    e.color = e.originalColor;
+                });
+
+                // Make only those nodes visible that belong to the statement selected
+
+                sigma.instances(0).graph.nodes().forEach(function(n) {
+                    n.color = n.originalColor;
+                    n.label = n.originalLabel;
+                });
+            }
+
+        }
+
+        sigma.instances(0).refresh();
+
+}
+
+
+function entryDoubleClick() {
+
+        $(".entry").on('doubletap', function(e) {
+
+        e.preventDefault();
+
+        // Get the content from the form edit and copy it into the switcher panel to show to the user
+
+        var _formcontent = $('#adds-content').html();
+
+        $("#switcher-panel").html(_formcontent);
+
+        // Get the statement into the edit box at the top
+        $("#statement").val($('.entry-text', e.currentTarget).text());
+
+        // Retrieve that statement's ID into the hidden field (for edit or delete)
+        $('input[name="statementid"]').val(e.currentTarget.dataset.uid);
+
+        // Retrieve the date of the statement
+        $('input[name="timestamp"]').val(e.currentTarget.dataset.timestamp);
+
+        $('#statementInputMenu').each(function() {
+            $("li", this).each(function(i) {
+
+                $(this).removeClass('pure-menu-selected-top');
+
+            });
+        });
+
+
+
+
+        // Change / add buttons
+        $('#submitbutton').hide();
+
+        if (!$('#deletebutton').val()) {
+
+            $("#submitform").append('<input type="submit" name="edit" value="edit" id="editbutton" class="pure-button"> <input type="submit" style="margin: 0px 8px;" name="delete" value="delete" id="deletebutton" > <input type="submit" name="cancel" value="cancel" id="cancelbutton" class="pure-button">');
+
+            $('#deletecontextbutton').hide();
+            $('#privacy-link').hide();
+            $('#collaborate-link').hide();
+            $('#import-link').hide();
+
+
+
+            // Delete text from the form in case of Cancel, remove the buttons
+
+            $("#cancelbutton").on('click', function(e) {
+
+                e.preventDefault();
+
+                $("#statement").val('');
+                $('#editbutton').remove();
+                $('#deletebutton').remove();
+                $('#cancelbutton').remove();
+                $('#submitbutton').show();
+                $('#deletecontextbutton').show();
+                $('#privacy-link').show();
+                $('#collaborate-link').show();
+                $('#import-link').show();
+
+                $("#entries").animate({ scrollTop: $('#entries')[0].scrollHeight }, 1000);
+
+                $('input[name="timestamp"]').val('');
+
+                // Populate contexts list next to statement add
+
+                current_context_field = [];
+
+                // Are we inside some context already?
+
+                if ($("#context").val()) {
+                    current_context_field.push($("#context").val());
+                    $("#addedContexts").val($("#context").val());
+                }
+
+                else {
+
+                    if (document.getElementById('context').value) {
+                        current_context_field.push(document.getElementById('context').value);
+                        $("#addedContexts").val(document.getElementById('context').value);
+                    }
+
+                    // if not, we're making the 'private' context default
+                    else {
+                        var lastcontexts = [];
+                        var laststatement = $(".entry:last").attr('data-uid');
+                        console.log(laststatement);
+                        for (var key in statementsOfContext) {
+                            var reiteratestatements = statementsOfContext[key];
+                            for (var i = 0; i< reiteratestatements.length; i++) {
+                                if (laststatement == reiteratestatements[i]) {
+                                    lastcontexts.push(key);
+                                    console.log(key);
+                                }
+                            }
+
+                        }
+                        if (lastcontexts[0] == 'help') {
+                            current_context_field = ['private'];
+                            $("#addedContexts").val('private');
+                        }
+                        else {
+                            current_context_field = lastcontexts;
+                            $("#addedContexts").val(current_context_field.join());
+                        }
+                    }
+
+
+                }
+
+
+
+                $("#addToContexts").tagHandler({
+                    assignedTags: current_context_field,
+                    availableTags: contextNames,
+                    autocomplete: true,
+                    afterAdd: function(tag) {
+                        current_context_field.push(tag);
+                        $("#addedContexts").val(current_context_field.join());
+                        console.log('contexts in cancel field: ' + current_context_field.join());
+                    }
+                });
+
+                // TODO a better way of dealing with delete and edit - in the logic of everything else
+
+                submitFormProcess();
+
+
+
+
+
+            });
+
+            $("#deletebutton").on('click', function(e) {
+                e.preventDefault();
+
+                $('#statement').addClass('loading');
+
+                $('#deletebutton').attr('disabled', 'disabled');
+
+                $('input[name="timestamp"]').val('');
+
+
+                var formSubmit = $("#submitform").serialize() + '&delete=delete';
+
+                $.post('/post', formSubmit)
+                        .done(function(res) {
+                            //3. Receive the server response, no need to emit an event
+                            console.log(res);
+                            if (res.successmsg) {
+                                //4. Show the updated text
+                                selfPosted = '1';
+                                $('#statement').removeClass('loading');
+                                $('#deletebutton').removeAttr('disabled');
+                                socket.emit('delete message', {entryuid: res.statementid});
+                                $("#warnings").append('<p class="warning">The statement was deleted.</p>');
+                                $("#warnings").slideDown('slow');
+                                $('#cancelbutton').trigger('click');
+                                setTimeout(function() {
+                                    $("#warnings").slideUp('slow');
+                                    $("#warnings").text('');
+                                },2000);
+
+
+                            }
+                            else if (res.errormsg) {
+                                alert(res.errormsg);
+                            }
+                            else {
+                                alert('Something went wrong, please, try again...');
+                            }
+                        })
+                        .fail(function(res) {
+                            alert("Server Error: " + res.status + " " + res.statusText);
+                        });
+
+
+
+            });
+
+            $("#editbutton").on('click', function(e) {
+                e.preventDefault();
+
+                $('#statement').addClass('loading');
+
+                $('#editbutton').attr('disabled', 'disabled');
+
+                var statementToHide = $('#statementid').val();
+
+                $('[data-uid="' + statementToHide + '"]').slideUp();
+
+                var formSubmit = $("#submitform").serialize() + '&edit=edit';
+
+                $.post('/post', formSubmit)
+                        .done(function(res) {
+                            //3. Receive the server response, no need to emit an event
+                            if (res.entryuid) {
+                                //4. Show the updated text
+                                selfPosted = '1';
+                                $('#statement').removeClass('loading');
+                                $('#editbutton').removeAttr('disabled');
+                                $('#cancelbutton').trigger('click');
+                                socket.emit('chat message', {entryuid: JSON.parse(res.entryuid).data, entrytext: res.entrytext, graph: res.graph});
+                            }
+                            else if (res.errormsg) {
+                                alert(res.errormsg);
+                            }
+                            else {
+                                alert('Something went wrong, please, try again...');
+                            }
+                        })
+                        .fail(function(res) {
+                            alert("Server Error: " + res.status + " " + res.statusText);
+                        });
+
+
+
+            });
+
+
+
+        }
+
+
+        current_context_field = [];
+
+        for (var key in statementsOfContext) {
+            var checkstatements = statementsOfContext[key];
+            for (var l = 0; l<checkstatements.length; l++) {
+                if (checkstatements[l] == e.currentTarget.dataset.uid) {
+                    current_context_field.push(key);
+                }
+            }
+
+        }
+
+        console.log('context of statement clicked: ' + current_context_field);
+
+        // Which contexts the statement should be in?
+        $("#addedContexts").val(current_context_field.join());
+
+        // Update the contexts list if anything changes in the context settings of the statement
+
+        $("#addToContexts").tagHandler({
+            assignedTags: current_context_field,
+            availableTags: contextNames,
+            autocomplete: true,
+            afterAdd: function(tag) {
+                current_context_field.push(tag);
+                $("#addedContexts").val(current_context_field.join());
+                console.log('contexts in statement field: ' + current_context_field.join());
+            }
+        });
+
+
+        // Smoothly scroll up
+        $("html, body").animate({ scrollTop: 0 }, "slow");
+
+
+        // THIS WAS BEFORE WHEN YOU CLICK A STATEMENT ONCE
+
+        // Shall all statements inside Entry if clicked
+
+
+
+
+        });
+}
+
+
+
+// Summary and Insight statement actions
+
+var summary_statements = [];
+
+
+function filter_statements_summary(top_words, top_community_words, filter_origin) {
+      console.log('Filering Summary top words');
+      console.log(top_words);
+      console.log(top_community_words);
+
+      // Let's first filter statements that contain all the most influential top_words
+      // If all 4 are nowhere to be found, we reiterate until at least the first 3, 2, 1 is found.
+      // Save that
+
+      var found_statements = [];
+
+      var com_statements = {0:[],1:[],2:[],3:[],4:[]};
+
+      var current_community;
+
+      var entries_shown = [];
+
+      var entries_ids = [];
+      var entries_keywords = [];
+
+
+      if (filter_origin == 'insight') {
+
+
+          for (var i = 0; i < top_community_words.length; i++) {
+
+            current_community = i;
+            find_statement(top_community_words[i].nodes,1+i);
+          }
+
+      }
+      else {
+
+          find_statement(top_words,0);
+      }
+
+      function find_statement(key_terms, sweetch) {
+
+          var nodesfound = 0;
+
+          // Find the first entry that contains ALL the key_terms
+
+          $(".entry").each(function(){
+
+            if ((found_statements.length < 1 && sweetch == 0) || (sweetch > 0 && com_statements[sweetch].length < 1)) {
+
+              var currentDiv = $(this).attr('data-uid');
+
+
+              var originaltext = $(this).children('.entry-text').html();
+              var statement_hashtags = $(this).attr('data-hashtags');
+              var currentTimecode = $(this).attr('data-timestamp');
+
+              for (var j = 0; j < key_terms.length; j++) {
+
+
+
+                var search_lemma;
+                  //TODO lemmas
+                  // var search_lemma = window.jstemmer(pinnedNodes[j]);
+
+                  if (sweetch == 0) {
+                   search_lemma = key_terms[j].label;
+                  }
+                  else {
+                    search_lemma = key_terms[j].name;
+                  }
+
+                    if (statement_hashtags.toLowerCase().indexOf(search_lemma.toLowerCase()) > -1) {
+                        nodesfound = nodesfound + 1;
+                    }
+
+                    if (nodesfound == key_terms.length) {
+                      if (sweetch == 0) {
+                        found_statements.push({text: originaltext, id: currentDiv, time: currentTimecode, origin: key_terms});
+                      }
+                      else if (sweetch > 0) {
+                        com_statements[sweetch].push({text: originaltext, id: currentDiv, time: currentTimecode, origin: key_terms});
+                      }
+
+                    }
+
+                    // If not all the search words are present in an entry, nullify the counter
+                    if ((j == key_terms.length - 1) && nodesfound != key_terms.length) {
+                      nodesfound = 0;
+                    }
+
+              }
+            }
+
+          });
+
+
+
+          // Ok, did we already find an entry where all the top_words exist?
+
+          if ((sweetch == 0 && nodesfound == top_words.length)) {
+
+                console.log('Found influential node statement:');
+                console.log(found_statements);
+
+                for (var s = 0; s < found_statements.length; s++) {
+                    entries_shown.push(found_statements[s]);
+                }
+
+                nodesfound = 0;
+
+                // Ok, now let's search through each community
+
+
+                for (var i = 0; i < top_community_words.length; i++) {
+
+
+                  current_community = i;
+                  find_statement(top_community_words[i].nodes,1+i);
+
+                  // TODO for when 3 words are not found
+
+                  // if (nodesfound == top_community_words[i].nodes.length) {
+                  //   console.log('found community statemenets');
+                  //   console.log(a_statements);
+                  // }
+                  // else {
+                  //   top_community_words[i].nodes = top_community_words[i].nodes.slice(0,-1);
+                  //   find_statement(top_community_words[i].nodes,1+i);
+                  // }
+                }
+
+
+          }
+          else if (sweetch > 0 && nodesfound == key_terms.length) {
+
+            // Did we reach the end of all the words?
+
+            if (current_community == top_community_words.length -1) {
+
+
+              function cleanup(obj) {
+                  let newObj = [];
+                  let idx = 0;
+                  for (var propName in obj) {
+                    let prop = obj[propName];
+
+                    if (prop !== null
+                     && prop !== undefined
+                     && JSON.stringify(prop) != "[]" // not empty array
+                     && JSON.stringify(prop) !== "{}") { // not empty obj
+                      newObj[idx] = prop[0]; // we only need one object, NOTE can be an array if we decide to get more statemetns for each community
+                      idx++;
+                    }
+                  }
+                  return newObj;
+              }
+
+              com_statements = cleanup(com_statements);
+
+              console.log('Main cluster topics:');
+              console.log(com_statements);
+
+
+              for (var s = 0; s < com_statements.length; s++) {
+                entries_shown.push(com_statements[s]);
+              }
+
+
+              function compare(a,b) {
+                if (a.time < b.time)
+                  return -1;
+                if (a.time > b.time)
+                  return 1;
+                return 0;
+              }
+
+              entries_shown.sort(compare);
+              console.log(entries_shown);
+
+              for (var s = 0; s < entries_shown.length; s++) {
+                entries_ids.push(entries_shown[s].id);
+                entries_keywords[entries_shown[s].id] = entries_shown[s].origin;
+              }
+
+              var most_inf_nodes_str = '';
+              console.log('mostinfnodes')
+              console.log(most_inf_nodes);
+              for (var l = 0; l < most_inf_nodes.length; l++) {
+                most_inf_nodes_str += most_inf_nodes[l].label;
+                if (l < most_inf_nodes.length - 1) {
+                  most_inf_nodes_str += ', ';
+                }
+              }
+
+
+              $('.entry').hide();
+
+              var explanation_html = 'The excerpts from the text containing the main topics and the most influential terms:';
+
+              if (filter_origin == 'insight') {
+                if (polysingularity_score == 'Dispersed') {
+                  explanation_html = "This discourse's structure is <strong>" + polysingularity_score + "</strong>. <br><br>To increase coherency, you can make connections between different separated clusters of key terms and statements. For example, the ones below:";
+                }
+                else if (polysingularity_score == 'Diversified') {
+                  explanation_html = "This discourse's structure is <strong>" + polysingularity_score + "</strong>. It has a balanced representation of several perspectives. <br><br>You can make it more focused if you develop the ideas around the main keywords — <strong>" + most_inf_nodes_str + "</strong> — or by identifying the structural gaps between the less represented clusters and making new connections between them (to focus) or going deeper into them (to diversify even more). Like the ones below:";
+                }
+                else if (polysingularity_score == 'Focused') {
+                  explanation_html = "This discourse's structure is <strong>" + polysingularity_score + "</strong>. While it has several perspectives, it is focused on one. <br><br>You can make it more diversified if you identify the structural gaps in the graph and make connections between them — that's where the new ideas may be. For example, these two sets of key terms and statements below:";
+                }
+                else if (polysingularity_score == 'Biased') {
+                  explanation_html = "This discourse's structure is <strong>" + polysingularity_score + "</strong>. It's leaning towards and promotes a certain perspective, circulating around the most influential words — <strong>" + most_inf_nodes_str + "</strong>. <br><br>You could further develop and make connections between the different perspectives (indicated with colored topical clusters) into this discourse to make it more diversified. For example, the ones below:";
+                }
+                // There is a structural gap and a potential for a new idea between these two sets of key terms and statements below:
+              }
+
+              $('#explanation').show();
+              $('#explanation').html(explanation_html);
+
+              $(".entry").each(function(){
+
+                  var currentDiv = $(this).attr('data-uid');
+                  if (entries_ids.includes(currentDiv)) {
+
+                    $(this).fadeIn(400);
+
+                  // TODO clear up the entry text like in the above -
+                  // 1. break into sentences; 2. find the first concentrate pf words; 3. keep it. 4. either create new ones or div the part non-relevant and make it opacity low or remove fully
+
+                    var summary_helper = '';
+
+                    for (var l = 0; l < entries_keywords[currentDiv].length; l++) {
+
+
+                        if (summary_helper.length > 0) {
+                          summary_helper += ', '
+                        }
+                        if (entries_keywords[currentDiv][l].label) {
+                          summary_helper += '<a href="#" class="top_nodes">' + entries_keywords[currentDiv][l].label + '</a>';
+                        }
+                        else if (entries_keywords[currentDiv][l].name) {
+                          summary_helper += '<a href="#" class="community_node" community="' + community_of_node[entries_keywords[currentDiv][l].name] + '">' + entries_keywords[currentDiv][l].name + '</a>';
+                        }
+
+                    }
+
+                    if($(this).find('.summary').length == 0){
+
+
+                      $(this).prepend( "<div class='summary'>key terms: " + summary_helper + "</div>" );
+
+                      //console.log(entries_keywords[currentDiv]);
+                    }
+
+                  }
+
+              });
+
+
+
+              document.getElementById('entries').scrollTop = 0;
+              top_nodes_activate();
+
+              console.log('top info');
+              console.log(top_community_words);
+
+
+            //  $('#finds').trigger('click');
+
+
+              // Make only those edges visible that belong to the statement selected
+
+              if (pinnedNodes.length == 0) {
+
+
+                  sigma.instances(0).graph.edges().forEach(function(e) {
+                      var got_match = 0;
+                      for (let item of e.statement_id) {
+                        if (entries_ids.includes(item)) {
+                            got_match += 1;
+                        }
+                      }
+                      if (got_match > 0) {
+                          e.color = e.originalColor;
+                      }
+                      else {
+                          e.color = deselected_nodes_color;
+                      }
+
+                  });
+
+                  // Make only those nodes visible that belong to the statement selected
+                  sigma.instances(0).graph.nodes().forEach(function(n) {
+
+                      // Is there no contexts at all? Show the node.
+                      for (var g = 0; g < entries_ids.length; g++) {
+                        if (!n.marked || n.marked == '0') {
+                          if (nodesOfStatement[entries_ids[g]].indexOf(n.id) < 0)  {
+                              n.color = deselected_nodes_color;
+                              n.label = '';
+                          }
+                          else {
+                              n.color = n.originalColor;
+                              n.label = n.originalLabel;
+                              n.marked = '1';
+                          }
+                        }
+                      }
+                  });
+                  sigma.instances(0).refresh();
+
+              }
+
+
+
+            }
+
+          }
+          else {
+            // All top nodes cannot be found anywhere, so we cut the list and search again
+            if (sweetch == 0) {
+              top_words = top_words.slice(0, -1);
+              find_statement(top_words,0)
+            }
+            else if (sweetch > 0) {
+                var reduced_query = key_terms.slice(0,-1);
+                find_statement(reduced_query,sweetch);
+              }
+          }
+
+
+      }
+
+
+}
+
+</script>

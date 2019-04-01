@@ -15,3 +15,82 @@
 </div>
 
 <%- include('./StatementsList', {entries}); %>
+
+<script>
+$("#summary").click(function(e) {
+        e.preventDefault();
+
+        // // Top influence nodes
+      //   console.log(toppbc_nodes);
+        //
+        // // Top community nodes
+        // console.log(topp_communities);
+
+        filter_statements_summary(most_inf_nodes, most_inf_comm_nodes);
+
+        $('#topnav_items').each(function() {
+            $("li", this).each(function(i) {
+                $(this).removeClass('pure-menu-selected-top');
+            });
+        });
+        this.className = 'pure-menu-selected-top';
+        // Top community terms
+
+    });
+
+    $("#insight").click(function(e) {
+        e.preventDefault();
+
+        var insight_nodes = [];
+
+        if (polysingularity_score == 'Diversified') {
+          if (most_inf_comm_nodes[0]) {
+            insight_nodes.push(most_inf_comm_nodes[0]);
+          }
+          if (most_inf_comm_nodes[1]) {
+            insight_nodes.push(most_inf_comm_nodes[1]);
+          }
+        }
+        else {
+          if (most_inf_comm_nodes[most_inf_comm_nodes.length-1]) {
+            insight_nodes.push(most_inf_comm_nodes[most_inf_comm_nodes.length-1]);
+          }
+          if (most_inf_comm_nodes[most_inf_comm_nodes.length-2]) {
+            insight_nodes.push(most_inf_comm_nodes[most_inf_comm_nodes.length-2]);
+          }
+        }
+
+
+        filter_statements_summary(most_inf_nodes, insight_nodes, 'insight');
+
+        $('#topnav_items').each(function() {
+            $("li", this).each(function(i) {
+                $(this).removeClass('pure-menu-selected-top');
+            });
+        });
+        this.className = 'pure-menu-selected-top';
+        // Top community terms
+
+    });
+
+    $("#overview").click(function(e) {
+        e.preventDefault();
+        $('.entry').fadeIn(400);
+        $('#topnav_items').each(function() {
+            $("li", this).each(function(i) {
+                $(this).removeClass('pure-menu-selected-top');
+            });
+        });
+        this.className = 'pure-menu-selected-top';
+        $("#entries").animate({ scrollTop: $('#entries')[0].scrollHeight }, 1000);
+
+        if (pinnedNodes.length > 0) {
+          filter_statements(pinnedNodes);
+        }
+        filter_graph(pinnedNodes);
+        $('.summary').remove();
+        $('#explanation').hide();
+    });
+
+
+</script>
