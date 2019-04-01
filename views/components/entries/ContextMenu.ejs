@@ -1,5 +1,270 @@
 <script src="/javascripts/ui.js"></script>
 <script>
+
+var newcontextname = getUrlVars()["newcontextname"];
+
+
+    // Populate context menu
+
+    function populateContextMenu (contextNames) {
+
+var switch_field = '';
+
+var context_filters = '';
+
+var currentContextURL = '';
+
+var appshome = '';
+
+var settingspane = '';
+<% if (perceivername) { %>
+
+    currentContextURL = '<li id="listall" class="menu-item-divided pure-menu-selected"><a href="/<%= perceivername %>">all contexts</a></li>';
+
+<% } else { %>
+
+    currentContextURL = '<li id="listall" class="menu-item-divided pure-menu-selected"><a href="/<%= user.name %>/edit">all contexts</a></li>';
+
+<% } %>
+
+var addNewContext = '';
+
+var auxLinks = '';
+
+var detectedContext = null;
+
+// The graph exists already?
+if (typeof contextNames[0] !== 'undefined' && contextNames[0] !== null) {
+    contextNames.forEach(function(n) {
+        if (n == current_context) {
+            detectedContext = 1;
+            // for the menu
+            <% if (perceivername) { %>
+                context_filters += '<li class="app-context-link menu-item-divided pure-menu-selected"><a href="/<%= perceivername %>/' + n + '">' + n + '</a></li>';
+                currentContextURL = '<li id="listall" class="menu-item-divided"><a href="/<%= perceivername %>">all contexts</a></li>';
+            <% } else { %>
+                context_filters += '<li class="app-context-link menu-item-divided pure-menu-selected"><a href="/<%= user.name %>/' + n + '/edit">' + n + '</a></li>';
+                currentContextURL = '<li id="listall" class="menu-item-divided"><a href="/<%= user.name %>/edit">all contexts</a></li>';
+            <% } %>
+        }
+        else {
+            // for the menu
+            <% if (perceivername) { %>
+                context_filters += '<li class="app-context-link menu-item-divided "><a href="/<%= perceivername %>/' + n + '">' + n + '</a></li>';
+            <% } else { %>
+                context_filters += '<li class="app-context-link menu-item-divided "><a href="/<%= user.name %>/' + n + '/edit">' + n + '</a></li>';
+
+            <% } %>
+
+            // for the statement add
+        }
+    });
+    // TODO this is code repeat from above, optimize
+    if (!detectedContext && current_context) {
+      <% if (perceivername) { %>
+          context_filters = '<li class="app-context-link menu-item-divided pure-menu-selected"><a href="/<%= perceivername %>/' + current_context + '">' + current_context + '</a></li>' + context_filters;
+          currentContextURL = '<li id="listall" class="menu-item-divided"><a href="/<%= perceivername %>">all contexts</a></li>';
+      <% } else { %>
+          context_filters = '<li class="app-context-link menu-item-divided pure-menu-selected"><a href="/<%= user.name %>/' + current_context + '/edit">' + current_context + '</a></li>' + context_filters;
+          currentContextURL = '<li id="listall" class="menu-item-divided"><a href="/<%= user.name %>/edit">all contexts</a></li>';
+      <% } %>
+    }
+}
+// No graph, so show private
+else {
+    context_filters += '<li class="app-context-link menu-item-divided"><a href="/<%= perceivername %>/private/edit">private</a></li>';
+}
+
+<% if (!perceivername) { %>
+    addNewContext = '<li id="addNewContext" class="menu-item-divided"><a id="addcontextbutton" href="javascript:"> + new context&nbsp;&nbsp;</a>&nbsp;<form action="/post" method="GET" class="pure-form" id="addcontextinput"><input type="text" id="addcontextname" size="7" class="pure-input"></form></li>';
+<% } else { %>
+    addNewContext = '<li class="menu-item-divided">&nbsp;<a href="javascript:"></a></li>';
+
+<% } %>
+
+
+// We are viewing the user's public page?
+
+<% if ((perceivername)) { %>
+
+    // So we know whose statements we see, but is it the same as the user who's viewing them?
+    <% if (perceivername == receivername) { %>
+
+    <% if (context) { %>
+        // switch_field = '<li class="menu-item-small"><a href="/<%= perceivername %>/<%= context %>/edit">go to private view</a></li>';
+    <% } else { %>
+        // switch_field = '<li class="menu-item-small"><a href="/<%= perceivername %>/edit">go to private view</a></li>';
+    <% } %>
+
+    // So we know whose statements we're going to view, but the user is not the same as the one who made them.
+    <% } else { %>
+
+
+
+    <% } %>
+
+// We are viewing the user's private page
+
+<% } else {  %>
+
+<% if (context) { %>
+
+        switch_field = '<li class="menu-item-small">&nbsp;</li><li class="menu-item-small"><a href="/<%= user.name %>/<% context %>">go to public view</a></li>';
+
+    <% } else { %>
+
+        switch_field = '<li class="menu-item-small">&nbsp;</li><li class="menu-item-small"><a href="/<%= user.name %>">go to public view</a></li>';
+
+    <% } %>
+
+
+<% } %>
+
+
+<% if (perceivername) { %>
+
+    <% if (perceivername == receivername) { %>
+        settingspane = '<li class="menu-item-small" id="settingspane"><a href="/settings">settings</a></li><br>';
+        appshome = '<li class="menu-item-small"><a href="/apps">apps/home</a></li>';
+        auxLinks = '<br>' +
+                '<li class="menu-item-small"><a href="/<%= perceivername %>/edit">back to private view</a></li>' +
+                '<li class="menu-item-small">&nbsp;</li>' +
+                '<li class="menu-item-divided"><a href="/logout">logout</a></li>' +
+                '<li class="menu-item-small">&nbsp;</li>' +
+                '<li class="menu-item-divided"><a href="/import">import</a></li>' +
+                '<li class="menu-item-divided"><a href="/api/public/nodes/<%= perceivername %>/<%= context %>" target="_blank">export</a></li>' +
+                '<li class="menu-item-small"><a href="/api/public/nodes/<%= perceivername %>/<%= context %>?gexf=1" target="_blank" download="<%= perceivername %>_<%= context %>.gexf">gexf</a> <a href="/api/public/nodes/<%= perceivername %>/<%= context %>?csv=1" target="_blank" download="<%= perceivername %>_<%= context %>.csv">csv</a> <a href="/api/public/nodes/<%= perceivername %>/<%= context %>?csvdata=1" target="_blank">csv matrix</a>  <a href="/api/public/statements/<%= perceivername %>/<%= context %>?textonly=1" target="_blank">text only</a> <a href="" target="_blank" id="downloadpng">PNG image</a></li>' +
+                '<li class="menu-item-small">&nbsp;</li>' +
+                '<li class="menu-item-small"><a href="http://noduslabs.com/infranodus/" target="_blank">about</a></li>' +
+                '<li class="menu-item-small"><a href="http://noduslabs.com/contact/" target="_blank">contact</a></li>' +
+                '<li class="menu-item-small"><a href="http://github.com/noduslabs/infranodus" target="_blank">help &amp; github</a></li>';
+
+
+    <% } else if (receivername) { %>
+        settingspane = '<li class="menu-item-small" id="settingspane"><a href="/settings">settings</a></li><br>';
+        appshome = '<li class="menu-item-small"><a href="/apps">apps/home</a></li>';
+        auxLinks = '<br>' +
+                '<li class="menu-item-small"><a href="/<%= receivername %>/edit">back to <%= receivername %></a></li>' +
+                '<li class="menu-item-small">&nbsp;</li>' +
+                '<li class="menu-item-divided"><a href="/">home page</a></li>' +
+                '<li class="menu-item-small">&nbsp;</li>' +
+                '<li class="menu-item-divided"><a href="/import">import</a></li>' +
+                '<li class="menu-item-divided"><a href="/api/user/nodes/<%= context %>" target="_blank">export</a></li>' +
+                '<li class="menu-item-small"><a href="/api/user/nodes/<%= context %>?gexf=1" target="_blank" download="<%= context %>.gexf">gexf</a> <a href="/api/user/nodes/<%= context %>?csv=1" target="_blank">csv</a> <a href="/api/user/nodes/<%= context %>?csvdata=1" target="_blank">csv matrix</a>  <a href="/api/user/statements/<%= context %>?textonly=1" target="_blank">text only</a> <a href="" target="_blank" id="downloadpng">PNG image</a></li>' +
+                '<li class="menu-item-small"><a href="http://noduslabs.com/infranodus/" target="_blank">about</a></li>' +
+                '<li class="menu-item-small"><a href="http://noduslabs.com/contact/" target="_blank">contact</a></li>' +
+                '<li class="menu-item-small"><a href="http://github.com/noduslabs/infranodus" target="_blank">help &amp; github</a></li>';
+
+
+    <% } else { %>
+      appshome = '<li class="menu-item-small"><a href="/">infranodus.com</a></li>';
+        auxLinks = '<br>' +
+                '<li class="menu-item-small">&nbsp;</li>' +
+                '<li class="menu-item-divided"><a href="/login">login</a></li>' +
+                '<li class="menu-item-divided"><a href="/signup">signup</a></li>' +
+                '<li class="menu-item-small">&nbsp;</li>' +
+                '<li class="menu-item-divided"><a href="/api/public/nodes/<%= perceivername %>/<%= context %>" target="_blank">export</a></li>' +
+                '<li class="menu-item-small"><a href="/api/public/nodes/<%= perceivername %>/<%= context %>?gexf=1" target="_blank" download="<%= context %>.gexf">gexf</a> <a href="/api/public/nodes/<%= perceivername %>/<%= context %>?csv=1" target="_blank">csv</a> <a href="/api/public/nodes/<%= perceivername %>/<%= context %>?csvdata=1" target="_blank">csv matrix</a>  <a href="/api/public/statements/<%= perceivername %>/<%= context %>?textonly=1" target="_blank">text only</a> <a href="" target="_blank" id="downloadpng">PNG image</a></li> ' +
+                '<li class="menu-item-small">&nbsp;</li>' +
+                '<li class="menu-item-divided"><a href="/#tutorials" target="_blank">tutorials</a></li>' +
+                '<li class="menu-item-small">&nbsp;</li>' +
+                '<li class="menu-item-small"><a href="http://noduslabs.com/infranodus/" target="_blank">about</a></li>' +
+                '<li class="menu-item-small"><a href="/#features">demo</a></li>' +
+                '<li class="menu-item-small"><a href="/#usecases">case studies</a></li>' +
+                '<li class="menu-item-small">&nbsp;</li>' +
+                '<li class="menu-item-small"><a href="http://noduslabs.com/contact/" target="_blank">contact</a></li>' +
+                '<li class="menu-item-small"><a href="http://github.com/noduslabs/infranodus" target="_blank">help &amp; github</a></li>';
+
+    <% } %>
+
+// THis below is a case when the user is logged in, so PERCEIVER does not exist (only RECEIVER) and we just use intternal APIs for exports
+
+<% } else { %>
+    settingspane = '<li class="menu-item-small" id="settingspane"><a href="/settings">settings</a></li><br>';
+    appshome = '<li class="menu-item-small"><a href="/">infranodus.com</a></li><li class="menu-item-small"><a href="/apps">apps/home</a></li>';
+    auxLinks = '<br>' +
+            '<li class="menu-item-divided"><a href="/logout">logout</a></li>' +
+            '<li class="menu-item-small">&nbsp;</li>' +
+            '<li class="menu-item-divided"><a href="/import">import</a></li>' +
+            '<li class="menu-item-divided"><a href="/api/user/nodes/<%= context %>" target="_blank">export</a></li>' +
+            '<li class="menu-item-small"><a href="/api/user/nodes/<%= context %>?gexf=1" target="_blank" download="<%= context %>.gexf">gexf</a> <a href="/api/user/nodes/<%= context %>?csv=1" target="_blank">csv</a> <a href="/api/user/nodes/<%= context %>?csvdata=1" target="_blank">csv matrix</a>  <a href="/api/user/statements/<%= context %>?textonly=1" target="_blank">text only</a> <a href="" target="_blank" id="downloadpng">PNG image</a></li>' +
+            '<li class="menu-item-small">&nbsp;</li>' +
+            '<li class="menu-item-small"><a href="/#tutorials" target="_blank">video tutorials</a></li>' +
+            '<li class="menu-item-small"><a href="http://noduslabs.com/courses/text-network-analysis-for-cognitive-stimulation/" target="_blank">online course</a></li>' +
+            '<li class="menu-item-small"><a href="http://noduslabs.com/category/tutorials/" target="_blank">case studies</a></li>' +
+            '<li class="menu-item-small">&nbsp;</li>' +
+            '<li class="menu-item-small"><a href="http://noduslabs.com/contact/" target="_blank">contact</a></li>' +
+            '<li class="menu-item-small"><a href="http://github.com/noduslabs/infranodus" target="_blank">help &amp; github</a></li>';
+
+<% } %>
+
+document.getElementById('contexts').innerHTML = appshome +
+                                                settingspane +
+                                                addNewContext +
+                                                currentContextURL +
+                                                context_filters +
+                                                switch_field +
+                                                auxLinks;
+
+
+
+// Select range in textarea function
+
+$.fn.selectRange = function(start, end) {
+    return this.each(function() {
+        if (this.setSelectionRange) {
+            this.focus();
+            this.setSelectionRange(start, end);
+        } else if (this.createTextRange) {
+            var range = this.createTextRange();
+            range.collapse(true);
+            range.moveEnd('character', end);
+            range.moveStart('character', start);
+            range.select();
+        }
+    });
+};
+
+// When add new context is clicked, add it into textarea and select it
+
+$("#addNewContext").on('tap', function(e) {
+
+    $("#addcontextinput").css("visibility", "visible");
+    $("#add").css("visibility", "visible");
+    $("#addcontextname").focus();
+
+
+});
+
+<% if (!perceivername) { %>
+$('#addcontextinput').submit(function(e) {
+    e.preventDefault(); // to stop the form from submitting
+    if ($('#addcontextname').val().length > 0) {
+        var contextredirect = $('#addcontextname').val();
+        contextredirect = contextredirect.replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+        contextredirect = contextredirect.replace(/[^\w]/gi, '');
+        window.location.href = "/<%= user.name %>/" + contextredirect + '/edit';
+    }
+
+});
+<% } %>
+
+// Now time to trigger the actions we want to have when user clicks on the contexts
+addContextTriggers();
+
+
+
+if (newcontextname) {
+  // $('#menuLink').click();
+  $("#addcontextinput").css("visibility", "visible");
+  $("#addcontextname").focus();
+  $("#addcontextname").val(newcontextname);
+}
+
+
+}
+
+
 function addContextTriggers() {
 
     // TODO Add case for clicking viewAll, so it doesn't reload the page, but simply removes all filters

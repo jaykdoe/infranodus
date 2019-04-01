@@ -1,0 +1,977 @@
+<script>
+sigma.parsers.json(
+        jsonpath,
+        {
+            container: 'graph-container',
+            renderer: {
+                container: document.getElementById('graph-container'),
+                type: 'canvas'
+            },
+            settings: {
+                minNodeSize: minnodesize,
+                maxNodeSize: maxnodesize,
+                minEdgeSize: 0.5,
+                maxEdgeSize: 2,
+                labelThreshold: in_label_threshold,
+                defaultLabelColor: default_label_color
+            }
+        },
+        function(sigma) {
+            var i,
+                    timeout = 4000,
+                    nodes = sigma.graph.nodes(),
+                    color_context = '#666',
+                    color_addcontext = '#cccccc',
+                    len = nodes.length;
+
+            // This is a fix for JSON
+            // Sigma requires that nodes have X, Y, Size and Color properties which our JSON doesn't have. So we add them.
+            // We also make the initial graph layout circular, so that ForceAtlas always looks the same
+
+            var maxnodesize = 0;
+
+            for (i = 0; i < len; i++) {
+                var nodesize = 0;
+                var angle = Math.PI * 2 * i / len;
+                nodes[i].x = Math.cos(angle);
+                nodes[i].y = Math.sin(angle);
+                nodes[i].size = sigma.graph.degree(nodes[i].id);
+                nodesize = nodes[i].size;
+                if (maxnodesize < nodesize) maxnodesize = nodesize;
+                nodes[i].color = color_context;
+
+                // Add to Cytoscape
+                elesnodes.push({
+                    group: "nodes",
+                    data: { id: nodes[i].id, name: nodes[i].label}
+                });
+               
+
+            }
+
+            // We first need to save the original colors and LABELS of our
+            // nodes and edges, like this:
+
+            sigma.graph.edges().forEach(function(e) {
+
+            //  console.log(e.source + ' ' + e.target + ' ' + e.weight);
+
+                var unique_edge_id = '';
+
+                // Let's see if the edge source in alphabetical order is further than its target and change places
+
+                if (e.source > e.target) {
+                    unique_edge_id = e.target + '-' + e.source;
+                }
+                else {
+                    unique_edge_id = e.source + '-' + e.target;
+                }
+
+
+                // Let's make a unique list of edges to count how many there are of the same kind
+
+                if (edgesList[unique_edge_id]) {
+                    ++edgesList[unique_edge_id];
+
+                    // TODO this is a bit of a workaround - in the future could be better to distribute the weight evenly
+                    e.size = e.weight + edgesList[unique_edge_id];
+                }
+                else {
+                    edgesList[unique_edge_id] = 1;
+                    e.size = e.weight;
+                }
+
+
+                e.originalColor = e.color;
+
+                // Make an index of nodes to context
+                if (contextNodeID[e.edge_context]) {
+                    if (contextNodeID[e.edge_context].indexOf(e.source) < 0)
+                        contextNodeID[e.edge_context].push(e.source);
+                    if (contextNodeID[e.edge_context].indexOf(e.target) < 0)
+                        contextNodeID[e.edge_context].push(e.target);
+                }
+                else {
+                    contextNodeID[e.edge_context] = [];
+                    contextNodeID[e.edge_context].push(e.source);
+                    contextNodeID[e.edge_context].push(e.target);
+                }
+
+                // Make an index of nodes to statement
+                for (let item of e.statement_id) {
+                  if (nodesOfStatement[item]) {
+                      if (nodesOfStatement[item].indexOf(e.source) < 0)
+                          nodesOfStatement[item].push(e.source);
+                      if (nodesOfStatement[item].indexOf(e.target) < 0)
+                          nodesOfStatement[item].push(e.target);
+                  }
+                  else {
+                      nodesOfStatement[item] = [];
+                      nodesOfStatement[item].push(e.source);
+                      nodesOfStatement[item].push(e.target);
+                  }
+                }
+
+                if (statementsOfContext[e.edge_context]) {
+                    for (let item of e.statement_id) {
+                      if (statementsOfContext[e.edge_context].indexOf(item) < 0) statementsOfContext[e.edge_context].push(item);
+                    }
+                }
+                else {
+                    statementsOfContext[e.edge_context] = [];
+                    for (let item of e.statement_id) {
+                      statementsOfContext[e.edge_context].push(item);
+                    }
+                }
+
+                // Add to Cytoscape
+                elesnodes.push({
+                    group: "edges",
+                    data: { id: unique_edge_id, source: e.source, target: e.target, weight: e.weight }
+                });
+
+               
+
+                // Add to EDGES db
+                edgesDB.push(e);
+
+            });
+
+
+
+
+            sigma.graph.nodes().forEach(function(n) {
+
+                // Save node's default color, for hide and show later
+                n.originalColor = n.color;
+                n.originalLabel = n.label;
+
+                // Creating an index of node labels to IDs for filtering
+                var key = n.label;
+                nodeIDs[key] = n.id;
+
+            });
+
+
+           //sigma.refresh();
+
+
+
+
+
+            // for (var j = 0; j < cy.nodes().length; j++) {
+            //    console.log(cy.edges()[j].data());
+            // }
+
+            //  console.log(eles.getElementById('d5167020-d3ac-11e3-a954-ab35be27f3fc'));
+
+
+            // Make a list of all the node labels displayed in the graph (for Autofill)
+
+            nodeNames = _.keys(nodeIDs);
+
+
+
+            // Get the context names - all the contexts that exist in the graph we just loaded
+            // This IF statement is for the case when the contextlist parameter is not passed on
+
+            // NOTE this function can be activated if you want to get the list of contexts from the visible graph only
+            // contextNames = _.keys(contextNodeID);
+
+            // populateContextMenu(contextNames);
+
+            // Now we get the context IDs from the graph - a little bit of a workaround
+            var suspects = [];
+            var nonsuspects = [];
+
+            nodeIDs_rev = _.invert(nodeIDs);
+
+            var jsGraphEdges = [];
+
+            sigma.graph.edges().forEach(function(e) {
+
+                // If an edge has a context prefix, one of its nodes is a context, but we don't know which yet
+
+                if (e.id.substr(0,7) == 'context') {
+                        if (suspects.indexOf(e.source) < 0) {
+                            suspects.push(e.source);
+                        }
+
+                        if (suspects.indexOf(e.target) < 0) {
+                            suspects.push(e.target);
+                        }
+
+                }
+
+                // If an edge doesn't have prefix context, for sure it has only nodes
+                else {
+                        if (nonsuspects.indexOf(e.source) < 0) {
+                            nonsuspects.push(e.source);
+                        }
+
+                        if (nonsuspects.indexOf(e.target) < 0) {
+                            nonsuspects.push(e.target);
+                        }
+                }
+
+                // TODO remove that, this is just to check data consistentency
+                e.sourcename = nodeIDs_rev[e.source];
+                e.targetname = nodeIDs_rev[e.target];
+
+                 // Add to jsnetworkx
+
+                 var edge_params = {
+                     weight: 1/e.weight,
+                     sourcename: e.sourcename,
+                     targetname: e.targetname                     
+                 };
+
+                 var edge_object = [e.source, e.target, edge_params];
+                 
+                 jsGraphEdges.push(edge_object);
+                 
+                 
+            });
+
+            var jsG = new jsnx.DiGraph();
+            // jsG = jsnx.convertToUndirected(jsG);
+           
+            jsG.addEdgesFrom(jsGraphEdges);
+
+            // console.log(jsG.edges(true));
+
+    
+            // Find the difference between two arrays above, so we get contexts only
+            var contextids = _.difference(suspects, nonsuspects);
+
+
+            // Now show those nodes that are contexts bigger and with a special label
+
+            for (i = 0; i < len; i++) {
+
+                if (contextids.indexOf(nodes[i].id) > -1) {
+                    nodes[i].size = maxnodesize;
+                    nodes[i].originalLabel = 'context: ' + nodes[i].originalLabel;
+                    nodes[i].label = 'context: ' + nodes[i].label;
+                }
+
+
+            }
+
+
+
+
+            // Initialize autofill for hashtags and contexts
+            autofill(nodeNames,contextNames);
+
+
+            if (document.getElementById('context').value) {
+                current_context_field = [document.getElementById('context').value];
+                $("#addedContexts").val(document.getElementById('context').value);
+            }
+
+            // if not, we're making the 'private' context default
+            else {
+                var lastcontexts = [];
+                var laststatement = $(".entry:last").attr('data-uid');
+                console.log(laststatement);
+                for (var key in statementsOfContext) {
+                    var reiteratestatements = statementsOfContext[key];
+                    for (var i = 0; i< reiteratestatements.length; i++) {
+                        if (laststatement == reiteratestatements[i]) {
+                            lastcontexts.push(key);
+                            console.log(key);
+                        }
+                    }
+
+                }
+                if (lastcontexts[0] == 'help' || !lastcontexts[0]) {
+                    current_context_field = ['private'];
+                    $("#addedContexts").val('private');
+                }
+
+                else {
+                    current_context_field = lastcontexts;
+                    $("#addedContexts").val(current_context_field.join());
+                }
+            }
+
+            // let's now populate contextHandlers
+
+            $("#addToContexts").tagHandler({
+                assignedTags: current_context_field,
+                availableTags: contextNames,
+                autocomplete: true,
+                afterAdd: function(tag) {
+                    current_context_field.push(tag);
+                    $("#addedContexts").val(current_context_field.join());
+                    console.log('contexts in hidden field: ' + current_context_field.join());
+                },
+                afterDelete: function(tag) {
+                    console.log('initiated delete from sigma');
+                    for (var i=current_context_field.length-1; i>=0; i--) {
+                        if (current_context_field[i] === tag) {
+                            current_context_field.splice(i, 1);
+                        }
+                    }
+                    $("#addedContexts").val(current_context_field.join());
+                    console.log('contexts in hidden field: ' + current_context_field.join());
+                }
+            });
+
+            if (background == 'dark') { $('#tagInputBox').css({'backgroundColor': 'rgba(250, 250, 250, 0.2)', 'border': 'none', 'box-shadow': 'none', 'color': '#aaaab5'}); }
+            // Do ForceAtlasLayout
+
+            if (sigma.isForceAtlas2Running()) {
+                sigma.stopForceAtlas2();
+                sigma.killForceAtlas2();
+            }
+            else {
+              sigma.startForceAtlas2(forceatlas_options);
+            }
+
+
+            // Don't run it forever not to overheat :)
+
+            setTimeout(function() {
+                sigma.stopForceAtlas2();
+                sigma.killForceAtlas2();
+                downloadPNG();
+
+            },timeout);
+
+
+            // Drag nodes function initiated, so we can drag nodes
+
+            dragNodes();
+
+            // Betweenness Centrality Calculation using Cytoscape
+
+            // console.log(elesnodes);
+            eles = cy.add(elesnodes);
+
+
+            //console.log(eles.nodes().length);
+
+            betweennessCentrality(eles, jsG);
+
+            // Community detect algorithm
+
+            communityDetect();
+
+
+            // TODO make it possible for collaboration also
+
+            if (addcontext && interpret) {
+
+              $('.entry').hide();
+
+              for (var ite in statementsOfContext[current_context]) {
+
+                $('.entry[data-uid="' + statementsOfContext[current_context][ite] + '"]').each(function() {
+                  $(this).show();
+                });
+
+              }
+
+              // $('.entry').each(function() {
+              //   if ($(this).is(':hidden')) {
+              //     $(this).remove();
+              //   }
+              // });
+
+
+
+            }
+
+
+            // What happens when we click analytics pane
+
+            $('#analyticsbutton').click(function(){
+                      // Process logic and remember settings
+                     $('#analytics').toggle('slide', function(){
+                       if ($('#analytics').is(":visible")) {
+                         localStorage.setItem('analytics', 1);
+                         $('#analyticsbutton').addClass('analytics-on');
+                         $('#analyticscaption').hide();
+
+                       }
+                       else {
+                         localStorage.setItem('analytics', 0);
+                         $('#analyticsbutton').removeClass('analytics-on')
+                         $('#analyticscaption').show();
+                       }
+                     });
+
+
+
+            });
+
+            $('#analytics').on('swipedown',function(){$('#analyticsbutton').trigger('click');});
+
+            // When a node is clicked, we check for each node
+            // if it is a neighbor of the clicked one. If not,
+            // we set its color as grey, and else, it takes its
+            // original color.
+            // We do the same for the edges, and we only keep
+            // edges that have both extremities colored.
+
+            sigma.bind('clickNode', function(e) {
+              if (!sigma_dragged) {
+                // A node was clicked, so we assume there was a meaningful graph interaction
+                graphInteraction = 1;
+
+                var nodeLabel = e.data.node.originalLabel;
+
+                if (interpret) {
+                  $('.entry').show();
+                }
+
+
+                if (nodeLabel.substr(0,9) == 'context: ') {
+                    window.open('/' + current_user + '/' + nodeLabel.substr(9,nodeLabel.length) + '<% if (!perceivername) { %>/edit<% } %>',"_self");
+                }
+                else {
+
+                    // Was the node clicked already? No? Add it to array of clicked nodes.
+                    // Highlight the clicked node in the text.
+
+
+                    if (splicedNodes.length > 1) {
+                         pinnedNodes = [];
+                         for (var p = 0; p < splicedNodes.length; p++ ){
+                             pinnedNodes[p] = splicedNodes[p];
+                         }
+                    }
+                    else if (splicedNodes.length == 1) {
+                        pinnedNodes = [];
+                        pinnedNodes[0] = splicedNodes[0];
+                        splicedNodes = [];
+                    }
+
+                    if (pinnedNodes.indexOf(nodeLabel) < 0) {
+                        pinnedNodes.push(nodeLabel);
+                    }
+                    else {
+                        var pinnedIndex = pinnedNodes.indexOf(nodeLabel);
+                        if (pinnedIndex > -1) {
+                            pinnedNodes.splice(pinnedIndex,1);
+                            $('.entry').fadeIn(400);
+                        }
+
+                    }
+
+                    // console.log("Pinned nodes: " + pinnedNodes);
+                    // console.log("Spliced nodes: " + splicedNodes);
+                    socket.emit('node click', {pinnedNodes: pinnedNodes, splicedNodes: splicedNodes, nodeLabel: nodeLabel, pinnedIndex: pinnedIndex});
+
+
+                    // Now show / hide statements that have the search field
+
+                    filter_statements(pinnedNodes);
+
+
+
+
+                    // If the window is wide enough to show the menu AND div with statements is not visible
+
+                    var isHidden = $("#statements").is(":hidden");
+
+                    // if (isHidden) {
+                    //
+                    //     var delayShow = 6000;
+                    //
+                    //     clearTimeout(inactiveTimeout);
+                    //     inactiveTimeout = setTimeout(showStatements, delayShow);
+                    //
+                    //     $('#graph-container').unbind('mousemove orientationchange scroll swipe tap swipeleft swiperight scrolltop');
+                    //     $('#graph-container').bind('mousemove orientationchange scroll swipe tap swipeleft swiperight scrolltop', function(){
+                    //         if (graphInteraction) {
+                    //             clearTimeout(inactiveTimeout);
+                    //             inactiveTimeout = setTimeout(showStatements, delayShow);
+                    //         }
+                    //     });
+                    //
+                    //
+                    // }
+
+                }
+
+              }
+
+              // This is just to reset node drag parameter
+              sigma_dragged = 0;
+
+
+            });
+
+
+            // Show node's label when we're over it
+
+            sigma.bind('overNode', function(e) {
+                e.data.node.label = e.data.node.originalLabel;
+                sigma.refresh();
+            });
+
+
+
+            // Hide node's label when we're out of it
+
+            sigma.bind('outNode', function(e) {
+                if (e.data.node.color != e.data.node.originalColor && pinnedNodes.indexOf(e.data.node.originalLabel) < 0) {
+                    e.data.node.label = '';
+                }
+                sigma.refresh();
+            });
+
+
+
+            // Zoom Graph Control
+
+            var c = sigma.camera;
+
+
+            $("#zoom-in").on('click', function(e) {
+                // Zoom in - single frame :
+                c.goTo({
+                    ratio: c.ratio / c.settings('zoomingRatio')
+                });
+            });
+
+            $("#zoom-out").on('click', function(e) {
+                // Zoom out - single frame :
+                c.goTo({
+                    ratio: c.ratio * c.settings('zoomingRatio')
+                });
+            });
+
+    
+
+            
+
+            // Forward from the graph function
+
+           
+
+
+
+            // Here we perform some live updates of the graph on receiving a Socket.IO message
+            // We could also move this code and use sigma.instances(0).graph.nodes() to get sigma properties
+
+            // TODO set up chatroom, make better design, think of graph sharing functionality
+
+            socket.on('chat message', function(msg){
+
+                visibleentries_original = visibleentries_original + 1;
+
+                var perceivedby = '';
+
+                <% if (receivername) { %>
+                   perceivedby = '<%= receivername %>';
+                <% } %>
+
+                var posted_by = msg.postedby;
+
+                var added_entry =  "<div class='entry' style='display: none;' data-uid='" + msg.entryuid + "' data-hashtags='" + msg.entryname + "'><p class='entry-text'>" + msg.entrytext + "</p><p class='entry-date'>by " + posted_by + " at " + moment().format('hh:mm:ss') + "</p><div class='separator'>&nbsp;</div><div id='" + msg.entryuid + "' class='hidden'></div></div>";
+
+                // if the message is not self-posted and also if the poster of the message is not the same as the guy logged in (in case there's two logins simultaneously)
+                if (!selfPosted && perceivedby != posted_by) {
+                    // add the alien class so the posted message looks like it's from elsewhere
+                    added_entry =  "<div class='entry alien' style='display: none; margin-left: 50px' data-uid='" + msg.entryuid + "'><p class='entry-text gray'>" + msg.entrytext + "</p><p class='entry-date gray'>by " + posted_by + " at " + moment().format('hh:mm:ss') + "</p><div class='separator'>&nbsp;</div><div id='" + msg.entryuid + "' class='hidden'></div></div>";
+
+                    if (msg.help) {
+                        added_entry =  "<div class='entry alien' style='display: none; margin-left: 50px' data-uid='" + msg.entryuid + "'><p class='entry-text gray'>" + msg.entrytext + "</p><p class='entry-date gray'>help tip &nbsp;<em></em><a href='javascript:' class='disablehelp'>disable</a></em></p><div class='separator'>&nbsp;</div><div id='" + msg.entryuid + "' class='hidden'></div></div>";
+                    }
+
+                    // We will set a user for receiving. If the posting user does not equal the user who's watching the graph, we force-add the statement into theirs (provided they collaborate)
+                    var receivedby = '';
+
+                     <% if (perceivername) { %>
+                        receivedby = '<%= perceivername %>';
+                    <% } %>
+
+                    // TODO make it possible that those statements get submitted in both graphs
+
+                    // So the user who posted is not the same who's receiving? then submit the form. If the sender didnt have the mute option
+                    // This is only for collaboration - we resubmit, otherwise it's already submitted before
+                    if ((receivedby != msg.postedby) && !msg.mute) {
+
+
+                        /*var temporary_statement = $('#statement').val();
+                        $('#statement').val(msg.entrytext);
+                        console.log($("#submitform").serialize());*/
+
+                        var to_submit = $('#submitform').serializeArray();
+
+                        for (key in to_submit) {
+                            if (to_submit[key].name == 'entry[body]') {
+                                to_submit[key].value = msg.entrytext;
+                            }
+                        }
+
+                        $.post('/post', $.param(to_submit))
+                                .done(function(res) {
+
+                          /*          $('#statement').val(temporary_statement);*/
+
+                                    //3. Receive the server response, no need to emit an event
+                                    if (res.entryuid) {
+                                        //4. Show the updated text
+
+                                        if (res.entryuid == 'multiple') {
+                                          if (res.successmsg) {
+                                            $("#warnings").append('<p class="warning">Your collaborator submitted a long text. Please, reload the page to see the graph.</p>');
+                                            $("#warnings").slideDown('slow');
+                                          }
+                                          setTimeout(function() {
+                                              location.reload();
+                                          },3000);
+                                        }
+                                    }
+                                    else if (res.errormsg) {
+                                        alert(res.errormsg);
+                                    }
+                                    else {
+                                        alert('Something went wrong, please, try again...');
+                                    }
+                                })
+                                .fail(function(res) {
+                                    alert("Server Error: " + res.status + " " + res.statusText);
+                                });
+
+                    }
+
+
+
+                }
+                else {
+                    selfPosted = null;
+                }
+
+                // So let's add that entry to the #entries DIV
+
+                $(added_entry).appendTo($('#entries')).slideDown("fast");
+
+                // Do some stupid class change for the dark theme background
+                if (background == 'dark') {
+                  $('.entry').addClass('entry-dark');
+                  $('.entry-text').addClass('entry-text-dark');
+                }
+                // Nicely scroll
+
+
+
+
+
+
+
+                //$('#entries').append(added_entry).slideUp("fast");
+
+                // Unfocus and reFocus again on the entry field
+                $('#statement').blur();
+                $('#statement').focus();
+
+
+                    // Add some behavior hooks again onto that element
+                    // One click will filter the nodes / edges of the statement on the graph
+                    // Doubleclick will open the edit pane
+
+                    entryClick();
+                    entryDoubleClick();
+
+
+                    adding_entry = true;
+                    if (dynamic_watch == 1 && dynamic_graph == 1) {
+                      $('#watch-link').trigger('click');
+                      setTimeout(function() {
+                        $("#entries").animate({ scrollTop: $('#entries')[0].scrollHeight }, 1000);
+                      }, 500);
+                      setTimeout(function() {
+                        adding_entry = false;
+                        $('#watch-link').trigger('click');
+                      }, 4000);
+                    }
+                    else {
+                      $("#entries").animate({ scrollTop: $('#entries')[0].scrollHeight }, 1000);
+                    }
+
+                    var addednodes = msg.graph.nodes;
+                    var addededges = msg.graph.edges;
+
+                    var nodes_added = [];
+                    var edges_added = [];
+
+
+                    // Let's add the nodes to the Sigma graph
+                    for (var i = 0; i < addednodes.length; i++) {
+
+                        if (nodeNames.indexOf(addednodes[i].label) == -1) {
+
+                           // var angle = Math.PI * 2 * i / len;
+
+                            sigma.graph.addNode({
+                                id: (id = addednodes[i].id),
+                                label: addednodes[i].label,
+                                originalLabel: addednodes[i].label,
+                                originalColor: color_context,
+                                size: maxnodesize - 2,
+                                x: Math.random(),
+                                y: Math.random(),
+                                color: color_context
+                            });
+                            nodeNames.push(addednodes[i].label);
+                            nodes_added.push(addednodes[i]);
+                            if (!nodeIDs[addednodes[i].label]) {
+                              nodeIDs[addednodes[i].label] = addednodes[i].id;
+                            }
+
+
+                        }
+
+
+                    }
+
+                    // Let's add the edges to the Sigma graph
+
+                    for (var j = 0; j < addededges.length; j++) {
+
+                       if ((addededges[j].statement_id == msg.entryuid)) {
+
+
+                         var unique_edge_id = '';
+
+                         // Let's see if the edge source in alphabetical order is further than its target and change places
+
+                         if (addededges[j].source > addededges[j].target) {
+                             unique_edge_id = addededges[j].target + '-' + addededges[j].source;
+                         }
+                         else {
+                             unique_edge_id = addededges[j].source + '-' + addededges[j].target;
+                         }
+
+
+                            sigma.graph.addEdge({
+                                id: addededges[j].id,
+                                source: addededges[j].source,
+                                target: addededges[j].target,
+                                weight: addededges[j].weight,
+                                size: addededges[j].weight,
+                                statement_id: addededges[j].statement_id,
+                                edge_context: addededges[j].edge_context
+                            });
+
+                            edges_added.push(addededges[j]);
+
+
+                        }
+
+                    }
+
+                    // Let's create a new collection for Cytoscape - used to calculate node metrics for the graph
+                    var collection = cy.elements();
+                    cy.remove(collection);
+
+                    elesnodes = [];
+
+                    // Adding all the refreshed nodes into Cytoscape
+                    sigma.graph.nodes().forEach(function(n) {
+                        if (n.id == 'dummy') {
+                            sigma.graph.dropNode('dummy');
+                        }
+                        else {
+
+                          // Add to Cytoscape
+                          elesnodes.push({
+                              group: "nodes",
+                              data: { id: n.id, name: n.label}
+                          });
+
+                        }
+
+                      //n.size = sigma.graph.degree(n.id);
+
+                    });
+
+                    // For each edge in the graph recalculate some important metrics
+                    // And update global parameters which we use to track the state of each element
+                    // TODO this code duplicates from above - move into a function
+                    sigma.graph.edges().forEach(function(e) {
+
+                      var unique_edge_id = '';
+
+                      // Let's see if the edge source in alphabetical order is further than its target and change places
+
+                      if (e.source > e.target) {
+                          unique_edge_id = e.target + '-' + e.source;
+                      }
+                      else {
+                          unique_edge_id = e.source + '-' + e.target;
+                      }
+
+
+                        // Make and index of nodes to statement
+
+                          if (nodesOfStatement[e.statement_id]) {
+                              if (nodesOfStatement[e.statement_id].indexOf(e.source) < 0)
+                                  nodesOfStatement[e.statement_id].push(e.source);
+                              if (nodesOfStatement[e.statement_id].indexOf(e.target) < 0)
+                                  nodesOfStatement[e.statement_id].push(e.target);
+                          }
+                          else {
+                              nodesOfStatement[e.statement_id] = [];
+                              nodesOfStatement[e.statement_id].push(e.source);
+                              nodesOfStatement[e.statement_id].push(e.target);
+                          }
+
+                        // Which statements belong to which context / graph
+                        if (statementsOfContext[e.edge_context]) {
+                              if (statementsOfContext[e.edge_context].indexOf(e.statement_id[0]) < 0) {
+                                statementsOfContext[e.edge_context].push(e.statement_id[0]);
+                              }
+                        }
+                        else {
+                            statementsOfContext[e.edge_context] = [];
+                            statementsOfContext[e.edge_context].push(e.statement_id[0]);
+                        }
+
+
+                                        // Make an index of nodes to context
+                                        if (contextNodeID[e.edge_context]) {
+                                            if (contextNodeID[e.edge_context].indexOf(e.source) < 0)
+                                                contextNodeID[e.edge_context].push(e.source);
+                                            if (contextNodeID[e.edge_context].indexOf(e.target) < 0)
+                                                contextNodeID[e.edge_context].push(e.target);
+                                        }
+                                        else {
+                                            contextNodeID[e.edge_context] = [];
+                                            contextNodeID[e.edge_context].push(e.source);
+                                            contextNodeID[e.edge_context].push(e.target);
+                                        }
+
+
+                        // Add to Cytoscape for betweenness centrality calculation
+                        elesnodes.push({
+                            group: "edges",
+                            data: { id: unique_edge_id, source: e.source, target: e.target, weight: e.weight }
+                        });
+
+
+                    });
+
+
+                    // Betweenness Centrality Calculation using Cytoscape
+                    eless = cy.add(elesnodes);
+
+                    // console.log(eles.nodes().length);
+
+                    betweennessCentrality(eless);
+                    communityDetect();
+
+                    //sigma.refresh();
+
+                    // Launch new layout
+                    if (forcedatlas_running) {
+                      $('#improve-layout').trigger('click');
+                      setTimeout(function() {
+                        $('#improve-layout').trigger('click');
+                      }, 500);
+                    }
+                    else {
+                      sigma.startForceAtlas2(forceatlas_options);
+                      setTimeout(function() {
+
+                          sigma.stopForceAtlas2();
+                          sigma.killForceAtlas2();
+
+                      }, 3000);
+                    }
+
+                    // MIDI activation
+
+                    // Play a note on adding nodes / edges
+
+                    <% if (locals.user) { %>
+                    <% if (locals.user.midi != undefined && locals.user.midi != 'off') { %>
+
+
+                    console.log('using MIDI data ' + midi);
+                    console.log('playing MIDI device:');
+                    console.log(output);
+
+                    var timecode = 0;
+
+                    var note_node = midi.substr(10,2);
+                    if (note_node.substr(1,1) == '0') {
+                      note_node = note_node.substr(0,1) + '1';
+                    }
+
+                    var note_edge = midi.substr(12,2);
+                    if (note_edge.substr(1,1) == '0') {
+                      note_edge = note_edge.substr(0,1) + '1';
+                    }
+
+
+
+                    for (var m = 0; m < nodes_added.length; m++) {
+
+
+                        setTimeout(function () {
+                          output.playNote(note_node, parseInt(midi.substr(0,2)));
+                          output.stopNote(note_node, parseInt(midi.substr(0,2)), {time: "+500"});
+                          console.log('playing a node note ' + note_node + ' at ' + timecode + ' on channel ' + parseInt(midi.substr(0,2)));
+                        }, timecode);
+                        timecode = getRandomInt(0,parseInt(midi.substr(6,4)));
+                    }
+
+                    var timecodea = 0;
+
+                    for (var ed = 0; ed < edges_added.length; ed++) {
+
+                        setTimeout(function () {
+                          output.playNote(note_edge, parseInt(midi.substr(2,2)));
+                          output.stopNote(note_edge, parseInt(midi.substr(2,2)), {time: "+500"});
+                          console.log('playing an edge note ' + note_edge + ' at ' + timecodea + ' on ' + parseInt(midi.substr(2,2)));
+                        }, timecodea);
+                          timecodea = getRandomInt(0,parseInt(midi.substr(6,4)));
+
+                    }
+
+                    <% } %>
+                    <% } %>
+
+
+
+
+                    //console.log(newnodes);
+                    // console.log(msg.graph.edges);
+                    // console.log(sigma.graph.edges());
+
+                    // TODO right now it doubles the code above
+
+                    // This is for special cases where the user is on a graph, but they are adding their own stuff to this graph into a new graph, so we only show the entries that he added, not the previous ones
+                    if (addcontext && interpret) {
+
+                      $('.entry').hide();
+
+                      for (var ite in statementsOfContext[current_context]) {
+
+                        $('.entry[data-uid="' + statementsOfContext[current_context][ite] + '"]').each(function() {
+                          $(this).show();
+                        });
+
+                      }
+
+
+                  }
+
+
+            });
+
+           
+
+
+
+
+        }
+);
+</script>
