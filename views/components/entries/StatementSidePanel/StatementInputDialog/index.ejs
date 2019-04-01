@@ -365,6 +365,11 @@ socket.on('chat message', function(msg){
     // For each edge in the graph recalculate some important metrics
     // And update global parameters which we use to track the state of each element
     // TODO this code duplicates from above - move into a function
+
+    // jsnetworkx
+    var jsGraphEdges = [];
+    nodeIDs_rev = _.invert(nodeIDs);
+
     sigma.instances(0).graph.edges().forEach(function(e) {
 
       var unique_edge_id = '';
@@ -425,6 +430,22 @@ socket.on('chat message', function(msg){
             data: { id: unique_edge_id, source: e.source, target: e.target, weight: e.weight }
         });
 
+        // TODO remove that, this is just to check data consistentency
+        e.sourcename = nodeIDs_rev[e.source];
+        e.targetname = nodeIDs_rev[e.target];
+
+        // Add to jsnetworkx
+
+        var edge_params = {
+                     weight: 1/e.weight,
+                     sourcename: e.sourcename,
+                     targetname: e.targetname                     
+        };
+
+        var edge_object = [e.source, e.target, edge_params];
+                 
+        jsGraphEdges.push(edge_object);
+
 
     });
 
@@ -432,9 +453,14 @@ socket.on('chat message', function(msg){
     // Betweenness Centrality Calculation using Cytoscape
     eless = cy.add(elesnodes);
 
+    var jsG = new jsnx.DiGraph();
+    // jsG = jsnx.convertToUndirected(jsG);
+           
+    jsG.addEdgesFrom(jsGraphEdges);
+
     // console.log(eles.nodes().length);
 
-    betweennessCentrality(eless);
+    betweennessCentrality(eless, jsG);
     communityDetect();
 
     //sigma.refresh();
@@ -447,11 +473,11 @@ socket.on('chat message', function(msg){
       }, 500);
     }
     else {
-      sigma.startForceAtlas2(forceatlas_options);
+      sigma.instances(0).startForceAtlas2(forceatlas_options);
       setTimeout(function() {
 
-          sigma.stopForceAtlas2();
-          sigma.killForceAtlas2();
+          sigma.instances(0).stopForceAtlas2();
+          sigma.instances(0).killForceAtlas2();
 
       }, 3000);
     }

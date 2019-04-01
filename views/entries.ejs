@@ -207,7 +207,7 @@ var midi = '';
 
 
 
-var forcedatlas_running = false;
+
 
 var adding_entry = false;
 
@@ -404,33 +404,7 @@ if (!collaborate_invite) {
 
 
 
-    // Dynamic graph functionality
 
-    // It basically makes only the nodes / edges of the graph visible that the user is currently seeing in the statements div
-
-    var dynamic_graph = 0;
-
-    var dynamic_watch = 0;
-
-    $("#timer-link").click(function(e) {
-      if (dynamic_graph == 0) {
-        //localStorage.setItem('timer',1);
-        dynamic_graph = 1;
-        $('#timer-link').addClass('timer-link-on');
-        $('#entries').scrollTop($('#entries').scrollTop() + 1);
-      }
-      else {
-        dynamic_graph = 0;
-        //localStorage.setItem('timer',0);
-        $('#timer-link').removeClass('timer-link-on');
-        entryScroll('',true);
-        if (dynamic_watch == 1) {
-          $("#watch-link").trigger('click');
-        }
-
-      }
-
-    });
 
 
 
