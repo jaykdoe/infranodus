@@ -9,6 +9,9 @@
 
 <script>
 
+
+
+
 function checkStatementsPanelMode() {
     return {
         visibility: function() {
@@ -62,17 +65,17 @@ function toggleStatementSidePanel() {
 var link_hashtags = getUrlVars()["link_hashtags"];
 
 
-   // Replace hashtags function
+// Replace hashtags function
 
-   function replaceHashtags(hash){
+function replaceHashtags(hash){
         var replacementString = $.trim(hash);
         return ' <a href="' + forwardTo + replacementString.substr(1) +'" class="app-concept-link" target="_blank">' + replacementString + '</a>';
-    }
+}
 
 
-    var hashRegex = /(?:\s|^)(?:#(?!\d+(?:\s|$)))(\w+)(?=\s|$)/gi;
+var hashRegex = /(?:\s|^)(?:#(?!\d+(?:\s|$)))(\w+)(?=\s|$)/gi;
 
-    if (link_hashtags) {
+if (link_hashtags) {
         $(".entry").each(function() {
             // Retrieve the statement text from the entry, clean from html
             var originale = $(this).children('.entry-text').html();
@@ -80,6 +83,40 @@ var link_hashtags = getUrlVars()["link_hashtags"];
             $(this).children('.entry-text').html(originale.replace(/#(\w+)/g,  " <a href='" + forwardTo + "$1' class='app-concept-link' target='_blank'>$&</a>"));
 
         });
-    }
+}
+
+
+
+
+// Did we receive a global setting to hide the graph?
+if ((hide_always || hide_edit) && !show_text) {
+        if (checkStatementsPanelMode().visibility() == 'VISIBLE') {
+            toggleStatementSidePanel();
+        }           
+}
+
+// Did we receive a global setting to hide when small only?
+
+if (hide_when_small && $(window).width() < 600) {
+
+            if ($('#menuLink').is(':visible')) {
+                if (checkStatementsPanelMode().visibility() == 'VISIBLE') {
+                    toggleStatementSidePanel();
+                }   
+            }
+
+            $('#analytics').hide();
+            $('#analyticsbutton').removeClass('analytics-on');
+            $('#analyticscaption').show();
+}
+
+// Are we loading the page to only show the graph?
+
+<% if (background == '1' || background == 'graph') { %>
+    if (checkStatementsPanelMode().visibility() == 'VISIBLE') {
+            toggleStatementSidePanel();
+    }   
+    graphOnly = 1;
+<% } %>
 
 </script>

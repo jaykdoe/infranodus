@@ -556,4 +556,23 @@ sigma.parsers.json(
 
         }
 );
+
+
+
+// Add a method to the graph model that returns an
+// object with every neighbors of a node inside:
+
+sigma.classes.graph.addMethod('neighbors', function(nodeId) {
+    var k,
+            neighbors = {},
+            index = this.allNeighborsIndex[nodeId] || {};
+
+    for (k in index)
+        neighbors[k] = this.nodesIndex[k];
+
+    return neighbors;
+});
+
+
+
 </script>

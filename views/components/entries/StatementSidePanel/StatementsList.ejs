@@ -440,4 +440,21 @@ function entries() {
     }
 
 
+
+function showStatements () {
+    var isHidden_ = $("#statements").is(":hidden");
+    if (isHidden_) {
+        $('#statements').fadeIn();
+        $("#chat-link").toggleClass('chat-highlight');
+    }
+}
+
+function showEntries () {
+    var isHidden_ = $("#entries").is(":hidden");
+    if (isHidden_) {
+        $('#entries').fadeIn();
+    }
+}
+
+
 </script>

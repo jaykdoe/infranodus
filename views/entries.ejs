@@ -529,100 +529,12 @@ if (!collaborate_invite) {
 
 
 
-// A function to hide / Show Statements and edit pane DIVs
-
-// Has to be called with every update of the edit pane #entryform
-
-function toggle_statements() {
-
-    /*$('#graph-link').toggleClass('graph-chat');
-    $('#entries').toggleClass("hide-entries");
-    $('#statements').toggleClass("hide-statements");
-
-    if ($('#graph-link').hasClass('graph-chat')) {
-        //$('#switcher-panel').toggleClass("hide-menu");
-        $('#finds').trigger('click');
-        $('#switcher-selector').toggleClass("hide-menu");
-    }
-    else {
-        // $('#switcher-panel').toggleClass("hide-menu");
-        $('#switcher-selector').toggleClass("hide-menu");
-        if (pinnedNodes.length == 0) {
-            $('#adds').trigger('click');
-        }
-    }*/
-
-   $("#statements").fadeToggle();
-
-
-    if (!$("#chat-link").hasClass('chat-highlight')) {
-        localStorage.setItem('graph', 1);
-    }
-    else {
-        localStorage.setItem('graph', 0);
-    }
-    $("#chat-link").toggleClass('chat-highlight');
-
-    if (!localStorage.getItem('analytics')) {
-    $('#analytics').toggle('slide', function(){
-      if ($('#analytics').is(":visible")) {
-            $('#analyticsbutton').addClass('analytics-on');
-            $('#analyticscaption').hide();
-            //localStorage.setItem('analytics', 1);
-      }
-      else {
-            $('#analyticsbutton').removeClass('analytics-on');
-            $('#analyticscaption').show();
-            //localStorage.setItem('analytics', 0);
-          }
-    });
-    }
 
 
 
 
 
 
-}
-
-function showStatements () {
-        var isHidden_ = $("#statements").is(":hidden");
-        if (isHidden_) {
-            $('#statements').fadeIn();
-            $("#chat-link").toggleClass('chat-highlight');
-        }
-}
-
-function showEntries () {
-        var isHidden_ = $("#entries").is(":hidden");
-        if (isHidden_) {
-            $('#entries').fadeIn();
-        }
-}
-
-
-
-
-
-// Add a method to the graph model that returns an
-// object with every neighbors of a node inside:
-
-sigma.classes.graph.addMethod('neighbors', function(nodeId) {
-    var k,
-            neighbors = {},
-            index = this.allNeighborsIndex[nodeId] || {};
-
-    for (k in index)
-        neighbors[k] = this.nodesIndex[k];
-
-    return neighbors;
-});
-
-// Initialize JSON parser for SIGMA visualization
-
-var color_addcontext = '#666666'; // #cccccc
-
-var highlight_addcontext = '#0089e0';
 
 
 
@@ -1344,28 +1256,7 @@ var highlight_addcontext = '#0089e0';
 
         // Some more graph interface settings
 
-        // Did we receive a global setting to hide the graph?
-
-        if ((hide_always || hide_edit) && !show_text) {
-            toggle_statements();
-            //localStorage.setItem('graph', 1);
-        }
-
-        // Did we receive a global setting to hide when small only?
-
-        if (hide_when_small && $(window).width() < 600) {
-
-            if ($('#menuLink').is(':visible')) {
-                toggle_statements();
-                //localStorage.setItem('graph', 1);
-            }
-
-            $('#analytics').hide();
-            $('#analyticsbutton').removeClass('analytics-on');
-            $('#analyticscaption').show();
-
-
-        }
+     
 
         // Did we receive a global setting to hide the editor pane?
 
@@ -1376,15 +1267,7 @@ var highlight_addcontext = '#0089e0';
         }
 
 
-        // Are we loading the page to only show the graph?
-
-        <% if (background == '1' || background == 'graph') { %>
-           // $('#finds').trigger('click');
-
-            toggle_statements();
-            //localStorage.setItem('graph', 1);
-            graphOnly = 1;
-        <% } %>
+   
 
         if (localStorage.getItem('graph') == 1 && !graphOnly && !hide_always && !hide_when_small) {
             var isHidden__ = $("#statements").is(":hidden");
