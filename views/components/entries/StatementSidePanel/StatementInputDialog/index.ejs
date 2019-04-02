@@ -92,6 +92,14 @@ function changeModeTo(mode) {
     updateStatementSidePanel()
 }
 
+function sendToImport() {
+    var fornode = $('#statement').val();
+    if (pinnedNodes.length > 0) {
+        fornode = pinnedNodes.join("+");
+    }
+    navigation().redirect('/import?context=' + current_context + '&fornode=' + fornode);
+}
+
 function changeModeToSearch() {changeModeTo('SEARCH')}
 function changeModeToEdit() {changeModeTo('EDIT')}
 function changeModeToInterpret() {changeModeTo('INTERPRET')}
@@ -110,6 +118,7 @@ editButton().onClick(changeModeToEdit);
 interpretButton().onClick(changeModeToInterpret);
 minimizeButton().onClick(togglePanel);
 closeStatementMenuButton().onClick(hideStatements);
+importLinkButton().onClick(sendToImport);
 
 
 function sidePanelContent() {

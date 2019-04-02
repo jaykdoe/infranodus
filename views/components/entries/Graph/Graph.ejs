@@ -144,6 +144,32 @@ var highlight_addcontext = '#0089e0';
 <%- include('GraphGenerate') %>
 
 <script>
+
+
+        // What happens when the user clicks on a node in the graph (this is caleld from sigma but processed here)
+
+socket.on('node click', function(msg){
+
+    pinnedNodes = msg.pinnedNodes;
+    console.log("Pinned nodes:");
+    console.log(pinnedNodes);
+    splicedNodes = msg.splicedNodes;
+    console.log("Spliced nodes:");
+    console.log(splicedNodes);
+    var pinnedIndex = msg.pinnedIndex;
+
+    // Are we clicking the node that was clicked already? Then show all divs
+    if (pinnedIndex > -1) {
+          $('.entry').fadeIn(400);
+    }
+
+
+    // Filter statements and select nodes on the graph
+    filter_statements(pinnedNodes);
+
+});
+
+
  function dragNodes () {
       var dragListener = sigma.plugins.dragNodes(sigma.instances(0), sigma.instances(0).renderers[0]);
       dragListener.bind('startdrag', function(event) {

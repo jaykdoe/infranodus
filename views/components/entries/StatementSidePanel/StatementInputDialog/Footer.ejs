@@ -1,5 +1,5 @@
 <% if (!perceivername) { %>
-    <a href="/import" id="import-link" class="tooltip" title="import from external sources">
+    <a href="javascript:" id="import-link" class="tooltip" title="import from external sources">
         <!-- Import icon -->
         <span></span>
     </a>
@@ -79,6 +79,9 @@ function importLinkButton() {
         },
         show: function () {
             $('#import-link').show();
+        },
+        onClick: function(onClick) {
+            $('#import-link').on('click', onClick)
         }
     }
 }

@@ -7,3 +7,71 @@
        
 </div>
 
+
+<script>
+
+        // What happens when we add a single node from the second editor on top
+
+        $("#addnode").on('click', function(e) {
+          e.preventDefault();
+
+          $('#addnode').addClass('addnode-on');
+          $('#searchnode').removeClass('searchnode-on');
+          localStorage.setItem('defaultbehavior', 'add');
+
+          document.getElementById('addnodeform').dispatchEvent(new Event('submit'));
+
+
+        });
+
+        // What if we search for a node in the graph using the form at the top right
+
+        $("#searchnode").on('click', function(e) {
+          e.preventDefault();
+
+          $('#addnode').removeClass('addnode-on');
+          $('#searchnode').addClass('searchnode-on');
+          localStorage.setItem('defaultbehavior', 'search');
+
+          var searchinput = $('#addnodeinput').val();
+          // TODO implement lemmas search
+          if (searchinput.length > 0) {
+              var searchinarray = searchinput.split(' ');
+              for (var key in searchinarray) {
+                if (searchinarray[key].charAt(0) == '#') { searchinarray[key] = searchinarray[key].slice(1); }
+              }
+              searchinput = searchinarray.join(' ');
+              $('#search').val(searchinput);
+              document.getElementById('searchform').dispatchEvent(new Event('submit'));
+          }
+          else {
+            alert('Please, enter the node name you want to find...');
+          }
+
+        });
+
+        
+
+      
+
+        // What happens when we add a node using the small form top right?
+        $('#addnodeform').submit(function(e) {
+            e.preventDefault(); // to stop the form from submitting
+            if ($(".searchnode-on").is(":visible")) {
+              $('#searchnode').trigger('click');
+            }
+            else {
+              if ($('#addnodeinput').val().length > 0) {
+                  $('#statement').val($('#addnodeinput').val());
+                  document.getElementById('submitform').dispatchEvent(new Event('submit'));
+                  $('#addnodeinput').val('');
+                  $("#addnodeinput").focus();
+              }
+              else {
+                alert('Please, enter the name of the node you want to add...');
+              }
+            }
+
+        });
+</script>
+
