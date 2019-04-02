@@ -1,0 +1,341 @@
+<script>
+
+var speech = getUrlVars()["speech"];
+
+var voice_continues = getUrlVars()["voice_continues"];
+
+// Getting the details parsed from routes/entries.js to see how to show the graph
+
+<% if (locals.user && locals.user.voice_continues != undefined && locals.user.voice_continues != '00') { %>
+    voice_continues = '<%=locals.user.voice_continues%>';
+<% } %>
+
+
+       // So the perceiver is the one who is viewing the graph
+        // receiver is the one who created it
+        // We use it to basically identify if the user is logged in as perceiver is only passed in this case if the user who's viewing the graph is not logged in
+
+        <% if (!perceivername) { %>
+
+
+// START Speech Recognition Module only for Chrome
+
+if ('webkitSpeechRecognition' in window) {
+
+    var recognition = new webkitSpeechRecognition();
+
+    $('#microphone-link').fadeIn();
+
+    if (localStorage.getItem('microphone') == 1) {
+        $('#microphone-link').toggleClass('microphone-on', 'add');
+        activateVoiceInput();
+    }
+
+    if (speech) {
+      $('#microphone-link').toggleClass('microphone-on', 'add');
+
+      activateVoiceInput();
+
+      if (walkthrough == "mic") {
+      // Instance the walkthrough tour
+        var tour = new Tour({
+          storage: false,
+          steps: [
+          {
+            element: "#microphone-link",
+            placement: "left",
+            title: "Turn on Your Microphone",
+            content: "When it's blue, it's on. Make sure you also have the sound and microphone turned on in your computer.",
+            onNext: function (tour) {
+              setTimeout(function() {
+                var player = new talkify.Html5Player(); //or new talkify.Html5Player()
+                player.playText('Please speak into your microphone and every word you say, will be visualized in a network.');
+              },1000);
+            }
+          },
+          {
+            element: "#entryform",
+            title: "Continue Talking...",
+            content: "As you speak, the words will appear here. Please, speak clearly and make breaks between sentences."
+          },
+          {
+            element: ".entry",
+            title: "Edit the Statements",
+            content: "You will see visualization on the right. To delete a statement, double-click it."
+          },
+          {
+            element: "#statement",
+            title: "Delete Statements",
+            content: "If you double-clicked the statement, it appears here. Then simply click the Delete icon below the statement and it will be removed."
+          }
+        ]});
+
+        // Initialize the tour
+        tour.init();
+
+        // Start the tour
+        tour.start();
+      }
+
+    }
+
+    $("#microphone-link").click(function(e) {
+
+        e.preventDefault();
+
+        if (localStorage.getItem('microphone')  == 1) {
+            localStorage.setItem('microphone', 0);
+            $('#microphone-link').toggleClass('microphone-on', 'remove');
+            recognition.abort();
+            $('#livetext').html('');
+        }
+        else {
+            localStorage.setItem('microphone', 1);
+            activateVoiceInput();
+            $('#microphone-link').toggleClass('microphone-on', 'add');
+        }
+
+    });
+
+
+
+}
+
+
+    function activateVoiceInput() {
+
+
+
+            var voiceresult = '';
+
+            var previoustalk = '';
+
+            var previoustalk_last = '';
+
+            var offtherecord = '';
+
+            var voicecorrect = '';
+
+            // Are we processing a short phrase or performing continuous dictation?
+            recognition.continuous = false;
+
+            // Do we require interim results in addition to the final results?
+            recognition.interimResults = true;
+
+            // Check if the user has a preferred language settings
+
+            if (inlanguage != undefined) {
+                if (inlanguage == 'auto') {
+                  recognition.lang = 'en-US';
+                }
+                else {
+                  recognition.lang = inlanguage;
+                }
+            }
+            else {
+                // We speak The US English here
+                recognition.lang = 'en-US';
+            }
+
+            if (language == 'en' || language == 'en-US' || language == 'english') {
+                recognition.lang = 'en-US';
+                localStorage.setItem('language', 'en');
+            }
+
+            else if (language == 'ru' || language == 'russian') {
+                recognition.lang = 'ru';
+                localStorage.setItem('language', 'ru');
+            }
+            else if (language == 'fr' || language == 'french') {
+                recognition.lang = 'fr';
+                localStorage.setItem('language', 'fr');
+            }
+            else if (language == 'de' || language == 'german') {
+                recognition.lang = 'de';
+                localStorage.setItem('language', 'de');
+            }
+
+            // if (localStorage.getItem('language') == 'ru') {
+            //     recognition.lang = 'ru';
+            //     localStorage.setItem('language', 'ru');
+            // }
+            // else if (localStorage.getItem('language') == 'en') {
+            //     recognition.lang = 'en';
+            //     localStorage.setItem('language', 'en');
+            // }
+            // else if (localStorage.getItem('language') == 'fr') {
+            //     recognition.lang = 'fr';
+            //     localStorage.setItem('language', 'fr');
+            // }
+            // else if (localStorage.getItem('language') == 'de') {
+            //     recognition.lang = 'de';
+            //     localStorage.setItem('language', 'de');
+            // }
+
+            // Kick off the Speech to Text recognition process
+            $('#livetext').html('<em>waiting...</em>' + ' <span></span>');
+            recognition.start();
+
+            // Set up
+            recognition.onstart = function(event){
+                console.log("onstart", event);
+            }
+            // Set up
+            recognition.onspeechstart = function(event){
+                console.log("onspeechstart", event);
+            }
+
+            // Process parsed result
+            recognition.onresult = function(event){
+                // console.log("onresult", event);
+
+
+
+                if ($('#statement').val().length == 0) {
+                  previoustalk = '';
+                }
+                voiceresult = previoustalk + event.results[0][0].transcript;
+                $('#statement').val(voiceresult);
+                $('#livetext').html(voiceresult + '<span></span>');
+
+                console.log(event.resultIndex);
+                for (var i = event.resultIndex; i < event.results.length; ++i) {
+                    if (event.results[i].isFinal) {
+
+                        recognition.abort();
+
+                        lastword = event.results[0][0].transcript.toLowerCase();
+
+                        if (offtherecord == 'on') {
+                            voiceresult = previoustalk;
+                            $('#statement').val(voiceresult);
+                            $('#livetext').html(voiceresult + '<span></span>');
+                            if (lastword == 'on the record') {
+                              offtherecord = '';
+                            }
+                        }
+                        else if (voicecorrect == 'on') {
+                          var wordswap = lastword.split(" ");
+                          var wordwas = wordswap[0];
+                          var wordis = wordswap[2];
+                          var reg = new RegExp('('+wordwas+')', 'gi');
+                          voiceresult = previoustalk.replace(reg,wordis);
+                          previoustalk = voiceresult + ' ';
+                          $('#statement').val(voiceresult);
+                          $('#livetext').html(voiceresult + '<span></span>');
+                          voicecorrect = '';
+                        }
+                        else {
+                          if (voiceresult.length > 2) {
+                              if (!voice_continues) {
+                                $('#livetext').html(voiceresult + '<br><em>saving into the graph...</em> <span></span>');
+                                setTimeout(function(){
+                                    $('#submitbutton').trigger('click');
+                                }, 1000);
+                                setTimeout(function(){
+                                    $('#livetext').html('<em>waiting...</em>' + ' <span></span>');
+                                }, 3000);
+                              }
+                              else {
+                                if (lastword == voice_continues) {
+                                  voiceresult = previoustalk;
+                                  previoustalk = '';
+                                  $('#statement').val(voiceresult);
+                                  $('#livetext').html(voiceresult + '<span></span>');
+                                  setTimeout(function(){
+                                      $('#submitbutton').trigger('click');
+                                  }, 1000);
+                                }
+                                else if (lastword == 'improve layout') {
+                                  voiceresult = previoustalk;
+                                  $('#statement').val(voiceresult);
+                                  $('#livetext').html(voiceresult + '<span></span>');
+                                  $('#improve-layout').trigger('click');
+                                }
+                                else if (lastword == 'off the record') {
+                                  voiceresult = previoustalk;
+                                  $('#statement').val(voiceresult);
+                                  $('#livetext').html(voiceresult + '<span></span>');
+                                  offtherecord = 'on';
+                                }
+                                else if (lastword == 'correct') {
+                                  voiceresult = previoustalk;
+                                  $('#statement').val(voiceresult);
+                                  $('#livetext').html(voiceresult + '<span></span>');
+                                  voicecorrect = 'on';
+                                }
+                                else if (lastword == 'erase') {
+                                  voiceresult = previoustalk_last;
+                                  previoustalk = previoustalk_last;
+                                  $('#statement').val(voiceresult);
+                                  $('#livetext').html(voiceresult + '<span></span>');
+                                }
+                                else if (lastword == 'new line') {
+                                  previoustalk_last = previoustalk;
+                                  previoustalk = voiceresult + ' \n';
+                                }
+                                else {
+                                  previoustalk_last = previoustalk;
+                                  previoustalk = voiceresult + ' ';
+                                }
+                              }
+                          }
+                          else {
+                            previoustalk = voiceresult + ' ';
+                              // recognition.start();
+                          }
+                        }
+                    }
+                }
+            }
+
+            // Handle error
+            recognition.onerror = function(event){
+                console.log("onerror", event);
+                if (event.error == 'no-speech') {
+
+                }
+            }
+
+          /*  // Housekeeping after success or failed parsing
+            recognition.onspeechend = function(){
+                console.log("onspeechend");
+                if (voiceresult.length > 4) {
+                    setTimeout(function(){
+                        $('#submitbutton').trigger('click');
+                    }, 1000);
+
+                }
+                else {
+                    previoustalk = voiceresult + '';
+                    // recognition.start();
+                }
+
+            }*/
+
+
+            recognition.onend = function(){
+
+                console.log("onend");
+                if (localStorage.getItem('microphone') == 1 || speech == 1) {
+                    recognition.start();
+                }
+
+            }
+
+
+
+    }
+
+
+    // END Speech recognition module
+
+
+
+
+
+// IMPORTANT NOTE this is the end of the cycle that shows only to the editor, if the user who' viewing is logged in and viewing their own stuff
+ <% } %>
+
+
+</script>
