@@ -268,7 +268,7 @@ var highlight_addcontext = '#0089e0';
 
       topbc_nodes = topbc_nodes.slice(0,5);
 
-
+      var nodes_shown = 0
       sigma.instances(0).graph.nodes().forEach(function(n) {
         if ((most_influential == 'bc' || most_influential == 'bc2') && topbc_nodes[0].bc > 0) {
           if (bcmap[n.id] == 0) { bcscore = bcmin } else { bcscore = bcmap[n.id] }
@@ -278,7 +278,13 @@ var highlight_addcontext = '#0089e0';
         else {
           n.size = sigma.instances(0).graph.degree(n.id);
         }
+
+        if (n.size > in_label_threshold) {
+          console.log(n.label);
+          nodes_shown++;
+        }
       });
+      console.log(nodes_shown);
 
 
       top_components = eles.components();

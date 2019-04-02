@@ -188,6 +188,9 @@ sigma.parsers.json(
 
             var jsGraphEdges = [];
 
+
+            var edge_data = [];
+
             sigma.graph.edges().forEach(function(e) {
 
                 // If an edge has a context prefix, one of its nodes is a context, but we don't know which yet
@@ -214,14 +217,32 @@ sigma.parsers.json(
                         }
                 }
 
-                // TODO remove that, this is just to check data consistentency
-                e.sourcename = nodeIDs_rev[e.source];
+                 // TODO remove that, this is just to check data consistentency
+                 e.sourcename = nodeIDs_rev[e.source];
                 e.targetname = nodeIDs_rev[e.target];
 
-                 // Add to jsnetworkx
 
-                 var edge_params = {
-                     weight: 1/e.weight,
+    var matche = 0;
+
+for (var i = 0; i < edge_data.length; i++) {
+    // replace && with || for undirected graph
+  if ((edge_data[i].source == e.source && edge_data[i].target == e.target) || (edge_data[i].target == e.source && edge_data[i].source == e.target)) {
+    matche = 1;
+    edge_data[i].weight = edge_data[i].weight + parseInt(e.weight);
+    for (var obj in jsGraphEdges) {
+        if ((jsGraphEdges[obj][0] == e.source && jsGraphEdges[obj][1] == e.target) || (jsGraphEdges[obj][1] == e.source && jsGraphEdges[obj][0] == e.target)) {
+            jsGraphEdges[obj][2].weight += parseInt(e.weight); 
+        }
+    }
+  }
+}
+if (matche == 0) {
+  edge_data.push({source: e.source, target: e.target, weight: parseInt(e.weight)});
+
+      // Add to jsnetworkx
+
+      var edge_params = {
+                     weight: parseInt(e.weight),
                      sourcename: e.sourcename,
                      targetname: e.targetname                     
                  };
@@ -229,12 +250,24 @@ sigma.parsers.json(
                  var edge_object = [e.source, e.target, edge_params];
                  
                  jsGraphEdges.push(edge_object);
+
+}
+
+               
+
+             
                  
                  
             });
 
-            var jsG = new jsnx.DiGraph();
+            for (var obj in jsGraphEdges) {
+                jsGraphEdges[obj][2].weight = 1 /  jsGraphEdges[obj][2].weight;
+            }
+
+            var jsG = new jsnx.Graph();
             // jsG = jsnx.convertToUndirected(jsG);
+            console.log('jsG');
+            console.log(jsG);
            
             jsG.addEdgesFrom(jsGraphEdges);
 
