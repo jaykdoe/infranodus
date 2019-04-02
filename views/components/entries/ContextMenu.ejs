@@ -2,11 +2,23 @@
 <script>
 
 var newcontextname = getUrlVars()["newcontextname"];
+// What are the concepts present in the graph?
+var contextNames = [];
 
+   // Get the context names - all the contexts that exist in the graph we just loaded
+      // This IF statement is for the case when the contextlist parameter is not passed on
+      <% if (contextlist.length > 0) { %>
+      <% contextlist.forEach(function(contextlabel) { %>
+        contextNames.push("<%= contextlabel[0] %>");
+      <% }); %>
+      <% } %>
+
+// Put the contexts into the menu
+populateContextMenu(contextNames);
 
     // Populate context menu
 
-    function populateContextMenu (contextNames) {
+function populateContextMenu (contextNames) {
 
 var switch_field = '';
 

@@ -1,0 +1,69 @@
+<script>
+// locals.user basically checks the user settings
+
+<% if (locals.user) { %>
+    <% if (locals.user.midi != undefined && locals.user.midi != 'off') { %>
+
+        var output;
+        var input;
+
+        function getRandomInt(min, max) {
+          return Math.floor(Math.random() * (max - min + 1)) + min;
+        }
+
+        WebMidi.enable(function (err) {
+
+          if (err) {
+            console.log("WebMidi could not be enabled.", err);
+          } else {
+
+
+            console.log("WebMidi enabled!");
+            console.log(WebMidi.inputs);
+            console.log(WebMidi.outputs);
+            console.log(WebMidi.time);
+
+            output = WebMidi.outputs[0];
+            console.log('midi substr ' + midi.substr(4,2));
+
+            if (midi.substr(4,2) != '00') {
+              output = WebMidi.outputs[parseInt(midi.substr(4,2))];
+            }
+
+            if (output) {
+              console.log('MIDI device connected');
+            }
+            else {
+              console.log('MIDI out device not connected');
+            }
+
+            input = WebMidi.inputs[0];
+
+            if (input) {
+
+              // Listen for a 'note on' message on all channels
+              input.addListener('noteon', "all",
+                function (e) {
+                  console.log("Received 'noteon' message (" + e.note.name + e.note.octave + ").");
+                  console.log(e);
+
+                  if (midi.substr(14,2) != '' && midi.substr(14,2) != undefined && midi.substr(14,2) != 'no') {
+                    $('#statement').val($('#statement').val() + '#' + e.note.name.replace(/#/g,'') + e.note.number + ' ');
+                  }
+
+                }
+              );
+            }
+            else {
+              console.log('MIDI input device not connected');
+            }
+
+          }
+
+
+
+        });
+
+    <% } %>
+<% } %>
+</script>

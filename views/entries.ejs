@@ -77,40 +77,13 @@
 <%- include('components/entries/Graph/GraphTags') %>
 <%- include('components/entries/Graph/GraphMenu') %>
 <%- include('components/entries/Graph/Walkthrough') %>
+<%- include('components/entries/MidiController') %>
 
 
 
 
-             <script>
+<script>
 ;(function(){
-
-  
-
-
-    // Get URL variables in the form of an array
-    // TODO can be moved out
-
- 
-
-
-
-    // First we query URL parameters
-
-    /* {
-
-     Which queries to add to search keywords from the graph:
-     "go_next_add": "keyword",
-     Which website to refer people to with the keywords (include search string with URL)
-     "go_next_url" : "http://soundcloud.com/search?q="
-     }
-
-     */
-
- 
-
-
-    var convert_hashtags = getUrlVars()["convert_hashtags"];
-
 
 
 
@@ -123,9 +96,7 @@
 
 
 
-    var highlight = getUrlVars()["highlight"];
 
-    var missing = getUrlVars()["missing"];
 
     var add_statement = getUrlVars()["statement"];
 
@@ -140,14 +111,6 @@
     <% } %>
 
     
-
-
-
-
-    
-    // For collaboration - Socket.IO chat
-    var collaborate_invite = getUrlVars()["collaborate"];
-
 
 
 // MAIN SETTINGS START
@@ -253,155 +216,6 @@ if (background == 'dark') {
 }
 
 $('#analyticscaption').html(customization);
-
-
-// locals.user basically checks the user settings
-
-<% if (locals.user) { %>
-<% if (locals.user.midi != undefined && locals.user.midi != 'off') { %>
-
-var output;
-var input;
-
-function getRandomInt(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
-WebMidi.enable(function (err) {
-
-  if (err) {
-    console.log("WebMidi could not be enabled.", err);
-  } else {
-
-
-    console.log("WebMidi enabled!");
-    console.log(WebMidi.inputs);
-    console.log(WebMidi.outputs);
-    console.log(WebMidi.time);
-
-    output = WebMidi.outputs[0];
-    console.log('midi substr ' + midi.substr(4,2));
-
-    if (midi.substr(4,2) != '00') {
-      output = WebMidi.outputs[parseInt(midi.substr(4,2))];
-    }
-
-    if (output) {
-      console.log('MIDI device connected');
-    }
-    else {
-      console.log('MIDI out device not connected');
-    }
-
-    input = WebMidi.inputs[0];
-
-    if (input) {
-
-      // Listen for a 'note on' message on all channels
-      input.addListener('noteon', "all",
-        function (e) {
-          console.log("Received 'noteon' message (" + e.note.name + e.note.octave + ").");
-          console.log(e);
-
-          if (midi.substr(14,2) != '' && midi.substr(14,2) != undefined && midi.substr(14,2) != 'no') {
-            $('#statement').val($('#statement').val() + '#' + e.note.name.replace(/#/g,'') + e.note.number + ' ');
-          }
-
-        }
-      );
-    }
-    else {
-      console.log('MIDI input device not connected');
-    }
-
-  }
-
-
-
-});
-
-<% } %>
-<% } %>
-
-
-// If the user opened a URL with collaborate=xxxxxx then they join the room that's the "url_path/xxxxxx"
-if (collaborate_invite) {
-    collaborate_id = collaborate_invite;
-}
-// Otherwise they join a room which is "url_path/randomnumber"
-else {
-    collaborate_id = Math.round((Math.random() * 1000000));
-}
-
-collaborate_matrix[collaborate_room] = collaborate_room + collaborate_id;
-
-// console.log('room id');
-// console.log(collaborate_matrix[collaborate_room]);
-
-if (!collaborate_invite) {
-    if (collaborate_storage) {
-
-        if (collaborate_storage[collaborate_room]) {
-            if (collaborate_storage[collaborate_room].length > 0) {
-                collaborate_matrix[collaborate_room] = collaborate_storage[collaborate_room];
-                collaborate_id = collaborate_matrix[collaborate_room].split("/").pop();
-            }
-        }
-    }
-
-    // Now in case the original user reloads the page by error, they'll get the new collaborate ID, so we avoid that by storing their data
-    localStorage.setItem("collaborate", JSON.stringify(collaborate_matrix));
-}
-
-   
-
-
-    socket.on('startChat', function(data){
-        console.log('chat started');
-        if(data.boolean && data.id == collaborate_matrix[collaborate_room]) {
-            console.log('in chat room ' + data.id);
-            var collab_content = $('#collaborate-link').tooltipster('content');
-            $('#collaborate-link').tooltipster('content', 'Collaboration is ON');
-            $('#collaborate-link').addClass('is-collab');
-            $('#collaborate-link').tooltipster('show');
-            setTimeout(function() {
-                $('#collaborate-link').tooltipster('hide');
-                setTimeout(function() {
-                    $('#collaborate-link').tooltipster('content', collab_content);
-                }, 1000);
-
-            }, 2000);
-        }
-    });
-
-    socket.on('leave', function(msg){
-        console.log('partner left');
-        console.log(msg.people);
-        if (msg.people < 2) {
-          $('#collaborate-link').removeClass('is-collab');
-          var collab_content = $('#collaborate-link').tooltipster('content');
-          $('#collaborate-link').tooltipster('content', 'Collaboration is OFF');
-          $('#collaborate-link').tooltipster('show');
-          setTimeout(function() {
-              $('#collaborate-link').tooltipster('hide');
-              setTimeout(function() {
-                  $('#collaborate-link').tooltipster('content', collab_content);
-              }, 1000);
-          }, 2000);
-        }
-    });
-
-    socket.on('tooMany', function(data){
-
-        console.log('one too many');
-        alert('There are already 2 users working on this context and this is our max so far. If you think it is a mistake, please, check if any of your extra browser tabs are opened.');
-        window.location.href = 'http://' + hostsite + '/' + 'home' + '/edit';
-
-    });
-
-
-
-
 
 
 
@@ -529,49 +343,13 @@ if (!collaborate_invite) {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// TODO: 1. Add search function by #hashtag; 2. Attach that same function to hashtag doubleclick;
-
 // Auto-resize to fill content;
 
     // This launches only when all other stuff from above have loaded
     $(document).ready(function(){
 
-
-
-
-      // Get the context names - all the contexts that exist in the graph we just loaded
-      // This IF statement is for the case when the contextlist parameter is not passed on
-      <% if (contextlist.length > 0) { %>
-      <% contextlist.forEach(function(contextlabel) { %>
-        contextNames.push("<%= contextlabel[0] %>");
-      <% }); %>
-      <% } %>
-
-      // Memorize which interface option the user had on last time
-      if (localStorage.getItem('defaultbehavior') == 'add') {
-        $('#addnode').addClass('addnode-on');
-      }
-      else {
-        $('#searchnode').addClass('searchnode-on');
-      }
-
-      // Put the contexts into the menu
-      populateContextMenu(contextNames);
-
+     
+         // Add hooks on all tooltips
         $('.tooltip').tooltipster({
             theme: 'tooltipster-noir',
             position: 'left',
@@ -581,76 +359,8 @@ if (!collaborate_invite) {
 
         // Some more settings from the URL or user settings passed from routes/entries.js and defined above in global parameters
 
-        var privacyform = '';
-
-        var graph_share_url = hostsite + '/' + current_user;
-
-        if (current_context) {
-            graph_share_url = graph_share_url + "/" + current_context + "?";
-        }
-
-        if (background) {
-            graph_share_url += 'background=' + background + '&';
-        }
-
-        if (most_influential) {
-            graph_share_url += '&most_influential=' + most_influential + '&';
-        }
-
-        if (maxnodes) {
-            graph_share_url += '&maxnodes=' + maxnodes + '&';
-        }
-
-        if (abstract == 'yes') {
-            graph_share_url += '&abstract=yes&hide_always=1&';
-        }
 
 
-        var privacy_iframe = "<iframe width='100%' height='500' style='height: 500px' src='https://" + graph_share_url + "hide_always=1&link_hashtags=1&background=" + background + "&maxnodes=" + maxnodes + "' frameborder='0' allowfullscreen></iframe>";
-
-        <% if (contextpublic && context && !perceivername && entries.length > 0) { %>
-            privacyform = $('<span><form action="/context" name="privacycontext" method="post" class="pure-form"><input type="hidden" name="context" value="<%= context %>">This context can be viewed on:<br><input type="text" id="embedurl" size="25" maxlength="80" class="pure-input" value="https://' + graph_share_url + '"><br><br>Embed code for websites:<br><input type="text" id="embedcode" size="25" maxlength="100" class="pure-input" value="' + privacy_iframe + '"><br><br><input type="submit" id="privacybutton" name="privacy" value="make private"></form></span>')
-
-        <% } else if (!perceivername && context && entries.length > 0) { %>
-            privacyform = $('<span><form action="/context" name="privacycontext" method="post" class="pure-form"><input type="hidden" name="context" value="<%= context %>">This context is currently private and cannot be seen by the public.<br><br><input type="submit" id="privacybutton" name="privacy" value="make public"></form></span>')
-        <% }  %>
-
-        $('#privacy-link').tooltipster({
-            theme: 'tooltipster-noir',
-            position: 'top-right',
-            maxWidth: 220,
-            interactive: true,
-            content: privacyform,
-            functionReady: function() {
-                $('#embedurl').focus(function(event) {
-                    setTimeout(function() {$('#embedurl').select();}, 0);
-                });
-                $('#embedcode').focus(function(event) {
-                    setTimeout(function() {$('#embedcode').select();}, 0);
-                });
-
-            }
-        });
-
-
-        collaborate_message = '<a href="mailto:chat@infranodus.com?subject=Chat%20Now&body=https://' + graph_share_url + '/edit?collaborate=' + collaborate_id + '">Invite us</a> or other people for a real-time constellaversation – just share the link below:<br>';
-
-        collaborate_html = '<span><form class="pure-form">' + collaborate_message + '<input type="text" id="collaburl" size="22" maxlength="80" class="pure-input" value="http://' + graph_share_url + '/edit?collaborate=' + collaborate_id + '"></form></span>';
-
-        collaborate_content = $(collaborate_html);
-
-        $('#collaborate-link').tooltipster({
-            theme: 'tooltipster-noir',
-            position: 'top-right',
-            maxWidth: 220,
-            interactive: true,
-            content: collaborate_content,
-            functionReady: function() {
-                $('#collaburl').focus(function(event) {
-                    this.setSelectionRange(0, 9999);
-                });
-            }
-        });
 
 
 
@@ -662,18 +372,6 @@ if (!collaborate_invite) {
 
         <% if (!perceivername) { %>
 
-            // Advertise graph collaboration module
-            if (!collaborate_invite) {
-                var collab_content = $('#collaborate-link').tooltipster('content');
-
-                var graph_share_url = hostsite + '/' + current_user;
-
-                if (current_context) {
-                    graph_share_url = graph_share_url + "/" + current_context;
-                }
-
-
-            }
 
         // START Speech Recognition Module only for Chrome
 
@@ -1049,17 +747,11 @@ if (!collaborate_invite) {
         var filteringstarted = 0;
 
         // Add the hooks to the newly rendered entries again
-
         entryClick();
 
         // If it's NOT some other user watching the graph, then statements can be edited. Otherwise - no.
         <% if (!perceivername) { %>
         entryDoubleClick();
-
-
-
-
-
         <% } %>
 
 

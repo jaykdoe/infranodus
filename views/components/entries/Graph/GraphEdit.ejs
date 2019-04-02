@@ -10,6 +10,15 @@
 
 <script>
 
+     // Memorize which interface option the user had on last time
+     if (localStorage.getItem('defaultbehavior') == 'add') {
+        $('#addnode').addClass('addnode-on');
+      }
+      else {
+        $('#searchnode').addClass('searchnode-on');
+      }
+      
+
         // What happens when we add a single node from the second editor on top
 
         $("#addnode").on('click', function(e) {

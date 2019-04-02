@@ -20,6 +20,18 @@ var graphPalette = getUrlVars()["palette"];
 
 var interpret = getUrlVars()["interpret"];
 
+var abstract;
+
+// default most influential nodes are displayed according to Betwenness Centrality (bc) or Degree (degree)
+var most_influential = 'bc';
+
+<% if (locals.user.topnodes) { %>
+most_influential = '<%= user.topnodes %>';
+<% } %>
+
+if (getUrlVars()["most_influential"] == 'bc' || getUrlVars()["most_influential"] == 'bc2' || getUrlVars()["most_influential"] == 'degree') {
+  most_influential = getUrlVars()["most_influential"];
+}
 
 var urlPath = location.pathname;
 
@@ -134,6 +146,53 @@ var nodesOfStatement = [];
         console.log('connected');
         socket.emit('login', {user: current_user, context: current_context, id: collaborate_matrix[collaborate_room]});
     });
+
+
+    socket.on('startChat', function(data){
+        console.log('chat started');
+        if(data.boolean && data.id == collaborate_matrix[collaborate_room]) {
+            console.log('in chat room ' + data.id);
+            var collab_content = $('#collaborate-link').tooltipster('content');
+            $('#collaborate-link').tooltipster('content', 'Collaboration is ON');
+            $('#collaborate-link').addClass('is-collab');
+            $('#collaborate-link').tooltipster('show');
+            setTimeout(function() {
+                $('#collaborate-link').tooltipster('hide');
+                setTimeout(function() {
+                    $('#collaborate-link').tooltipster('content', collab_content);
+                }, 1000);
+
+            }, 2000);
+        }
+    });
+
+    socket.on('leave', function(msg){
+        console.log('partner left');
+        console.log(msg.people);
+        if (msg.people < 2) {
+          $('#collaborate-link').removeClass('is-collab');
+          var collab_content = $('#collaborate-link').tooltipster('content');
+          $('#collaborate-link').tooltipster('content', 'Collaboration is OFF');
+          $('#collaborate-link').tooltipster('show');
+          setTimeout(function() {
+              $('#collaborate-link').tooltipster('hide');
+              setTimeout(function() {
+                  $('#collaborate-link').tooltipster('content', collab_content);
+              }, 1000);
+          }, 2000);
+        }
+    });
+
+    socket.on('tooMany', function(data){
+
+        console.log('one too many');
+        alert('There are already 2 users working on this context and this is our max so far. If you think it is a mistake, please, check if any of your extra browser tabs are opened.');
+        window.location.href = 'http://' + hostsite + '/' + 'home' + '/edit';
+
+    });
+
+
+    
 
      // When we click reset button
 

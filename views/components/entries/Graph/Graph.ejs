@@ -51,7 +51,6 @@ var maxnodes = '';
 
 
 // Do we show abstract graph and no nodes?
-var abstract;
 
 <% if (locals.user && locals.user.abstract != undefined) { %>
         abstract = '<%=locals.user.abstract%>';
@@ -81,23 +80,13 @@ if (abstract && abstract != 'no') {
     in_label_threshold = 20;
 }
 
-// default most influential nodes are displayed according to Betwenness Centrality (bc) or Degree (degree)
-var most_influential = 'bc';
 
-<% if (locals.user.topnodes) { %>
-most_influential = '<%= user.topnodes %>';
-<% } %>
-
-if (getUrlVars()["most_influential"] == 'bc' || getUrlVars()["most_influential"] == 'bc2' || getUrlVars()["most_influential"] == 'degree') {
-  most_influential = getUrlVars()["most_influential"];
-}
 
 // Sigma graph layout options
 var forceatlas_options = {worker: false, startingIterations: 100, scalingRatio: 0.1, slowDown: 100, strongGravityMode: true};
 
 
-// What are the concepts present in the graph?
-var contextNames = [];
+
 
 // What are the concepts present in the graph?
 var statementsOfContext = [];
@@ -136,6 +125,9 @@ var color_addcontext = '#666666'; // #cccccc
 
 var highlight_addcontext = '#0089e0';
 
+var highlight = getUrlVars()["highlight"];
+
+var missing = getUrlVars()["missing"];
 
 
 
