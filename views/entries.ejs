@@ -66,68 +66,7 @@
 ;(function(){
 
 
-// MAIN SETTINGS START
-
-
-var current_context_field = [];
-
-
-// These are the nodes clicked in the graph
-
-var global_totalnodes = 0;
-
-// These are for Summary / Insight functionality
-
-var most_inf_nodes = [];
-
-var most_inf_comm_nodes = {};
-
-var polysingularity_score = 0;
-
-// Whats the clicked nodes in the graph
-var clickedNodes = [];
-
-// What are the shown nodes on the graph;
-var shownNodes = [];
-
-// Inactivity timeout
-var inactiveTimeout = null;
-
-// This variable shows if there was a meaningful interaction with the graph yet
-var graphInteraction = null;
-
-// Loaded with graph only?
-var graphOnly = null;
-
-
-
-
-
-
-
-
-
-
-
-
-// This is for the option to emit and receive MIDI signals for the graph
-
-var midi = '';
-
-// TODO for desktop browses that support webwork (not iphone): webworker: true, slowdown: 300
-
-
-
-
-
-
-
-
-
-
-var adding_entry = false;
-
-// This is a very stupid way to change the interface color to dark if the setting is on (through URL or user settings)
+// TODO simply load different classes with these parameters
 
 if (background == 'dark') {
   $('#graph-container').addClass('graph-dark');
@@ -171,116 +110,6 @@ if (background == 'dark') {
 
 
 
-
-
-
-
-    // When scroll happens if the dynamic graph is on, show which uids are visible
-
-    var scroll_signal;
-
-    $("#entries").scroll(function() { //.box is the class of the div
-
-          if (dynamic_graph == 1) {
-
-            var ventries = [];
-
-
-              $('#entries').children(".entry").each(function(){
-                  var vresult;
-                  vresult = checkInView(this,true);
-                  if (vresult == true) {
-                      if (ventries.indexOf($(this).attr('data-uid')) == -1) {
-                          ventries.push($(this).attr('data-uid'));
-                      }
-                  }
-
-                //  result2 += " " +  checkInView($(e),true);
-               });
-
-              entryScroll(ventries);
-
-
-
-              if (!$(this).is(':animated')) {
-
-                var current_scroll = ($(this).scrollTop());
-                var max_scroll = $(this)[0].scrollHeight - $(this).height();
-
-                if (current_scroll == max_scroll && scroll_signal != 'bottom') {
-                  $(this).scrollTop(0);
-                  scroll_signal = 'top';
-                }
-                else if (current_scroll == 0 && scroll_signal != 'top') {
-                  $(this).scrollTop($(this)[0].scrollHeight);
-                  scroll_signal = 'bottom';
-                }
-
-              }
-
-
-          }
-
-    });
-
-
-    // Dynamically watch the graph unfold
-
-    $("#watch-link").click(function(e) {
-
-      if (dynamic_watch == 0) {
-          var speed_scroll = 1000;
-          dynamic_watch = 1;
-
-          $('#watch-link').addClass('watch-link-on');
-
-          if (dynamic_graph == 0) {
-            $("#timer-link").trigger('click');
-          }
-
-          var max_scroll = $('#entries')[0].scrollHeight - $('#entries').height();
-
-          function autoScrollUp(){
-            var current_scroll = ($('#entries').scrollTop());
-            var scroll_to = max_scroll;
-            var num_entries =  $('.entry').length;
-
-            if (current_scroll == max_scroll) {
-              $('#entries').scrollTop(0);
-              current_scroll = $('#entries').scrollTop();
-            }
-            var play_time = Math.round(((max_scroll - current_scroll)/max_scroll) * num_entries * speed_scroll);
-
-            $("#entries").animate({scrollTop: scroll_to},play_time,"linear", autoScrollUp); // and animate
-          }
-          autoScrollUp();
-
-      }
-      else  {
-        dynamic_watch = 0;
-        $('#watch-link').removeClass('watch-link-on');
-        $("#entries").stop();
-
-      }
-    });
-
-    // TODO move this general function out — this is just to check which elements inside (#entries) are visible for the dynamic graph feature above
-
-    function checkInView(elem,partial)
-      {
-          var container = $("#entries");
-          var contHeight = container.height();
-          var contTop = container.scrollTop();
-          var contBottom = contTop + contHeight ;
-
-          var elemTop = $(elem).offset().top - container.offset().top;
-          var elemBottom = elemTop + $(elem).height();
-
-          var isTotal = (elemTop >= 0 && elemBottom <=contHeight);
-          var isPart = ((elemTop < 0 && elemBottom > 0 ) || (elemTop > 0 && elemTop <= container.height())) && partial ;
-
-          return  isTotal  || isPart ;
-      }
 
 
 
@@ -405,13 +234,7 @@ if (background == 'dark') {
 
    
 
-        if (localStorage.getItem('graph') == 1 && !graphOnly && !hide_always && !hide_when_small) {
-            var isHidden__ = $("#statements").is(":hidden");
-            if (!isHidden__) {
-                $('#statements').fadeOut();
-                $("#chat-link").toggleClass('chat-highlight','add');
-            }
-        }
+  
 
         if (localStorage.getItem('timer') == 1) {
           ($("#timer-link").trigger('click'));

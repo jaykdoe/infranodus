@@ -17,11 +17,12 @@
 <%- include('./StatementsList', {entries}); %>
 
 <script>
-$("#summary").click(function(e) {
+
+    $("#summary").click(function(e) {
         e.preventDefault();
 
         // // Top influence nodes
-      //   console.log(toppbc_nodes);
+        //   console.log(toppbc_nodes);
         //
         // // Top community nodes
         // console.log(topp_communities);
@@ -90,6 +91,48 @@ $("#summary").click(function(e) {
         filter_graph(pinnedNodes);
         $('.summary').remove();
         $('#explanation').hide();
+    });
+
+
+    // If the dynamic graph function is on, when the user scrolls the statements, she sees the graph unfold
+
+    $("#entries").scroll(function() { //.box is the class of the div
+
+        if (dynamic_graph == 1) {
+
+          var ventries = [];
+
+            $('#entries').children(".entry").each(function(){
+                var vresult;
+                vresult = checkInView(this,true);
+                if (vresult == true) {
+                    if (ventries.indexOf($(this).attr('data-uid')) == -1) {
+                        ventries.push($(this).attr('data-uid'));
+                    }
+                }
+
+              //  result2 += " " +  checkInView($(e),true);
+            });
+
+            entryScroll(ventries);
+
+            if (!$(this).is(':animated')) {
+
+              var current_scroll = ($(this).scrollTop());
+              var max_scroll = $(this)[0].scrollHeight - $(this).height();
+
+              if (current_scroll == max_scroll && scroll_signal != 'bottom') {
+                $(this).scrollTop(0);
+                scroll_signal = 'top';
+              }
+              else if (current_scroll == 0 && scroll_signal != 'top') {
+                $(this).scrollTop($(this)[0].scrollHeight);
+                scroll_signal = 'bottom';
+              }
+
+            }
+        }
+
     });
 
 

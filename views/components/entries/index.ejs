@@ -140,6 +140,32 @@ var contextNodeID = [];
 // Create statement-node index for filtering
 var nodesOfStatement = [];
 
+// Used to populate entry textfield
+var current_context_field = [];
+
+
+// These are for Summary / Insight functionality in StatementView and StatementEntry fields
+
+var most_inf_nodes = [];
+
+var most_inf_comm_nodes = {};
+
+
+// Loaded with graph only?
+
+var graphOnly = null;
+
+
+var adding_entry = false;
+
+
+var scroll_signal;
+
+
+// Bias index / Diversity / Polysingularity Score. Used in StatementEntry and StatementOverview and the Graph
+
+var polysingularity_score = 0;
+
 
  // Collaboration features realized using Socket.IO
     // On connection to server get the id of the current chat "room", which is actually the folder/URL of the current user

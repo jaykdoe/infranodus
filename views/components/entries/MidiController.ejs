@@ -1,6 +1,10 @@
 <script>
 // locals.user basically checks the user settings
 
+// This is for the option to emit and receive MIDI signals for the graph
+
+var midi = '';
+
 <% if (locals.user) { %>
     <% if (locals.user.midi != undefined && locals.user.midi != 'off') { %>
 

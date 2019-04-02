@@ -94,6 +94,48 @@ function addContextButton() {
     });
 
 
+
+    // Dynamically watch the graph unfold
+
+    $("#watch-link").click(function(e) {
+
+    if (dynamic_watch == 0) {
+        var speed_scroll = 1000;
+        dynamic_watch = 1;
+
+        $('#watch-link').addClass('watch-link-on');
+
+        if (dynamic_graph == 0) {
+        $("#timer-link").trigger('click');
+        }
+
+        var max_scroll = $('#entries')[0].scrollHeight - $('#entries').height();
+
+        function autoScrollUp(){
+        var current_scroll = ($('#entries').scrollTop());
+        var scroll_to = max_scroll;
+        var num_entries =  $('.entry').length;
+
+        if (current_scroll == max_scroll) {
+            $('#entries').scrollTop(0);
+            current_scroll = $('#entries').scrollTop();
+        }
+        var play_time = Math.round(((max_scroll - current_scroll)/max_scroll) * num_entries * speed_scroll);
+
+        $("#entries").animate({scrollTop: scroll_to},play_time,"linear", autoScrollUp); // and animate
+        }
+        autoScrollUp();
+
+    }
+    else  {
+    dynamic_watch = 0;
+    $('#watch-link').removeClass('watch-link-on');
+    $("#entries").stop();
+
+    }
+    });
+
+
     
 
 </script>

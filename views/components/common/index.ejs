@@ -52,4 +52,21 @@
         return rtn;
     }
 
+
+    function checkInView(elem,partial)
+    {
+        var container = $("#entries");
+        var contHeight = container.height();
+        var contTop = container.scrollTop();
+        var contBottom = contTop + contHeight ;
+
+        var elemTop = $(elem).offset().top - container.offset().top;
+        var elemBottom = elemTop + $(elem).height();
+
+        var isTotal = (elemTop >= 0 && elemBottom <=contHeight);
+        var isPart = ((elemTop < 0 && elemBottom > 0 ) || (elemTop > 0 && elemTop <= container.height())) && partial ;
+
+        return  isTotal  || isPart ;
+    }
+
 </script>
