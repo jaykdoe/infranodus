@@ -67,6 +67,11 @@ function addContextButton() {
 
     // Dynamic graph functionality
 
+    if (localStorage.getItem('timer') == 1) {
+          ($("#timer-link").trigger('click'));
+    }
+
+
     // It basically makes only the nodes / edges of the graph visible that the user is currently seeing in the statements div
 
     var dynamic_graph = 0;

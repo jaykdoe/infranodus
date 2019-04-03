@@ -585,6 +585,10 @@ if (matche == 0) {
             // Forward from the graph function
 
 
+            // Select previously selected nodes on the graph (from LocalStorage) or passed through parameters
+            selectNodes();
+
+
 
 
         }
@@ -606,6 +610,74 @@ sigma.classes.graph.addMethod('neighbors', function(nodeId) {
     return neighbors;
 });
 
+
+// TODO if the nodes are deleted, we call community detection twice. Fix that.
+
+function selectNodes() {
+    var selected_keywords = getUrlVars()["keywords"];
+    if (localStorage.getItem("selections")) {
+
+            var saved_selections = JSON.parse(localStorage.getItem("selections"));
+
+            if (saved_selections[window.location.href]) {
+                
+                deletedNodes = saved_selections[window.location.href].stopnodes;
+                pinnedNodes = saved_selections[window.location.href].pinnednodes;
+
+                if (deletedNodes.length > 0) {
+                    socket.emit('node delete', {pinnedNodes: deletedNodes, delete_from: "localstorage"});
+                }
+                else {
+                    if (pinnedNodes.length > 0) {
+                    filter_statements(pinnedNodes);
+                    }
+                }
+
+            }
+            else if (interpret) {
+                console.log(saved_selections);
+                for (var boom in saved_selections) {
+                    if (boom.indexOf('/'+addcontext+'/') > -1) {
+                    deletedNodes = saved_selections[boom].stopnodes;
+                    pinnedNodes = saved_selections[boom].pinnednodes;
+                    console.log(deletedNodes);
+                    console.log(pinnedNodes);
+                    if (deletedNodes.length > 0) {
+                        socket.emit('node delete', {pinnedNodes: deletedNodes, delete_from: "localstorage"});
+                    }
+                    else {
+                        if (pinnedNodes.length > 0) {
+                        filter_statements(pinnedNodes);
+                        }
+                    }
+                    }
+                }
+            }
+            else if (selected_keywords && selected_keywords.length > 0) {
+                
+                pinnedNodes = selected_keywords.split("+");
+
+
+                if (pinnedNodes.length > 0) {
+                    filter_statements(pinnedNodes);
+                }
+
+
+            }
+
+            }
+            // TODO clear that
+            else if (selected_keywords && selected_keywords.length > 0) {
+               
+                pinnedNodes = selected_keywords.split("+");
+
+                if (pinnedNodes.length > 0) {
+                    filter_statements(pinnedNodes);
+                }
+
+
+            }
+}
 
 
 </script>

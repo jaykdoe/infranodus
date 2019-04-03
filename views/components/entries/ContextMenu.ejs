@@ -473,4 +473,121 @@ function addContextTriggers() {
 
     }
 
+
+    // This function is launched when an item in side-menu is double-clicked
+    // It filters out the contexts in the graph
+    // TODO it works well with one, but not with the subsequent ones. To fix.
+
+    function renderGraph(contextsToFilter) {
+
+            // Creating the context index
+            var nodesToKeep = [];
+
+            var keepNodes = [];
+
+            var keepEdges = [];
+
+            // First, let's reiterate the graph and make a list of nodes and edges to keep
+
+            if (contextsToFilter.length > 0) {
+
+                sigma.instances(0).graph.edges().forEach(function(e) {
+
+                    // Reiterating through edges, leaving only the nodes that appear in at least one filtered context
+
+                    contextsToFilter.forEach(function(element){
+
+                        if (contextNodeID[element].indexOf(e.source) > -1) {
+                            keepNodes.push(e.source);
+                        }
+
+                        if (contextNodeID[element].indexOf(e.target) > -1) {
+                            keepNodes.push(e.target);
+                        }
+
+                    });
+
+                    // Keep edges that are in at least one of the filtered contexts
+
+                    if (contextsToFilter.indexOf(e.edge_context) > -1) {
+                        keepEdges.push(e.id);
+                    }
+
+
+                });
+            }
+
+            // Uniqualize to avoid duplicates
+
+            keepNodes = $.unique(keepNodes);
+            keepEdges = $.unique(keepEdges);
+
+
+            // Then let's reiterate the graph edges and only show nodes that belong to the contexts created
+
+            sigma.instances(0).graph.edges().forEach(function(e) {
+
+                if (contextsToFilter.length == 0) {
+                    // Show the edge if there's no contexts at all
+                    e.color = e.originalColor;
+                }
+
+                else if (keepEdges.indexOf(e.id) > -1) {
+                    // The edge is in the list to keep => show it normal color
+                    e.color = e.originalColor;
+
+                    // The source of the edge is in the list to keep, so we will keep it.
+                    if (keepNodes.indexOf(e.source) > -1) {
+                        nodesToKeep.push(e.source);
+                    }
+                    // The target of the edge is in the list to keep, so we will keep it also.
+                    if (keepNodes.indexOf(e.target) > -1) {
+                        nodesToKeep.push(e.target);
+                    }
+                    // PS We only do this check for the nodes that belong to the edges that we keep
+                }
+                else {
+                    // Otherwise (the edge IS in the list for removal), so we color the edge invisible
+                    e.color = deselected_nodes_color;
+                }
+
+
+
+            });
+
+
+
+            // Ensure no duplicates
+            nodesToKeep = $.unique(nodesToKeep);
+
+            // Now that we know which nodes to keep, let's reiterate through them all
+
+            sigma.instances(0).graph.nodes().forEach(function(n) {
+
+                // Is there no contexts at all? Show the node.
+                if (contextsToFilter.length == 0) {
+                    n.color = n.originalColor;
+                    n.label = n.originalLabel;
+                }
+
+                // The node is not in the list to keep? Hide it!
+                else if (nodesToKeep.indexOf(n.id) < 0)  {
+                    n.color = deselected_nodes_color;
+                    n.label = '';
+                }
+
+                // Looks like there is a filtering context function AND the node is in the keep list, so make it show!
+                else {
+                    n.color = n.originalColor;
+                    n.label = n.originalLabel;
+                }
+            });
+
+
+            // Refresh the graph (we do it through instances(0) as we're a bit outside of Sigma now)
+            sigma.instances(0).refresh();
+
+
+            }
+
 </script>

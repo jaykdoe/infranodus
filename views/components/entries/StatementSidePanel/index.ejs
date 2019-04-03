@@ -31,14 +31,15 @@ function toggleStatementSidePanel() {
     $("#statements").fadeToggle();
     
     
-    if (!$("#graph-link").hasClass('graph-highlight')) {
+    if (checkStatementsPanelMode().visibility() == checkEntriesMode().visibility() && checkStatementsPanelMode().visibility() == 'HIDDEN') {
         localStorage.setItem('graph', 1);
+        $("#graph-link").toggleClass('graph-highlight','add');
     }
     else {
         localStorage.setItem('graph', 0);
+        $("#graph-link").toggleClass('graph-highlight','remove');
     }
 
-    $("#graph-link").toggleClass('graph-highlight');
 
     if (!localStorage.getItem('analytics')) {
 

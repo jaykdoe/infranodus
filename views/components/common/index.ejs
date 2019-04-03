@@ -75,4 +75,10 @@
         return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
     }
 
+    function timeConverter(UNIX_timestamp){
+            var modTimestamp = UNIX_timestamp.substr(0, UNIX_timestamp.length - 4);
+            var time = moment(modTimestamp, 'x').fromNow();
+            return time;
+    }
+
 </script>

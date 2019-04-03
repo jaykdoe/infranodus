@@ -17,12 +17,31 @@
 
 var currentEntriesPanelMode = "VISIBLE"
 
-var visibleentries_original = '0';
+
+// This is used for filtering the statements when we search
+var visibleentries_original = $(".entry:visible").length;
 
 if (localStorage.getItem('folded') == 1) {
     currentEntriesPanelMode = "HIDDEN"
     changeEntriesModeTo(currentEntriesPanelMode);
 }    
+
+// Add the hooks to the newly rendered entries
+
+entryClick();
+
+// If it's NOT some other user watching the graph, then statements can be edited. Otherwise - no.
+<% if (!perceivername) { %>
+
+entryDoubleClick();
+
+<% } %>
+
+$(".entry-date").each(function() {
+    var convertedTime = timeConverter($(this).text()) ;
+    $(this).text(convertedTime);
+});
+
 
 
         
@@ -478,7 +497,7 @@ function entries() {
         var isHidden_ = $("#statements").is(":hidden");
         if (isHidden_) {
             $('#statements').fadeIn();
-            $("#graph-link").toggleClass('graph-highlight');
+            $("#graph-link").toggleClass('graph-highlight','remove');
         }
     }
 

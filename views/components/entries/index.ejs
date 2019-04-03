@@ -25,7 +25,7 @@ var abstract;
 // default most influential nodes are displayed according to Betwenness Centrality (bc) or Degree (degree)
 var most_influential = 'bc';
 
-<% if (locals.user.topnodes) { %>
+<% if (locals.user && !locals.vieweduser && locals.user.topnodes) { %>
 most_influential = '<%= user.topnodes %>';
 <% } %>
 
@@ -36,10 +36,6 @@ if (getUrlVars()["most_influential"] == 'bc' || getUrlVars()["most_influential"]
 var urlPath = location.pathname;
 
 var background = getUrlVars()["background"];
-
-if (!background) {
-    background = '<%= user.background %>';
-}
 
 var walkthrough = getUrlVars()["walkthrough"];
 
@@ -76,6 +72,10 @@ var inlanguage = '<%= user.inlanguage %>';
 
     <% if (locals.user.maxnodes) { %>
     maxnodes = '<%= user.maxnodes %>';
+    <% } %>
+
+    <% if (!background) { %>
+    background = '<%= user.background %>';
     <% } %>
 
 
