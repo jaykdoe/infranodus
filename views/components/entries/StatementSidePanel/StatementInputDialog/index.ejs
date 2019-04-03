@@ -136,6 +136,36 @@ function hideStatements() {
     toggleStatementSidePanel();
 }
 
+// Here we add onClick event for the entry add form after it's loaded. 
+// TODO move it out into a function
+
+submitFormProcess();
+
+
+// OnLoad get the right height for the entries elements — this depends on the form so it's here
+
+var uproll = $('#entryform').height();
+
+if (hide_edit) {
+  uproll = 50;
+}
+
+entries().fillSpace(uproll + 100);
+
+// Scroll down all the entries
+
+entries().scroll();
+
+// Do the same with when the window is resized 
+
+$(window).resize(function() {
+    entries().fillSpace(uproll + 100);
+    entries().scroll();
+});
+
+
+
+
 
 // Here we perform some live updates of the graph on receiving a Socket.IO message
 // We could also move this code and use sigma.instances(0).graph.nodes() to get sigma properties
@@ -266,7 +296,7 @@ socket.on('chat message', function(msg){
     if (dynamic_watch == 1 && dynamic_graph == 1) {
       $('#watch-link').trigger('click');
       setTimeout(function() {
-        $("#entries").animate({ scrollTop: $('#entries')[0].scrollHeight }, 1000);
+        entries().scroll();
       }, 500);
       setTimeout(function() {
         adding_entry = false;
@@ -274,7 +304,7 @@ socket.on('chat message', function(msg){
       }, 4000);
     }
     else {
-      $("#entries").animate({ scrollTop: $('#entries')[0].scrollHeight }, 1000);
+        entries().scroll();
     }
 
     var addednodes = msg.graph.nodes;

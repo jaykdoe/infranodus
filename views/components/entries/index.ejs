@@ -311,6 +311,26 @@ socket.on('delete message', function(msg){
 
 });
 
+
+// Autocomplete any form with the populated data
+
+
+function autoComplete(element,nodeNames) {
+                    
+                    $(element).autocomplete({
+                        source: nodeNames,
+                        minLength: 1,
+                        delay: 500,
+                        messages: {
+                            noResults: '',
+                            results: function() {}
+                        },
+                        select: function(event, ui) {
+                            var filter = ui.item.value;
+                        }
+                    });
+}
+
 // Autofill initialized only after Sigma above loaded and populated all the nodes
 
 function autofill(nodeNames,contextNames) {
@@ -363,9 +383,6 @@ function autofill(nodeNames,contextNames) {
         }
 
     ]);
-
-
-
 
 
     $('#addcontext').textcomplete([

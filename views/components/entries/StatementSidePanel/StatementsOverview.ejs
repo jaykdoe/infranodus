@@ -83,7 +83,7 @@
             });
         });
         this.className = 'pure-menu-selected-top';
-        $("#entries").animate({ scrollTop: $('#entries')[0].scrollHeight }, 1000);
+        entries().scroll();
 
         if (pinnedNodes.length > 0) {
           filter_statements(pinnedNodes);

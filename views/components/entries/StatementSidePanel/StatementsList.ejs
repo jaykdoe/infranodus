@@ -23,6 +23,8 @@ if (localStorage.getItem('folded') == 1) {
     currentEntriesPanelMode = "HIDDEN"
     changeEntriesModeTo(currentEntriesPanelMode);
 }    
+
+
         
 function changeEntriesModeTo(mode) {
     currentEntriesPanelMode = mode
@@ -51,6 +53,11 @@ function entries() {
     return {
         fillSpace: function(heightToReduce){
             $('#entries').css({height:  $(window).height() - heightToReduce});
+        },
+        scroll: function(speed, type, onEnd) {
+            if (!speed) speed = 1000; // scroll speed in ms
+            if (!type) type = 'swing'; // can also be 'linear'
+            $("#entries").animate({ scrollTop: $('#entries')[0].scrollHeight }, speed, type, onEnd);
         },
         show: function() {
                 $("#entries").css('z-index','5');

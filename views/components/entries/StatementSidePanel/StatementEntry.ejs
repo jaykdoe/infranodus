@@ -247,7 +247,7 @@ function entryDoubleClick() {
                 $('#collaborate-link').show();
                 $('#import-link').show();
 
-                $("#entries").animate({ scrollTop: $('#entries')[0].scrollHeight }, 1000);
+                entries().scroll();
 
                 $('input[name="timestamp"]').val('');
 

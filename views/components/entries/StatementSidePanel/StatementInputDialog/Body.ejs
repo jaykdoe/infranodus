@@ -26,30 +26,69 @@
 
     <script>
     
+    searchForm().onSubmit(submitSearchForm);
+
     function searchForm() {
         return {
             autofill: function() {
-                // Autocomplete for search input
-                $("#search").autocomplete({
-                    source: nodeNames,
-                    minLength: 1,
-                    delay: 500,
-                    messages: {
-                        noResults: '',
-                        results: function() {}
-                    },
-                    select: function(event, ui) {
-
-                        var filter = ui.item.value;
-
-                    }
-
-                });
-               // TODO add search_graph(); after this action 
+                autoComplete('#search',nodeNames);  
+            },
+            onSubmit: function(onSubmit) {   
+                $('#searchform').on('submit', onSubmit);
             }
         }
     }
 
+    function submitSearchForm(e) {
+
+        e.preventDefault();
+        // What are we searching?
+        var searchPhrase = $('#search').val();
+
+        if (searchPhrase.length > 1) {
+
+            // Clean up the search string
+            searchPhrase = searchPhrase.replace(/\s+/g,' ').trim();
+
+            // Separate terms into array
+            var searchArray = searchPhrase.toLowerCase().split(" ");
+
+            var searchPhraseLemmas = [];
+
+
+            for (var j = 0; j < searchArray.length; j++) {
+
+                // Is the search term cyrillic?
+                var search_cyrillic = searchArray[j].match(/[а-яА-Я]/);
+
+                // SEARCHMOD
+                // var search_lemma = window.jstemmer(searchArray[j]);
+
+                var search_lemma = searchArray[j];
+
+                searchPhraseLemmas.push(search_lemma);
+
+            }
+
+            for (var k = 0; k < searchPhraseLemmas.length; k++) {
+                if (pinnedNodes.indexOf(searchPhraseLemmas[k]) < 0) {
+                    pinnedNodes.push(searchPhraseLemmas[k]);
+                }
+            }
+
+            filter_statements(pinnedNodes, "search");
+
+        }
+
+    }
+    
+
+
+ 
+
+
+
+    
 
         // Textarea select conversion to hashtags
 
@@ -86,6 +125,7 @@
             }
 
         });
+
 
 
     </script>

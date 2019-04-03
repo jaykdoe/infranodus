@@ -9,7 +9,8 @@
 
 
 <script>
-
+      
+     
      // Memorize which interface option the user had on last time
      if (localStorage.getItem('defaultbehavior') == 'add') {
         $('#addnode').addClass('addnode-on');
@@ -59,9 +60,6 @@
 
         });
 
-        
-
-      
 
         // What happens when we add a node using the small form top right?
         $('#addnodeform').submit(function(e) {
@@ -82,5 +80,13 @@
             }
 
         });
+
+
+        $("#addnodeinput").bind("focus", function() {
+          autoComplete('#addnodeinput',nodeNames)
+        });
+
+       
+
 </script>
 
