@@ -8,6 +8,39 @@
     --statements-toggle-background-image: url('../images/close.png');
     --graph-link-background-image:  url('../images/graphnet.png');
     --graph-link-opacity: 1;
+    --improve-layout-opacity: 1;
+    --improve-layout-background-image: url('../images/location-precise.png')!important;
+    --abstract-layout-opacity: 1;
+    --abstract-layout-background-image: url('../images/diamond.png')!important;
+    --walkthrough-button-opacity: 1;
+    --walkthrough-button-background-image: url('../images/question.png')!important;
+    
+    --deletecontextbutton-opacity: 1;
+    --deletecontextbutton-background-image: url('../images/trash.png')!important;
+
+    --collaborate-link-opacity: 1;
+    --collaborate-link-background-image: url('../images/group.png')!important;
+
+    --import-link-opacity: 1;
+    --import-link-background-image: url('../images/telescope.png')!important;
+
+    --windowdown-link-opacity: 1;
+    --windowdown-link-background-image: url('../images/closewindow.png')!important;
+
+    --statements-link-opacity: 1;
+    --statements-link-background-image: url('../images/square.png')!important;
+
+    --timer-link-opacity: 1;
+    --timer-link-background-image: url('../images/timer.png')!important;
+
+    --watch-link-opacity: 1;
+    --watch-link-background-image: url('../images/watch.png')!important;
+
+    --microphone-link-opacity: 1;
+    --microphone-link-background-image: url('../images/microphone.png')!important;
+
+    --addcontext-link-opacity: 1;
+    --addcontext-link-background-image: url('../images/compare.png')!important;
 }
 
 :root[theme='dark'] {
@@ -17,6 +50,39 @@
     --statements-toggle-background-image: url('../images/closewhite.png');
     --graph-link-background-image:  url('../images/graphnet-white.png');
     --graph-link-opacity: 0.8;
+    --improve-layout-opacity: 0.6;
+    --improve-layout-background-image: url('../images/location-precise-white.png')!important;
+    --abstract-layout-opacity: 0.6;
+    --abstract-layout-background-image: url('../images/diamond-white.png')!important;
+    --walkthrough-button-opacity: 0.6;
+    --walkthrough-button-background-image: url('../images/question-white.png')!important;
+
+    --deletecontextbutton-opacity: 0.6;
+    --deletecontextbutton-background-image: url('../images/trash-white.png')!important;
+
+    --collaborate-link-opacity: 0.6;
+    --collaborate-link-background-image: url('../images/group-white.png')!important;
+
+    --import-link-opacity: 0.6;
+    --import-link-background-image: url('../images/telescope-white.png')!important;
+
+    --windowdown-link-opacity: 0.6;
+    --windowdown-link-background-image: url('../images/closewindow-white.png')!important;
+
+    --statements-link-opacity: 0.8;
+    --statements-link-background-image: url('../images/square-white.png')!important;
+
+    --timer-link-opacity: 0.8;
+    --timer-link-background-image: url('../images/timer-white.png')!important;
+
+    --watch-link-opacity: 0.6;
+    --watch-link-background-image: url('../images/watch-white.png')!important;
+
+    --microphone-link-opacity: 0.6;
+    --microphone-link-background-image: url('../images/microphone-white.png')!important;
+
+    --addcontext-link-opacity: 0.6;
+    --addcontext-link-background-image: url('../images/compare-white.png')!important;
 }
 
 
@@ -250,15 +316,11 @@ small screens.
     /* float: right; */
     padding: 5px 5px;
     z-index: 10;
-    background-image: url('../images/square.png');
+    background-image: var(--statements-link-background-image);
+    opacity: var(--statements-link-opacity);
     background-repeat:no-repeat;
     background-position:center;
     pointer-events: auto!important;
-}
-
-.statements-link-dark {
-    opacity: 0.8;
-    background-image: url('../images/square-white.png')!important;
 }
 
 
@@ -275,16 +337,14 @@ small screens.
     /* float: right; */
     padding: 5px 5px;
     z-index: 10;
-    background-image: url('../images/timer.png');
+    background-image: var(--timer-link-background-image);
+    opacity: var(--timer-link-opacity);
     background-repeat:no-repeat;
     background-position:center;
     pointer-events: auto!important;
 }
 
-.timer-link-dark {
-    opacity: 0.8;
-    background-image: url('../images/timer-white.png')!important;
-}
+
 
 .timer-link-on {
     background-image: url('../images/timer-blue.png')!important;
@@ -303,18 +363,13 @@ small screens.
     /* float: right; */
     padding: 5px 5px;
     z-index: 10;
-    background-image: url('../images/watch.png');
+    background-image: var(--watch-link-background-image);
+    opacity: var(--watch-link-opacity);
     background-repeat:no-repeat;
     background-position:center;
     pointer-events: auto!important;
 }
 
-
-
-.watch-link-dark {
-      opacity: 0.6;
-      background-image: url('../images/watch-white.png')!important;
-}
 
 .watch-link-on {
     opacity: 0.8;
@@ -345,15 +400,13 @@ small screens.
     float: right;
     padding: 3.3em 1.6em;
     z-index: 10;
-    background-image: url('../images/closewindow.png');
+    background-image: var(--windowdown-link-background-image);
+    opacity: var(--windowdown-link-opacity);
     background-repeat:no-repeat;
     background-position:center;
     pointer-events: auto!important;
 }
-.windowdown-link-dark {
-    opacity: 0.6;
-    background-image: url('../images/closewindow-white.png')!important;
-}
+
 
 #deletecontext {
     position: absolute;
@@ -388,7 +441,8 @@ small screens.
     background-image: url('../images/trash-white.png')!important;
 }
 #deletecontextbutton {
-    background: url('../images/trash.png');
+    background: var(--deletecontextbutton-background-image);
+    opacity: var(--deletecontextbutton-opacity);
     background-repeat:no-repeat;
     background-position:center;
     border: 0;
@@ -399,10 +453,7 @@ small screens.
     line-height: 0px;
     font-size: 0px;
 }
-.deletecontextbutton-dark {
-  opacity: 0.6;
-  background-image: url('../images/trash-white.png')!important;
-}
+
 
 #privacy-link {
     background: url('../images/share.png');
@@ -422,7 +473,8 @@ small screens.
 }
 
 #collaborate-link {
-    background: url('../images/group.png');
+    background: var(--collaborate-link-background-image);
+    opacity: var(--collaborate-link-opacity);
     background-repeat:no-repeat;
     background-position:center;
     border: 0;
@@ -437,11 +489,7 @@ small screens.
     padding: 3.3em 1.6em;
     z-index: 10;
 }
-.collaborate-link-dark {
-  opacity: 0.6;
-  background-image: url('../images/group-white.png')!important;
 
-}
 
 .is-public {
     background: url('../images/share-green.png')!important;
@@ -456,7 +504,8 @@ small screens.
 }
 
 #import-link {
-    background: url('../images/telescope.png');
+    background: var(--import-link-background-image);
+    opacity: var(--import-link-opacity);
     background-repeat:no-repeat;
     background-position:center;
     border: 0;
@@ -472,11 +521,7 @@ small screens.
     z-index: 10;
 }
 
-.import-link-dark {
-  opacity: 0.6;
-  background-image: url('../images/telescope-white.png')!important;
 
-}
 
 #graph-link {
 
@@ -529,7 +574,7 @@ small screens.
 
 #microphone-link {
     display: none;
-    opacity: 1;
+    opacity: var(--microphone-link-opacity);
     position: fixed;
     top: 200px;
     left: 0;
@@ -539,7 +584,7 @@ small screens.
     font-size: 32px; /* change this value to increase/decrease button size */
     padding: 5px 5px;
     z-index: 10;
-    background-image: url('../images/microphone.png');
+    background-image: var(--microphone-link-background-image);
     background-repeat:no-repeat;
     background-position:center;
 
@@ -557,8 +602,8 @@ small screens.
     height: 32px;
     padding: 5px 5px;
     z-index: 10;
-    opacity: 1;
-    background-image: url('../images/compare.png');
+    opacity: var(--addcontext-link-opacity);
+    background-image: var(--addcontext-link-background-image);
     background-repeat:no-repeat;
     background-position:center;
     pointer-events: auto!important;
@@ -591,15 +636,12 @@ small screens.
    height: auto;*/
   padding: 0em 2.5em;
   z-index: 11;
-  background-image: url('../images/location-precise.png');
+  opacity: var(--improve-layout-opacity);
+  background-image: var(--improve-layout-background-image);
   background-repeat:no-repeat;
   background-position:center;
 }
 
-.improve-layout-dark {
-    opacity: 0.6;
-    background-image: url('../images/location-precise-white.png')!important;
-}
 
 #abstract-layout {
   position: fixed;
@@ -612,15 +654,13 @@ small screens.
    height: auto;*/
   padding: 0em 2.5em;
   z-index: 11;
-  background-image: url('../images/diamond.png');
+  background-image: var(--abstract-layout-background-image);
+  opacity: var(--abstract-layout-opacity);
   background-repeat:no-repeat;
   background-position:center;
 }
 
-.abstract-layout-dark {
-    opacity: 0.6;
-    background-image: url('../images/diamond-white.png')!important;
-}
+
 
 #walkthrough {
     position: fixed;
@@ -632,16 +672,14 @@ small screens.
     padding: 0em 2.5em;
     z-index: 11;
     background: none;
-    background-image: url('../images/question.png');
+    background-image: var(--walkthrough-button-background-image);
+    opacity: var(--walkthrough-button-opacity);
     background-repeat:no-repeat;
     background-position:center;
   }
   
-  .walkthrough-dark {
-    opacity: 0.6;
-    background-image: url('../images/question-white.png')!important;
-  
-  }
+
+
 
 .microphone-on {
     opacity: 1!important;

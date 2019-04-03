@@ -26,7 +26,11 @@
 :root {
     --body-text-color: #000;
     --graph-background: #f0ecec;
+
     --analytics-button-background: #d5d5d5;
+    --analytics-button-border: 1px solid #d0d0d0;
+
+
     --entry-background: rgba(250, 250, 250, 0.9); 
     --entry-box-shadow: 0px 1px 1px 2px #f3f4f6;
     --entry-text-color: #000;
@@ -49,11 +53,20 @@
 
     --reload-button-opacity: 1;
     --reload-button-background-image: url('../images/reload.png');
+
+
+    --zoom-in-opacity: 1!important;
+    --zoom-in-background-image: url('../images/zoom-in.png')!important;
+    --zoom-out-opacity: 1!important;
+    --zoom-out-background-image: url('../images/zoom-out.png')!important;
 }
 :root[theme='dark'] {
     --body-text-color: #aaaab5;
     --graph-background: #000000;
+
     --analytics-button-background: #444444;
+    --analytics-button-border: 1px solid #444444;
+
     --entry-background: rgba(30, 30, 30, 0.9); 
     --entry-box-shadow: 0px 0px 0px 0px #000000;
     --entry-text-color: #aaaab5;
@@ -72,8 +85,14 @@
     --statement-color: #aaaab5;
     --go-next-opacity: 0.6;
     --go-next-background-image: url('../images/eyezoom-white.png');
+    
     --reload-button-opacity: 0.6;
     --reload-button-background-image: url('../images/reload-white.png');
+
+    --zoom-in-opacity: 0.6!important;
+    --zoom-in-background-image: url('../images/zoom-in-white.png')!important;
+    --zoom-out-opacity: 0.6!important;
+    --zoom-out-background-image: url('../images/zoom-out-white.png')!important;
 }
 
 
@@ -617,7 +636,7 @@ button {
   background-repeat:no-repeat;
   background-position:center;
   content: attr(data-before);
-  border: 1px solid #d0d0d0;
+  border: var(--analytics-button-border);
   border-radius: 30px;
   vertical-align: middle;
   background-color: var(--analytics-button-background);
@@ -930,16 +949,13 @@ button {
   height: 23px;
 padding: 0em 0em 1em 0em;
   z-index: 10;
-  opacity: 1;
-  background-image: url('../images/zoom-in.png');
+  opacity: var(--zoom-in-opacity);
+  background-image: var(--zoom-in-background-image);
   background-repeat:no-repeat;
   background-position:center;
 }
 
-.zoom-in-dark {
-  opacity: 0.6!important;
-  background-image: url('../images/zoom-in-white.png')!important;
-}
+
 
 #zoom-out {
   float: right;
@@ -948,16 +964,12 @@ padding: 0em 0em 1em 0em;
   height: 23px;
   padding: 1.5em 0em 0em 0em;
   z-index: 10;
-  opacity: 1;
-  background-image: url('../images/zoom-out.png');
+  opacity: var(--zoom-out-opacity);
+  background-image: var(--zoom-out-background-image);
   background-repeat:no-repeat;
   background-position:center;
 }
 
-.zoom-out-dark {
-  opacity: 0.6!important;
-  background-image: url('../images/zoom-out-white.png')!important;
-}
 
 #searchnode {
     float: right;
