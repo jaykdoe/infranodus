@@ -49,7 +49,7 @@
 
 <!-- TODO: remove absolute position from the tooltips below and render them inside the header div -->
 
-<%- include('../../../common/tooltip', {title:"hide this pane and all text", id:"graph-link"}); %>
+<%- include('../../../common/tooltip', {title:"hide this pane and all text", id:"statements-toggle"}); %>
 <%- include('../../../common/tooltip', {title:"minimize window", id:"windowdown-link"}); %>
 
 <script>
@@ -89,7 +89,7 @@ function minimizeButton() {
 function closeStatementMenuButton() {
     return {
         onClick: function(onClick){
-            $('#graph-link').on('click', onClick)
+            $('#statements-toggle').on('click', onClick)
         }
     }
 }

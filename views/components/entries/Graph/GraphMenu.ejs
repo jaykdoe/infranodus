@@ -1,4 +1,4 @@
-<a href="javascript:" id="chat-link" class="tooltip" title="show / hide the text">
+<a href="javascript:" id="graph-link" class="tooltip" title="show / hide the text">
     <!-- Chat icon -->
     <span></span>
 </a>
@@ -69,7 +69,7 @@ tutorialButton().onClick(activateTutorial);
 function graphButton() {
     return {
         onClick: function(onClick){
-            $('#chat-link').on('click', onClick)
+            $('#graph-link').on('click', onClick)
         }
     }
 }

@@ -23,9 +23,63 @@
     url('../fonts/IstokWeb-Regular.svg#IstokWeb-Regular') format('svg');
 }
 
+:root {
+    --body-text-color: #000;
+    --graph-background: #f0ecec;
+    --analytics-button-background: #d5d5d5;
+    --entry-background: rgba(250, 250, 250, 0.9); 
+    --entry-box-shadow: 0px 1px 1px 2px #f3f4f6;
+    --entry-text-color: #000;
+    --analytics-pane-background: rgba(250, 250, 250, 0.9);
+    --entry-form-background: rgba(250, 250, 250, 0.9);
+    --addnode-input-background: rgba(255, 255, 255, 0.5);
+    --addnode-input-border: 1px solid rgba(141, 141, 141, 0.2);
+    --addnode-input-shadow: inset 0 0 3px rgba(141, 141, 141, 0.2);
+    --addnode-input-color: #333;
+    --addnode-background: url('../images/add.png');
+    --addnode-opacity: 1;
+    --statement-background: rgb(250, 250, 250);
+    --statement-border: 1px solid rgba(141, 141, 141, 0.2);
+    --statement-box-shadow: inset 0 0 3px rgba(141, 141, 141, 0.2);
+    --statement-border-focus: 1px solid rgba(0, 174, 255, 0.6);
+    --statement-box-shadow-focus: inset 0 0 3px rgba(141, 141, 141, 0.6);
+    --statement-color: #000;
+    --go-next-opacity: 1;
+    --go-next-background-image: url('../images/eyezoom.png');
+
+    --reload-button-opacity: 1;
+    --reload-button-background-image: url('../images/reload.png');
+}
+:root[theme='dark'] {
+    --body-text-color: #aaaab5;
+    --graph-background: #000000;
+    --analytics-button-background: #444444;
+    --entry-background: rgba(30, 30, 30, 0.9); 
+    --entry-box-shadow: 0px 0px 0px 0px #000000;
+    --entry-text-color: #aaaab5;
+    --analytics-pane-background: rgba(30, 30, 30, 0.9);
+    --entry-form-background: rgba(30, 30, 30, 0.9);
+    --addnode-input-background: rgba(250, 250, 250, 0.2);
+    --addnode-input-border: none;
+    --addnode-input-shadow: none;
+    --addnode-input-color: #aaaab5;
+    --addnode-background: url('../images/add-white.png');
+    --addnode-opacity: 0.6;
+    --statement-background: rgba(250, 250, 250, 0.2);
+    --statement-border: 1px solid rgba(141, 141, 141, 0.0);
+    --statement-box-shadow: inset 0 0 3px rgba(141, 141, 141, 0.0);
+    --statement-box-shadow-focus: inset 0 0 3px rgba(141, 141, 141, 0.0);
+    --statement-color: #aaaab5;
+    --go-next-opacity: 0.6;
+    --go-next-background-image: url('../images/eyezoom-white.png');
+    --reload-button-opacity: 0.6;
+    --reload-button-background-image: url('../images/reload-white.png');
+}
+
 
 body {
     font: 16px 'IstokWeb-Bold',sans-serif;
+    color: var(--body-text-color);
 }
 
 a {
@@ -107,26 +161,20 @@ textarea:focus {
     min-width: 160px;
     min-height: 10px;
     margin-left: 2px;
-    background-color: rgba(250, 250, 250, 0.9);
+    background-color: var(--entry-background);
     border-radius: 5px;
-    box-shadow: 0px 1px 1px 2px #f3f4f6;
+    box-shadow: var(--entry-box-shadow);
     word-wrap: break-word;
     pointer-events: auto!important;
 }
 
-.entry-dark {
-  background-color: rgba(30, 30, 30, 0.9)!important;
-  box-shadow: 0px 0px 0px 0px #000000;
-}
 
 .entry-text {
     font: 17px 'IstokWeb-Bold',sans-serif;
-    color: #000;
+    color: var(--entry-text-color);
     max-width: 95%;
 }
-.entry-text-dark {
-    color: #aaaab5!important;
-}
+
 
 .gray {
     opacity: 0.5;
@@ -411,6 +459,22 @@ a:hover.app-more-link {
 /*    pointer-events: none;*/
 }
 
+#statement {
+    background-color: var(--statement-background);
+    border: var(--statement-border);
+    box-shadow: var(--statement-box-shadow);
+    -moz-box-shadow: var(--statement-box-shadow);
+    -webkit-box-shadow: var(--statement-box-shadow);
+    color: var(--statement-color);
+}
+
+#statement:focus {
+    border: var(--statement-border-focus);
+    box-shadow: var(--statement-box-shadow-focus);
+    -moz-box-shadow: var(--statement-box-shadow-focus);
+    -webkit-box-shadow: var(--statement-box-shadow-focus);
+}
+
 ::-webkit-scrollbar {
     width: 6px;
     height: 0px;
@@ -448,7 +512,7 @@ a:hover.app-more-link {
 #entryform {
     position: fixed;
     bottom: 0;
-    background-color: rgba(250, 250, 250, 0.9);
+    background-color: var(--entry-form-background);
     width: 340px;
     border-radius: 8px;
     padding-top: 10px;
@@ -459,9 +523,6 @@ a:hover.app-more-link {
 
 }
 
-.entryform-dark {
-  background-color: rgba(30, 30, 30, 0.9)!important;
-}
 
 #analytics {
     font: 15px 'IstokWeb-Regular',sans-serif;
@@ -477,18 +538,14 @@ a:hover.app-more-link {
     padding: 0px 10px 10px 10px;
     margin-right: 0px;
     z-index: 12;
-    background-color: rgba(250, 250, 250, 0.9);
+    background-color: var(--analytics-pane-background);
     /* box-shadow: 0px 1px 1px 2px #f3f4f6; */
     word-wrap: break-word;
     display:none;
     box-shadow: 0 5px 40px rgba(0,0,0,.16)!important;
     -webkit-box-shadow: 0 5px 40px rgba(0,0,0,.16)!important;
-
 }
 
-.analytics-dark {
-  background-color: rgba(30, 30, 30, 0.9)!important;
-}
 
 
 #analytics a {
@@ -563,7 +620,7 @@ button {
   border: 1px solid #d0d0d0;
   border-radius: 30px;
   vertical-align: middle;
-  background-color: #d5d5d5;
+  background-color: var(--analytics-button-background);
   box-shadow: 0 3px 15px rgba(0,0,0,.16);
   -webkit-box-shadow: 0 3px 15px rgba(0,0,0,.16);
 
@@ -704,9 +761,6 @@ button {
 
 .analyticsbutton-dark {
   border: 1px solid #444444!important;
-  background-color: #444444!important;
-
-
 }
 
 #analyticscaption {
@@ -816,8 +870,8 @@ button {
     height: 23px;
     padding: 0em 0em 0em 2em;
     z-index: 10;
-    opacity: 1!important;
-    background-image: url('../images/add.png');
+    opacity: var(--addnode-opacity);
+    background-image: var(--addnode-background);
     background-repeat:no-repeat;
     background-position:center;
 }
@@ -828,9 +882,8 @@ button {
   background-position:center!important;
 }
 .addnode-dark {
-  opacity: 0.6;
-  background-image: url('../images/add-white.png')!important;
-
+  opacity: var(--addnode-opacity);
+  background-image: var(--addnode-background);
 }
 #go_next {
 
@@ -845,15 +898,12 @@ button {
    height: auto;*/
   padding: 0em 2.5em;
   z-index: 11;
-   
-  background-image: url('../images/eyezoom.png');
+  opacity: var(--go-next-opacity); 
+  background-image: var(--go-next-background-image);
   background-repeat:no-repeat;
   background-position:center;
 }
-.go_next-dark {
-  opacity: 0.6!important;
-  background-image: url('../images/eyezoom-white.png')!important;
-}
+
 #reloadbutton {
     position: fixed;
   top: 85px;
@@ -866,14 +916,12 @@ button {
    height: auto;*/
   padding: 0em 2.5em;
   z-index: 11;
-  background-image: url('../images/reload.png');
+  opacity: var(--reload-button-opacity);
+  background-image: var(--reload-button-background-image);
   background-repeat:no-repeat;
   background-position:center;
 }
-.reloadbutton-dark {
-  opacity: 0.6!important;
-  background-image: url('../images/reload-white.png')!important;
-}
+
 
 #zoom-in {
   float: right;
@@ -985,13 +1033,10 @@ padding: 0em 0em 1em 0em;
     background-color: #e9e9e6;
 */
 
-    background-color: #f0ecec;
+    background-color: var(--graph-background);
 
 }
 
-.graph-dark {
-  background-color: #000000!important;
-}
 
 .small-caption {
   font-size: 13px;
@@ -1121,7 +1166,10 @@ padding: 0em 0em 1em 0em;
   float: right;
   /* visibility: hidden; */
   z-index:99;
-
+  background-color: var(--addnode-input-background);
+  border: var(--addnode-input-border);
+  box-shadow: var(--addnode-input-shadow);
+  color: var(--addnode-input-color);
 }
 
 

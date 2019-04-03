@@ -41,7 +41,6 @@ if (!background) {
     background = '<%= user.background %>';
 }
 
-
 var walkthrough = getUrlVars()["walkthrough"];
 
 var customization = ' ';
@@ -165,6 +164,22 @@ var scroll_signal;
 // Bias index / Diversity / Polysingularity Score. Used in StatementEntry and StatementOverview and the Graph
 
 var polysingularity_score = 0;
+
+
+// Change the theme
+
+function toggleTheme() {
+    if(document.documentElement.hasAttribute('theme')){
+        document.documentElement.removeAttribute('theme');
+    }
+    else {
+        document.documentElement.setAttribute('theme', 'dark');
+    }
+}
+
+if (background == 'dark') {
+    toggleTheme();
+}
 
 
  // Collaboration features realized using Socket.IO

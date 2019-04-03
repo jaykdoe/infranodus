@@ -69,21 +69,7 @@
 // TODO simply load different classes with these parameters
 
 if (background == 'dark') {
-  $('#graph-container').addClass('graph-dark');
-  $('#analyticsbutton').addClass('analyticsbutton-dark');
-  $('.entry').addClass('entry-dark');
-  $('.entry-text').addClass('entry-text-dark');
-  $('#analytics').addClass('analytics-dark');
-  $('#entryform').addClass('entryform-dark');
-  $('#addnodeinput').css({'backgroundColor': 'rgba(250, 250, 250, 0.2)', 'border': 'none', 'box-shadow': 'none', 'color': '#aaaab5'});
-  $('#statement').css({'backgroundColor': 'rgba(250, 250, 250, 0.2)', 'border': 'none', 'box-shadow': 'none', 'color': '#aaaab5'});
-  $('body').css('color', '#aaaab5');
-  // $('li.pure-menu-selected-top a').css('backgroundColor', '#888888');
-  $('.menu-link').css('background', 'rgba(250, 250, 250, 0.4)');
-  $('#graph-link').addClass('graph-link-dark');
-  $('#chat-link').addClass('chat-dark');
-  $('#addnode').addClass('addnode-dark');
-  $('#go_next').addClass('go_next-dark');
+  
   $('#reloadbutton').addClass('reloadbutton-dark');
   $('#improve-layout').addClass('improve-layout-dark');
   $('#abstract-layout').addClass('abstract-layout-dark');
@@ -142,7 +128,7 @@ if (background == 'dark') {
 
         // If it's NOT some other user watching the graph, then statements can be edited. Otherwise - no.
         <% if (!perceivername) { %>
-        entryDoubleClick();
+          entryDoubleClick();
         <% } %>
 
 

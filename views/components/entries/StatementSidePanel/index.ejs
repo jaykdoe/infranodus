@@ -10,8 +10,6 @@
 <script>
 
 
-
-
 function checkStatementsPanelMode() {
     return {
         visibility: function() {
@@ -33,14 +31,14 @@ function toggleStatementSidePanel() {
     $("#statements").fadeToggle();
     
     
-    if (!$("#chat-link").hasClass('chat-highlight')) {
+    if (!$("#graph-link").hasClass('graph-highlight')) {
         localStorage.setItem('graph', 1);
     }
     else {
         localStorage.setItem('graph', 0);
     }
 
-    $("#chat-link").toggleClass('chat-highlight');
+    $("#graph-link").toggleClass('graph-highlight');
 
     if (!localStorage.getItem('analytics')) {
 
@@ -124,7 +122,7 @@ if (localStorage.getItem('graph') == 1 && !graphOnly && !hide_always && !hide_wh
             var isHidden__ = $("#statements").is(":hidden");
             if (!isHidden__) {
                 $('#statements').fadeOut();
-                $("#chat-link").toggleClass('chat-highlight','add');
+                $("#graph-link").toggleClass('graph-highlight','add');
             }
 }
 

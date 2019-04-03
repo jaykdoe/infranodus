@@ -1,5 +1,25 @@
 
 
+
+:root {
+    --menu-link-background:  rgba(0,0,0,0.7);
+    --menu-link-hover: #000;
+    --statements-toggle-opacity: 1;
+    --statements-toggle-background-image: url('../images/close.png');
+    --graph-link-background-image:  url('../images/graphnet.png');
+    --graph-link-opacity: 1;
+}
+
+:root[theme='dark'] {
+    --menu-link-background: rgba(250, 250, 250, 0.4);
+    --menu-link-hover: #444;
+    --statements-toggle-opacity: 0.6;
+    --statements-toggle-background-image: url('../images/closewhite.png');
+    --graph-link-background-image:  url('../images/graphnet-white.png');
+    --graph-link-opacity: 0.8;
+}
+
+
 .pure-img-responsive {
     max-width: 100%;
     height: auto;
@@ -131,8 +151,8 @@ small screens.
     display: block; /* show this only on small screens */
     top: 0;
     left: 0; /* "#menu width" */
-    background: #000;
-    background: rgba(0,0,0,0.7);
+    
+    background: var(--menu-link-background);
     font-size: 8px; /* change this value to increase/decrease button size */
     width: 2em;
     height: auto;
@@ -142,7 +162,7 @@ small screens.
 
     .menu-link:hover,
     .menu-link:focus {
-        background: #000;
+        background: var(--menu-link-hover);
     }
 
     .menu-link span {
@@ -195,7 +215,7 @@ small screens.
     top: 40px;
 }
 
-#graph-link {
+#statements-toggle {
     position: absolute;
     display: inline; /* show this only on small screens */
     top: 0;
@@ -207,11 +227,14 @@ small screens.
     float: right;
     padding: 3.3em 1.6em;
     z-index: 10;
-    background-image: url('../images/close.png');
-    background-repeat:no-repeat;
+    background-image: var(--statements-toggle-background-image);
+    opacity: var(--statements-toggle-opacity);
+    background-repeat: no-repeat;
     background-position:center;
     pointer-events: auto!important;
 }
+
+
 
 
 #statements-link {
@@ -307,17 +330,8 @@ small screens.
     background-image: url('../images/squareplus-white.png')!important;
 }
 
-.graph-link-dark {
-      opacity: 0.6;
-      background-image: url('../images/closewhite.png')!important;
-}
 
-#graph-link:hover {
-    background: none;
-    background-image: url('../images/close.png');
-    background-repeat:no-repeat;
-    background-position:center;
-}
+
 
 #windowdown-link {
     position: absolute;
@@ -464,7 +478,7 @@ small screens.
 
 }
 
-#chat-link {
+#graph-link {
 
 
     margin-top: 0px;
@@ -479,12 +493,15 @@ small screens.
     padding: 2.6em 2.6em;
     z-index: 11;
     /* background-image: url('../images/chat.png'); */
-    background-image: url('../images/graphnet.png');
+    background-image: var(--graph-link-background-image);
+    opacity: var(--graph-link-opacity);
     background-repeat:no-repeat;
     background-position:center;
 }
 
-.chat-highlight {
+
+
+.graph-highlight {
 
     background: rgba(31,141,214,1)!important;
     background-image: url('../images/chatwhite.png')!important;
@@ -492,11 +509,9 @@ small screens.
     background-position:center!important;
 
 }
-.chat-dark {
-  background-image: url('../images/chatwhite.png')!important;
-}
 
-.chat-highlight:hover {
+
+.graph-highlight:hover {
 
     background: rgba(0,0,0,0.7)!important;
     background-image: url('../images/chatwhite.png')!important;
@@ -505,9 +520,9 @@ small screens.
 
 }
 
-#chat-link:hover {
+#graph-link:hover {
     background: rgba(0,0,0,0.7);
-    background-image: url('../images/chatwhite.png');
+    background-image: url('../images/graphnet-white.png');
     background-repeat:no-repeat;
     background-position:center;
 }
@@ -748,7 +763,7 @@ Hides the menu at `48em`, but modify this based on your app's needs.
     }
 
 
-    #chat-link {
+    #graph-link {
         margin-top: 0px;
         background: none;
         position: fixed;
@@ -765,14 +780,14 @@ Hides the menu at `48em`, but modify this based on your app's needs.
         background-position:center;
     }
 
-    #chat-link:hover {
+    #graph-link:hover {
         background: rgba(0,0,0,0.1);
         background-image: url('../images/graphnet.png');
         background-repeat:no-repeat;
         background-position:center;
     }
 
-    #graph-link {
+    #statements-toggle {
         /* display:none; */
     }
 
