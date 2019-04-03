@@ -1,6 +1,6 @@
 <div id="entryform" class="editorpane">
     <%- include('./Header',
-        {perceivername, addcontext, user, context}); %>
+        {perceivername, addcontext, context}); %>
 
     <%- include('./Footer',
         {perceivername, context, contextpublic}); %>
@@ -11,7 +11,6 @@
 </div>
 
 <script>
-
 
 // Who posted the entry?
 var selfPosted = null;
@@ -30,7 +29,7 @@ changeModeTo(currentStatementSidePanelMode);
 function updateStatementSidePanel() {
     if(currentStatementSidePanelMode === "EDIT") switchToEdit()
     if(currentStatementSidePanelMode === "SEARCH") switchToSearch()
-    if(currentStatementSidePanelMode === "INTERPRET") switchToInterpret()
+   
 }
 
 function switchToSearch() {
@@ -43,12 +42,14 @@ function switchToSearch() {
 }
 
 function switchToEdit() {
-    switchStatementMenu('adds');
-    sidePanelContent().hide('#search-panel');
-    sidePanelContent().show('#edit-panel');
-    // TODO: get the logic from entries.ejs starting from (topmenuaction == 'adds') {
-    changeEntriesHeight(400)
-    showFooter()
+    if (viewType != 'external') {
+        switchStatementMenu('adds');
+        sidePanelContent().hide('#search-panel');
+        sidePanelContent().show('#edit-panel');
+        // TODO: get the logic from entries.ejs starting from (topmenuaction == 'adds') {
+        changeEntriesHeight(400)
+        showFooter()    
+    }
 }
 
 function switchToInterpret() {
@@ -58,7 +59,7 @@ function switchToInterpret() {
         // a. remove all visible entries from the "old" context
         // b. switch the way both graph intersection is colored
     // open the page with the parameters above
-    navigation().redirect('/<%= user.name %>/meta_<%= context %>/edit?addcontext=<%= context %>&interpret=1');
+    navigation().redirect('');
 }
 
 function changeEntriesHeight(height) {
