@@ -1,0 +1,132 @@
+<script>
+
+var go_next_url = getUrlVars()["go_next_url"];
+
+var go_next_site = getUrlVars()["go_next_site"];
+
+var go_next_add = getUrlVars()["go_next_add"];
+
+var go_next_override = getUrlVars()["go_next_override"];
+
+// This identifies through the URL where the user is forwarded when he clicks on the link button on #go_next element
+
+if (go_next_url) {
+
+        if ((go_next_url.substr(go_next_url.length - 1) == 's' || go_next_url.substr(go_next_url.length - 6) == 'search' || go_next_url.substr(go_next_url.length - 5) == 'query')) {
+           go_next_url = go_next_url + '=';
+        }
+        forwardTo = go_next_url;
+}
+else if (go_next_site == 'soundcloud') {
+        forwardTo = 'https://soundcloud.com/search?q=';
+}
+else if (go_next_site == 'youtube') {
+        forwardTo = 'https://www.youtube.com/results?search_query=';
+}
+else if (go_next_site == 'wikipedia') {
+        forwardTo = 'https://wikipedia.org/wiki/Special:Search?search=';
+}
+else if (go_next_site == 'amazon') {
+        forwardTo = 'http://www.amazon.com/s/field-keywords=';
+}
+else if (go_next_site == 'twitter') {
+        forwardTo = 'http://twitter.com/search?q=';
+}
+
+graphButton().onClick(toggleStatementSidePanel);
+goNextButton().onClick(externalNavigation);
+improveLayoutButton().onClick(adjustGraphLayout);
+abstractLayoutButton().onLoad();
+abstractLayoutButton().onClick(abstractGraphLayout);
+tutorialButton().onClick(activateTutorial);
+
+
+function graphButton() {
+    return {
+        onClick: function(onClick){
+            $('#graph-link').on('click', onClick)
+        }
+    }
+}
+
+function goNextButton() {
+    return {
+        onClick: function(onClick) {
+             $('#go_next').on('click', onClick)
+        }
+    }
+}
+
+function improveLayoutButton() {
+    return {
+        onClick: function(onClick) {
+             $('#improve-layout').on('click', onClick)
+        }
+    }
+}
+
+function tutorialButton() {
+    return {
+        onClick: function(onClick) {
+            $('#walkthrough').on('click', onClick)
+        }
+    }
+}
+
+function activateTutorial() {
+    walkthrough = 'default';
+    initializeWalkthrough();
+}
+
+function abstractLayoutButton() {
+    return {
+        onClick: function(onClick) {
+             $('#abstract-layout').on('click', onClick)
+        },
+        onLoad: function() {
+            if (abstract && abstract != 'no') {
+                $('#abstract-layout').addClass('abstract-on');  
+            }
+        }
+    }
+}
+
+function adjustGraphLayout() {
+    sigmaGraph().adjustLayout();
+}
+
+function abstractGraphLayout() {
+    sigmaGraph().abstractLayout();
+}
+
+
+function externalNavigation() {
+    
+    var searchQuery = pinnedNodes.join("+");
+
+    if (go_next_add) {
+        searchQuery = searchQuery + '+' + go_next_add;
+    }
+
+    if (searchQuery.length > 0 || go_next_add) {
+
+        // TODO: Use navigation function below (modify it first)
+        if (go_next_override) {
+            if (pinnedNodes.length > go_next_override) {
+                window.open('http://google.com/search?q=' + searchQuery,'_blank');
+            }
+        else {
+                window.open(forwardTo + searchQuery,'_blank');
+            }
+        } else {
+            window.open(forwardTo + searchQuery,'_blank');
+        }
+    }
+    else {
+        alert("Click this after you select a few nodes to find them on the web.");
+    }
+
+
+}
+
+</script>

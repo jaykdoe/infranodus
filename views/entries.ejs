@@ -42,6 +42,12 @@
 
           <%- include('components/entries/Graph/GraphCanvas'); %>
 
+          <%- include('components/entries/Graph/GraphTags') %>
+
+          <%- include('components/entries/Graph/GraphEdit') %>
+
+          <%- include('components/entries/Graph/GraphMenu') %>
+
           <%- include('components/entries/Analytics/BiasSlider'); %>   
 
           <%- include('components/entries/VoiceInput/VoiceInputLiveText'); %>
@@ -50,15 +56,13 @@
 
       </div>
 
-    </div>
-
 </div>
 
 <%- include('components/entries/ContextMenu') %>
 <%- include('components/entries/Graph/Graph') %>
-<%- include('components/entries/Graph/GraphTags') %>
-<%- include('components/entries/Graph/GraphEdit') %>
-<%- include('components/entries/Graph/GraphMenu') %>
+<%- include('components/entries/Graph/GraphTagsLogic') %>
+<%- include('components/entries/Graph/GraphEditLogic') %>
+<%- include('components/entries/Graph/GraphMenuLogic') %>
 <%- include('components/entries/Graph/Walkthrough') %>
 <%- include('components/entries/MidiController') %>
 <%- include('components/entries/VoiceInput/VoiceInputController') %>
