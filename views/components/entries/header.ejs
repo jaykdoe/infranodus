@@ -10,6 +10,22 @@
                 const viewType = 'internal';
             <% } %> 
 
+            function GraphFactory(){
+                this.nodeNames = [];
+                this.initNames = function(nodes) {
+                    nodeNames = nodes;
+                }
+                this.getNodeNames = function() {
+                    return nodeNames;
+                }
+                this.addNameToNodeNames = function(name) {
+                    nodeNames.push(name);
+                    return true;
+                }
+            }
+
+            let graphFactory = new GraphFactory();
+
             // What are the concepts displayed - the opposite of above
             var nodeNames = [];
 
@@ -28,12 +44,7 @@
             var hostsite = window.location.host;
 
             var addcontext = '';
-
-
-           
-
-           
-            
+          
     </script>
     <link rel='stylesheet' href='/stylesheets/jquery.textcomplete.css' />
     <link rel="stylesheet" href="/stylesheets/jquery-ui.min.css">

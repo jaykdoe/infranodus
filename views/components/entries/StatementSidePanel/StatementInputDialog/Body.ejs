@@ -31,7 +31,7 @@
     function searchForm() {
         return {
             autofill: function() {
-                autoComplete('#search',nodeNames);  
+                autoComplete('#search',graphFactory.getNodeNames());  
             },
             onSubmit: function(onSubmit) {   
                 $('#searchform').on('submit', onSubmit);

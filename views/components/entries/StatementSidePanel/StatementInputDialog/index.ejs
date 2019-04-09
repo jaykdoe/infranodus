@@ -320,7 +320,7 @@ socket.on('chat message', function(msg){
     // Let's add the nodes to the Sigma graph
     for (var i = 0; i < addednodes.length; i++) {
 
-        if (nodeNames.indexOf(addednodes[i].label) == -1) {
+        if (graphFactory.getNodeNames().indexOf(addednodes[i].label) == -1) {
 
            // var angle = Math.PI * 2 * i / len;
 
@@ -334,7 +334,7 @@ socket.on('chat message', function(msg){
                 y: Math.random(),
                 color: color_context
             });
-            nodeNames.push(addednodes[i].label);
+            graphFactory.addNameToNodeNames(addednodes[i].label);
             nodes_added.push(addednodes[i]);
             if (!nodeIDs[addednodes[i].label]) {
               nodeIDs[addednodes[i].label] = addednodes[i].id;

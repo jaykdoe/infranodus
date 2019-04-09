@@ -14,7 +14,9 @@
     </a>
      <div id="menu">
         <div class="pure-menu pure-menu-open">
+
         <% if (locals.user || perceivername) { %>
+
             <% if (perceivername) { %>
             <a class="pure-menu-heading" href="/<%= perceivername %>"><%= perceivername %></a>
             <% } else { %>
@@ -27,16 +29,17 @@
             &nbsp;<br><br>
 
         <% } else { %>
+
             <%- include('components/common/menu', {contextlist:contextlist}); %>
 
         <% } %>
+
         </div>
    </div>
      <div id='content'>
 
           <%- include('components/entries/StatementMenu'); %>
-           
-          
+                     
           <%- include('components/entries/StatementSidePanel/index',
                 {entries, perceivername, addcontext, context, contextpublic, url, urltitle}); %>
 
@@ -67,6 +70,8 @@
 <%- include('components/entries/MidiController') %>
 <%- include('components/entries/VoiceInput/VoiceInputController') %>
 <%- include('components/entries/Binders') %>
+
 <% include statsbelow %>
+
 </body>
 </html>

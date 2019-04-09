@@ -76,7 +76,7 @@
 
 
         $("#addnodeinput").bind("focus", function() {
-          autoComplete('#addnodeinput',nodeNames)
+          autoComplete('#addnodeinput',graphFactory.getNodeNames());
         });
 
        

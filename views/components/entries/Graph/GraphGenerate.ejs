@@ -168,7 +168,7 @@ sigma.parsers.json(
 
             // Make a list of all the node labels displayed in the graph (for Autofill)
 
-            nodeNames = _.keys(nodeIDs);
+            graphFactory.initNames(_.keys(nodeIDs));
 
 
 
@@ -295,7 +295,7 @@ if (matche == 0) {
 
 
             // Initialize autofill for hashtags and contexts
-            autofill(nodeNames,contextNames);
+            autofill(graphFactory.getNodeNames(),contextNames);
 
 
             if (document.getElementById('context').value) {

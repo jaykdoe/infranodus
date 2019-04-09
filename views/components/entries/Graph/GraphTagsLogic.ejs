@@ -339,8 +339,8 @@ if (cyclefinished == edgesDB.length) {
                       if (!nodeIDs[key]) {
                           nodeIDs[key] = n.id;
                       }
-                      if (nodeNames.indexOf(key) == -1) {
-                          nodeNames.push(key);
+                      if (graphFactory.getNodeNames().indexOf(key) == -1) {
+                            graphFactory.addNameToNodeNames(key);
                       }
 
   });
