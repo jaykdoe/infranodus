@@ -162,10 +162,9 @@ socket.on('node click', function(msg){
     splicedNodes = msg.splicedNodes;
     console.log("Spliced nodes:");
     console.log(splicedNodes);
-    var pinnedIndex = msg.pinnedIndex;
 
     // Are we clicking the node that was clicked already? Then show all divs
-    if (pinnedIndex > -1) {
+    if (graphFactory.checkIfPinned == true) {
           $('.entry').fadeIn(400);
     }
 

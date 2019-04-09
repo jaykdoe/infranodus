@@ -11,9 +11,31 @@
             <% } %> 
 
             function GraphFactory(){
+                
                 this.nodeNames = [];
+                this.pinnedNodes = [];
+
                 this.initNames = function(nodes) {
                     nodeNames = nodes;
+                }
+                this.initPinnedNodes = function(nodes) {
+                    pinnedNodes = nodes;
+                }
+                this.checkIfPinned = function(node) {
+                    if (pinnedNodes.indexOf(node) > -1) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+                this.addToPinnedNodes = function(name) {
+                    pinnedNodes.push(name);
+                    return true;
+                }
+                this.removeFromPinnedNodes = function(name) {
+                    pinnedNodes.splice(pinnedNodes.indexOf(name),1);
+                    return true;
                 }
                 this.getNodeNames = function() {
                     return nodeNames;
@@ -26,8 +48,6 @@
 
             let graphFactory = new GraphFactory();
 
-            // What are the concepts displayed - the opposite of above
-            var nodeNames = [];
 
             var pinnedNodes = [];
             var splicedNodes = [];

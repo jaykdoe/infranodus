@@ -218,45 +218,42 @@ sigma.parsers.json(
                 }
 
                  // TODO remove that, this is just to check data consistentency
-                 e.sourcename = nodeIDs_rev[e.source];
+                e.sourcename = nodeIDs_rev[e.source];
                 e.targetname = nodeIDs_rev[e.target];
 
 
-    var matche = 0;
+                var matche = 0;
 
-for (var i = 0; i < edge_data.length; i++) {
-    // replace && with || for undirected graph
-  if ((edge_data[i].source == e.source && edge_data[i].target == e.target) || (edge_data[i].target == e.source && edge_data[i].source == e.target)) {
-    matche = 1;
-    edge_data[i].weight = edge_data[i].weight + parseInt(e.weight);
-    for (var obj in jsGraphEdges) {
-        if ((jsGraphEdges[obj][0] == e.source && jsGraphEdges[obj][1] == e.target) || (jsGraphEdges[obj][1] == e.source && jsGraphEdges[obj][0] == e.target)) {
-            jsGraphEdges[obj][2].weight += parseInt(e.weight); 
-        }
-    }
-  }
-}
-if (matche == 0) {
-  edge_data.push({source: e.source, target: e.target, weight: parseInt(e.weight)});
+                for (var i = 0; i < edge_data.length; i++) {
+                    // replace && with || for undirected graph
+                    if ((edge_data[i].source == e.source && edge_data[i].target == e.target) || (edge_data[i].target == e.source && edge_data[i].source == e.target)) {
+                        matche = 1;
+                        edge_data[i].weight = edge_data[i].weight + parseInt(e.weight);
+                        for (var obj in jsGraphEdges) {
+                            if ((jsGraphEdges[obj][0] == e.source && jsGraphEdges[obj][1] == e.target) || (jsGraphEdges[obj][1] == e.source && jsGraphEdges[obj][0] == e.target)) {
+                                jsGraphEdges[obj][2].weight += parseInt(e.weight); 
+                            }
+                        }
+                    }
+                }
 
-      // Add to jsnetworkx
+                if (matche == 0) {
+                    edge_data.push({source: e.source, target: e.target, weight: parseInt(e.weight)});
 
-      var edge_params = {
-                     weight: parseInt(e.weight),
-                     sourcename: e.sourcename,
-                     targetname: e.targetname                     
-                 };
+                    // Add to jsnetworkx
 
-                 var edge_object = [e.source, e.target, edge_params];
+                    var edge_params = {
+                        weight: parseInt(e.weight),
+                        sourcename: e.sourcename,
+                        targetname: e.targetname                     
+                     };
+
+                    var edge_object = [e.source, e.target, edge_params];
                  
-                 jsGraphEdges.push(edge_object);
+                    jsGraphEdges.push(edge_object);
 
-}
-
-               
-
-             
-                 
+                }
+     
                  
             });
 
@@ -265,9 +262,8 @@ if (matche == 0) {
             }
 
             var jsG = new jsnx.Graph();
-            // jsG = jsnx.convertToUndirected(jsG);
-            console.log('jsG');
-            console.log(jsG);
+            // jsG = jsnx.convertToUndirected(jsG); // this is if we instantiated with DiGraph and fixed the logic above
+           
            
             jsG.addEdgesFrom(jsGraphEdges);
 
@@ -290,8 +286,6 @@ if (matche == 0) {
 
 
             }
-
-
 
 
             // Initialize autofill for hashtags and contexts
@@ -450,7 +444,9 @@ if (matche == 0) {
             // edges that have both extremities colored.
 
             sigma.bind('clickNode', function(e) {
+                
               if (!sigma_dragged) {
+                
                 // A node was clicked, so we assume there was a meaningful graph interaction
                 graphInteraction = 1;
 
@@ -482,21 +478,17 @@ if (matche == 0) {
                         splicedNodes = [];
                     }
 
-                    if (pinnedNodes.indexOf(nodeLabel) < 0) {
-                        pinnedNodes.push(nodeLabel);
+                    if (graphFactory.checkIfPinned(nodeLabel) == false) {
+                        graphFactory.addToPinnedNodes(nodeLabel);
                     }
-                    else {
-                        var pinnedIndex = pinnedNodes.indexOf(nodeLabel);
-                        if (pinnedIndex > -1) {
-                            pinnedNodes.splice(pinnedIndex,1);
-                            $('.entry').fadeIn(400);
-                        }
-
+                    else {   
+                        graphFactory.removeFromPinnedNodes(nodeLabel);
+                        $('.entry').fadeIn(400);                        
                     }
 
                     // console.log("Pinned nodes: " + pinnedNodes);
                     // console.log("Spliced nodes: " + splicedNodes);
-                    socket.emit('node click', {pinnedNodes: pinnedNodes, splicedNodes: splicedNodes, nodeLabel: nodeLabel, pinnedIndex: pinnedIndex});
+                    socket.emit('node click', {pinnedNodes: pinnedNodes, splicedNodes: splicedNodes, nodeLabel: nodeLabel});
 
 
                     // Now show / hide statements that have the search field
