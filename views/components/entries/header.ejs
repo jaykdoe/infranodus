@@ -10,54 +10,7 @@
                 const viewType = 'internal';
             <% } %> 
 
-            function GraphFactory(){
-                
-                let nodeNames = [];
-                let pinnedNodes = [];
-
-                this.initNames = function(nodes) {
-                    nodeNames = nodes;
-                }
-                this.initPinnedNodes = function(nodes) {
-                    if (nodes) {
-                        pinnedNodes = nodes;
-                    }
-                    else {
-                        pinnedNodes = [];
-                    }
-                }
-                this.checkIfPinned = function(node) {
-                    if (pinnedNodes.indexOf(node) > -1) {
-                        return true;
-                    }
-                    else {
-                        return false;
-                    }
-                }
-                this.addToPinnedNodes = function(name) {
-                    pinnedNodes.push(name);
-                    return true;
-                }
-                this.removeFromPinnedNodes = function(name) {
-                    pinnedNodes.splice(pinnedNodes.indexOf(name),1);
-                    return true;
-                }
-                this.getPinnedNodes = function() {
-                    return pinnedNodes;
-                }
-                this.getNodeNames = function() {
-                    return nodeNames;
-                }
-                this.addNameToNodeNames = function(name) {
-                    nodeNames.push(name);
-                    return true;
-                }
-            }
-
-            let graphFactory = new GraphFactory();
-
-            // TODO insert this right after localStorage check
-            graphFactory.initPinnedNodes();
+      
 
      
 

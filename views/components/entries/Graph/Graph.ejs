@@ -1164,45 +1164,47 @@ $('#graphstats').html(diversitytext);
 
 
 
-var commClicked = [];
+    var commClicked = [];
 
-  top_nodes_activate();
-
-  $('#resetgraph').click(function(){
-    sigma.instances(0).graph.nodes().forEach(function(n) {
-            n.color = n.originalColor;
-            n.label = n.originalLabel;
-    });
-    pinnedNodes = [];
-    commClicked = [];
-
-    $('.community_node').each(function(){
-      $(this).removeAttr('style');
-    });
-
-    $('.top_nodes').each(function(){
-      $(this).removeAttr('style');
-    });
-
-    filter_statements(pinnedNodes);
-    sigma.instances(0).refresh();
-  });
+    top_nodes_activate();
 
 
 
 
-function componentToHex(c) {
-    var hex = c.toString(16);
-    return hex.length == 1 ? "0" + hex : hex;
-}
 
-function rgbToHex(r, g, b) {
-    return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
-}
-
+    resetGraphButton().onClick(resetGraph);
 
 
 // communityDetect function ends here
+}
+
+
+
+function analyticsPanel() {
+  return {
+    removeSelections: function() {
+      
+      $('.community_node').each(function(){
+        $(this).removeAttr('style');
+      });
+
+      console.log('removing');
+
+      $('.top_nodes').each(function(){
+          $(this).removeAttr('style');
+      });
+    
+    }
+  }
+}
+
+
+function resetGraphButton() {
+    return {
+        onClick: function(onClick){
+            $('#resetgraph').on('click', onClick);
+        }
+    }
 }
 
 function top_nodes_activate() {
@@ -1236,22 +1238,18 @@ function top_nodes_activate() {
       });
       var commClicked = [];
       $('.community_node').click(function(){
+
             var communityClicked = $(this).attr('community').toString();
 
             var nodeLabel = $(this).text();
 
-            if (pinnedNodes.indexOf(nodeLabel) < 0) {
-                pinnedNodes.push(nodeLabel);
+            if (graphFactory.checkIfPinned(nodeLabel) == false) {
+                graphFactory.addToPinnedNodes(nodeLabel);
                 $(this).attr('style','color: #0089e0 !important; text-decoration: underline !important;');
             }
             else {
-                var pinnedIndex = pinnedNodes.indexOf(nodeLabel);
-                if (pinnedIndex > -1) {
-                    pinnedNodes.splice(pinnedIndex,1);
-                    $(this).removeAttr('style');
-                    $('.entry').fadeIn(400);
-                }
-
+                graphFactory.removeFromPinnedNodes(nodeLabel);
+                $(this).removeAttr('style');
             }
 
 
@@ -1461,284 +1459,6 @@ function sigmaGraph() {
         }
     }
 }
-
-
-function filter_graph(pins, origin){
-
-
-var toKeep = [];
-
-var toKeepPinned = [];
-
-var toKeepMap = [];
-
-
-// Debug: show which nodes are clicked
-// console.log("Pinned nodes clicked:");
-// console.log(pins);
-
-
-// Are any nodes at all selected on the graph?
-
-if (pins.length > 0) {
-
-    // Reiterate for each pinned node
-
-    for (var i = 0; i < pins.length; i ++) {
-
-        // Now we reiterate through every node in the graph
-
-        sigma.instances(0).graph.nodes().filter(function(n) {
-
-            var pinSearch = '';
-
-            // Lemmataze search query if we're coming from search box
-
-            // SEARCHMOD
-           /* if (origin == 'search') {
-
-                var nodeLemma = window.jstemmer(n.originalLabel);
-
-
-                if (nodeLemma.length > 0) {
-                    pinSearch = nodeLemma;
-                }
-                else {
-                    pinSearch = n.originalLabel;
-                }
-            }
-
-            // This means the user clicked on the tag or on the graph, so we use that exact parameter to search
-
-            else {
-                pinSearch = n.originalLabel;
-            }*/
-
-            pinSearch = n.originalLabel;
-
-            // Is the current node of the graph one of the ones that was clicked before?
-
-            if (pins[i] == pinSearch) {
-
-
-                // The ID of the current node is...
-                var nodeId = n.id;
-
-                // Its neighbors are...
-                var nnodes = sigma.instances(0).graph.neighbors(nodeId);
-
-                var nnodesArray = [];
-
-                // We create an array from neighbors that looks like toKeep one
-
-                for (var key in nnodes) {
-                    nnodesArray.push(nnodes[key]);
-                }
-
-
-                // If that's not the first iteration, we only keep intersection of both
-
-                if (i > 0) {
-                    toKeep = _.intersection(toKeep, nnodesArray);
-                }
-                else {
-                    toKeep = nnodesArray;
-                }
-
-                toKeepPinned.push(n);
-
-
-            }
-
-        });
-
-    }
-
-    // Make array of nodes to keep unique to avoid duplicates
-
-
-
-    toKeep = _.uniq(toKeep);
-
-    toKeep = _.union(toKeep,toKeepPinned);
-
-
-    // console.log("Keeping the nodes:");
-    // console.log(toKeep);
-
-    console.log(toKeep.length + ' nodes selected out of ' + global_totalnodes + ' (' + (toKeep.length/global_totalnodes).toFixed(2)*100 + '%)')
-
-    selectedNodes = [];
-    for (var irr in toKeep) {
-      selectedNodes.push(toKeep[irr].label);
-    }
-
-
-    // Now convert this to an array that will be understood by the functions below
-
-    for (key in toKeep) {
-        toKeepMap[toKeep[key].id] = toKeep[key];
-    }
-
-
-    // For each node in the graph
-
-    sigma.instances(0).graph.nodes().forEach(function(n) {
-
-        if (toKeepMap[n.id])  {
-
-            var pinSearch = '';
-
-            // Lemmataze search query if we're coming from search box
-            // SEARCHMOD
-           /* if (origin == 'search') {
-                var nodeLemma = window.jstemmer(n.originalLabel);
-
-
-                if (nodeLemma.length > 0) {
-                    pinSearch = nodeLemma;
-                }
-                else {
-                    pinSearch = n.originalLabel;
-                }
-            }
-
-            // This means the user clicked on the tag or on the graph, so we use that exact parameter to search
-
-            else {
-                pinSearch = n.originalLabel;
-            }*/
-
-            pinSearch = n.originalLabel;
-
-
-            if (pins.indexOf(pinSearch) > -1) {
-                    n.color = '#0089e0';
-
-                    if (n.originalLabel == toKeepPinned[toKeepPinned.length-1].label) {
-                        console.log('The node "' + n.originalLabel + '" has ' + n.size + ' edges (degree), betweenness centrality: ' + n.bc + ', belongs to ' + n.community + ' community.');
-                    }
-
-                }
-                else {
-                    n.color = n.originalColor;
-
-                }
-                n.label = n.originalLabel;
-
-        }
-            else  {
-                n.color = deselected_nodes_color;
-                n.label = '';
-            }
-
-    });
-
-    sigma.instances(0).graph.edges().forEach(function(e) {
-            if (toKeepMap[e.source] && toKeepMap[e.target]) {
-                e.color = e.originalColor;
-            }
-            else {
-                e.color = deselected_nodes_color;
-            }
-    });
-
-
-
-}
-
-// No nodes are selected (or all are deselected) - show the whole graph
-
-else {
-    console.log('deselecting the graph');
-
-    sigma.instances(0).graph.nodes().forEach(function(n) {
-
-
-       n.color = n.originalColor;
-       n.label = n.originalLabel;
-
-       n.marked = 0;
-
-
-
-    });
-
-    sigma.instances(0).graph.edges().forEach(function(e) {
-
-       e.color = e.originalColor;
-
-    });
-
-    // Remove all selections
-    selectedNodes = [];
-
-
-    // We show the whole graph above so scroll down to all the statements
-    entries().scroll();
-
-
-}
-
-// Since the data has been modified, we need to
-// call the refresh method to make the colors
-// update effective.
-
-sigma.instances(0).refresh();
-
-<% if (locals.user) { %>
-<% if (locals.user.midi != undefined && locals.user.midi != 'off') { %>
-
-
-console.log('using MIDI data ' + midi);
-console.log('playing MIDI device:');
-console.log(output);
-
-var timecode = 0;
-
-var note_node = midi.substr(10,2);
-if (note_node.substr(1,1) == '0') {
-  note_node = note_node.substr(0,1) + '1';
-}
-
-var note_edge = midi.substr(12,2);
-if (note_edge.substr(1,1) == '0') {
-  note_edge = note_edge.substr(0,1) + '1';
-}
-
-
-
-for (var m = 0; m < pins.length; m++) {
-
-
-    setTimeout(function () {
-      output.playNote(note_node, parseInt(midi.substr(0,2)));
-      output.stopNote(note_node, parseInt(midi.substr(0,2)), {time: "+500"});
-      console.log('playing a node note ' + note_node + ' at ' + timecode + ' on channel ' + parseInt(midi.substr(0,2)));
-    }, timecode);
-    timecode = getRandomInt(0,parseInt(midi.substr(6,4)));
-}
-
-var timecodea = 0;
-
-for (var ed = 0; ed < toKeep.length; ed++) {
-
-    setTimeout(function () {
-      output.playNote(note_edge, parseInt(midi.substr(2,2)));
-      output.stopNote(note_edge, parseInt(midi.substr(2,2)), {time: "+500"});
-      console.log('playing an edge note ' + note_edge + ' at ' + timecodea + ' on ' + parseInt(midi.substr(2,2)));
-    }, timecodea);
-      timecodea = getRandomInt(0,parseInt(midi.substr(6,4)));
-
-}
-
-<% } %>
-<% } %>
-
-
-}
-
-
 
 
 

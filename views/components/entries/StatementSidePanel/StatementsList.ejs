@@ -126,6 +126,9 @@ function entries() {
                     $('#statements-link').addClass('statements-link-on');
                 }
                 
+        },
+        unfilter: function() {
+               $('.entry').fadeIn(400);
         }
     }
 }
@@ -367,11 +370,7 @@ function entries() {
 
           }
 
-          // Show only the clicked nodes and their neighbors in the graph
-          if (origin != 'community' && origin != 'stopwords') {
-            filter_graph(pinnedNodes, origin);
-          }
-
+       
 
         // END OF if origin != stopwords
       }

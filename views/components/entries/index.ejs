@@ -243,21 +243,17 @@ if (background == 'dark') {
 
     
 
-     // When we click reset button
+// When we click reset button
 
- socket.on('graph reset', function(msg){
+socket.on('graph reset', function(msg){
      
-
-     pinnedNodes = [];
-     splicedNodes = [];
-     notfoundNodes = [];
+    graphFactory.initPinnedNodes();
+    splicedNodes = [];
+    notfoundNodes = []; 
+    analyticsPanel().removeSelections();
+    entries().unfilter();
      
-     $('.entry').fadeIn(400);
-     
-     // Filter statements and select nodes on the graph
-     filter_statements(pinnedNodes);
-     
-     });
+});
 
 
 // This is called when an entry is deleted

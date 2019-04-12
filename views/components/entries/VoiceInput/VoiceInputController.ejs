@@ -88,11 +88,13 @@ if ('webkitSpeechRecognition' in window) {
             $('#microphone-link').toggleClass('microphone-on', 'remove');
             recognition.abort();
             $('#livetext').html('');
+            $('#livetext').hide();
         }
         else {
             localStorage.setItem('microphone', 1);
             activateVoiceInput();
             $('#microphone-link').toggleClass('microphone-on', 'add');
+            $('#livetext').show();
         }
 
     });
