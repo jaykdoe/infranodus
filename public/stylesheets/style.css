@@ -59,6 +59,8 @@
     --zoom-in-background-image: url('../images/zoom-in.png')!important;
     --zoom-out-opacity: 1!important;
     --zoom-out-background-image: url('../images/zoom-out.png')!important;
+
+    --deleted-nodes-background-image: url('../images/trash.png');
 }
 :root[theme='dark'] {
     --body-text-color: #aaaab5;
@@ -93,6 +95,8 @@
     --zoom-in-background-image: url('../images/zoom-in-white.png')!important;
     --zoom-out-opacity: 0.6!important;
     --zoom-out-background-image: url('../images/zoom-out-white.png')!important;
+
+    --deleted-nodes-background-image: url('../images/trash-white.png');
 }
 
 
@@ -825,17 +829,11 @@ button {
 
 .deletenodes-on {
     opacity: 1!important;
-    background-image: url('../images/trash.png');
+    background-image: var(--deleted-nodes-background-image);
     background-repeat:no-repeat;
     background-position:center;
 }
 
-.deletenodes-dark {
-  opacity: 1!important;
-  background-image: url('../images/trash-white.png');
-  background-repeat:no-repeat;
-  background-position:center;
-}
 
 #undo {
     float: right;

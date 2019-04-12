@@ -12,14 +12,19 @@
 
             function GraphFactory(){
                 
-                this.nodeNames = [];
-                this.pinnedNodes = [];
+                let nodeNames = [];
+                let pinnedNodes = [];
 
                 this.initNames = function(nodes) {
                     nodeNames = nodes;
                 }
                 this.initPinnedNodes = function(nodes) {
-                    pinnedNodes = nodes;
+                    if (nodes) {
+                        pinnedNodes = nodes;
+                    }
+                    else {
+                        pinnedNodes = [];
+                    }
                 }
                 this.checkIfPinned = function(node) {
                     if (pinnedNodes.indexOf(node) > -1) {
@@ -37,6 +42,9 @@
                     pinnedNodes.splice(pinnedNodes.indexOf(name),1);
                     return true;
                 }
+                this.getPinnedNodes = function() {
+                    return pinnedNodes;
+                }
                 this.getNodeNames = function() {
                     return nodeNames;
                 }
@@ -48,8 +56,12 @@
 
             let graphFactory = new GraphFactory();
 
+            // TODO insert this right after localStorage check
+            graphFactory.initPinnedNodes();
 
-            var pinnedNodes = [];
+     
+
+            
             var splicedNodes = [];
             var notfoundNodes = [];
             var deletedNodes = [];

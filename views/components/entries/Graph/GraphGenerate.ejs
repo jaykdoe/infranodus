@@ -462,6 +462,7 @@ sigma.parsers.json(
                 }
                 else {
 
+
                     // Was the node clicked already? No? Add it to array of clicked nodes.
                     // Highlight the clicked node in the text.
 
@@ -478,6 +479,7 @@ sigma.parsers.json(
                         splicedNodes = [];
                     }
 
+
                     if (graphFactory.checkIfPinned(nodeLabel) == false) {
                         graphFactory.addToPinnedNodes(nodeLabel);
                     }
@@ -486,17 +488,12 @@ sigma.parsers.json(
                         $('.entry').fadeIn(400);                        
                     }
 
-                    // console.log("Pinned nodes: " + pinnedNodes);
-                    // console.log("Spliced nodes: " + splicedNodes);
-                    socket.emit('node click', {pinnedNodes: pinnedNodes, splicedNodes: splicedNodes, nodeLabel: nodeLabel});
-
+                    // Let's send an event to all the collaborators in the chatroom
+                    socket.emit('node click', {pinnedNodes: graphFactory.getPinnedNodes(), splicedNodes: splicedNodes, nodeLabel: nodeLabel});
+           
 
                     // Now show / hide statements that have the search field
-
-                    filter_statements(pinnedNodes);
-
-
-
+                    filter_statements(graphFactory.getPinnedNodes());
 
                     // If the window is wide enough to show the menu AND div with statements is not visible
 
@@ -543,7 +540,7 @@ sigma.parsers.json(
             // Hide node's label when we're out of it
 
             sigma.bind('outNode', function(e) {
-                if (e.data.node.color != e.data.node.originalColor && pinnedNodes.indexOf(e.data.node.originalLabel) < 0) {
+                if (e.data.node.color != e.data.node.originalColor && graphFactory.checkIfPinned(e.data.node.originalLabel) == false) {
                     e.data.node.label = '';
                 }
                 sigma.refresh();

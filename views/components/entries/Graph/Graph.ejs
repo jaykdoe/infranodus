@@ -2,7 +2,6 @@
 
 var jsonpath = '';
 
-
 var maxnodes = '';
 
 // Get the setting from user DB how many max nodes we show
@@ -152,7 +151,8 @@ var inactiveTimeout = null;
 <script>
 
 
-        // What happens when the user clicks on a node in the graph (this is caleld from sigma but processed here)
+// What happens when the user clicks on a node in the graph (this is caleld from sigma but processed here)
+// This is for collaboration only
 
 socket.on('node click', function(msg){
 
@@ -892,7 +892,7 @@ sigma.instances(0).graph.nodes().forEach(function(n) {
 
   n.originalColor = rgbToHex(palette[n.community]._rgb[0],palette[n.community]._rgb[1],palette[n.community]._rgb[2]);
 
-  if (pinnedNodes.indexOf(n.originalLabel) < 0) {
+  if (graphFactory.checkIfPinned(n.originalLabel) == false) {
 
         if (selectedNodes.length > 0){
           if (selectedNodes.indexOf(n.originalLabel) > -1) {
@@ -1387,11 +1387,11 @@ function top_nodes_activate() {
 
                         }
 
-                        if (pinnedNodes.indexOf(n.originalLabel) > -1) {
+                        if (graphFactory.checkIfPinned(n.originalLabel) == true) {
                           n.color = '#0089e0';
                           n.label = n.originalLabel;
                         }
-                        if (pinnedNodes.indexOf(n.originalLabel) < 0 && islastnode && n.originalLabel == nodeLabel) {
+                        if (graphFactory.checkIfPinned(n.originalLabel) == false && islastnode && n.originalLabel == nodeLabel) {
                           n.color = n.originalColor;
                           n.label = n.originalLabel;
                         }
