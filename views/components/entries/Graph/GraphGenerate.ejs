@@ -233,7 +233,10 @@ sigma.parsers.json(
                 }
 
                 // Make an index of nodes to statement
+
+                // For each statement that contains this edge
                 for (let item of e.statement_id) {
+                           
                   if (nodesOfStatement[item]) {
                       if (nodesOfStatement[item].indexOf(e.source) < 0)
                           nodesOfStatement[item].push(e.source);
@@ -243,7 +246,11 @@ sigma.parsers.json(
                   else {
                       nodesOfStatement[item] = [];
                       nodesOfStatement[item].push(e.source);
-                      nodesOfStatement[item].push(e.target);
+                      // avoid duplicates
+                      if (e.source != e.target) {
+                        nodesOfStatement[item].push(e.target);
+                      }
+                      
                   }
                 }
 
@@ -583,7 +590,7 @@ sigma.parsers.json(
                     }
                     else {   
                         graphFactory.removeFromPinnedNodes(nodeLabel);
-                        $('.entry').fadeIn(400);                        
+                                              
                     }
 
                     // Let's send an event to all the collaborators in the chatroom

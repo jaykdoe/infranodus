@@ -139,30 +139,29 @@ function entries() {
         filter: function(that) {
 
           if (that) {
-            $(that).fadeOut(500);
+            $(that).fadeOut();
           }
           else {
-          
-            let timesfiltered = 0;
-        
+                  
             if (graphFactory.existPinnedNodes() == false) {
               entries().unfilter();
+              entries().removeHighlight('.entry');
             }
             else {
               entries().filter('.entry');
-              entries().search(entries().highlighter);
+              entries().search();
+              entries().addHighlight('.entry');           
             }
 
           }
         },
-        highlighter: function(that) {
+        addHighlight: function(that) {
           
           // Highlight the nodes that were clicked
-          $(that).removeHighlight();
-
           let pinnedNodes = graphFactory.getPinnedNodes();
 
           for (let i = 0; i < pinnedNodes.length; i++) {
+              // TODO instead identify the language setting and use jstemmer for that 
               if (pinnedNodes[i].match(/[а-яА-Я]/)) {
                 $(that).highlight(window.jstemmer(pinnedNodes[i]));
               }
@@ -172,11 +171,13 @@ function entries() {
           }
 
         },
+        removeHighlight: function(that) {
+              // Remove highlight everywhere
+              $(that).removeHighlight();
+        },
         search: function(callback) {
 
            let totalEntriesMatched = 0;
-
-           let visibleentries = visibleentries_original;
 
            let nodeIDs_reversed = graphFactory.getNodeIDsRev();
 
@@ -188,22 +189,21 @@ function entries() {
               // Retrieve the statement text from the entry, clean from html
               let originaltext = $(this).children('.entry-text').html();
 
-              // How many nodes we found in this entry?
-              let nodesfound = 0;
-
               // How many entries in total were matched?
               let matchedThisEntry = 0;
+
+              // How many nodes we found in this entry?
+              let nodesfound = 0;
 
               // For each node present in this statement:
               for (let item in nodesOfStatement[currentDiv]) {
 
-                var nmarker = nodesOfStatement[currentDiv][item]; //
+                let nmarker = nodesOfStatement[currentDiv][item]; //
 
                 // Is this node in pinnedNodes?
                 if (graphFactory.checkIfPinned(nodeIDs_reversed[nmarker]) == true) {
                   
                   nodesfound = nodesfound + 1;
-
                   // The number of nodes found in this entry equals the number of pinned nodes?
                   if (nodesfound == graphFactory.getPinnedNodes().length) {
 
@@ -211,6 +211,7 @@ function entries() {
                       matchedThisEntry = 1;
 
                       totalEntriesMatched += 1;
+
                   }
 
                 }
@@ -219,7 +220,6 @@ function entries() {
 
               if (matchedThisEntry == 1) {
                   entries().unfilter(this);
-                  callback(this); // do the highlight
               }
 
           });
@@ -273,7 +273,6 @@ function entries() {
 
                         if (matchedentry == 1) {
                             entries().unfilter(this);
-                            callback(this); // do the highlight
                         }
                         
                 });
@@ -319,7 +318,7 @@ function entries() {
 
     var timesfiltered = 0;
 
-    function filter_statements(pinnedNodes, origin) {
+    function filter_statements_old(pinnedNodes, origin) {
 
         var visibleentries = visibleentries_original;
 
