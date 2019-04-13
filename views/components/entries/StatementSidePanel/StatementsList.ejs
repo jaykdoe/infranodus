@@ -148,27 +148,28 @@ function entries() {
               entries().removeHighlight('.entry');
             }
             else {
-              entries().search();
-              entries().addHighlight('.entry');           
+              entries().search(entries().addHighlight);        
             }
 
           }
         },
-        addHighlight: function(that) {
-          
-          // Highlight the nodes that were clicked
-          let pinnedNodes = graphFactory.getPinnedNodes();
+        addHighlight: function(that, nodesToHighlight) {
+
+          // No nodes sent to highlight? Then highlight the pinned ones
+          if (!nodesToHighlight) {
+            let nodesToHighlight = graphFactory.getPinnedNodes();
+          }
 
           // Have to do this, so we don't add extra spans
           $(that).removeHighlight();
 
-          for (let i = 0; i < pinnedNodes.length; i++) {
+          for (let i = 0; i < nodesToHighlight.length; i++) {
               // TODO instead identify the language setting and use jstemmer for that 
-              if (pinnedNodes[i].match(/[а-яА-Я]/)) {
-                $(that).highlight(window.jstemmer(pinnedNodes[i]));
+              if (nodesToHighlight[i].match(/[а-яА-Я]/)) {
+                $(that).highlight(window.jstemmer(nodesToHighlight[i]));
               }
               else {
-                $(that).highlight(pinnedNodes[i]);
+                $(that).highlight(nodesToHighlight[i]);
               }
           }
 
@@ -224,6 +225,7 @@ function entries() {
 
               if (matchedThisEntry == 1) {
                   entries().unfilter(this);
+                  callback(this, graphFactory.getPinnedNodes());
               }
               else {
                   entries().filter(this);
@@ -251,7 +253,11 @@ function entries() {
 
               // We then find the inersection between the nodes that were connected to the last selected pinnedNode and the neightbors of the one before that one
               let overlapNodes = [];
-              overlapNodes = _.intersection(selectedNNodes, selectedNodes);      
+              overlapNodes = _.intersection(selectedNNodes, selectedNodes);  
+              
+              // Let's now create an object for all the nodes selected on the graph to highlight
+              let allSelectedNodes = [];
+              allSelectedNodes = _.union(overlapNodes,graphFactory.getPinnedNodes());
               
               $(".entry").each(function(){
                         let matchedentry = 0;
@@ -269,7 +275,6 @@ function entries() {
                               var n2marker = nodesOfStatement[currentDiv][node];
                               // Yes? the entry has a match
                               if (graphFactory.checkIfPinned(nodeIDs_reversed[n2marker]) == true || lastNode == nodeIDs_reversed[n2marker]) {
-                                  console.log('match')
                                   matchedentry = 1;
                                   totalEntriesMatched += 1;
                               }
@@ -279,6 +284,7 @@ function entries() {
 
                         if (matchedentry == 1) {
                           entries().unfilter(this);
+                          callback(this, allSelectedNodes);
                         }
                         else {
                           entries().filter(this);
