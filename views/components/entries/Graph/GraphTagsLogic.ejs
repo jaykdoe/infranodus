@@ -96,7 +96,7 @@ function addTagTriggers() {
 
 $("#deletenodes").on('click', function(e) {
     e.preventDefault;
-    socket.emit('node delete', {pinnedNodes: pinnedNodes});
+    socket.emit('node delete', {pinnedNodes: graphFactory.getPinnedNodes()});
 });
 
 
@@ -129,28 +129,31 @@ socket.on('node delete', function(msg){
     sigma.instances(0).graph.nodes().forEach(function(n) {
 
         if (nodesToDelete.indexOf(n.originalLabel) >= 0) {
-        sigma.instances(0).graph.dropNode(n.id);
-        if (deletedNodes.indexOf(n.originalLabel) == -1) {
-            deletedNodes.push(n.originalLabel);
-        }
+            sigma.instances(0).graph.dropNode(n.id);
+            if (deletedNodes.indexOf(n.originalLabel) == -1) {
+                deletedNodes.push(n.originalLabel);
+            }
         }
         else {
-        // Add the remaining ones to Cytoscape
-        n.color = n.originalColor;
-        n.label = n.originalLabel;
-        elesnodes.push({
-            group: "nodes",
-            data: { id: n.id, name: n.label}
-        });
+            n.color = n.originalColor;
+            n.label = n.originalLabel;
+
+            // Add the remaining ones to Cytoscape
+            elesnodes.push({
+                group: "nodes",
+                data: { id: n.id, name: n.label}
+            });
 
 
         }
+
     //n.size = sigma.graph.degree(n.id);
 
     });
 
     // Reiterate all the remaining edges and add them to Cytascape
     // TODO this code duplicates from above - move into a function
+
     sigma.instances(0).graph.edges().forEach(function(e) {
 
         var unique_edge_id = '';
@@ -169,17 +172,16 @@ socket.on('node delete', function(msg){
             data: { id: unique_edge_id, source: e.source, target: e.target, weight: e.weight }
         });
 
-             // TODO remove that, this is just to check data consistentency
-             e.sourcename = nodeIDs_rev[e.source];
+        // TODO remove that, this is just to check data consistentency
+        e.sourcename = nodeIDs_rev[e.source];
         e.targetname = nodeIDs_rev[e.target];
 
 
          // Add to jsnetworkx
-
          var edge_params = {
-                     weight: 1/e.weight,
-                     sourcename: e.sourcename,
-                     targetname: e.targetname                     
+            weight: 1/e.weight,
+            sourcename: e.sourcename,
+            targetname: e.targetname                     
         };
 
         var edge_object = [e.source, e.target, edge_params];
@@ -207,16 +209,16 @@ socket.on('node delete', function(msg){
     // No more pinned nodes
 
     if (!delete_from) {
-    pinnedNodes = [];
+        pinnedNodes = [];
     }
     commClicked = [];
 
     $('.community_node').each(function(){
-    $(this).removeAttr('style');
+         $(this).removeAttr('style');
     });
 
     $('.top_nodes').each(function(){
-    $(this).removeAttr('style');
+        $(this).removeAttr('style');
     });
 
     if (sigma.instances(0).isForceAtlas2Running()) {
@@ -244,13 +246,7 @@ socket.on('node delete', function(msg){
 
     }
 
-
-    // Unfliter the nodes
-    filter_statements(pinnedNodes, "nodedelete");
-
-
     sigma.instances(0).refresh();
-
 
 
 });
