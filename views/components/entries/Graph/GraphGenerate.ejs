@@ -10,7 +10,7 @@ function GraphFactory(){
         // These are the nodes that are selected
         let pinnedNodes = [];
 
-        // These are the nodes that were selected but not found
+        // These are the nodes that were selected but not found (so gray pinnedNodes)
         let notFoundNodes = [];
 
 
@@ -47,7 +47,7 @@ function GraphFactory(){
             // Add tags to the graph
             graphTags().update();
 
-            // TODO Perform filter statements function on the nodes selected
+            // Perform filter statements function on the nodes selected
             entries().filter();
 
             // Add search terms into the top graph search form
@@ -59,7 +59,6 @@ function GraphFactory(){
         }
 
         // TODO write initiatilization for the delete nodes
-        // TODO move the tags initiation logic from filter_statements to the GraphTagsLogic
 
         this.checkIfPinned = function(node) {
             if (pinnedNodes.indexOf(node) > -1) {
@@ -82,11 +81,14 @@ function GraphFactory(){
         this.getPinnedNodes = function() {
             return pinnedNodes;
         }
+        this.getPinnedNode = function(position) {
+            return pinnedNodes[position];
+        }
         this.getLastPinnedNode = function() {
-            return pinnedNodes[pinneNodes.length];
+            return pinnedNodes[pinnedNodes.length];
         }
         this.getPreviousPinnedNode = function() {
-            return pinnedNodes[pinneNodes.length - 1];
+            return pinnedNodes[pinnedNodes.length - 1];
         }
         this.existPinnedNodes = function() {
             if (pinnedNodes && pinnedNodes.length > 0) {
@@ -104,6 +106,10 @@ function GraphFactory(){
             else {
                 notFoundNodes = nodes;
             }
+            return true;
+        }
+        this.addToNotFoundNodes = function(name) {
+            notFoundNodes.push(name);
             return true;
         }
         this.getNotFoundNodes = function() {

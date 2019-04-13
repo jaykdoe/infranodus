@@ -144,12 +144,12 @@ function entries() {
           else {
           
             let timesfiltered = 0;
-            let visibleentries = visibleentries_original;
         
-            if (graphFactory.existPinnedNodes == false) {
+            if (graphFactory.existPinnedNodes() == false) {
               entries().unfilter();
             }
             else {
+              entries().filter('.entry');
               entries().search(entries().highlighter);
             }
 
@@ -175,6 +175,8 @@ function entries() {
         search: function(callback) {
 
            let totalEntriesMatched = 0;
+
+           let visibleentries = visibleentries_original;
 
            let nodeIDs_reversed = graphFactory.getNodeIDsRev();
 
@@ -210,149 +212,105 @@ function entries() {
 
                       totalEntriesMatched += 1;
                   }
+
                 }
 
               }
 
               if (matchedThisEntry == 1) {
-                callback(this);
+                  entries().unfilter(this);
+                  callback(this); // do the highlight
               }
-              else {
-                entries().filter(this);
+
+          });
+
+          if (totalEntriesMatched == 0) {
+
+              // Logic #1:
+              // If no matches are found, let's find entries that have at least one pinned node and one intersection of the pinned ones
+
+              // Let's choose the previous node
+              let lastNode = graphFactory.getPreviousPinnedNode();
+
+              // Get the neighbor nodes in the graph for the previous node, but not including it
+              let nnodes = sigma.instances(0).graph.neighbors(nodeIDs[lastNode]);
+
+              let selectedNNodes = [];
+
+              // We create an array from the neighbors of that previous node
+              for (let key in nnodes) {
+                  selectedNNodes.push(nnodes[key].label);
               }
-           });
 
-          //     // None of the pinned nodes are not found in the entry
-          //     if (matched1entry == 0) {
-
-          //       // Hide this entry
-          //       $(this).fadeOut(500);
-
-          //       // Reset the counter
-          //       visibleentries = visibleentries - 1;
-
-          //       // If visibleenries == 0 that means we checked all the entries and there was no full match (for all the pinnedNodes) in any of them
-          //       // Then launch a different (lax) search algorithm
-
-          //       if (visibleentries == 0) {
-
-          //           // #1 Logic for the intersections
-
-          //           // Let's choose the previous node
-          //           let lastNode = graphFactory.getPreviousPinnedNode();
-
-          //           // Get the neighbor nodes in the graph for the previous node
-          //           let nnodes = sigma.instances(0).graph.neighbors(nodeIDs[lastNode]);
-
-          //           let selectedNNodes = [];
-
-          //           // We create an array from neighbors that looks like toKeep one
-          //           for (let key in nnodes) {
-          //               selectedNNodes.push(nnodes[key].label);
-          //           }
-
-          //           // We then find the inersection between the nodes that were selected before and now
-          //           var overlapNodes = [];
-          //           overlapNodes = _.intersection(selectedNNodes, selectedNodes);
-
-          //           // TODO we always should have ONLY entries with one intersection and at least one of the pinned
-          //           // This breaks when we start navigating in the graph and have 3 pinned items — in this case no neighbors and it breaks
-
-          //           // Also some problems with deselection
-
-          //           $(".entry").each(function(){
-          //               var matchedentry = 0;
-          //               var currentDiv = $(this).attr('data-uid');
-
-          //               // For each node present in this statement:
-          //               for (var item in nodesOfStatement[currentDiv]) {
-          //                 var nmarker = nodesOfStatement[currentDiv][item];
-
-          //                 // Does this node belong to the Overlap nodes AND at the same time
-          //                 if (overlapNodes.indexOf(nodeIDs_reversed[nmarker]) > -1) {
-          //                   for (var node in nodesOfStatement[currentDiv]) {
-          //                     var n2marker = nodesOfStatement[currentDiv][node];
-          //                     if (pinnedNodes.indexOf(nodeIDs_reversed[n2marker]) > -1 || lastNode == nodeIDs_reversed[n2marker]) {
-          //                       matchedentry = 1;
-          //                     }
-          //                   }
-          //                 }
-          //               }
-          //               if (matchedentry == 1) {
-          //                   $(this).fadeIn(500);
-          //                   visibleentries = visibleentries + 1;
-          //               }
-          //           });
+              // We then find the inersection between the nodes that were connected to the last selected pinnedNode and the neightbors of the one before that one
+              let overlapNodes = [];
+              overlapNodes = _.intersection(selectedNNodes, selectedNodes);      
 
 
-          //           if (visibleentries == 0) {
+              
+              $(".entry").each(function(){
+                        let matchedentry = 0;
+                        let currentDiv = $(this).attr('data-uid');
 
-          //               $('.entry').fadeIn(500);
-          //               // #2 Logic
-          //               // This is if we want to remove the node before the last one.
+                        // For each node present in this statement:
+                        for (let item in nodesOfStatement[currentDiv]) {
+                          let nmarker = nodesOfStatement[currentDiv][item];
 
-          //               // timesfiltered = timesfiltered + 1;
-          //               // var posnodes = pinnedNodes.length - timesfiltered - 1;
+                          // Is at least one node in that statement belongs to the intersection?
+                          if (overlapNodes.indexOf(nodeIDs_reversed[nmarker]) > -1) {
 
-          //               var posnodes = 0;
+                            // Yes? then reiterate through the other nodes in there and see if it either contains at least one of the pinnedNodes or the last node?
+                            for (var node in nodesOfStatement[currentDiv]) {
+                              var n2marker = nodesOfStatement[currentDiv][node];
+                              // Yes? the entry has a match
+                              if (pinnedNodes.indexOf(nodeIDs_reversed[n2marker]) > -1 || lastNode == nodeIDs_reversed[n2marker]) {
+                                  matchedentry = 1;
+                                  totalEntriesMatched += 1;
+                              }
+                            }
+                          }
+                        }
 
-          //               // Final nodes to search
+                        if (matchedentry == 1) {
+                            entries().unfilter(this);
+                            callback(this); // do the highlight
+                        }
+                        
+                });
+                
 
-          //               splicedNodes = [];
+                if (totalEntriesMatched == 0) {
 
-          //               // First all of them
+                      // Logic #2:
+                      // We then remove the node before the last pinnedNode to at least see the entries that contain that last selected node
 
-          //               for (var k = 0; k < pinnedNodes.length; k++) {
-          //                   splicedNodes[k] = pinnedNodes[k];
-          //               }
+                      let posnodes = 0;
 
-          //               // Remove the one we can't find (the very first one of the bunch)
+                      // Final nodes to search
+                      splicedNodes = [];
 
-          //               splicedNodes.splice(posnodes, 1);
+                      // First all of them
+                      for (let k = 0; k < graphFactory.getPinnedNodes().length; k++) {
+                          splicedNodes[k] = graphFactory.getPinnedNodes()[k];
+                      }
 
-          //               // Save that one also into the list of the nodes we removed
+                      // Remove the one we can't find (the oldest one of the bunch first)
+                      splicedNodes.splice(posnodes, 1);
 
-          //               notfoundNodes.push(pinnedNodes[posnodes]);
+                      // Save that one also into the list of the nodes we removed
+                      graphFactory.addToNotFoundNodes(graphFactory.getPinnedNode(posnodes));
 
-          //               // This is for alert
-          //               // var r = confirm('No link between ' + pinnedNodes + '.\nShow entries just with ' + splicedNodes + '?');
+                      // This is for plain message
+                      // $('#messages').html('No entries contain "' + pinnedNodes.join(' and ') + '".<br>Showing entries that contain "' + splicedNodes.join(' and ') + '" only:<br>&nbsp;');
 
-          //               // This is for plain message
-          //               // $('#messages').html('No entries contain "' + pinnedNodes.join(' and ') + '".<br>Showing entries that contain "' + splicedNodes.join(' and ') + '" only:<br>&nbsp;');
+                      graphFactory.initPinnedNodes(splicedNodes);
 
-          //               // Get the pinnedNodes back to a good shape
-          //               pinnedNodes = [];
-          //               for (var l = 0; l < splicedNodes.length; l++) {
-          //                   pinnedNodes[l] = splicedNodes[l];
-          //               }
+                }
 
-          //               // Relaunch the function with the newly cleared list of pinnedNodes
-
-          //               filter_statements(pinnedNodes, origin);
-          //         }
-
-          //       }
-          //     // END OF not found any entries with the nodes clicked
-          //     }
-
-          //     // FOUND something with the nodes clicked
-          //     else {
-
-          //       // Populate statement with a new text
-
-          //     //  $(this).children('.entry-text').html(newtext);
-
-          //       // $(this).find('.nonmatched-sentence').fadeOut(500); this is only if we want to fade non-matched sentences - see above also
-
-
-
-          //     }
-
+          }
 
           
-          // callback();
-
-        },
+        }
     }
 }
 
