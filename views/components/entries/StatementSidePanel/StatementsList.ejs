@@ -139,7 +139,7 @@ function entries() {
         filter: function(that) {
 
           if (that) {
-            $(that).fadeOut();
+            $(that).fadeOut(400);
           }
           else {
                   
@@ -148,7 +148,6 @@ function entries() {
               entries().removeHighlight('.entry');
             }
             else {
-              entries().filter('.entry');
               entries().search();
               entries().addHighlight('.entry');           
             }
@@ -159,6 +158,8 @@ function entries() {
           
           // Highlight the nodes that were clicked
           let pinnedNodes = graphFactory.getPinnedNodes();
+
+          $(that).removeHighlight();
 
           for (let i = 0; i < pinnedNodes.length; i++) {
               // TODO instead identify the language setting and use jstemmer for that 
@@ -172,8 +173,10 @@ function entries() {
 
         },
         removeHighlight: function(that) {
+
               // Remove highlight everywhere
               $(that).removeHighlight();
+
         },
         search: function(callback) {
 
@@ -220,6 +223,9 @@ function entries() {
 
               if (matchedThisEntry == 1) {
                   entries().unfilter(this);
+              }
+              else {
+                  entries().filter(this);
               }
 
           });
@@ -272,7 +278,10 @@ function entries() {
                         }
 
                         if (matchedentry == 1) {
-                            entries().unfilter(this);
+                          entries().unfilter(this);
+                        }
+                        else {
+                          entries().filter(this);
                         }
                         
                 });

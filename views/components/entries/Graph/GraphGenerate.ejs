@@ -572,17 +572,17 @@ sigma.parsers.json(
                     // Highlight the clicked node in the text.
 
 
-                    if (splicedNodes.length > 1) {
-                         pinnedNodes = [];
-                         for (var p = 0; p < splicedNodes.length; p++ ){
-                             pinnedNodes[p] = splicedNodes[p];
-                         }
-                    }
-                    else if (splicedNodes.length == 1) {
-                        pinnedNodes = [];
-                        pinnedNodes[0] = splicedNodes[0];
-                        splicedNodes = [];
-                    }
+                    // if (splicedNodes.length > 1) {
+                    //      pinnedNodes = [];
+                    //      for (var p = 0; p < splicedNodes.length; p++ ){
+                    //          pinnedNodes[p] = splicedNodes[p];
+                    //      }
+                    // }
+                    // else if (splicedNodes.length == 1) {
+                    //     pinnedNodes = [];
+                    //     pinnedNodes[0] = splicedNodes[0];
+                    //     splicedNodes = [];
+                    // }
 
 
                     if (graphFactory.checkIfPinned(nodeLabel) == false) {
@@ -594,7 +594,7 @@ sigma.parsers.json(
                     }
 
                     // Let's send an event to all the collaborators in the chatroom
-                    socket.emit('node click', {pinnedNodes: graphFactory.getPinnedNodes(), splicedNodes: splicedNodes, nodeLabel: nodeLabel});
+                   // socket.emit('node click', {pinnedNodes: graphFactory.getPinnedNodes(), splicedNodes: splicedNodes, nodeLabel: nodeLabel});
            
 
                     // Now show / hide statements that have the search field
