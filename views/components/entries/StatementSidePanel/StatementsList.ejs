@@ -159,6 +159,7 @@ function entries() {
           // Highlight the nodes that were clicked
           let pinnedNodes = graphFactory.getPinnedNodes();
 
+          // Have to do this, so we don't add extra spans
           $(that).removeHighlight();
 
           for (let i = 0; i < pinnedNodes.length; i++) {
