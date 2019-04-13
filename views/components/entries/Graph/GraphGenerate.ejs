@@ -23,7 +23,9 @@ function GraphFactory(){
         this.getNodeIDs = function() {
             return nodeIDs;
         }
-
+        this.getNodeID = function(name) {
+            return nodeIDs[name];
+        }
         this.getNodeIDsRev = function() {
             return nodeIDs_rev;
         }
@@ -85,9 +87,6 @@ function GraphFactory(){
             return pinnedNodes[position];
         }
         this.getLastPinnedNode = function() {
-            return pinnedNodes[pinnedNodes.length];
-        }
-        this.getPreviousPinnedNode = function() {
             return pinnedNodes[pinnedNodes.length - 1];
         }
         this.existPinnedNodes = function() {
@@ -557,11 +556,12 @@ sigma.parsers.json(
 
                 var nodeLabel = e.data.node.originalLabel;
 
+                // TODO to check that
                 if (interpret) {
                   $('.entry').show();
                 }
 
-
+                // If we click on the context node, just bring us to that context
                 if (nodeLabel.substr(0,9) == 'context: ') {
                     window.open('/' + current_user + '/' + nodeLabel.substr(9,nodeLabel.length) + '<% if (!perceivername) { %>/edit<% } %>',"_self");
                 }
@@ -584,8 +584,9 @@ sigma.parsers.json(
                     //     splicedNodes = [];
                     // }
 
-
+                    // Is the node pinned?
                     if (graphFactory.checkIfPinned(nodeLabel) == false) {
+                        // Add to pinned and launch the whole filtering machinery
                         graphFactory.addToPinnedNodes(nodeLabel);
                     }
                     else {   
@@ -814,15 +815,17 @@ function filter_graph(pins){
                         nnodesArray.push(nnodes[key]);
                     }
 
-                    // If that's not the first iteration, we only keep intersection of both
-
+                    
                     if (i > 0) {
+                        // If that's not the first iteration, we only keep intersection of both
                         toKeep = _.intersection(toKeep, nnodesArray);
                     }
                     else {
+                        // If that is the first interaction, we create toKeep array from the neighbors only
                         toKeep = nnodesArray;
                     }
 
+                    // We also add the actual node to another array
                     toKeepPinned.push(n);
 
 
@@ -836,16 +839,20 @@ function filter_graph(pins){
 
         toKeep = _.uniq(toKeep);
 
+        // We make a list of the nodes to keep which includes the pinnedNodes and its shared neighbors
+
         toKeep = _.union(toKeep,toKeepPinned);
 
-        console.log(toKeep.length + ' nodes selected out of ' + global_totalnodes + ' (' + (toKeep.length/global_totalnodes).toFixed(2)*100 + '%)')
+        
 
+        console.log(toKeep.length + ' nodes selected out of ' + global_totalnodes + ' (' + (toKeep.length/global_totalnodes).toFixed(2)*100 + '%)')
+        console.log(toKeep)
         // Save which nodes are selected on the graph for community detection
 
         selectedNodes = [];
 
         for (var irr in toKeep) {
-            selectedNodes.push(toKeep[irr].label);
+            selectedNodes.push(toKeep[irr].originalLabel);
         }
 
         // Now convert this to an array that will be understood by the functions below

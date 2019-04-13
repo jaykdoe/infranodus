@@ -237,23 +237,21 @@ function entries() {
               // If no matches are found, let's find entries that have at least one pinned node and one intersection of the pinned ones
 
               // Let's choose the previous node
-              let lastNode = graphFactory.getPreviousPinnedNode();
+              let lastNode = graphFactory.getLastPinnedNode();
 
               // Get the neighbor nodes in the graph for the previous node, but not including it
-              let nnodes = sigma.instances(0).graph.neighbors(nodeIDs[lastNode]);
+              let nnodes = sigma.instances(0).graph.neighbors(graphFactory.getNodeID(lastNode));
 
               let selectedNNodes = [];
 
               // We create an array from the neighbors of that previous node
               for (let key in nnodes) {
-                  selectedNNodes.push(nnodes[key].label);
+                  selectedNNodes.push(nnodes[key].originalLabel);
               }
 
               // We then find the inersection between the nodes that were connected to the last selected pinnedNode and the neightbors of the one before that one
               let overlapNodes = [];
               overlapNodes = _.intersection(selectedNNodes, selectedNodes);      
-
-
               
               $(".entry").each(function(){
                         let matchedentry = 0;
@@ -263,14 +261,15 @@ function entries() {
                         for (let item in nodesOfStatement[currentDiv]) {
                           let nmarker = nodesOfStatement[currentDiv][item];
 
-                          // Is at least one node in that statement belongs to the intersection?
+                          // At least one node in that statement belongs to the intersection?
                           if (overlapNodes.indexOf(nodeIDs_reversed[nmarker]) > -1) {
 
                             // Yes? then reiterate through the other nodes in there and see if it either contains at least one of the pinnedNodes or the last node?
                             for (var node in nodesOfStatement[currentDiv]) {
                               var n2marker = nodesOfStatement[currentDiv][node];
                               // Yes? the entry has a match
-                              if (pinnedNodes.indexOf(nodeIDs_reversed[n2marker]) > -1 || lastNode == nodeIDs_reversed[n2marker]) {
+                              if (graphFactory.checkIfPinned(nodeIDs_reversed[n2marker]) == true || lastNode == nodeIDs_reversed[n2marker]) {
+                                  console.log('match')
                                   matchedentry = 1;
                                   totalEntriesMatched += 1;
                               }
