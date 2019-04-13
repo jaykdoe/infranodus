@@ -73,26 +73,6 @@ function addTagTriggers() {
 
         }
 
-        // TODO this is very fuzzy logic here bad bad
-
-        // Is there any nodes that were clicked before but not displayed on the graph?
-        // Yes, more than 1
-        // if (splicedNodes.length > 1) {
-        //     // Add them into the pinned
-        //     pinnedNodes = [];
-        //     for (var p = 0; p < splicedNodes.length; p++ ){
-        //         pinnedNodes[p] = splicedNodes[p];
-        //     }
-        // }
-
-
-        // // Only one
-        // else if (splicedNodes.length == 1) {
-        //     pinnedNodes = [];
-        //     pinnedNodes[0] = splicedNodes[0];
-        //     splicedNodes = [];
-        // }
-
 
         if (deletedNodes.indexOf(remove_node) > -1) {
             socket.emit('node add', {addingNodes: remove_node, stoplistNodes: deletedNodes});

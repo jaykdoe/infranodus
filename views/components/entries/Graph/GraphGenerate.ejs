@@ -13,6 +13,8 @@ function GraphFactory(){
         // These are the nodes that were selected but not found (so gray pinnedNodes)
         let notFoundNodes = [];
 
+        // These are selected nodes for community detection (so that they're not colored)
+        let selectedNodes = [];
 
         this.addNode = function(name, id) {
             nodeIDs[name] = id;
@@ -104,7 +106,9 @@ function GraphFactory(){
             }
             else {
                 notFoundNodes = nodes;
+                graphTags().update();
             }
+            // Add tags to the graph
             return true;
         }
         this.addToNotFoundNodes = function(name) {
@@ -116,6 +120,26 @@ function GraphFactory(){
         }
         this.existNotFoundNodes = function() {
             if (notFoundNodes && notFoundNodes.length > 0) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+        this.addToSelectedNodes = function(name) {
+            selectedNodes.push(name);
+            return true;
+        }
+        this.getSelectedNodes = function() {
+            return selectedNodes;
+        }
+        this.updateSelectedNodes = function(nodes) {
+            selectedNodes = nodes;
+            return true;
+        }
+        this.checkIfSelected = function(node) {
+            if (selectedNodes.indexOf(node) > -1) {
                 return true;
             }
             else {
@@ -567,23 +591,6 @@ sigma.parsers.json(
                 }
                 else {
 
-
-                    // Was the node clicked already? No? Add it to array of clicked nodes.
-                    // Highlight the clicked node in the text.
-
-
-                    // if (splicedNodes.length > 1) {
-                    //      pinnedNodes = [];
-                    //      for (var p = 0; p < splicedNodes.length; p++ ){
-                    //          pinnedNodes[p] = splicedNodes[p];
-                    //      }
-                    // }
-                    // else if (splicedNodes.length == 1) {
-                    //     pinnedNodes = [];
-                    //     pinnedNodes[0] = splicedNodes[0];
-                    //     splicedNodes = [];
-                    // }
-
                     // Is the node pinned?
                     if (graphFactory.checkIfPinned(nodeLabel) == false) {
                         // Add to pinned and launch the whole filtering machinery
@@ -597,9 +604,6 @@ sigma.parsers.json(
                     // Let's send an event to all the collaborators in the chatroom
                    // socket.emit('node click', {pinnedNodes: graphFactory.getPinnedNodes(), splicedNodes: splicedNodes, nodeLabel: nodeLabel});
            
-
-                    // Now show / hide statements that have the search field
-                    // filter_statements(graphFactory.getPinnedNodes());
 
                     // If the window is wide enough to show the menu AND div with statements is not visible
 
@@ -778,11 +782,11 @@ function selectNodes() {
 function filter_graph(pins){
 
 
-    var toKeep = [];
+    let toKeep = [];
 
-    var toKeepPinned = [];
+    let toKeepPinned = [];
 
-    var toKeepMap = [];
+    let toKeepMap = [];
 
 
     // What are the nodes that we want to filter?
@@ -846,18 +850,18 @@ function filter_graph(pins){
         
 
         console.log(toKeep.length + ' nodes selected out of ' + global_totalnodes + ' (' + (toKeep.length/global_totalnodes).toFixed(2)*100 + '%)')
-        console.log(toKeep)
+        
         // Save which nodes are selected on the graph for community detection
 
-        selectedNodes = [];
+        graphFactory.updateSelectedNodes([]);
 
-        for (var irr in toKeep) {
-            selectedNodes.push(toKeep[irr].originalLabel);
+        for (let irr in toKeep) {
+            graphFactory.addToSelectedNodes(toKeep[irr].originalLabel);
         }
 
         // Now convert this to an array that will be understood by the functions below
 
-        for (var key in toKeep) {
+        for (let key in toKeep) {
             toKeepMap[toKeep[key].id] = toKeep[key];
         }
 
@@ -932,7 +936,7 @@ function filter_graph(pins){
         });
 
         // Remove all selections
-        selectedNodes = [];
+        graphFactory.updateSelectedNodes([]);
 
         // No communities clicked
         commClicked = [];

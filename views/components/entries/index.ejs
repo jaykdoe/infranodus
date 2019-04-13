@@ -248,8 +248,8 @@ if (background == 'dark') {
 socket.on('graph reset', function(msg){
      
     graphFactory.initPinnedNodes();
-    splicedNodes = [];
     graphFactory.updateNotFoundNodes();
+    graphFactory.updateSelectedNodes([]);
     analyticsPanel().removeSelections();
     entries().unfilter();
      

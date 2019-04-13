@@ -1,147 +1,147 @@
 <script>
 
-var jsonpath = '';
+  var jsonpath = '';
 
-var maxnodes = '';
+  var maxnodes = '';
 
-// Get the setting from user DB how many max nodes we show
-<% if (maxnodes) { %>
-  maxnodes = <%= maxnodes %>;
-<% } %>
-
-
-// Path to the JSON graph file (specific context or a general one)
-<% if (addcontext) { %>
-    jsonpath = '/api/user/nodes/<%= context %>?addcontext=<%= addcontext %>';
-    addcontext = "<%= addcontext %>";
-
-<% } else if (showcontexts) { %>
-    jsonpath = '/api/user/nodes/<%= context %>?showcontexts=<%= showcontexts %>';
-    addcontext = "";
-
-<% } else if (maxnodes) { %>
-    jsonpath = '/api/user/nodes/<%= context %>?maxnodes=<%= maxnodes %>';
-    maxnodes = '<%= maxnodes %>';
-    addcontext = "";
-
-<% } else { %>
-    jsonpath = '/api/user/nodes/<%= context %>';
-    addcontext = "";
-<% }  %>
-
-// Is the user going to look at somebody else's graph?
-
-<% if (perceivername) { %>
-    <% if (showcontexts && maxnodes) { %>
-        jsonpath = '/api/public/nodes/<%= perceivername %>/<%= context %>?showcontexts=<%= showcontexts %>&maxnodes=<%= maxnodes %>';
-    <% } else if (showcontexts) { %>
-        jsonpath = '/api/public/nodes/<%= perceivername %>/<%= context %>?showcontexts=<%= showcontexts %>';
-    <% } else if (maxnodes) { %>
-        jsonpath = '/api/public/nodes/<%= perceivername %>/<%= context %>?maxnodes=<%= maxnodes %>';
-    <% } else  { %>
-        <% if (locals.vieweduser && vieweduser.maxnodes) { %>
-            maxnodes = '<%= vieweduser.maxnodes %>';
-            jsonpath = '/api/public/nodes/<%= perceivername %>/<%= context %>?maxnodes=<%= vieweduser.maxnodes %>';
-        <% } else { %>
-            jsonpath = '/api/public/nodes/<%= perceivername %>/<%= context %>';
-        <% } %>
-<% } %>
-<% } %>
+  // Get the setting from user DB how many max nodes we show
+  <% if (maxnodes) { %>
+    maxnodes = <%= maxnodes %>;
+  <% } %>
 
 
-// Do we show abstract graph and no nodes?
+  // Path to the JSON graph file (specific context or a general one)
+  <% if (addcontext) { %>
+      jsonpath = '/api/user/nodes/<%= context %>?addcontext=<%= addcontext %>';
+      addcontext = "<%= addcontext %>";
 
-<% if (locals.user && locals.user.abstract != undefined) { %>
-        abstract = '<%=locals.user.abstract%>';
-<% } %>
+  <% } else if (showcontexts) { %>
+      jsonpath = '/api/user/nodes/<%= context %>?showcontexts=<%= showcontexts %>';
+      addcontext = "";
 
-if (getUrlVars()["abstract"]) {
-      abstract = getUrlVars()["abstract"];
-}
+  <% } else if (maxnodes) { %>
+      jsonpath = '/api/user/nodes/<%= context %>?maxnodes=<%= maxnodes %>';
+      maxnodes = '<%= maxnodes %>';
+      addcontext = "";
+
+  <% } else { %>
+      jsonpath = '/api/user/nodes/<%= context %>';
+      addcontext = "";
+  <% }  %>
+
+  // Is the user going to look at somebody else's graph?
+
+  <% if (perceivername) { %>
+      <% if (showcontexts && maxnodes) { %>
+          jsonpath = '/api/public/nodes/<%= perceivername %>/<%= context %>?showcontexts=<%= showcontexts %>&maxnodes=<%= maxnodes %>';
+      <% } else if (showcontexts) { %>
+          jsonpath = '/api/public/nodes/<%= perceivername %>/<%= context %>?showcontexts=<%= showcontexts %>';
+      <% } else if (maxnodes) { %>
+          jsonpath = '/api/public/nodes/<%= perceivername %>/<%= context %>?maxnodes=<%= maxnodes %>';
+      <% } else  { %>
+          <% if (locals.vieweduser && vieweduser.maxnodes) { %>
+              maxnodes = '<%= vieweduser.maxnodes %>';
+              jsonpath = '/api/public/nodes/<%= perceivername %>/<%= context %>?maxnodes=<%= vieweduser.maxnodes %>';
+          <% } else { %>
+              jsonpath = '/api/public/nodes/<%= perceivername %>/<%= context %>';
+          <% } %>
+  <% } %>
+  <% } %>
 
 
+  // Do we show abstract graph and no nodes?
 
-// default label threshold
-var in_label_threshold = 8;
+  <% if (locals.user && locals.user.abstract != undefined) { %>
+          abstract = '<%=locals.user.abstract%>';
+  <% } %>
 
-var default_label_color = '#000000';
-
-if (background == 'dark') {
-  default_label_color = '#ffffff';
-}
-
-var minnodesize = 5;
-var maxnodesize = 16;
-
-if (abstract && abstract != 'no') {
-    minnodesize = 1;
-    maxnodesize = 1;
-    in_label_threshold = 20;
-}
+  if (getUrlVars()["abstract"]) {
+        abstract = getUrlVars()["abstract"];
+  }
 
 
 
-// Sigma graph layout options
-var forceatlas_options = {worker: false, startingIterations: 100, scalingRatio: 0.1, slowDown: 100, strongGravityMode: true};
+  // default label threshold
+  var in_label_threshold = 8;
+
+  var default_label_color = '#000000';
+
+  if (background == 'dark') {
+    default_label_color = '#ffffff';
+  }
+
+  var minnodesize = 5;
+  var maxnodesize = 16;
+
+  if (abstract && abstract != 'no') {
+      minnodesize = 1;
+      maxnodesize = 1;
+      in_label_threshold = 20;
+  }
+
+
+
+  // Sigma graph layout options
+  var forceatlas_options = {worker: false, startingIterations: 100, scalingRatio: 0.1, slowDown: 100, strongGravityMode: true};
 
 
 
 
-// What are the concepts present in the graph?
-var statementsOfContext = [];
+  // What are the concepts present in the graph?
+  var statementsOfContext = [];
 
-// Cytoscape object
+  // Cytoscape object
 
-var elesnodes = [];
+  var elesnodes = [];
 
-// Add Cytoscape Library - to calculate betweenness centrality for nodes and other stuff
+  // Add Cytoscape Library - to calculate betweenness centrality for nodes and other stuff
 
-var cy = cytoscape({
-    container: undefined,
-    headless: true
-});
+  var cy = cytoscape({
+      container: undefined,
+      headless: true
+  });
 
-var eles;
+  var eles;
 
-var topbc_nodes = [];
+  var topbc_nodes = [];
 
-var top_components = [];
+  var top_components = [];
 
-// Let's record all the unique edges we've got
-var edgesList = [];
+  // Let's record all the unique edges we've got
+  var edgesList = [];
 
-var community_of_node = [];
-
-
-var sigma_dragged = 0;
+  var community_of_node = [];
 
 
-
-// Initialize JSON parser for SIGMA visualization
-
-var color_addcontext = '#666666'; // #cccccc
-
-var highlight_addcontext = '#0089e0';
-
-var highlight = getUrlVars()["highlight"];
-
-var missing = getUrlVars()["missing"];
+  var sigma_dragged = 0;
 
 
-// These are the nodes clicked in the graph
 
-var global_totalnodes = 0;
+  // Initialize JSON parser for SIGMA visualization
+
+  var color_addcontext = '#666666'; // #cccccc
+
+  var highlight_addcontext = '#0089e0';
+
+  var highlight = getUrlVars()["highlight"];
+
+  var missing = getUrlVars()["missing"];
 
 
-// This variable shows if there was a meaningful interaction with the graph yet
+  // These are the nodes clicked in the graph
 
-var graphInteraction = null;
+  var global_totalnodes = 0;
 
 
-// This may be a deprecated setting
+  // This variable shows if there was a meaningful interaction with the graph yet
 
-// Inactivity timeout
-var inactiveTimeout = null;
+  var graphInteraction = null;
+
+
+  // This may be a deprecated setting
+
+  // Inactivity timeout
+  var inactiveTimeout = null;
 
 
 </script>
@@ -151,28 +151,14 @@ var inactiveTimeout = null;
 <script>
 
 
-// What happens when the user clicks on a node in the graph (this is caleld from sigma but processed here)
-// This is for collaboration only
+  // What happens when the user clicks on a node in the graph (this is caleld from sigma but processed here)
+  // This is for collaboration only
 
-socket.on('node click', function(msg){
+  socket.on('node click', function(msg){
 
-    pinnedNodes = msg.pinnedNodes;
-    console.log("Pinned nodes:");
-    console.log(pinnedNodes);
-    splicedNodes = msg.splicedNodes;
-    console.log("Spliced nodes:");
-    console.log(splicedNodes);
+      graphFactory.initPinnedNodes(msg.pinnedNodes);   
 
-    // Are we clicking the node that was clicked already? Then show all divs
-    if (graphFactory.checkIfPinned == true) {
-          $('.entry').fadeIn(400);
-    }
-
-
-    // Filter statements and select nodes on the graph
-    filter_statements(pinnedNodes);
-
-});
+  });
 
 
  function dragNodes () {
@@ -894,8 +880,8 @@ sigma.instances(0).graph.nodes().forEach(function(n) {
 
   if (graphFactory.checkIfPinned(n.originalLabel) == false) {
 
-        if (selectedNodes.length > 0){
-          if (selectedNodes.indexOf(n.originalLabel) > -1) {
+        if (graphFactory.getSelectedNodes().length > 0){
+          if (graphFactory.checkIfSelected(n.originalLabel) == true) {
             n.color = rgbToHex(palette[n.community]._rgb[0],palette[n.community]._rgb[1],palette[n.community]._rgb[2]);
           }
           else if (coming_from == 'node add' && n.originalLabel == node_origin) {
@@ -948,12 +934,8 @@ sigma.instances(0).graph.nodes().forEach(function(n) {
                 n.originalColor = '#90909f';
 
                 if (pinnedNodes.indexOf(n.label) == -1) {
-                  if (selectedNodes.length > 0){
-                    if (selectedNodes.indexOf(n.originalLabel) > -1) {
-                    }
-                  }
-                  else {
-                  n.color = '#90909f';
+                  if (graphFactory.getSelectedNodes().length == 0) {
+                    n.color = '#90909f';  
                   }
                 }
               }
@@ -964,12 +946,8 @@ sigma.instances(0).graph.nodes().forEach(function(n) {
               n.originalColor = highlight_addcontext;
 
               if (pinnedNodes.indexOf(n.label) == -1) {
-                if (selectedNodes.length > 0){
-                  if (selectedNodes.indexOf(n.originalLabel) > -1) {
-                  }
-                }
-                else {
-                n.color = highlight_addcontext;
+                if (graphFactory.getSelectedNodes().length == 0){
+                    n.color = highlight_addcontext;
                 }
               }
             }
@@ -1227,7 +1205,7 @@ function top_nodes_activate() {
         }
 
         // console.log("node clicked, now will filter for nodes " + pinnedNodes);
-        socket.emit('node click', {pinnedNodes: pinnedNodes, splicedNodes: splicedNodes, nodeLabel: nodeLabel, pinnedIndex: pinnedIndex});
+        socket.emit('node click', {pinnedNodes: pinnedNodes, nodeLabel: nodeLabel, pinnedIndex: pinnedIndex});
 
 
         // Now show / hide statements that have the search field

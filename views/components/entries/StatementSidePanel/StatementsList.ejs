@@ -253,15 +253,18 @@ function entries() {
 
               // We then find the inersection between the nodes that were connected to the last selected pinnedNode and the neightbors of the one before that one
               let overlapNodes = [];
-              overlapNodes = _.intersection(selectedNNodes, selectedNodes);  
+              overlapNodes = _.intersection(selectedNNodes, graphFactory.getSelectedNodes());  
               
               // Let's now create an object for all the nodes selected on the graph to highlight
               let allSelectedNodes = [];
               allSelectedNodes = _.union(overlapNodes,graphFactory.getPinnedNodes());
               
               $(".entry").each(function(){
+                        
                         let matchedentry = 0;
                         let currentDiv = $(this).attr('data-uid');
+
+                        let notFoundNodes = [];
 
                         // For each node present in this statement:
                         for (let item in nodesOfStatement[currentDiv]) {
@@ -277,6 +280,7 @@ function entries() {
                               if (graphFactory.checkIfPinned(nodeIDs_reversed[n2marker]) == true || lastNode == nodeIDs_reversed[n2marker]) {
                                   matchedentry = 1;
                                   totalEntriesMatched += 1;
+                                  notFoundNodes.push(nodeIDs_reversed[nmarker]);
                               }
                             }
                           }
@@ -284,6 +288,7 @@ function entries() {
 
                         if (matchedentry == 1) {
                           entries().unfilter(this);
+                          graphFactory.updateNotFoundNodes(notFoundNodes);
                           callback(this, allSelectedNodes);
                         }
                         else {
@@ -292,32 +297,49 @@ function entries() {
                         
                 });
                 
+                // We didn't find any matches that would contain the neighbors of any of those nodes and at least one
 
                 if (totalEntriesMatched == 0) {
 
                       // Logic #2:
-                      // We then remove the node before the last pinnedNode to at least see the entries that contain that last selected node
+                      // We then select all the pins, their neighborhoods, and show the statements that contain both of those words
 
-                      let posnodes = 0;
+                      $(".entry").each(function(){
 
-                      // Final nodes to search
-                      splicedNodes = [];
+                          // What is the current statement ID for the entry?
+                          let currentDiv = $(this).attr('data-uid');
 
-                      // First all of them
-                      for (let k = 0; k < graphFactory.getPinnedNodes().length; k++) {
-                          splicedNodes[k] = graphFactory.getPinnedNodes()[k];
-                      }
+                          // Retrieve the statement text from the entry, clean from html
+                          let originaltext = $(this).children('.entry-text').html();
 
-                      // Remove the one we can't find (the oldest one of the bunch first)
-                      splicedNodes.splice(posnodes, 1);
+                          // How many entries in total were matched?
+                          let matchedThisEntry = 0;
 
-                      // Save that one also into the list of the nodes we removed
-                      graphFactory.addToNotFoundNodes(graphFactory.getPinnedNode(posnodes));
+                          // For each node present in this statement:
+                          for (let item in nodesOfStatement[currentDiv]) {
 
-                      // This is for plain message
-                      // $('#messages').html('No entries contain "' + pinnedNodes.join(' and ') + '".<br>Showing entries that contain "' + splicedNodes.join(' and ') + '" only:<br>&nbsp;');
+                            let nmarker = nodesOfStatement[currentDiv][item]; //
 
-                      graphFactory.initPinnedNodes(splicedNodes);
+                            // Is this node in pinnedNodes?
+                            if (graphFactory.checkIfPinned(nodeIDs_reversed[nmarker]) == true) {
+                              
+                                  // Then this entry has the full match
+                                  matchedThisEntry = 1;
+                              
+
+                            }
+
+                          }
+
+                          if (matchedThisEntry == 1) {
+                              entries().unfilter(this);
+                              callback(this, graphFactory.getPinnedNodes());
+                          }
+                          else {
+                              entries().filter(this);
+                          }
+
+                    });
 
                 }
 
