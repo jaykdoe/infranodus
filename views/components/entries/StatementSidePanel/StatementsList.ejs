@@ -142,7 +142,7 @@ function entries() {
 
         var visibleentries = visibleentries_original;
 
-        var nodeIDs_reversed = _.invert(nodeIDs);
+        var nodeIDs_reversed = graphFactory.getNodeIDsRev;
 
         // Hide the sentences that don't contain the terms
 
@@ -312,48 +312,7 @@ function entries() {
             }
 
 
-            // Add a delete button next to those nodes
-
-            if (pinnedNodes.length > 0) {
-                  $('#deletenodes').addClass('deletenodes-on');
-                  $('#undo').addClass('undo-on');
-            }
-            else {
-                $('#deletenodes').removeClass('deletenodes-on');
-                $('#undo').removeClass('undo-on');
-            }
-
-            // Show tags that are currently used in search
-
-            var htmlNodes =  '<ul class="tags">';
-            var pinnedNodes_string = '';
-
-            if (pinnedNodes.length == 0) { notfoundNodes = [] }
-
-            for (var x = 0; x < notfoundNodes.length; x++) {
-                htmlNodes = htmlNodes + '<li><a class="notfound" href="#">' + notfoundNodes[x] + '</a></li>';
-                pinnedNodes_string = pinnedNodes_string + '#' + notfoundNodes[x] + ' ';
-            }
-
-            for (var q = 0; q < pinnedNodes.length; q++) {
-                htmlNodes = htmlNodes + '<li><a href="#">' + pinnedNodes[q] + '</a></li>';
-                pinnedNodes_string = pinnedNodes_string + '#' + pinnedNodes[q] + ' ';
-            }
-
-            if ($('#addnodeinput').val().length == 0 || $('#addnodeinput').val().charAt(0) == '#') {
-              $('#addnodeinput').val(pinnedNodes_string);
-            }
-
-            if ($('#statement').val().length == 0 || $('#statement').val().charAt(0) == '#') {
-              $('#statement').val(pinnedNodes_string);
-            }
-
-
-            htmlNodes = htmlNodes + '<div class="tagsend"></div></ul>';
-
-            //  notfoundNodes = [];
-
-            $('#pinnednodeslist').html(htmlNodes);
+       
 
 
           // Highlight the nodes that were clicked
@@ -441,9 +400,7 @@ function entries() {
 
       $('#stopnodeslist').html(stopNodesList);
 
-      // Add triggers to newly shown Tags elements
 
-      addTagTriggers();
 
 
       if (pinnedNodes.length == 0) {

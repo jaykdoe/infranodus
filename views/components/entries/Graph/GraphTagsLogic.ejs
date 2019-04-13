@@ -11,6 +11,49 @@ function undoButton() {
     }
 }
 
+function graphTags() {
+    return {
+        // TODO maybe add pinnedNodes, notFoundNodes, stopNodes into the function arguments and perform the logic accordingly
+        update: function() {
+                 
+            // Add a delete button next to those nodes
+            if (graphFactory.existPinnedNodes() == true) {
+                $('#deletenodes').addClass('deletenodes-on');
+                $('#undo').addClass('undo-on');
+            }
+            else {
+                $('#deletenodes').removeClass('deletenodes-on');
+                $('#undo').removeClass('undo-on');
+            }
+
+            // Show tags that are currently used in search
+            var htmlNodes =  '<ul class="tags">';
+
+            // If no pinned nodes, reset not found nodes
+            if (graphFactory.existPinnedNodes() == false) { graphFactory.updateNotFoundNodes(); }
+
+            // Add not found nodes as tags (gray)
+            for (let x = 0; x < graphFactory.getNotFoundNodes().length; x++) {
+                htmlNodes = htmlNodes + '<li><a class="notfound" href="#">' + graphFactory.getNotFoundNodes()[x] + '</a></li>';
+            }
+
+            // Add pinned nodes as tags (blue)
+            for (let q = 0; q < graphFactory.getPinnedNodes().length; q++) {
+                htmlNodes = htmlNodes + '<li><a href="#">' + graphFactory.getPinnedNodes()[q] + '</a></li>';
+            }
+
+            htmlNodes = htmlNodes + '<div class="tagsend"></div></ul>';
+
+            $('#pinnednodeslist').html(htmlNodes);
+
+            // Add triggers to newly shown Tags elements
+
+            addTagTriggers();
+            
+        }
+    }
+}
+
 
 
 function addTagTriggers() {
@@ -20,41 +63,35 @@ function addTagTriggers() {
 
         e.preventDefault();
 
-        var remove_node = e.target.innerText;
+        let remove_node = e.target.innerText;
 
-        // Is the clicked node in the pinnedNodes list
-        var pinnedIndex = pinnedNodes.indexOf(remove_node);
+        // If the clicked node is in the pinnedNodes list, remove it and push it into the notfoundNodes list
 
-        // Yes, it is, remove it and push it into the notfoundNodes list
+        if (graphFactory.checkIfPinned(remove_node) == true) {
 
-        if (pinnedIndex > -1) {
-
-                pinnedNodes.splice(pinnedIndex,1);
-
-            //  notfoundNodes.push(remove_node);
+                graphFactory.removeFromPinnedNodes(remove_node);
 
         }
-
 
         // TODO this is very fuzzy logic here bad bad
 
         // Is there any nodes that were clicked before but not displayed on the graph?
         // Yes, more than 1
-        if (splicedNodes.length > 1) {
-            // Add them into the pinned
-            pinnedNodes = [];
-            for (var p = 0; p < splicedNodes.length; p++ ){
-                pinnedNodes[p] = splicedNodes[p];
-            }
-        }
+        // if (splicedNodes.length > 1) {
+        //     // Add them into the pinned
+        //     pinnedNodes = [];
+        //     for (var p = 0; p < splicedNodes.length; p++ ){
+        //         pinnedNodes[p] = splicedNodes[p];
+        //     }
+        // }
 
 
-        // Only one
-        else if (splicedNodes.length == 1) {
-            pinnedNodes = [];
-            pinnedNodes[0] = splicedNodes[0];
-            splicedNodes = [];
-        }
+        // // Only one
+        // else if (splicedNodes.length == 1) {
+        //     pinnedNodes = [];
+        //     pinnedNodes[0] = splicedNodes[0];
+        //     splicedNodes = [];
+        // }
 
 
         if (deletedNodes.indexOf(remove_node) > -1) {
@@ -72,27 +109,24 @@ function addTagTriggers() {
         }
 
 
-
-
-
     });
 
 }
 
-        // What happens when we click a button to delete a selected node
-        $("#deletenodes").on('click', function(e) {
-          e.preventDefault;
-          socket.emit('node delete', {pinnedNodes: pinnedNodes});
-        });
+// What happens when we click a button to delete a selected node
 
-     
+$("#deletenodes").on('click', function(e) {
+    e.preventDefault;
+    socket.emit('node delete', {pinnedNodes: pinnedNodes});
+});
 
-        // What happens if we want to pass the list of keywords we selected to the settings
 
-        $("#stopsave").on('click', function(e) {
-          e.preventDefault;
-          window.location.href = "/settings?stopwords=" + encodeURIComponent(deletedNodes.join(' ')) + "&returncontext=" + current_context;
-        });
+// What happens if we want to pass the list of keywords we selected to the settings
+
+$("#stopsave").on('click', function(e) {
+    e.preventDefault;
+    window.location.href = "/settings?stopwords=" + encodeURIComponent(deletedNodes.join(' ')) + "&returncontext=" + current_context;
+});
 
 // What happens when we delete a node
 
@@ -245,177 +279,170 @@ socket.on('node delete', function(msg){
 // What happens when we add a node ?
 
 socket.on('node add', function(msg){
-var addingNodes = msg.addingNodes;
-var stoplistNodes = msg.stoplistNodes;
 
-// Remove the clicked node from the stoplist
+    var addingNodes = msg.addingNodes;
+    var stoplistNodes = msg.stoplistNodes;
 
-stoplistNodes.splice(stoplistNodes.indexOf(addingNodes), 1);
+    // Remove the clicked node from the stoplist
 
-
-sigma.instances(0).graph.addNode({
-    id: nodeIDs[addingNodes],
-    label: addingNodes,
-    originalLabel: addingNodes,
-    size: 16,
-    x: Math.random(),
-    y: Math.random()
-});
-
-var cyclefinished = 0;
-var edgeproc;
-
-var nodeIDs_rev = _.invert(nodeIDs);
+    stoplistNodes.splice(stoplistNodes.indexOf(addingNodes), 1);
 
 
+    sigma.instances(0).graph.addNode({
+        id: nodeIDs[addingNodes],
+        label: addingNodes,
+        originalLabel: addingNodes,
+        size: 16,
+        x: Math.random(),
+        y: Math.random()
+    });
 
-for (var i = 0; i < edgesDB.length; i++ ) {
-  if (edgesDB[i].source == nodeIDs[addingNodes] || edgesDB[i].target == nodeIDs[addingNodes]) {
+    var cyclefinished = 0;
+    var edgeproc;
 
-    edgeproc = edgesDB[i];
+    var nodeIDs_rev = _.invert(nodeIDs);
 
-    if (stoplistNodes.length > 0) {
+    for (var i = 0; i < edgesDB.length; i++ ) {
 
-        // Do connections only if target/source is not in the remaining stoplistNodes
-          if (stoplistNodes.indexOf(nodeIDs_rev[edgeproc.source]) < 0 && stoplistNodes.indexOf(nodeIDs_rev[edgeproc.target]) < 0) {
+        if (edgesDB[i].source == nodeIDs[addingNodes] || edgesDB[i].target == nodeIDs[addingNodes]) {
 
-                sigma.instances(0).graph.addEdge({
-                       id: edgeproc.id,
-                       source: edgeproc.source,
-                       target: edgeproc.target,
-                       weight: edgeproc.weight,
-                       size: edgeproc.weight,
-                       statement_id: edgeproc.statement_id,
-                       edge_context: edgeproc.edge_context
-                });
+            edgeproc = edgesDB[i];
+
+            if (stoplistNodes.length > 0) {
+
+                // Do connections only if target/source is not in the remaining stoplistNodes
+                if (stoplistNodes.indexOf(nodeIDs_rev[edgeproc.source]) < 0 && stoplistNodes.indexOf(nodeIDs_rev[edgeproc.target]) < 0) {
+
+                        sigma.instances(0).graph.addEdge({
+                            id: edgeproc.id,
+                            source: edgeproc.source,
+                            target: edgeproc.target,
+                            weight: edgeproc.weight,
+                            size: edgeproc.weight,
+                            statement_id: edgeproc.statement_id,
+                            edge_context: edgeproc.edge_context
+                        });
+
+                    }
+
+
+
 
             }
+            else {
+            sigma.instances(0).graph.addEdge({
+                    id: edgeproc.id,
+                    source: edgeproc.source,
+                    target: edgeproc.target,
+                    weight: edgeproc.weight,
+                    size: edgeproc.weight,
+                    statement_id: edgeproc.statement_id,
+                    edge_context: edgeproc.edge_context
+            });
 
+            }
+        }
 
-
-
+        cyclefinished = cyclefinished + 1;
     }
-    else {
-      sigma.instances(0).graph.addEdge({
-             id: edgeproc.id,
-             source: edgeproc.source,
-             target: edgeproc.target,
-             weight: edgeproc.weight,
-             size: edgeproc.weight,
-             statement_id: edgeproc.statement_id,
-             edge_context: edgeproc.edge_context
-      });
-
-    }
-  }
-  cyclefinished = cyclefinished + 1;
-}
 
 
 
-if (cyclefinished == edgesDB.length) {
-  sigma.instances(0).refresh();
-  var collectiond = cy.elements();
-  var elessss;
+    if (cyclefinished == edgesDB.length) {
+        sigma.instances(0).refresh();
+        var collectiond = cy.elements();
+        var elessss;
 
-  cy.remove(collectiond);
+        cy.remove(collectiond);
 
-  elesnodes = [];
+        elesnodes = [];
 
 
-  sigma.instances(0).graph.nodes().forEach(function(n) {
-                      elesnodes.push({
-                          group: "nodes",
-                          data: { id: n.id, name: n.label}
-                      });
+        sigma.instances(0).graph.nodes().forEach(function(n) {
+                            elesnodes.push({
+                                group: "nodes",
+                                data: { id: n.id, name: n.label}
+                            });
 
-                      // Adding a node to the nodeIDs
-                      var key = n.label;
-                      if (!nodeIDs[key]) {
-                          nodeIDs[key] = n.id;
-                      }
-                      if (graphFactory.getNodeNames().indexOf(key) == -1) {
-                            graphFactory.addNameToNodeNames(key);
-                      }
+                            // Adding a node to the nodeIDs
+                            graphFactory.addNode(n.label, n.id);
 
-  });
-
-  // jsnetworkx
-  var jsGraphEdges = [];
-    nodeIDs_rev = _.invert(nodeIDs);
-
-  sigma.instances(0).graph.edges().forEach(function(e) {
-
-      var unique_edge_id = '';
-
-      // Let's see if the edge source in alphabetical order is further than its target and change places
-
-      if (e.source > e.target) {
-          unique_edge_id = e.target + '-' + e.source;
-      }
-      else {
-          unique_edge_id = e.source + '-' + e.target;
-      }
-
-        elesnodes.push({
-            group: "edges",
-            data: { id: unique_edge_id, source: e.source, target: e.target, weight: e.weight }
         });
 
-             // TODO remove that, this is just to check data consistentency
-             e.sourcename = nodeIDs_rev[e.source];
-        e.targetname = nodeIDs_rev[e.target];
+        // jsnetworkx
+        var jsGraphEdges = [];
+        nodeIDs_rev = _.invert(nodeIDs);
 
-        // Add to jsnetworkx
+        sigma.instances(0).graph.edges().forEach(function(e) {
 
-        var edge_params = {
-                     weight: 1/e.weight,
-                     sourcename: e.sourcename,
-                     targetname: e.targetname                     
-        };
+            var unique_edge_id = '';
 
-        var edge_object = [e.source, e.target, edge_params];
-                 
-        jsGraphEdges.push(edge_object);
+            // Let's see if the edge source in alphabetical order is further than its target and change places
 
+            if (e.source > e.target) {
+                unique_edge_id = e.target + '-' + e.source;
+            }
+            else {
+                unique_edge_id = e.source + '-' + e.target;
+            }
 
-  });
+                elesnodes.push({
+                    group: "edges",
+                    data: { id: unique_edge_id, source: e.source, target: e.target, weight: e.weight }
+                });
 
+                    // TODO remove that, this is just to check data consistentency
+                    e.sourcename = nodeIDs_rev[e.source];
+                e.targetname = nodeIDs_rev[e.target];
 
-  // Betweenness Centrality Calculation using Cytoscape
-  elessss = cy.add(elesnodes);
+                // Add to jsnetworkx
 
-  var jsG = new jsnx.DiGraph();
-    // jsG = jsnx.convertToUndirected(jsG);
-           
-    jsG.addEdgesFrom(jsGraphEdges);
+                var edge_params = {
+                            weight: 1/e.weight,
+                            sourcename: e.sourcename,
+                            targetname: e.targetname                     
+                };
 
-
-  betweennessCentrality(elessss, jsG);
-
-  // Community detect algorithm
-
-  communityDetect("node add", addingNodes);
-
-  sigma.instances(0).refresh();
-
-    sigma.instances(0).startForceAtlas2(forceatlas_options);
-    // Don't run it forever not to overheat :)
-
-    setTimeout(function() {
-
-        sigma.instances(0).stopForceAtlas2();
-        sigma.instances(0).killForceAtlas2();
-
-    }, 5000);
+                var edge_object = [e.source, e.target, edge_params];
+                        
+                jsGraphEdges.push(edge_object);
 
 
-  filter_statements(stoplistNodes, 'stopwords');
+        });
 
 
-}
+        // Betweenness Centrality Calculation using Cytoscape
+        elessss = cy.add(elesnodes);
+
+        var jsG = new jsnx.DiGraph();
+        // jsG = jsnx.convertToUndirected(jsG);
+            
+        jsG.addEdgesFrom(jsGraphEdges);
 
 
+        betweennessCentrality(elessss, jsG);
+
+        // Community detect algorithm
+
+        communityDetect("node add", addingNodes);
+
+        sigma.instances(0).refresh();
+
+        sigma.instances(0).startForceAtlas2(forceatlas_options);
+        // Don't run it forever not to overheat :)
+
+        setTimeout(function() {
+
+            sigma.instances(0).stopForceAtlas2();
+            sigma.instances(0).killForceAtlas2();
+
+        }, 5000);
+
+
+        filter_statements(stoplistNodes, 'stopwords');
+
+
+    }
 
 
 

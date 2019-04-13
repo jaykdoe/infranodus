@@ -2,12 +2,37 @@
 
 function GraphFactory(){
                 
+        // Variables that contain the nodes (for easier search)
         let nodeNames = [];
+        let nodeIDs = {}; // maps names (key) to IDs (values)
+        let nodeIDs_rev = {}; // maps IDs (key) to names (values)
+
+        // These are the nodes that are selected
         let pinnedNodes = [];
 
-        this.initNames = function(nodes) {
-            nodeNames = nodes;
+        // These are the nodes that were selected but not found
+        let notFoundNodes = [];
+
+
+        this.addNode = function(name, id) {
+            nodeIDs[name] = id;
+            nodeIDs_rev[id] = name;
+            nodeNames.push(name);
+            return true;
         }
+        this.getNodeIDs = function() {
+            return nodeIDs;
+        }
+
+        this.getNodeIDsRev = function() {
+            return nodeIDs_rev;
+        }
+
+        this.getNodeNames = function() {
+            return nodeNames;
+        }
+  
+
         this.initPinnedNodes = function(nodes) {
             if (nodes) {
                 pinnedNodes = nodes;
@@ -19,7 +44,23 @@ function GraphFactory(){
             // Select the pinned nodes on the graph and the adjacent ones 
             filter_graph(pinnedNodes);
 
+            // Add tags to the graph
+            graphTags().update();
+
+            // TODO Perform filter statements function on the nodes selected
+
+
+            // Add search terms into the top graph search form
+            nodeInputField().update(pinnedNodes.concat(notFoundNodes));
+
+            // Add search terms into the bottom entry add field
+            addEntryForm().update(pinnedNodes.concat(notFoundNodes));       
+
         }
+
+        // TODO write initiatilization for the delete nodes
+        // TODO move the tags initiation logic from filter_statements to the GraphTagsLogic
+
         this.checkIfPinned = function(node) {
             if (pinnedNodes.indexOf(node) > -1) {
                 return true;
@@ -41,13 +82,36 @@ function GraphFactory(){
         this.getPinnedNodes = function() {
             return pinnedNodes;
         }
-        this.getNodeNames = function() {
-            return nodeNames;
+        this.existPinnedNodes = function() {
+            if (pinnedNodes && pinnedNodes.length > 0) {
+                return true;
+            }
+            else {
+                return false;
+            }
         }
-        this.addNameToNodeNames = function(name) {
-            nodeNames.push(name);
+
+        this.updateNotFoundNodes = function(nodes) {
+            if (!nodes) {
+                notFoundNodes = [];
+            }
+            else {
+                notFoundNodes = nodes;
+            }
             return true;
         }
+        this.getNotFoundNodes = function() {
+            return notFoundNodes;
+        }
+        this.existNotFoundNodes = function() {
+            if (notFoundNodes && notFoundNodes.length > 0) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
 }
 
 let graphFactory = new GraphFactory();
@@ -76,23 +140,29 @@ sigma.parsers.json(
                     nodes = sigma.graph.nodes(),
                     color_context = '#666',
                     color_addcontext = '#cccccc',
-                    len = nodes.length;
+                    maxnodesize = 0;
+                    
 
             // This is a fix for JSON
             // Sigma requires that nodes have X, Y, Size and Color properties which our JSON doesn't have. So we add them.
             // We also make the initial graph layout circular, so that ForceAtlas always looks the same
 
-            var maxnodesize = 0;
-
-            for (i = 0; i < len; i++) {
+            for (let i = 0; i < nodes.length; i++) {
                 var nodesize = 0;
-                var angle = Math.PI * 2 * i / len;
+                var angle = Math.PI * 2 * i / nodes.length;
                 nodes[i].x = Math.cos(angle);
                 nodes[i].y = Math.sin(angle);
                 nodes[i].size = sigma.graph.degree(nodes[i].id);
                 nodesize = nodes[i].size;
                 if (maxnodesize < nodesize) maxnodesize = nodesize;
                 nodes[i].color = color_context;
+                
+                // Save for backup
+                nodes[i].originalColor = color_context;
+                nodes[i].originalLabel = nodes[i].label;
+
+                // Creating an index of node labels to IDs for filtering
+                graphFactory.addNode(nodes[i].label, nodes[i].id);
 
                 // Add to Cytoscape
                 elesnodes.push({
@@ -100,7 +170,6 @@ sigma.parsers.json(
                     data: { id: nodes[i].id, name: nodes[i].label}
                 });
                
-
             }
 
             // We first need to save the original colors and LABELS of our
@@ -192,40 +261,6 @@ sigma.parsers.json(
             });
 
 
-
-
-            sigma.graph.nodes().forEach(function(n) {
-
-                // Save node's default color, for hide and show later
-                n.originalColor = n.color;
-                n.originalLabel = n.label;
-
-                // Creating an index of node labels to IDs for filtering
-                var key = n.label;
-                nodeIDs[key] = n.id;
-
-            });
-
-
-           //sigma.refresh();
-
-
-
-
-
-            // for (var j = 0; j < cy.nodes().length; j++) {
-            //    console.log(cy.edges()[j].data());
-            // }
-
-            //  console.log(eles.getElementById('d5167020-d3ac-11e3-a954-ab35be27f3fc'));
-
-
-            // Make a list of all the node labels displayed in the graph (for Autofill)
-
-            graphFactory.initNames(_.keys(nodeIDs));
-
-
-
             // Get the context names - all the contexts that exist in the graph we just loaded
             // This IF statement is for the case when the contextlist parameter is not passed on
 
@@ -238,10 +273,7 @@ sigma.parsers.json(
             var suspects = [];
             var nonsuspects = [];
 
-            nodeIDs_rev = _.invert(nodeIDs);
-
             var jsGraphEdges = [];
-
 
             var edge_data = [];
 
@@ -330,7 +362,7 @@ sigma.parsers.json(
 
             // Now show those nodes that are contexts bigger and with a special label
 
-            for (i = 0; i < len; i++) {
+            for (i = 0; i < nodes.length; i++) {
 
                 if (contextids.indexOf(nodes[i].id) > -1) {
                     nodes[i].size = maxnodesize;
@@ -547,7 +579,7 @@ sigma.parsers.json(
            
 
                     // Now show / hide statements that have the search field
-                    filter_statements(graphFactory.getPinnedNodes());
+                    // filter_statements(graphFactory.getPinnedNodes());
 
                     // If the window is wide enough to show the menu AND div with statements is not visible
 

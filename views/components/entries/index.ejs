@@ -249,7 +249,7 @@ socket.on('graph reset', function(msg){
      
     graphFactory.initPinnedNodes();
     splicedNodes = [];
-    notfoundNodes = []; 
+    graphFactory.updateNotFoundNodes();
     analyticsPanel().removeSelections();
     entries().unfilter();
      

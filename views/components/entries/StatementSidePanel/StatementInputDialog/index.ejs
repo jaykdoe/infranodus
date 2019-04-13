@@ -334,7 +334,7 @@ socket.on('chat message', function(msg){
                 y: Math.random(),
                 color: color_context
             });
-            graphFactory.addNameToNodeNames(addednodes[i].label);
+            graphFactory.addNode(addednodes[i].label, addednodes[i], id);
             nodes_added.push(addednodes[i]);
             if (!nodeIDs[addednodes[i].label]) {
               nodeIDs[addednodes[i].label] = addednodes[i].id;

@@ -1,30 +1,30 @@
  
-    <div id="edit-panel">
-        <form action='/post' name='submitform' id="submitform" method='post' class='pure-form'>
+<div id="edit-panel">
+    <form action='/post' name='submitform' id="submitform" method='post' class='pure-form'>
 
-                <textarea columns="40" rows="4" name='entry[body]' id="statement" placeholder='type in some words or #hashtags to see how they connect'><% if (url) { %><%= urltitle %> <%= url %><% } %></textarea>
-                <div id="addToContextsLabel">in context:</div>
-                <ul id="addToContexts"></ul>
-                <input type="hidden" id="addedContexts" name="addedContexts">
-                <input type="hidden" id="context" name="context" value="<%= context %>">
-                <input type="hidden" id="selectedContexts" name="selectedContexts" value="">
-                <input type="hidden" id="statementid" name="statementid" value="">
-                <input type="hidden" name="timestamp" value="">
-                &nbsp;<br>
-                <input type='submit' id="submitbutton" name="btnSubmit" value="save" class="pure-button pure-button-primary">
+            <textarea columns="40" rows="4" name='entry[body]' id="statement" placeholder='type in some words or #hashtags to see how they connect'><% if (url) { %><%= urltitle %> <%= url %><% } %></textarea>
+            <div id="addToContextsLabel">in context:</div>
+            <ul id="addToContexts"></ul>
+            <input type="hidden" id="addedContexts" name="addedContexts">
+            <input type="hidden" id="context" name="context" value="<%= context %>">
+            <input type="hidden" id="selectedContexts" name="selectedContexts" value="">
+            <input type="hidden" id="statementid" name="statementid" value="">
+            <input type="hidden" name="timestamp" value="">
+            &nbsp;<br>
+            <input type='submit' id="submitbutton" name="btnSubmit" value="save" class="pure-button pure-button-primary">
 
-        </form>
-    </div>
+    </form>
+</div>
 
-    <div id="search-panel">
-        <form class="pure-form" id="searchform">
-            <input type="text" id="search" size="14" maxlength="20" class="pure-input" placeholder="search...">
-            &nbsp;&nbsp;
-            <input type='submit' name="submit" value=">" class="pure-button pure-button-primary">
-        </form>
-    </div>
+<div id="search-panel">
+    <form class="pure-form" id="searchform">
+        <input type="text" id="search" size="14" maxlength="20" class="pure-input" placeholder="search...">
+        &nbsp;&nbsp;
+        <input type='submit' name="submit" value=">" class="pure-button pure-button-primary">
+    </form>
+</div>
 
-    <script>
+<script>
     
     searchForm().onSubmit(submitSearchForm);
 
@@ -84,48 +84,56 @@
     
 
 
- 
+
+    // Textarea select conversion to hashtags
+
+    // For now it's disabled, but will be enabled for bulk statement correction later
+
+    var getSelected = function(){
+        var t = '';
+        if(window.getSelection) {
+            t = window.getSelection();
+        } else if(document.getSelection) {
+            t = document.getSelection();
+        } else if(document.selection) {
+            t = document.selection.createRange().text;
+        }
+        return t;
+    }
 
 
+    $("#statement").select(function(eventObject) {
+        var selectedText = getSelected().toString();
+
+        var statementReplace = $("#statement").val();
+
+        if ((statementReplace.indexOf('@'+selectedText) === -1) && (selectedText !== statementReplace)) {
+
+            var regex = RegExp(selectedText, "g");
+
+            var dasherized = S(selectedText).underscore().chompLeft('_').s;
+
+            // TODO check words for morphology (if found, alert)
+
+            var replacedString = statementReplace.replace(regex,"#" + dasherized).replace(/##/g,'#');
+            $("#statement").val(replacedString);
+        }
+
+    });
+
+    function addEntryForm() {
+        return {
+            update: function(content) {          
+                if ($('#statement').val().length == 0 || $('#statement').val().charAt(0) == '#') {
+                    $('#statement').val(arrayToHashtagString(content));
+                }
+            }
+        }
+    }
 
     
 
-        // Textarea select conversion to hashtags
-
-        // For now it's disabled, but will be enabled for bulk statement correction later
-
-        var getSelected = function(){
-            var t = '';
-            if(window.getSelection) {
-                t = window.getSelection();
-            } else if(document.getSelection) {
-                t = document.getSelection();
-            } else if(document.selection) {
-                t = document.selection.createRange().text;
-            }
-            return t;
-        }
-
-
-        $("#statement").select(function(eventObject) {
-            var selectedText = getSelected().toString();
-
-            var statementReplace = $("#statement").val();
-
-            if ((statementReplace.indexOf('@'+selectedText) === -1) && (selectedText !== statementReplace)) {
-
-                var regex = RegExp(selectedText, "g");
-
-                var dasherized = S(selectedText).underscore().chompLeft('_').s;
-
-                // TODO check words for morphology (if found, alert)
-
-                var replacedString = statementReplace.replace(regex,"#" + dasherized).replace(/##/g,'#');
-                $("#statement").val(replacedString);
-            }
-
-        });
 
 
 
-    </script>
+</script>

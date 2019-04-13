@@ -90,4 +90,24 @@
         return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
     }
 
+    function arrayToHashtagString(array) {
+        
+        let string = '';
+        
+        if (array.constructor !== Array) {
+            string = array;
+        }
+
+        if (array && array.length > 0) {
+            string = array.join(' #');
+            string = '#' + string; 
+        } 
+        else {
+            string = '';
+        }
+
+        return string;
+        
+    }
+
 </script>
