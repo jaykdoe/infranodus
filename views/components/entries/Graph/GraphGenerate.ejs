@@ -48,7 +48,7 @@ function GraphFactory(){
             graphTags().update();
 
             // TODO Perform filter statements function on the nodes selected
-
+            entries().filter();
 
             // Add search terms into the top graph search form
             nodeInputField().update(pinnedNodes.concat(notFoundNodes));
@@ -81,6 +81,12 @@ function GraphFactory(){
         }
         this.getPinnedNodes = function() {
             return pinnedNodes;
+        }
+        this.getLastPinnedNode = function() {
+            return pinnedNodes[pinneNodes.length];
+        }
+        this.getPreviousPinnedNode = function() {
+            return pinnedNodes[pinneNodes.length - 1];
         }
         this.existPinnedNodes = function() {
             if (pinnedNodes && pinnedNodes.length > 0) {
@@ -826,7 +832,7 @@ function filter_graph(pins){
         selectedNodes = [];
 
         for (var irr in toKeep) {
-        selectedNodes.push(toKeep[irr].label);
+            selectedNodes.push(toKeep[irr].label);
         }
 
         // Now convert this to an array that will be understood by the functions below

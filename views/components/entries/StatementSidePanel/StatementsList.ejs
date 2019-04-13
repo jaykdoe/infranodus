@@ -17,7 +17,6 @@
 
 var currentEntriesPanelMode = "VISIBLE"
 
-
 // This is used for filtering the statements when we search
 var visibleentries_original = $(".entry:visible").length;
 
@@ -37,12 +36,8 @@ entryDoubleClick();
 
 <% } %>
 
-$(".entry-date").each(function() {
-    var convertedTime = timeConverter($(this).text()) ;
-    $(this).text(convertedTime);
-});
 
-
+entries().changeTime();
 
         
 function changeEntriesModeTo(mode) {
@@ -93,6 +88,12 @@ function entries() {
         fillSpace: function(heightToReduce){
             $('#entries').css({height:  $(window).height() - heightToReduce});
         },
+        changeTime: function() {
+            $(".entry-date").each(function() {
+                var convertedTime = timeConverter($(this).text()) ;
+                $(this).text(convertedTime);
+            });
+        },
         scroll: function(speed, scrollTo, type, onEnd) {
             if (!speed) speed = 1000; // scroll speed in ms
             if (!scrollTo) scrollTo = $('#entries')[0].scrollHeight;
@@ -127,9 +128,231 @@ function entries() {
                 }
                 
         },
-        unfilter: function() {
-               $('.entry').fadeIn(400);
-        }
+        unfilter: function(that) {
+            if (that) {
+                $(that).fadeIn(400);
+            }
+            else {
+                $('.entry').fadeIn(400);
+            }
+        },
+        filter: function(that) {
+
+          if (that) {
+            $(that).fadeOut(500);
+          }
+          else {
+          
+            let timesfiltered = 0;
+            let visibleentries = visibleentries_original;
+        
+            if (graphFactory.existPinnedNodes == false) {
+              entries().unfilter();
+            }
+            else {
+              entries().search(entries().highlighter);
+            }
+
+          }
+        },
+        highlighter: function(that) {
+          
+          // Highlight the nodes that were clicked
+          $(that).removeHighlight();
+
+          let pinnedNodes = graphFactory.getPinnedNodes();
+
+          for (let i = 0; i < pinnedNodes.length; i++) {
+              if (pinnedNodes[i].match(/[а-яА-Я]/)) {
+                $(that).highlight(window.jstemmer(pinnedNodes[i]));
+              }
+              else {
+                $(that).highlight(pinnedNodes[i]);
+              }
+          }
+
+        },
+        search: function(callback) {
+
+           let totalEntriesMatched = 0;
+
+           let nodeIDs_reversed = graphFactory.getNodeIDsRev();
+
+           $(".entry").each(function(){
+
+              // What is the current statement ID for the entry?
+              let currentDiv = $(this).attr('data-uid');
+
+              // Retrieve the statement text from the entry, clean from html
+              let originaltext = $(this).children('.entry-text').html();
+
+              // How many nodes we found in this entry?
+              let nodesfound = 0;
+
+              // How many entries in total were matched?
+              let matchedThisEntry = 0;
+
+              // For each node present in this statement:
+              for (let item in nodesOfStatement[currentDiv]) {
+
+                var nmarker = nodesOfStatement[currentDiv][item]; //
+
+                // Is this node in pinnedNodes?
+                if (graphFactory.checkIfPinned(nodeIDs_reversed[nmarker]) == true) {
+                  
+                  nodesfound = nodesfound + 1;
+
+                  // The number of nodes found in this entry equals the number of pinned nodes?
+                  if (nodesfound == graphFactory.getPinnedNodes().length) {
+
+                      // Then this entry has the full match
+                      matchedThisEntry = 1;
+
+                      totalEntriesMatched += 1;
+                  }
+                }
+
+              }
+
+              if (matchedThisEntry == 1) {
+                callback(this);
+              }
+              else {
+                entries().filter(this);
+              }
+           });
+
+          //     // None of the pinned nodes are not found in the entry
+          //     if (matched1entry == 0) {
+
+          //       // Hide this entry
+          //       $(this).fadeOut(500);
+
+          //       // Reset the counter
+          //       visibleentries = visibleentries - 1;
+
+          //       // If visibleenries == 0 that means we checked all the entries and there was no full match (for all the pinnedNodes) in any of them
+          //       // Then launch a different (lax) search algorithm
+
+          //       if (visibleentries == 0) {
+
+          //           // #1 Logic for the intersections
+
+          //           // Let's choose the previous node
+          //           let lastNode = graphFactory.getPreviousPinnedNode();
+
+          //           // Get the neighbor nodes in the graph for the previous node
+          //           let nnodes = sigma.instances(0).graph.neighbors(nodeIDs[lastNode]);
+
+          //           let selectedNNodes = [];
+
+          //           // We create an array from neighbors that looks like toKeep one
+          //           for (let key in nnodes) {
+          //               selectedNNodes.push(nnodes[key].label);
+          //           }
+
+          //           // We then find the inersection between the nodes that were selected before and now
+          //           var overlapNodes = [];
+          //           overlapNodes = _.intersection(selectedNNodes, selectedNodes);
+
+          //           // TODO we always should have ONLY entries with one intersection and at least one of the pinned
+          //           // This breaks when we start navigating in the graph and have 3 pinned items — in this case no neighbors and it breaks
+
+          //           // Also some problems with deselection
+
+          //           $(".entry").each(function(){
+          //               var matchedentry = 0;
+          //               var currentDiv = $(this).attr('data-uid');
+
+          //               // For each node present in this statement:
+          //               for (var item in nodesOfStatement[currentDiv]) {
+          //                 var nmarker = nodesOfStatement[currentDiv][item];
+
+          //                 // Does this node belong to the Overlap nodes AND at the same time
+          //                 if (overlapNodes.indexOf(nodeIDs_reversed[nmarker]) > -1) {
+          //                   for (var node in nodesOfStatement[currentDiv]) {
+          //                     var n2marker = nodesOfStatement[currentDiv][node];
+          //                     if (pinnedNodes.indexOf(nodeIDs_reversed[n2marker]) > -1 || lastNode == nodeIDs_reversed[n2marker]) {
+          //                       matchedentry = 1;
+          //                     }
+          //                   }
+          //                 }
+          //               }
+          //               if (matchedentry == 1) {
+          //                   $(this).fadeIn(500);
+          //                   visibleentries = visibleentries + 1;
+          //               }
+          //           });
+
+
+          //           if (visibleentries == 0) {
+
+          //               $('.entry').fadeIn(500);
+          //               // #2 Logic
+          //               // This is if we want to remove the node before the last one.
+
+          //               // timesfiltered = timesfiltered + 1;
+          //               // var posnodes = pinnedNodes.length - timesfiltered - 1;
+
+          //               var posnodes = 0;
+
+          //               // Final nodes to search
+
+          //               splicedNodes = [];
+
+          //               // First all of them
+
+          //               for (var k = 0; k < pinnedNodes.length; k++) {
+          //                   splicedNodes[k] = pinnedNodes[k];
+          //               }
+
+          //               // Remove the one we can't find (the very first one of the bunch)
+
+          //               splicedNodes.splice(posnodes, 1);
+
+          //               // Save that one also into the list of the nodes we removed
+
+          //               notfoundNodes.push(pinnedNodes[posnodes]);
+
+          //               // This is for alert
+          //               // var r = confirm('No link between ' + pinnedNodes + '.\nShow entries just with ' + splicedNodes + '?');
+
+          //               // This is for plain message
+          //               // $('#messages').html('No entries contain "' + pinnedNodes.join(' and ') + '".<br>Showing entries that contain "' + splicedNodes.join(' and ') + '" only:<br>&nbsp;');
+
+          //               // Get the pinnedNodes back to a good shape
+          //               pinnedNodes = [];
+          //               for (var l = 0; l < splicedNodes.length; l++) {
+          //                   pinnedNodes[l] = splicedNodes[l];
+          //               }
+
+          //               // Relaunch the function with the newly cleared list of pinnedNodes
+
+          //               filter_statements(pinnedNodes, origin);
+          //         }
+
+          //       }
+          //     // END OF not found any entries with the nodes clicked
+          //     }
+
+          //     // FOUND something with the nodes clicked
+          //     else {
+
+          //       // Populate statement with a new text
+
+          //     //  $(this).children('.entry-text').html(newtext);
+
+          //       // $(this).find('.nonmatched-sentence').fadeOut(500); this is only if we want to fade non-matched sentences - see above also
+
+
+
+          //     }
+
+
+          
+          // callback();
+
+        },
     }
 }
 
@@ -315,20 +538,7 @@ function entries() {
        
 
 
-          // Highlight the nodes that were clicked
-
-          $(".entry").removeHighlight();
-
-          for (var i=0; i<pinnedNodes.length; i++) {
-              if (pinnedNodes[i].match(/[а-яА-Я]/)) {
-                $(".entry").highlight(window.jstemmer(pinnedNodes[i]));
-              }
-              else {
-                $(".entry").highlight(pinnedNodes[i]);
-              }
-
-          }
-
+          
        
 
         // END OF if origin != stopwords
