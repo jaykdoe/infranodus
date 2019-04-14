@@ -32,26 +32,29 @@
 
 
             <form action='/import' name='submitform' id="submitform" method='post' enctype="multipart/form-data" class='pure-form pure-form-stacked'>
-
-                <input type='text' size="14" maxlength="50" name='search' id="search" class="pure-input" placeholder='search terms' value="<% if (fornode) { %><%= fornode %><% } %>" /> &nbsp;&nbsp; <input class="pure-button" type='submit' name="btnSubmit" value=">" class="pure-button pure-button-primary">
-
+                Type in your search query and visualize the available results as a graph, so you can see the main topics, how they relate, what's there and what's missing.
                 <br>&nbsp;<br>
-                Type in your search query, and we will show you which words are the most related to your query, so you can continue your search in a more informed way.
+                <input type='text' size="25" maxlength="50" name='search' id="search" class="pure-input" placeholder='search terms' value="<% if (fornode) { %><%= fornode %><% } %>" /> <br><br><input class="pure-button pure-button-primary" type='submit' name="btnSubmit" value="Import">
+
+                
 
                 <br>&nbsp;<br>
                 <% include messages %>
 
+                <label for="source" class="pure-checkbox">
+                <input id="source" type="radio" name="source" value="googlesearch" checked> Import from Google Search<br>
+                <input id="source" type="radio" name="source" value="googlescholar" disabled> Import from Google Scholar
+                 </label>
+                
                 <label for="extractfilter" class="pure-checkbox">
-                    <input id="extractfilter" type="checkbox" name="excludesearchquery" value="1" checked> exclude search terms from the graph<br>
+                    <input id="extractfilter" type="checkbox" name="excludesearchquery" value="1"> exclude search terms from the graph<br>
                 </label>
-
+               
                 <label for="savegraph" class="pure-input">
                     saving in <input style="display:inline;" id="savegraph" type='text' size="10" maxlength="15" name='context' value='<% if (context) { %><%= context %><% } else { %>google<% } %>'/> context
                 </label>
 
-
-                <input type="hidden" name="source" value="googlesearch">
-                <input type='hidden' name='limit' value='20' />
+                <input type='hidden' name='limit' value='40' />
                 <input type="hidden" name="settings" value="morphemes">
                 <input type="hidden" id="hide_always" name="hide_always" value="1">
                 <input type="hidden" id="go_next_add" name="go_next_add" value="">
