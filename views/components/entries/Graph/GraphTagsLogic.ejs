@@ -3,10 +3,20 @@
 
 undoButton().onClick(resetGraph);
 
+deleteNodeButton().onClick(deleteNodes);
+
 function undoButton() {
     return {
         onClick: function(onClick){
-            $('#undo').on('click', onClick)
+            $('#undo').on('click', onClick);
+        }
+    }
+}
+
+function deleteNodeButton() {
+    return {
+        onClick: function(onClick){
+            $('#deletenodes').on('click', deleteNodes);
         }
     }
 }
@@ -42,9 +52,18 @@ function graphTags() {
                 htmlNodes = htmlNodes + '<li><a href="#">' + graphFactory.getPinnedNodes()[q] + '</a></li>';
             }
 
+            // Add stopNodes to the list 
+            var stopNodesList = '<ul class="tags">';
+            for (var x = 0; x < graphFactory.getStopNodes().length; x++) {
+                stopNodesList = stopNodesList + '<li><a class="deleted" href="#">' + graphFactory.getStopNodes()[x] + '</a></li>';
+            }
+            stopNodesList = stopNodesList + '</ul>';
+
             htmlNodes = htmlNodes + '<div class="tagsend"></div></ul>';
 
             $('#pinnednodeslist').html(htmlNodes);
+
+            $('#stopnodeslist').html(stopNodesList);
 
             // Add triggers to newly shown Tags elements
 
@@ -72,7 +91,8 @@ function addTagTriggers() {
                 graphFactory.removeFromPinnedNodes(remove_node);
 
         }
-
+        
+        // Adding a deleted node back into the graph
 
         if (deletedNodes.indexOf(remove_node) > -1) {
             socket.emit('node add', {addingNodes: remove_node, stoplistNodes: deletedNodes});
@@ -92,12 +112,6 @@ function addTagTriggers() {
 
 }
 
-// What happens when we click a button to delete a selected node
-
-$("#deletenodes").on('click', function(e) {
-    e.preventDefault;
-    socket.emit('node delete', {pinnedNodes: graphFactory.getPinnedNodes()});
-});
 
 
 // What happens if we want to pass the list of keywords we selected to the settings
@@ -107,149 +121,7 @@ $("#stopsave").on('click', function(e) {
     window.location.href = "/settings?stopwords=" + encodeURIComponent(deletedNodes.join(' ')) + "&returncontext=" + current_context;
 });
 
-// What happens when we delete a node
 
-socket.on('node delete', function(msg){
-
-    var nodesToDelete = msg.pinnedNodes;
-    var delete_from = msg.delete_from;
-    var collectiond = cy.elements();
-    var elesss;
-
-    cy.remove(collectiond);
-
-    elesnodes = [];
-
-    // jsnetworkx
-    var jsGraphEdges = [];
-    nodeIDs_rev = _.invert(nodeIDs);
-
-    // Reiterate nodes and delete all the pinned nodes
-
-    sigma.instances(0).graph.nodes().forEach(function(n) {
-
-        if (nodesToDelete.indexOf(n.originalLabel) >= 0) {
-            sigma.instances(0).graph.dropNode(n.id);
-            if (deletedNodes.indexOf(n.originalLabel) == -1) {
-                deletedNodes.push(n.originalLabel);
-            }
-        }
-        else {
-            n.color = n.originalColor;
-            n.label = n.originalLabel;
-
-            // Add the remaining ones to Cytoscape
-            elesnodes.push({
-                group: "nodes",
-                data: { id: n.id, name: n.label}
-            });
-
-
-        }
-
-    //n.size = sigma.graph.degree(n.id);
-
-    });
-
-    // Reiterate all the remaining edges and add them to Cytascape
-    // TODO this code duplicates from above - move into a function
-
-    sigma.instances(0).graph.edges().forEach(function(e) {
-
-        var unique_edge_id = '';
-
-        // Let's see if the edge source in alphabetical order is further than its target and change places
-
-        if (e.source > e.target) {
-            unique_edge_id = e.target + '-' + e.source;
-        }
-        else {
-            unique_edge_id = e.source + '-' + e.target;
-        }
-
-        elesnodes.push({
-            group: "edges",
-            data: { id: unique_edge_id, source: e.source, target: e.target, weight: e.weight }
-        });
-
-        // TODO remove that, this is just to check data consistentency
-        e.sourcename = nodeIDs_rev[e.source];
-        e.targetname = nodeIDs_rev[e.target];
-
-
-         // Add to jsnetworkx
-         var edge_params = {
-            weight: 1/e.weight,
-            sourcename: e.sourcename,
-            targetname: e.targetname                     
-        };
-
-        var edge_object = [e.source, e.target, edge_params];
-                 
-        jsGraphEdges.push(edge_object);
-
-    });
-
-
-    // Betweenness Centrality Calculation using Cytoscape
-    elesss = cy.add(elesnodes);
-
-    var jsG = new jsnx.DiGraph();
-    // jsG = jsnx.convertToUndirected(jsG);
-           
-    jsG.addEdgesFrom(jsGraphEdges);
-
-
-    betweennessCentrality(elesss, jsG);
-
-    // Community detect algorithm
-
-    communityDetect();
-
-    // No more pinned nodes
-
-    if (!delete_from) {
-        pinnedNodes = [];
-    }
-    commClicked = [];
-
-    $('.community_node').each(function(){
-         $(this).removeAttr('style');
-    });
-
-    $('.top_nodes').each(function(){
-        $(this).removeAttr('style');
-    });
-
-    if (sigma.instances(0).isForceAtlas2Running()) {
-        sigma.instances(0).stopForceAtlas2();
-        sigma.instances(0).killForceAtlas2();
-        setTimeout(function() {
-        sigma.instances(0).startForceAtlas2(forceatlas_options);
-        setTimeout(function() {
-
-            sigma.instances(0).stopForceAtlas2();
-            sigma.instances(0).killForceAtlas2();
-
-        }, 5000);
-    }, 1000);
-    }
-    else {
-
-        sigma.instances(0).startForceAtlas2(forceatlas_options);
-        setTimeout(function() {
-
-            sigma.instances(0).stopForceAtlas2();
-            sigma.instances(0).killForceAtlas2();
-
-        }, 5000);
-
-    }
-
-    sigma.instances(0).refresh();
-
-
-});
 
 // What happens when we add a node ?
 

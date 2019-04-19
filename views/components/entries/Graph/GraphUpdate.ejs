@@ -1,0 +1,296 @@
+<script>
+
+function filter_graph(pins){
+
+
+        let toKeep = [];
+
+        let toKeepPinned = [];
+
+        let toKeepMap = [];
+
+
+        // What are the nodes that we want to filter?
+
+        if (pins.length > 0) {
+
+            // Reiterate for each pinned node
+
+            for (var i = 0; i < pins.length; i ++) {
+
+                // Now we reiterate through every node in the graph
+
+                sigma.instances(0).graph.nodes().filter(function(n) {
+
+                    // Is the current node of the graph one of the ones that was clicked before?
+
+                    if (pins[i] == n.originalLabel) {
+
+                        // The ID of the current node is...
+                        var nodeId = n.id;
+
+                        // Its neighbors are...
+                        var nnodes = sigma.instances(0).graph.neighbors(nodeId);
+
+                        var nnodesArray = [];
+
+                        // We create an array from neighbors that looks like toKeep one
+
+                        for (var key in nnodes) {
+                            nnodesArray.push(nnodes[key]);
+                        }
+
+                        
+                        if (i > 0) {
+                            // If that's not the first iteration, we only keep intersection of both
+                            toKeep = _.intersection(toKeep, nnodesArray);
+                        }
+                        else {
+                            // If that is the first interaction, we create toKeep array from the neighbors only
+                            toKeep = nnodesArray;
+                        }
+
+                        // We also add the actual node to another array
+                        toKeepPinned.push(n);
+
+
+                    }
+
+                });
+
+            }
+
+            // Make array of nodes to keep unique to avoid duplicates
+
+            toKeep = _.uniq(toKeep);
+
+            // We make a list of the nodes to keep which includes the pinnedNodes and its shared neighbors
+
+            toKeep = _.union(toKeep,toKeepPinned);
+
+            
+
+            console.log(toKeep.length + ' nodes selected out of ' + global_totalnodes + ' (' + (toKeep.length/global_totalnodes).toFixed(2)*100 + '%)')
+            
+            // Save which nodes are selected on the graph for community detection
+
+            graphFactory.updateSelectedNodes([]);
+
+            for (let irr in toKeep) {
+                graphFactory.addToSelectedNodes(toKeep[irr].originalLabel);
+            }
+
+            // Now convert this to an array that will be understood by the functions below
+
+            for (let key in toKeep) {
+                toKeepMap[toKeep[key].id] = toKeep[key];
+            }
+
+            // Let's now color the nodes in the graph accordingly
+
+            sigma.instances(0).graph.nodes().forEach(function(n) {
+
+                // Is the current node iterated in the list to be shown?
+
+                if (toKeepMap[n.id])  {
+
+                    if (pins.indexOf(n.originalLabel) > -1) {
+
+                        n.color = '#0089e0';
+
+                        // Display info on the last node selected
+                        if (n.originalLabel == toKeepPinned[toKeepPinned.length-1].label) {
+                            console.log('The node "' + n.originalLabel + '" has ' + n.size + ' edges (degree), betweenness centrality: ' + n.bc + ', belongs to ' + n.community + ' community.');
+                        }
+
+                    }
+                    else {
+
+                        n.color = n.originalColor;
+
+                    }
+
+                    n.label = n.originalLabel;
+
+                }
+                else  {
+                    n.color = deselected_nodes_color;
+                    n.label = '';
+                }
+
+            });
+
+            // Do the same for the edges
+
+            sigma.instances(0).graph.edges().forEach(function(e) {
+                    if (toKeepMap[e.source] && toKeepMap[e.target]) {
+                        e.color = e.originalColor;
+                    }
+                    else {
+                        e.color = deselected_nodes_color;
+                    }
+            });
+
+
+
+        }
+
+        // No nodes are selected (or all are deselected) - show the whole graph
+
+        else {
+
+            console.log('deselecting the graph');
+
+            sigma.instances(0).graph.nodes().forEach(function(n) {
+
+                n.color = n.originalColor;
+                n.label = n.originalLabel;
+
+                n.marked = 0;
+
+            });
+
+            sigma.instances(0).graph.edges().forEach(function(e) {
+
+                e.color = e.originalColor;
+
+            });
+
+            // Remove all selections
+            graphFactory.updateSelectedNodes([]);
+
+            // No communities clicked
+            commClicked = [];
+
+        }
+
+        // Since the data has been modified, we need to
+        // call the refresh method to make the colors
+        // update effective.
+
+        // sigma.instances(0).refresh();
+
+        // Let's play the graph MIDI sounds on selection
+
+        <% if (locals.user) { %>
+        <% if (locals.user.midi != undefined && locals.user.midi != 'off') { %>
+
+
+        console.log('using MIDI data ' + midi);
+        console.log('playing MIDI device:');
+        console.log(output);
+
+        var timecode = 0;
+
+        var note_node = midi.substr(10,2);
+        if (note_node.substr(1,1) == '0') {
+        note_node = note_node.substr(0,1) + '1';
+        }
+
+        var note_edge = midi.substr(12,2);
+        if (note_edge.substr(1,1) == '0') {
+        note_edge = note_edge.substr(0,1) + '1';
+        }
+
+
+
+        for (var m = 0; m < pins.length; m++) {
+
+
+            setTimeout(function () {
+            output.playNote(note_node, parseInt(midi.substr(0,2)));
+            output.stopNote(note_node, parseInt(midi.substr(0,2)), {time: "+500"});
+            console.log('playing a node note ' + note_node + ' at ' + timecode + ' on channel ' + parseInt(midi.substr(0,2)));
+            }, timecode);
+            timecode = getRandomInt(0,parseInt(midi.substr(6,4)));
+        }
+
+        var timecodea = 0;
+
+        for (var ed = 0; ed < toKeep.length; ed++) {
+
+            setTimeout(function () {
+            output.playNote(note_edge, parseInt(midi.substr(2,2)));
+            output.stopNote(note_edge, parseInt(midi.substr(2,2)), {time: "+500"});
+            console.log('playing an edge note ' + note_edge + ' at ' + timecodea + ' on ' + parseInt(midi.substr(2,2)));
+            }, timecodea);
+            timecodea = getRandomInt(0,parseInt(midi.substr(6,4)));
+
+        }
+
+        <% } %>
+        <% } %>
+
+
+}
+
+
+function resetGraph() {
+    socket.emit('graph reset');
+}
+
+function deleteNodes() {
+    socket.emit('node delete', {pinnedNodes: graphFactory.getPinnedNodes()});
+}
+
+
+// What happens when we delete a node
+socket.on('node delete', function(msg){
+    
+    // Which nodes are we going to delete?
+    let nodesToDelete = msg.pinnedNodes;
+
+    // Was it user action or from the LocalStorage / user setting?
+    let delete_from = msg.delete_from;
+
+    graphFactory.deleteNodes(nodesToDelete);
+ 
+    // No more pinned nodes
+
+    if (!delete_from) {
+        pinnedNodes = [];
+    }
+    commClicked = [];
+
+    $('.community_node').each(function(){
+        $(this).removeAttr('style');
+    });
+
+    $('.top_nodes').each(function(){
+        $(this).removeAttr('style');
+    });
+
+    if (sigma.instances(0).isForceAtlas2Running()) {
+        sigma.instances(0).stopForceAtlas2();
+        sigma.instances(0).killForceAtlas2();
+        setTimeout(function() {
+        sigma.instances(0).startForceAtlas2(forceatlas_options);
+        setTimeout(function() {
+
+            sigma.instances(0).stopForceAtlas2();
+            sigma.instances(0).killForceAtlas2();
+
+        }, 5000);
+    }, 1000);
+    }
+    else {
+
+        sigma.instances(0).startForceAtlas2(forceatlas_options);
+        setTimeout(function() {
+
+            sigma.instances(0).stopForceAtlas2();
+            sigma.instances(0).killForceAtlas2();
+
+        }, 5000);
+
+    }
+
+
+
+
+});
+
+
+
+
+</script>

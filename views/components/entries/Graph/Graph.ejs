@@ -147,8 +147,145 @@
 </script>
 
 <%- include('GraphGenerate') %>
+<%- include('GraphUpdate') %>
+<%- include('GraphRank') %>
+<%- include('GraphModularity') %>
+<%- include('../Analytics/AnalyticsPaneLogic') %>
 
 <script>
+
+
+function graph() {
+    return {
+        updateNodes: function(nodes, callback){
+
+            sigma.instances(0).graph.nodes().forEach(function(n) {
+                if (!nodes[n.id]) {
+                  sigma.instances(0).graph.dropNode(n.id);
+                  console.log('UPDATENODE');
+                }               
+            });
+
+            callback(nodes);
+
+        },
+        updateMetrics: function(nodes) {
+
+            // Cytoscape object renew
+            let cyCollection = cy.elements();
+            cy.remove(cyCollection);            
+            let cyNodes = [];
+
+            // Add the nodes to Cytoscape array
+            for (let nid in nodes) {
+                cyNodes.push({
+                    group: "nodes",
+                    data: { id: nid, name: nodes[nid]}
+                });
+            }
+
+            // jsnetworkx object creation
+            let jsGraphEdges = [];
+            let edge_data = [];
+            let nodeIDs_rev = graphFactory.getNodeIDsRev();
+
+            sigma.instances(0).graph.edges().forEach(function(e) {
+
+                var unique_edge_id = '';
+
+                // Let's see if the edge source in alphabetical order is further than its target and change places
+
+                if (e.source > e.target) {
+                    unique_edge_id = e.target + '-' + e.source;
+                }
+                else {
+                    unique_edge_id = e.source + '-' + e.target;
+                }
+
+                cyNodes.push({
+                    group: "edges",
+                    data: { id: unique_edge_id, source: e.source, target: e.target, weight: e.weight }
+                });
+
+                // TODO remove that, this is just to check data consistentency
+                e.sourcename = nodeIDs_rev[e.source];
+                e.targetname = nodeIDs_rev[e.target];
+
+                var matche = 0;
+
+                // Do we already have any edges saved for jsX? Reiterate
+                for (var i = 0; i < edge_data.length; i++) {
+                    // Found an edge that has the current edge's source/target combination?
+                    // replace && with || for undirected graph
+                    if ((edge_data[i].source == e.source && edge_data[i].target == e.target) || (edge_data[i].target == e.source && edge_data[i].source == e.target)) {
+                        
+                        // Do not add this age as new later
+                        matche = 1;
+
+                        // Add the weights together
+                        edge_data[i].weight += parseInt(e.weight);
+
+                        // Reiterate through each jsX object and if found similar source/target combo, update the weight.
+                        for (var obj in jsGraphEdges) {
+                            if ((jsGraphEdges[obj][0] == e.source && jsGraphEdges[obj][1] == e.target) || (jsGraphEdges[obj][1] == e.source && jsGraphEdges[obj][0] == e.target)) {
+                                jsGraphEdges[obj][2].weight += parseInt(e.weight); 
+                            }
+                        }
+                    }
+                }
+
+                // This is the first time we see this edge
+                if (matche == 0) {
+
+                    // Add it into the graph
+                    edge_data.push({source: e.source, target: e.target, weight: parseInt(e.weight)});
+
+                    // Add to jsnetworkx
+
+                    let edge_params = {
+                        weight: parseInt(e.weight),
+                        sourcename: e.sourcename,
+                        targetname: e.targetname                     
+                    };
+
+                    let edge_object = [e.source, e.target, edge_params];
+                
+                    jsGraphEdges.push(edge_object);
+
+                }
+
+            });
+            
+            // Add the array to the collection
+            let cyElements = cy.add(cyNodes);
+
+            // Create a new graph and add the new edges
+            var jsG = new jsnx.Graph(); // DiGraph for directed
+
+            // Fix edge weights (the BC algorithm considers a lower weight edge stronger)
+            for (let obj in jsGraphEdges) {
+                jsGraphEdges[obj][2].weight = 1 / jsGraphEdges[obj][2].weight;
+            }
+            // jsG = jsnx.convertToUndirected(jsG);
+            jsG.addEdgesFrom(jsGraphEdges);
+
+            // Launch betweenness centrality detection
+            betweennessCentrality(cyElements, jsG);
+
+            // Launch community detect algorithm
+            communityDetect();
+
+
+
+
+
+        },
+        updateEdges: function(){
+
+        
+        }
+    }
+}
 
 
   // What happens when the user clicks on a node in the graph (this is caleld from sigma but processed here)
@@ -207,7 +344,7 @@
 
     // Calculate Betweenness Centrality
 
-    var bc_nodes_map;
+    var bc_nodes_map = {};
 
     function betweennessCentrality (eles, jsG) {
 
@@ -218,7 +355,7 @@
       var jsbc = jsnx.betweennessCentrality(jsG, {normalized: true, weight: 'weight'});
       var bc_jsx = jsbc._stringValues;
       
-      
+      let nodeIDs_rev = graphFactory.getNodeIDsRev();
 
       var bc = eles.bc({
           weight: function(edges) {
@@ -227,40 +364,41 @@
           directed: true
       });
 
-      var bcmin = 1;
-      var bcmax = 0;
+      let bcmin = 1;
+      let bcmax = 0;
 
-      var bcmap = [];
+      let bcmap = {};
 
       topbc_nodes = [];
 
       if (!jsG) {
-      for (var i = 0; i < cy.nodes().length; i++) {
+        for (var i = 0; i < cy.nodes().length; i++) {
 
-          var nn = eles.getElementById(cy.nodes()[i].data('id'));
+            var nn = eles.getElementById(cy.nodes()[i].data('id'));
 
-          var currentbc = bc.betweennessNormalized(nn);
+            var currentbc = bc.betweennessNormalized(nn);
 
-          bcmap[cy.nodes()[i].data('id')] = currentbc;
+            bcmap[cy.nodes()[i].data('id')] = currentbc;
 
-          topbc_nodes.push({key: cy.nodes()[i].data('id'), label: cy.nodes()[i].data('name'), bc: currentbc});
+            topbc_nodes.push({key: cy.nodes()[i].data('id'), label: cy.nodes()[i].data('name'), bc: currentbc});
 
-          if (bcmin > currentbc && currentbc != 0) {
-            bcmin = currentbc;
-          }
-          else {
-            bcmin = 0.00001
-          }
+            if (bcmin > currentbc && currentbc != 0) {
+              bcmin = currentbc;
+            }
+            else {
+              bcmin = 0.00001
+            }
 
-          if (bcmax < currentbc) {
-            bcmax = currentbc;
-          }
+            if (bcmax < currentbc) {
+              bcmax = currentbc;
+            }
 
-      }
+        }
     }
     else {
-        for (key in bc_jsx) {
-            var currentbc = bc_jsx[key];
+        
+        for (let key in bc_jsx) {
+            let currentbc = bc_jsx[key];
             topbc_nodes.push({key: key, label: nodeIDs_rev[key], bc: bc_jsx[key]});
             bcmap[key] = bc_jsx[key];
 
@@ -286,6 +424,10 @@
       topbc_nodes = topbc_nodes.slice(0,5);
 
       var nodes_shown = 0
+
+      console.log(bcmap);
+
+      let bcscore = 0;
       sigma.instances(0).graph.nodes().forEach(function(n) {
         if ((most_influential == 'bc' || most_influential == 'bc2') && topbc_nodes[0].bc > 0) {
           if (bcmap[n.id] == 0) { bcscore = bcmin } else { bcscore = bcmap[n.id] }
@@ -301,12 +443,12 @@
           nodes_shown++;
         }
       });
-      console.log(nodes_shown);
+      // console.log(nodes_shown);
 
 
       top_components = eles.components();
 
-      //sigma.instances(0).refresh();
+      // sigma.instances(0).refresh();
 
 
       //console.log(_.first(_.sortBy(bcmap,'degree').reverse(),3);
@@ -557,13 +699,12 @@ console.log(parseInt(max_community_number + 1));
 
    var toppbc_nodes = topbc_nodes.slice(0,4);
 
-   console.log('Top betweenness centrality nodes:')
+   console.log('Top betweenness centrality nnodes:')
    console.log(toppbc_nodes);
 
    most_inf_nodes = toppbc_nodes;
 
    // TODO   if (most_influential == 'bc' && toppbc_nodes[0].bc > 0) {
-
 
    if ((most_influential == 'bc' || (most_influential == 'bc2') && toppbc_nodes[0].bc > 0)) {
      analytics += '</div> (highest betweenness centrality):<br>';
