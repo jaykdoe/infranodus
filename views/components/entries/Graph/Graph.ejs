@@ -416,11 +416,6 @@ function graph() {
     }
       bc_nodes_map = bcmap;
 
-      console.log('BCMINBCMAX')
-
-      console.log(bcmin)
-      console.log(bcmax)
-
       topbc_nodes = _.sortBy(topbc_nodes, 'bc').reverse();
 
       console.log('Top betweenness centrality nodes:');
@@ -431,14 +426,23 @@ function graph() {
       var nodes_shown = 0
 
       let bcscore = 0;
+
       sigma.instances(0).graph.nodes().forEach(function(n) {
+
+        // Do we range the nodes by betweenness centrality?
         if ((most_influential == 'bc' || most_influential == 'bc2') && topbc_nodes[0].bc > 0) {
-          if (bcmap[n.id] == 0) { bcscore = bcmin } else { bcscore = bcmap[n.id] }
-          n.size = Math.round(normalize(bcscore, bcmin, bcmax, 5, 35));
-          console.log(n.size);
-          if (!n.size) {
-            console.log(n.originalLabel)
+          
+          // Does the BC value for this node = 0 or doesn't exist?
+          if (bcmap[n.id] == 0 || !bcmap[n.id]) { 
+            bcscore = bcmin; 
+          } 
+          else { 
+            bcscore = bcmap[n.id] 
           }
+          
+          // Normalize the size of the nodes 
+          n.size = Math.round(normalize(bcscore, bcmin, bcmax, 5, 35));
+
           n.bc = bcmap[n.id];
         }
         else {
@@ -451,8 +455,6 @@ function graph() {
 
 
       top_components = eles.components();
-
-      // sigma.instances(0).refresh();
 
 
       //console.log(_.first(_.sortBy(bcmap,'degree').reverse(),3);
