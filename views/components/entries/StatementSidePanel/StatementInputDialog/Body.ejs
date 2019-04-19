@@ -41,6 +41,8 @@
 
     function submitSearchForm(e) {
 
+        
+
         e.preventDefault();
         // What are we searching?
         var searchPhrase = $('#search').val();
@@ -57,7 +59,6 @@
 
 
             for (var j = 0; j < searchArray.length; j++) {
-
                 // Is the search term cyrillic?
                 var search_cyrillic = searchArray[j].match(/[а-яА-Я]/);
 
@@ -71,12 +72,10 @@
             }
 
             for (var k = 0; k < searchPhraseLemmas.length; k++) {
-                if (pinnedNodes.indexOf(searchPhraseLemmas[k]) < 0) {
-                    pinnedNodes.push(searchPhraseLemmas[k]);
+                if (graphFactory.checkIfPinned(searchPhraseLemmas[k]) == false) {
+                    graphFactory.addToPinnedNodes(searchPhraseLemmas[k]);
                 }
             }
-
-            filter_statements(pinnedNodes, "search");
 
         }
 
