@@ -48,7 +48,8 @@ function GraphFactory(){
             }
             // If we are deleting the nodes, we transform all the pinned ones, so they can be removed too
             this.initPinnedNodes([]);
-            this.updateGraphNodes(nodeIDs_rev);
+            // this.updateGraphNodes(nodeIDs_rev);
+            this.deleteGraphNodes(this.getStopNodes());
             return true;
         }
         this.getNodeIDs = function() {
@@ -68,7 +69,7 @@ function GraphFactory(){
         this.updateGraphNodes = function(nodes) {
              
             // Update the graph nodes (delete or add)
-            graph().updateNodes(nodes, graph().updateMetrics);
+            // graph().updateNodes(nodes, graph().updateMetrics);
            
         //    graphUpdateNodes(nodes);
         //    graphUpdateEdges() 
@@ -78,6 +79,15 @@ function GraphFactory(){
            // possible with a callback to then update the Analytics like here               entries().search(entries().addHighlight);        
            // Update the graph if needed (refresh + forceatlas)
         }
+
+
+        this.deleteGraphNodes = function(nodesToDelete) {
+             
+             // Update the graph nodes (delete or add)
+             graph().deleteNodes(nodesToDelete);
+             graph().updateMetrics();
+       
+         }
   
 
         this.initPinnedNodes = function(nodes) {

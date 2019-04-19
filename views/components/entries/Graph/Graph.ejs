@@ -157,19 +157,30 @@
 
 function graph() {
     return {
+        deleteNodes: function(nodesToDelete, callback){
+            sigma.instances(0).graph.nodes().forEach(function(n) {
+                if (nodesToDelete.indexOf(n.originalLabel) >= 0) {
+                  sigma.instances(0).graph.dropNode(n.id);
+                }               
+            });
+
+            sigma.instances(0).refresh();
+
+        },
         updateNodes: function(nodes, callback){
 
             sigma.instances(0).graph.nodes().forEach(function(n) {
                 if (!nodes[n.id]) {
                   sigma.instances(0).graph.dropNode(n.id);
-                  console.log('UPDATENODE');
                 }               
             });
 
-            callback(nodes);
+            sigma.instances(0).refresh();
 
         },
-        updateMetrics: function(nodes) {
+        updateMetrics: function() {
+            
+            let nodes = graphFactory.getNodeIDsRev();
 
             // Cytoscape object renew
             let cyCollection = cy.elements();
