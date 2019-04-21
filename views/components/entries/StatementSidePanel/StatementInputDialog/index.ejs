@@ -137,10 +137,6 @@ function hideStatements() {
     toggleStatementSidePanel();
 }
 
-// Here we add onClick event for the entry add form after it's loaded. 
-// TODO move it out into a function
-
-submitFormProcess();
 
 
 // OnLoad get the right height for the entries elements — this depends on the form so it's here
@@ -612,101 +608,7 @@ socket.on('chat message', function(msg){
 
 // What do do when the form is submitted and a new entry (text) is added?
 
-function submitFormProcess() {
 
-    document.querySelector('#submitform').addEventListener('submit', function(e) {
-
-        e.preventDefault();
-
-        $('#statement').addClass('loading');
-
-        $('#submitbutton').attr('disabled', 'disabled');
-
-        if ($('#livetext').html().length > 0 && voice_continues) {
-        $('#livetext').html($('#statement').val() + '<br><em>saving into the graph...</em><span></span>');
-        setTimeout(function(){
-            $('#livetext').html('<em>waiting...</em>' + ' <span></span>');
-        }, 3000);
-        }
-
-        // We will set a user for posting. If the posting user does not equal the user who's watching the graph, we force-add the statement into theirs (provided they collaborate)
-        var postedby = '';
-
-        <% if (receivername) { %>
-        postedby = '<%= receivername %>';
-        <% } %>
-        // TODO make it possible that those statements get submitted in both graphs
-
-        // is urlvars mute off? then post as usual
-        if (!mute) {
-        $.post('/post', $("#submitform").serialize())
-                .done(function(res) {
-                    //3. Receive the server response, no need to emit an event
-                    if (res.entryuid) {
-                        //4. Show the updated text
-                        selfPosted = '1';
-                        $("#statement").val('');
-                        $('#statement').removeClass('loading');
-                        $('#submitbutton').removeAttr('disabled');
-
-                        // This below if a few statements were posted
-                        // TODO as we can now get all the s.uid back as an array this could be rewritten so no need for the condition after
-                        if (res.entryuid == 'multiple') {
-                            socket.emit('chat message', {postedby: postedby, entryuid: 'multiplesocket', entrytext: res.entrycontent, graph: res.graph});
-                            if (res.successmsg) {
-                            $("#warnings").append('<p class="warning">Please, reload the page after a few seconds to see the graph.</p>');
-                            $("#warnings").slideDown('slow');
-                            }
-                            setTimeout(function() {
-                                location.reload();
-                            },3000);
-                        }
-                        else {
-                            // Only one statement added? Initiate processing that will show it both to the user and the collaborator (if exists)
-                            socket.emit('chat message', {postedby: postedby, entryuid: JSON.parse(res.entryuid).data, entrytext: res.entrytext, graph: res.graph});
-                        }
-
-                    }
-                    else if (res.errormsg) {
-                        $('#statement').removeClass('loading');
-                        $('#submitbutton').removeAttr('disabled');
-                        alert(res.errormsg);
-                    }
-                    else {
-                        alert('Something went wrong, please, try again...');
-                    }
-                })
-                .fail(function(res) {
-                    alert("Server Error: " + res.status + " " + res.statusText);
-                });
-
-        }
-        // otherwise - make a dummy post - it appears in the list but doesn't get submitted into the graph
-        // This was made before to introduce a chat feature — so the software can "talk" to the user without adding stuff into the graph
-        else {
-            selfPosted = '1';
-            $('#statement').removeClass('loading');
-            $('#submitbutton').removeAttr('disabled');
-            $("#statement").val('');
-            socket.emit('chat message', {mute: 1, postedby: postedby, entryuid: '', entrytext: $('#statement').val(), graph: ''});
-        }
-
-        return false;
-    });
-
-
-    $('#statement').keypress(function(e){
-
-        // Submit the form on enter
-
-        if(e.which == 13 && !e.shiftKey) {
-            e.preventDefault();
-            $('#submitbutton').trigger('click');
-        }
-
-    });
-
-}
 
 
 </script>
