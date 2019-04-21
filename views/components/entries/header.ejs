@@ -4,11 +4,62 @@
     <title><%= title %></title>
     <script src="/javascripts/jquery.min.js"></script>
     <script>
-            <% if (perceivername) { %>
-                const viewType = 'external';
-            <% } else { %> 
-                const viewType = 'internal';
-            <% } %> 
+
+    // Global user parameters
+
+    function UserFactory(){
+
+        let loggedInUser = null;
+
+        let watchedUser = null;
+
+        let viewType = 'internal';
+
+        let selfPosted = null;
+
+        this.getLoggedInUser = function() {
+            return loggedInUser;
+        }   
+        this.setLoggedInUser = function(name) {
+            loggedInUser = name;
+        }
+
+        this.getWatchedUser = function() {
+            return watchedUser;
+        }  
+        this.setWatchedUser = function(name) {
+            watchedUser = name;
+        }
+
+        this.setViewType = function(type) {
+            viewType = type;
+            return true;
+        }
+        this.getViewType = function() {
+            return viewType;
+        }
+
+        this.getSelfPosted = function() {
+            return selfPosted;
+        }
+        this.updateSelfPosted = function(value) {
+            selfPosted = value;
+            return true;
+        }
+       
+    }
+
+    let userFactory = new UserFactory();
+
+    <% if (perceivername) { %>
+        userFactory.setViewType('external');
+        userFactory.setWatchedUser('<%= perceivername %>');
+    <% } %> 
+
+    <% if (receivername) { %>
+        userFactory.setLoggedInUser('<%= receivername %>');
+    <% } %> 
+
 
             var deletedNodes = [];
 

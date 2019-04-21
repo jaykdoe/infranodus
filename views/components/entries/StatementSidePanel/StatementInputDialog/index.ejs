@@ -12,15 +12,10 @@
 
 <script>
 
-// Who posted the entry?
-var selfPosted = null;
-
-
-var mute = getUrlVars()["mute"];
 
 var currentStatementSidePanelMode = "EDIT"
 
-if (viewType == 'external') {    
+if (userFactory.getViewType() == 'external') {    
     currentStatementSidePanelMode = "SEARCH"
 }
 
@@ -42,7 +37,7 @@ function switchToSearch() {
 }
 
 function switchToEdit() {
-    if (viewType != 'external') {
+    if (userFactory.getViewType() == 'internal') {
         switchStatementMenu('adds');
         sidePanelContent().hide('#search-panel');
         sidePanelContent().show('#edit-panel');
@@ -172,116 +167,44 @@ $('textarea').autosize();
 // TODO set up chatroom, make better design, think of graph sharing functionality
 
 socket.on('chat message', function(msg){
+    
+    let selfPosted = userFactory.getSelfPosted();
 
-    visibleentries_original = visibleentries_original + 1;
+    let perceivedby = userFactory.getLoggedInUser();    
 
-    var perceivedby = '';
+    let posted_by = msg.postedby;
 
-    <% if (receivername) { %>
-    perceivedby = '<%= receivername %>';
-    <% } %>
+    let alien = false;
 
-    var posted_by = msg.postedby;
-
-    var added_entry =  "<div class='entry' style='display: none;' data-uid='" + msg.entryuid + "' data-hashtags='" + msg.entryname + "'><p class='entry-text'>" + msg.entrytext + "</p><p class='entry-date'>by " + posted_by + " at " + moment().format('hh:mm:ss') + "</p><div class='separator'>&nbsp;</div><div id='" + msg.entryuid + "' class='hidden'></div></div>";
+    let chatbot = false;
 
     // if the message is not self-posted and also if the poster of the message is not the same as the guy logged in (in case there's two logins simultaneously)
     if (!selfPosted && perceivedby != posted_by) {
-        // add the alien class so the posted message looks like it's from elsewhere
-        added_entry =  "<div class='entry alien' style='display: none; margin-left: 50px' data-uid='" + msg.entryuid + "'><p class='entry-text gray'>" + msg.entrytext + "</p><p class='entry-date gray'>by " + posted_by + " at " + moment().format('hh:mm:ss') + "</p><div class='separator'>&nbsp;</div><div id='" + msg.entryuid + "' class='hidden'></div></div>";
 
+        // add the alien class so the posted message looks like it's from elsewhere
+        alien = true;
+
+        // add another class if this is a help message from the chatbot
         if (msg.help) {
-            added_entry =  "<div class='entry alien' style='display: none; margin-left: 50px' data-uid='" + msg.entryuid + "'><p class='entry-text gray'>" + msg.entrytext + "</p><p class='entry-date gray'>help tip &nbsp;<em></em><a href='javascript:' class='disablehelp'>disable</a></em></p><div class='separator'>&nbsp;</div><div id='" + msg.entryuid + "' class='hidden'></div></div>";
+            chatbot = true;
         }
 
         // We will set a user for receiving. If the posting user does not equal the user who's watching the graph, we force-add the statement into theirs (provided they collaborate)
-        var receivedby = '';
-
-        <% if (perceivername) { %>
-            receivedby = '<%= perceivername %>';
-        <% } %>
-
-        // TODO make it possible that those statements get submitted in both graphs
+        var receivedby = userFactory.getWatchedUser();
 
         // So the user who posted is not the same who's receiving? then submit the form. If the sender didnt have the mute option
         // This is only for collaboration - we resubmit, otherwise it's already submitted before
         if ((receivedby != msg.postedby) && !msg.mute) {
-
-
-            /*var temporary_statement = $('#statement').val();
-            $('#statement').val(msg.entrytext);
-            console.log($("#submitform").serialize());*/
-
-            var to_submit = $('#submitform').serializeArray();
-
-            for (key in to_submit) {
-                if (to_submit[key].name == 'entry[body]') {
-                    to_submit[key].value = msg.entrytext;
-                }
-            }
-
-            $.post('/post', $.param(to_submit))
-                    .done(function(res) {
-
-            /*          $('#statement').val(temporary_statement);*/
-
-                        //3. Receive the server response, no need to emit an event
-                        if (res.entryuid) {
-                            //4. Show the updated text
-
-                            if (res.entryuid == 'multiple') {
-                            if (res.successmsg) {
-                                $("#warnings").append('<p class="warning">Your collaborator submitted a long text. Please, reload the page to see the graph.</p>');
-                                $("#warnings").slideDown('slow');
-                            }
-                            setTimeout(function() {
-                                location.reload();
-                            },3000);
-                            }
-                        }
-                        else if (res.errormsg) {
-                            alert(res.errormsg);
-                        }
-                        else {
-                            alert('Something went wrong, please, try again...');
-                        }
-                    })
-                    .fail(function(res) {
-                        alert("Server Error: " + res.status + " " + res.statusText);
-                    });
-
+            // Populate the form and submit
+            addEntryForm().populateAndPost(msg.entrytext, addEntryForm().post);
         }
-
-
-
-    }
-    else {
-        selfPosted = null;
     }
 
-    // So let's add that entry to the #entries DIV
-
-    $(added_entry).appendTo($('#entries')).slideDown("fast");
-
-    // Do some stupid class change for the dark theme background
-    if (background == 'dark') {
-    $('.entry').addClass('entry-dark');
-    $('.entry-text').addClass('entry-text-dark');
-    }
-    // Nicely scroll
-
-
-
-
-
-
-
-    //$('#entries').append(added_entry).slideUp("fast");
+    // So let's add that entry to the #entries div
+    entries().append(msg.entrytext, msg.entryuid, msg.entryname, msg.posted_by, alien, chatbot);
 
     // Unfocus and reFocus again on the entry field
-    $('#statement').blur();
-    $('#statement').focus();
-
+    addEntryForm().refocus();
 
     // Add some behavior hooks again onto that element
     // One click will filter the nodes / edges of the statement on the graph

@@ -4,6 +4,27 @@ var speech = getUrlVars()["speech"];
 
 var voice_continues = getUrlVars()["voice_continues"];
 
+
+function voiceInputPanel() {
+  return {
+    update: function() {
+      if ($('#livetext').html().length > 0 && voice_continues) {
+        $('#livetext').html($('#statement').val() + '<br><em>saving into the graph...</em><span></span>');
+        setTimeout(function(){
+            $('#livetext').html('<em>waiting...</em>' + ' <span></span>');
+        }, 3000);
+        }
+    },
+    activate: function() {
+      $('#livetext').show();
+    },
+    deactivate: function() {
+      $('#livetext').html('');
+      $('#livetext').hide();
+    }
+  }
+}
+
 // Getting the details parsed from routes/entries.js to see how to show the graph
 
 <% if (locals.user && locals.user.voice_continues != undefined && locals.user.voice_continues != '00') { %>
@@ -87,14 +108,13 @@ if ('webkitSpeechRecognition' in window) {
             localStorage.setItem('microphone', 0);
             $('#microphone-link').toggleClass('microphone-on', 'remove');
             recognition.abort();
-            $('#livetext').html('');
-            $('#livetext').hide();
+            voiceInputPanel().deactivate();
         }
         else {
             localStorage.setItem('microphone', 1);
             activateVoiceInput();
             $('#microphone-link').toggleClass('microphone-on', 'add');
-            $('#livetext').show();
+            voiceInputPanel().activate();
         }
 
     });

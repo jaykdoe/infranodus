@@ -17,8 +17,6 @@
 
 var currentEntriesPanelMode = "VISIBLE"
 
-// This is used for filtering the statements when we search
-var visibleentries_original = $(".entry:visible").length;
 
 if (localStorage.getItem('folded') == 1) {
     currentEntriesPanelMode = "HIDDEN"
@@ -39,6 +37,17 @@ entryDoubleClick();
 
 entries().changeTime();
 
+function userMessages() {
+  return {
+    display: function(message) {
+      $("#warnings").append('<p class="warning">' + message + '</p>');
+      $("#warnings").slideDown('slow');
+    },
+    clear: function() {
+
+    }
+  }
+}
         
 function changeEntriesModeTo(mode) {
     currentEntriesPanelMode = mode
@@ -83,6 +92,9 @@ function infiniteEntriesScroll() {
 
 }
 
+
+
+
 function entries() {
     return {
         fillSpace: function(heightToReduce){
@@ -104,6 +116,20 @@ function entries() {
         },
         stopAnimation: function() {
             $("#entries").stop();
+        },
+        append: function(text, id, name, posted_by, alien, chatbot) {
+            let added_entry = '';
+            if (!alien) { 
+              added_entry = "<div class='entry' style='display: none;' data-uid='" + id + "' data-hashtags='" + name + "'><p class='entry-text'>" + text + "</p><p class='entry-date'>by " + posted_by + " at " + moment().format('hh:mm:ss') + "</p><div class='separator'>&nbsp;</div><div id='" + id + "' class='hidden'></div></div>";
+            }
+            else {
+              if (!chatbot) 
+                added_entry = "<div class='entry alien' style='display: none; margin-left: 50px' data-uid='" + id + "' data-hashtags='" + name + "'><p class='entry-text gray'>" + text + "</p><p class='entry-date gray'>by " + posted_by + " at " + moment().format('hh:mm:ss') + "</p><div class='separator'>&nbsp;</div><div id='" + id + "' class='hidden'></div></div>";
+              else {
+                added_entry =  "<div class='entry alien' style='display: none; margin-left: 50px' data-uid='" + id + "'><p class='entry-text gray'>" + text + "</p><p class='entry-date gray'>help tip &nbsp;<em></em><a href='javascript:' class='disablehelp'>disable</a></em></p><div class='separator'>&nbsp;</div><div id='" + id + "' class='hidden'></div></div>";
+              }
+            }
+            $(added_entry).appendTo($('#entries')).slideDown("fast");
         },
         show: function() {
                 $("#entries").css('z-index','5');
@@ -357,7 +383,6 @@ function entries() {
 
     function filter_statements_old(pinnedNodes, origin) {
 
-        var visibleentries = visibleentries_original;
 
         var nodeIDs_reversed = graphFactory.getNodeIDsRev;
 

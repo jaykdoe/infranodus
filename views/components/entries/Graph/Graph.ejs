@@ -560,6 +560,9 @@ var edge_data = [];
 
 var totaledgescount = 0;
 
+let nodeIDs_rev = graphFactory.getNodeIDsRev();
+let nodeIDs = graphFactory.getNodeIDs();
+
 // Reiterate edges
 sigma.instances(0).graph.edges().forEach(function(e) {
 

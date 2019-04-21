@@ -25,12 +25,33 @@
 </div>
 
 <script>
+
+
+    let mute = getUrlVars()["mute"];
+
+    // We will set a user for posting. If the posting user does not equal the user who's watching the graph, we force-add the statement into theirs (provided they collaborate)
+    let postedby = '';
+
+    <% if (receivername) { %>
+    postedby = '<%= receivername %>';
+    <% } %>
     
     searchForm().onSubmit(submitSearchForm);
 
     addEntryForm().activate();
 
     addEntryForm().onSubmit(submitEditForm);
+
+    function submitButton() {
+        return {
+            disable: function() {
+                $('#submitbutton').attr('disabled', 'disabled');
+            },
+            enable: function() {
+                $('#submitbutton').removeAttr('disabled');
+            }
+        }
+    }
 
     function searchForm() {
         return {
@@ -61,7 +82,72 @@
                         $('#submitbutton').trigger('click');
                     }
                 });
-            }
+            },
+            disable: function() {
+                $('#statement').addClass('loading');
+            },
+            enable: function() {
+                $('#statement').removeClass('loading');
+            },
+            clear: function() {
+                $("#statement").val('');
+            },
+            refocus: function() {
+                $('#statement').blur();
+                $('#statement').focus();
+            },
+            populateAndPost: function(text, callback) {
+                let to_submit = $('#submitform').serializeArray();
+                for (let key in to_submit) {
+                    if (to_submit[key].name == 'entry[body]') {
+                        to_submit[key].value = text;
+                    }
+                }
+                callback($.param(to_submit));
+            },
+            post: function(submitData) {
+                if (!submitData) {
+                    submitData = $("#submitform").serialize();
+                }
+                $.post('/post', submitData)
+                    .done(function(res) {
+                        // Get the response from the server (ID of the entry added)
+                        if (res.entryuid) {
+                     
+                            addEntryForm().clear();
+                            addEntryForm().enable();
+                            submitButton().enable();
+
+                            // This below if a few statements were posted
+                            // TODO as we can now get all the s.uid back as an array this could be rewritten so no need for the condition after
+                            if (res.entryuid == 'multiple') {
+                                socket.emit('chat message', {postedby: postedby, entryuid: 'multiplesocket', entrytext: res.entrycontent, graph: res.graph});
+                                if (res.successmsg) {
+                                   userMessages().display('Please, reload the page after a few seconds to see the graph.');
+                                }
+                                setTimeout(function() {
+                                    location.reload();
+                                },3000);
+                            }
+                            else {
+                                // Only one statement added? Initiate processing that will show it both to the user and the collaborator (if exists)
+                                socket.emit('chat message', {postedby: postedby, entryuid: JSON.parse(res.entryuid).data, entrytext: res.entrytext, graph: res.graph});
+                            }
+
+                        }
+                        else if (res.errormsg) {
+                            addEntryForm().enable();
+                            submitButton().enable();
+                            displayAlert(res.errormsg);
+                        }
+                        else {
+                            displayAlert('Something went wrong, please, try again...');
+                        }
+                    })
+                    .fail(function(res) {
+                        displayAlert("Server Error: " + res.status + " " + res.statusText);
+                    });
+            } 
         }
     }
 
@@ -110,87 +196,29 @@
 
     function submitEditForm() {
 
-        $('#statement').addClass('loading');
+        addEntryForm().disable();
 
-        $('#submitbutton').attr('disabled', 'disabled');
+        submitButton().disable();
 
-        if ($('#livetext').html().length > 0 && voice_continues) {
-        $('#livetext').html($('#statement').val() + '<br><em>saving into the graph...</em><span></span>');
-        setTimeout(function(){
-            $('#livetext').html('<em>waiting...</em>' + ' <span></span>');
-        }, 3000);
-        }
+        voiceInputPanel().update();
 
-        // We will set a user for posting. If the posting user does not equal the user who's watching the graph, we force-add the statement into theirs (provided they collaborate)
-        var postedby = '';
-
-        <% if (receivername) { %>
-        postedby = '<%= receivername %>';
-        <% } %>
-        // TODO make it possible that those statements get submitted in both graphs
-
-        // is urlvars mute off? then post as usual
+        // is urlvars mute off? in this case we submit this entry
         if (!mute) {
-        $.post('/post', $("#submitform").serialize())
-                .done(function(res) {
-                    //3. Receive the server response, no need to emit an event
-                    if (res.entryuid) {
-                        //4. Show the updated text
-                        selfPosted = '1';
-                        $("#statement").val('');
-                        $('#statement').removeClass('loading');
-                        $('#submitbutton').removeAttr('disabled');
-
-                        // This below if a few statements were posted
-                        // TODO as we can now get all the s.uid back as an array this could be rewritten so no need for the condition after
-                        if (res.entryuid == 'multiple') {
-                            socket.emit('chat message', {postedby: postedby, entryuid: 'multiplesocket', entrytext: res.entrycontent, graph: res.graph});
-                            if (res.successmsg) {
-                            $("#warnings").append('<p class="warning">Please, reload the page after a few seconds to see the graph.</p>');
-                            $("#warnings").slideDown('slow');
-                            }
-                            setTimeout(function() {
-                                location.reload();
-                            },3000);
-                        }
-                        else {
-                            // Only one statement added? Initiate processing that will show it both to the user and the collaborator (if exists)
-                            socket.emit('chat message', {postedby: postedby, entryuid: JSON.parse(res.entryuid).data, entrytext: res.entrytext, graph: res.graph});
-                        }
-
-                    }
-                    else if (res.errormsg) {
-                        $('#statement').removeClass('loading');
-                        $('#submitbutton').removeAttr('disabled');
-                        alert(res.errormsg);
-                    }
-                    else {
-                        alert('Something went wrong, please, try again...');
-                    }
-                })
-                .fail(function(res) {
-                    alert("Server Error: " + res.status + " " + res.statusText);
-                });
-
+            userFactory.updateSelfPosted('true');
+            addEntryForm().post();
         }
         // otherwise - make a dummy post - it appears in the list but doesn't get submitted into the graph
         // This was made before to introduce a chat feature — so the software can "talk" to the user without adding stuff into the graph
         else {
-            selfPosted = '1';
-            $('#statement').removeClass('loading');
-            $('#submitbutton').removeAttr('disabled');
-            $("#statement").val('');
-            socket.emit('chat message', {mute: 1, postedby: postedby, entryuid: '', entrytext: $('#statement').val(), graph: ''});
+            addEntryForm().enable();
+            submitButton().enable();
+            addEntryForm().clear();
+            socket.emit('chat message', {mute: 1, postedby: postedby, entryuid: '', entrytext: $('#statement').val(), graph: '' });
         }
-
-
-
-
 
         return false;
         
     }
-
 
 
     // Textarea select conversion to hashtags
@@ -228,10 +256,6 @@
         }
 
     });
-
-
-
-    
 
 
 
