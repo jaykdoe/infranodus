@@ -107,14 +107,10 @@
 
   var top_components = [];
 
-  // Let's record all the unique edges we've got
-  var edgesList = [];
-
   var community_of_node = [];
 
 
   var sigma_dragged = 0;
-
 
 
   // Initialize JSON parser for SIGMA visualization
@@ -158,6 +154,7 @@
 function graph() {
     return {
         deleteNodes: function(nodesToDelete, callback){
+            // Delete the nodes from the Sigma graph (the edges will get deleted automatically)
             sigma.instances(0).graph.nodes().forEach(function(n) {
                 if (nodesToDelete.indexOf(n.originalLabel) >= 0) {
                   sigma.instances(0).graph.dropNode(n.id);
@@ -166,6 +163,73 @@ function graph() {
 
             sigma.instances(0).refresh();
 
+        },
+        addNodes: function(nodesToAdd, callback){
+                   
+            let nodeIDs = graphFactory.getNodeIDs();
+            let nodeIDs_rev = graphFactory.getNodeIDsRev();
+            
+            let cyclefinished = 0;
+            let edgeproc;
+
+            let edgesDB = graphFactory.getEdges();
+
+            let stoplistNodes = graphFactory.getStopNodes();
+            
+            // First, let's add nodes into the Sigma graph
+
+            for (let node in nodesToAdd) {
+           
+              sigma.instances(0).graph.addNode({
+                id: nodeIDs[nodesToAdd[node]],
+                label: nodesToAdd[node],
+                originalLabel: nodesToAdd[node],
+                size: 16,
+                x: Math.random(),
+                y: Math.random()
+              }); 
+
+            }
+
+            // Now, let's see if this node already had any edges from that graph before
+            
+            for (let addingNodes in nodesToAdd) {
+
+              for (var i = 0; i < edgesDB.length; i++ ) {
+                  if (edgesDB[i].source == nodeIDs[nodesToAdd[addingNodes]] || edgesDB[i].target == nodeIDs[nodesToAdd[addingNodes]]) {
+                      edgeproc = edgesDB[i];
+                      // Do we have any stopwords?
+                      if (stoplistNodes.length > 0) {
+                          // Do connections only if target/source is not in the remaining stoplistNodes
+                          if (stoplistNodes.indexOf(nodeIDs_rev[edgeproc.source]) < 0 && stoplistNodes.indexOf(nodeIDs_rev[edgeproc.target]) < 0) {
+                                  this.addEdge(edgeproc);
+                          }
+                      }
+                      else {
+                        this.addEdge(edgeproc);
+                      }
+
+                    }
+                }
+                
+              }
+
+            sigma.instances(0).refresh();
+            
+            // After the nodes and edges are added, call the graphMetrics
+            callback();
+
+        },
+        addEdge: function(edgeproc) {
+            sigma.instances(0).graph.addEdge({
+                id: edgeproc.id,
+                source: edgeproc.source,
+                target: edgeproc.target,
+                weight: edgeproc.weight,
+                size: edgeproc.size,
+                statement_id: edgeproc.statement_id,
+                edge_context: edgeproc.edge_context
+            });
         },
         updateNodes: function(nodes, callback){
 

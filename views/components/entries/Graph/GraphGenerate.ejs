@@ -2,13 +2,18 @@
 
 function GraphFactory(){
                 
-        // Variables that contain the nodes (for easier search)
+        // Variables that contain all the current nodes (for easier search)
         let nodeNames = [];
         let nodeIDs = {}; // maps names (key) to IDs (values)
         let nodeIDs_rev = {}; // maps IDs (key) to names (values)
+    
+        // Variables that contain only the original set
+        let origNodeIDs = {};
+        let origNodeIDs_rev = {};
 
         // Variabls that contain the edges
-        let graphEdges = {};
+        let edgesDB = [];
+        let nodesDB = [];
 
         // These are the nodes that are selected
         let pinnedNodes = [];
@@ -22,14 +27,19 @@ function GraphFactory(){
         // These are the nodes that are currently in the stoplist
         let stopNodes = [];
 
-        this.addNode = function(name, id) {
+        this.addNode = function(name, id, n) {
             nodeIDs[name] = id;
             nodeIDs_rev[id] = name;
             nodeNames.push(name);
+            if (n) {
+                nodesDB.push(n);
+                origNodeIDs[n.originalLabel] = n.id;
+                origNodeIDs_rev[n.id] = n.originalLabel;
+            }
             return true;
         }
-        this.addEdge = function(id, source, target, weight) {
-            graphEdges[source + '-' + target] = [id, source, target, weight];
+        this.addEdge = function(e) {
+            edgesDB.push(e);
             return true;
         }
         this.removeNode = function(name) {
@@ -52,8 +62,28 @@ function GraphFactory(){
             this.deleteGraphNodes(this.getStopNodes());
             return true;
         }
+        this.addDeletedNode = function(node) {
+           
+            this.removeFromStopNodes(node);
+            this.addNode(node, origNodeIDs[node]);
+            this.initPinnedNodes(pinnedNodes);
+            let nodesToAdd = [];
+            nodesToAdd.push(node);
+            this.addGraphNodes(nodesToAdd);
+            return true;
+
+        }
         this.getNodeIDs = function() {
             return nodeIDs;
+        }
+        this.getOrigNodes = function() {
+            return nodesDB;
+        }
+        this.getOrigNodeIDs = function() {
+            return origNodeIDs;
+        }
+        this.getOrigNodeIDsRev = function() {
+            return origNodeIDs_rev;
         }
         this.getNodeID = function(name) {
             return nodeIDs[name];
@@ -64,6 +94,10 @@ function GraphFactory(){
 
         this.getNodeNames = function() {
             return nodeNames;
+        }
+
+        this.getEdges = function() {
+            return edgesDB;
         }
 
         this.updateGraphNodes = function(nodes) {
@@ -86,6 +120,13 @@ function GraphFactory(){
              // Update the graph nodes (delete or add)
              graph().deleteNodes(nodesToDelete);
              graph().updateMetrics();
+       
+         }
+
+         this.addGraphNodes = function(nodesToAdd) {
+             
+             // Update the graph nodes (delete or add)
+             graph().addNodes(nodesToAdd, graph().updateMetrics);
        
          }
   
@@ -219,6 +260,22 @@ function GraphFactory(){
         this.getStopNodes = function() {
             return stopNodes;
         }
+        this.checkIfStopNode = function(node) {
+            if (stopNodes.indexOf(node) > -1) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        this.existStopNodes = function() {
+            if (stopNodes && stopNodes.length > 0) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
 
 }
 
@@ -270,7 +327,7 @@ sigma.parsers.json(
                 nodes[i].originalLabel = nodes[i].label;
 
                 // Creating an index of node labels to IDs for filtering
-                graphFactory.addNode(nodes[i].label, nodes[i].id);
+                graphFactory.addNode(nodes[i].label, nodes[i].id, nodes[i]);
 
                 // Add to Cytoscape
                 elesnodes.push({
@@ -283,13 +340,16 @@ sigma.parsers.json(
             // We first need to save the original colors and LABELS of our
             // nodes and edges, like this:
 
+            // Let's record all the unique edges we've got
+            let edgesList = [];
+
             sigma.graph.edges().forEach(function(e) {
 
             //  console.log(e.source + ' ' + e.target + ' ' + e.weight);
 
                 var unique_edge_id = '';
 
-                // Let's see if the edge source in alphabetical order is further than its target and change places
+                // Let's create a unique edge ID for the edges linking these two nodes
 
                 if (e.source > e.target) {
                     unique_edge_id = e.target + '-' + e.source;
@@ -298,25 +358,19 @@ sigma.parsers.json(
                     unique_edge_id = e.source + '-' + e.target;
                 }
 
-
-                // Let's make a unique list of edges to count how many there are of the same kind
+                // An edge linking these nodes already exists? Let's add their sizes (Sigma doesn't do this automatically)
 
                 if (edgesList[unique_edge_id]) {
-                    ++edgesList[unique_edge_id];
-
-                    // TODO this is a bit of a workaround - in the future could be better to distribute the weight evenly
+                    edgesList[unique_edge_id] += edgesList[unique_edge_id];
                     e.size = e.weight + edgesList[unique_edge_id];
                 }
                 else {
-                    edgesList[unique_edge_id] = 1;
+                    // New edge? Just create the edge weight parameter and assign the size
+                    edgesList[unique_edge_id] = e.weight;
                     e.size = e.weight;
                 }
 
-
                 e.originalColor = e.color;
-
-
-                graphFactory.addEdge(e.id, e.source, e.target, e.weight);
 
                 // Make an index of nodes to context
                 if (contextNodeID[e.edge_context]) {
@@ -369,12 +423,10 @@ sigma.parsers.json(
                 elesnodes.push({
                     group: "edges",
                     data: { id: unique_edge_id, source: e.source, target: e.target, weight: e.weight }
-                });
-
-               
+                });         
 
                 // Add to EDGES db
-                edgesDB.push(e);
+                graphFactory.addEdge(e);
 
             });
 

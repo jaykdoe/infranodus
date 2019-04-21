@@ -240,18 +240,8 @@ socket.on('node delete', function(msg){
     // Which nodes are we going to delete?
     let nodesToDelete = msg.pinnedNodes;
 
-    // Was it user action or from the LocalStorage / user setting?
-    let delete_from = msg.delete_from;
-
     graphFactory.deleteNodes(nodesToDelete);
  
-    // No more pinned nodes
-
-    if (!delete_from) {
-        pinnedNodes = [];
-    }
-    commClicked = [];
-
     $('.community_node').each(function(){
         $(this).removeAttr('style');
     });
@@ -287,6 +277,16 @@ socket.on('node delete', function(msg){
 
 
 
+
+});
+
+
+// What happens when we add a node ?
+
+socket.on('node add', function(msg){
+
+        let addingNodes = msg.addingNodes;
+        graphFactory.addDeletedNode(addingNodes);
 
 });
 
