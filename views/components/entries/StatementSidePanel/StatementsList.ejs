@@ -25,7 +25,7 @@ if (localStorage.getItem('folded') == 1) {
 
 // Add the hooks to the newly rendered entries
 
-entryClick();
+entries().onClick(entryClick);
 
 // If it's NOT some other user watching the graph, then statements can be edited. Otherwise - no.
 <% if (!perceivername) { %>
@@ -130,6 +130,9 @@ function entries() {
               }
             }
             $(added_entry).appendTo($('#entries')).slideDown("fast");
+        },
+        onClick: function(onClick) {
+            $('.entry').on('click', onClick);
         },
         show: function() {
                 $("#entries").css('z-index','5');
@@ -682,27 +685,15 @@ function showEntries () {
 
 
 
-function entryClick () {
-
-    $(".entry").on('click', function(e) {
-        if (e.target.className == 'app-link-menu') {
-
-            if ($(this).find('.app-link-menu').text() == 'hide filtered') {
-                $(this).find('.nonmatched-sentence').fadeOut(400);
-                $(this).find('.app-link-menu').text('show filtered');
-            }
-            else {
-                $(this).find('.nonmatched-sentence').fadeTo(400, '0.4');
-                $(this).find('.app-link-menu').text('hide filtered');
-            }
-
-        }
-
+function entryClick (e) {
+ 
         // A parameter to check if we're taking off the flag
 
-        var alreadyClicked = null;
+        let alreadyClicked = null;
 
         // Make all entries semitrasparent
+        
+        let pinnedNodes = graphFactory.getPinnedNodes();
 
         if (pinnedNodes.length == 0) {
 
@@ -722,11 +713,9 @@ function entryClick () {
 
         }
 
+        let keepStatementID = e.currentTarget.dataset.uid;
 
-
-        var keepStatementID = e.currentTarget.dataset.uid;
-
-
+        console.log("Clicked on statement ID #");
         console.log(keepStatementID);
 
         // Make only those edges visible that belong to the statement selected
@@ -734,7 +723,7 @@ function entryClick () {
         if (!alreadyClicked && pinnedNodes.length == 0) {
 
             sigma.instances(0).graph.edges().forEach(function(e) {
-                var got_match = 0;
+                let got_match = 0;
 
                 for (let item of e.statement_id) {
                     if (item == keepStatementID) {
@@ -768,11 +757,7 @@ function entryClick () {
                 }
             });
         }
-        else if (e.target.className == 'app-link-menu') {
-
-            // Do nothing
-
-        }
+     
         else {
 
             if (pinnedNodes.length == 0) {
@@ -791,7 +776,7 @@ function entryClick () {
         }
 
         sigma.instances(0).refresh();
-    });
+  
 
 }
 
