@@ -241,26 +241,6 @@ function graph() {
             let total_nodes = sigma.instances(0).graph.nodes().length;
             let maxnodesize = 0;
 
-            sigma.instances(0).graph.nodes().forEach(function(nodes) {
-                var nodesize = 0;
-                var angle = Math.PI * 2 * tot / total_nodes;
-                nodes.x = Math.cos(angle);
-                nodes.y = Math.sin(angle);
-                nodes.size = sigma.instances(0).graph.degree(nodes.id);
-                nodesize = nodes.size;
-                if (maxnodesize < nodesize) maxnodesize = nodesize;
-                nodes.color = color_context;
-                
-                // Save for backup
-                nodes.originalColor = color_context;
-                nodes.originalLabel = nodes.label;
-
-                // Creating an index of node labels to IDs for filtering
-                graphFactory.addNode(nodes.label, nodes.id, nodes);
-
-                tot = tot + 1;
-               
-            });
 
             // Now we get the context IDs from the graph - a little bit of a workaround
             let suspects = [];
@@ -299,23 +279,46 @@ function graph() {
                 e.sourcename = nodeIDs_rev[e.source];
                 e.targetname = nodeIDs_rev[e.target];
 
+                graph().updateEdgeStats(e);
+
               });
 
 
             // Find the difference between two arrays above, so we get contexts only
-            var contextids = _.difference(suspects, nonsuspects);
+            let contextids = _.difference(suspects, nonsuspects);
+
+            let contexts_length = contextids.length;
 
 
             // Now show those nodes that are contexts bigger and with a special label
-
+              
             sigma.instances(0).graph.nodes().forEach(function(nodes) {
+                var nodesize = 0;
+                var angle = Math.PI * 2 * tot / total_nodes;
+                nodes.x = Math.cos(angle);
+                nodes.y = Math.sin(angle);
+                nodes.size = sigma.instances(0).graph.degree(nodes.id);
+                nodesize = nodes.size;
+                if (maxnodesize < nodesize) maxnodesize = nodesize;
+                nodes.color = color_context;
+                
+                // Save for backup
+                nodes.originalColor = color_context;
+                nodes.originalLabel = nodes.label;
 
-                if (contextids.indexOf(nodes.id) > -1) {
-                    nodes.size = maxnodesize;
-                    nodes.originalLabel = 'context: ' + nodes.originalLabel;
-                    nodes.label = 'context: ' + nodes.label;
+                // Creating an index of node labels to IDs for filtering
+                graphFactory.addNode(nodes.label, nodes.id, nodes);
+
+                tot = tot + 1;
+                
+                if (contexts_length > 0) {
+                  if (contextids.indexOf(nodes.id) > -1) {
+                      nodes.size = maxnodesize;
+                      nodes.originalLabel = 'context: ' + nodes.originalLabel;
+                      nodes.label = 'context: ' + nodes.label;
+                  }
                 }
-
+               
             });
 
             callback();
@@ -370,6 +373,10 @@ function graph() {
                   contextNodeID[e.edge_context].push(e.source);
                   contextNodeID[e.edge_context].push(e.target);
               }
+
+
+               // Add to EDGES db
+               graphFactory.addEdge(e);
 
         },
         addNode: function(node) {
