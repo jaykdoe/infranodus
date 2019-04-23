@@ -29,6 +29,9 @@
 
     let mute = getUrlVars()["mute"];
 
+    // Used to populate entry textfield
+    let current_context_field = [];
+
     // We will set a user for posting. If the posting user does not equal the user who's watching the graph, we force-add the statement into theirs (provided they collaborate)
     let postedby = '';
 
@@ -80,6 +83,59 @@
                     if(e.which == 13 && !e.shiftKey) {
                         e.preventDefault();
                         $('#submitbutton').trigger('click');
+                    }
+                });
+
+                // Let's add the right context into the entry form
+                if (document.getElementById('context').value) {
+                    current_context_field = [document.getElementById('context').value];
+                    $("#addedContexts").val(document.getElementById('context').value);
+                }
+
+                // if not, we're making the 'private' context default
+                else {
+                    var lastcontexts = [];
+                    var laststatement = $(".entry:last").attr('data-uid');
+                    for (var key in statementsOfContext) {
+                        var reiteratestatements = statementsOfContext[key];
+                        for (var i = 0; i< reiteratestatements.length; i++) {
+                            if (laststatement == reiteratestatements[i]) {
+                                lastcontexts.push(key);
+                                console.log(key);
+                            }
+                        }
+
+                    }
+                    if (lastcontexts[0] == 'help' || !lastcontexts[0]) {
+                        current_context_field = ['private'];
+                        $("#addedContexts").val('private');
+                    }
+
+                    else {
+                        current_context_field = lastcontexts;
+                        $("#addedContexts").val(current_context_field.join());
+                    }
+                }
+
+                // Let's add into the contexts field
+                $("#addToContexts").tagHandler({
+                    assignedTags: current_context_field,
+                    availableTags: contextNames,
+                    autocomplete: true,
+                    afterAdd: function(tag) {
+                        current_context_field.push(tag);
+                        $("#addedContexts").val(current_context_field.join());
+                        console.log('contexts in hidden field: ' + current_context_field.join());
+                    },
+                    afterDelete: function(tag) {
+                        console.log('initiated delete from sigma');
+                        for (var i=current_context_field.length-1; i>=0; i--) {
+                            if (current_context_field[i] === tag) {
+                                current_context_field.splice(i, 1);
+                            }
+                        }
+                        $("#addedContexts").val(current_context_field.join());
+                        console.log('contexts in hidden field: ' + current_context_field.join());
                     }
                 });
             },

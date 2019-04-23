@@ -88,8 +88,6 @@ function GraphFactory(){
 
         }
         this.addNewNodes = function(nodes, edges, statement) {
-            console.log('addnewnodes')
-            console.log(statement)
             
             let nodesToAdd = [];
             let edgesToAdd = [];
@@ -108,7 +106,6 @@ function GraphFactory(){
                     }
                 }
             }
-            console.log(edgesToAdd);
             this.addGraphNodesEdges(nodesToAdd, edgesToAdd);
             return true;
         }
@@ -374,67 +371,15 @@ sigma.parsers.json(
             
             graph().initNodesEdges(graph().updateMetrics);
   
-
-            // Initialize autofill for hashtags and contexts
+            // initialize autofill for hashtags and contexts - only after the graph is loaded
             autofill(graphFactory.getNodeNames(),contextNames);
 
 
-            if (document.getElementById('context').value) {
-                current_context_field = [document.getElementById('context').value];
-                $("#addedContexts").val(document.getElementById('context').value);
-            }
-
-            // if not, we're making the 'private' context default
-            else {
-                var lastcontexts = [];
-                var laststatement = $(".entry:last").attr('data-uid');
-                console.log(laststatement);
-                for (var key in statementsOfContext) {
-                    var reiteratestatements = statementsOfContext[key];
-                    for (var i = 0; i< reiteratestatements.length; i++) {
-                        if (laststatement == reiteratestatements[i]) {
-                            lastcontexts.push(key);
-                            console.log(key);
-                        }
-                    }
-
-                }
-                if (lastcontexts[0] == 'help' || !lastcontexts[0]) {
-                    current_context_field = ['private'];
-                    $("#addedContexts").val('private');
-                }
-
-                else {
-                    current_context_field = lastcontexts;
-                    $("#addedContexts").val(current_context_field.join());
-                }
-            }
+          
 
             // let's now populate contextHandlers
 
-            $("#addToContexts").tagHandler({
-                assignedTags: current_context_field,
-                availableTags: contextNames,
-                autocomplete: true,
-                afterAdd: function(tag) {
-                    current_context_field.push(tag);
-                    $("#addedContexts").val(current_context_field.join());
-                    console.log('contexts in hidden field: ' + current_context_field.join());
-                },
-                afterDelete: function(tag) {
-                    console.log('initiated delete from sigma');
-                    for (var i=current_context_field.length-1; i>=0; i--) {
-                        if (current_context_field[i] === tag) {
-                            current_context_field.splice(i, 1);
-                        }
-                    }
-                    $("#addedContexts").val(current_context_field.join());
-                    console.log('contexts in hidden field: ' + current_context_field.join());
-                }
-            });
-
-            if (background == 'dark') { $('#tagInputBox').css({'backgroundColor': 'rgba(250, 250, 250, 0.2)', 'border': 'none', 'box-shadow': 'none', 'color': '#aaaab5'}); }
-            // Do ForceAtlasLayout
+          
 
            
             // Drag nodes function initiated, so we can drag nodes

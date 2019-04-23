@@ -61,6 +61,12 @@
     --zoom-out-background-image: url('../images/zoom-out.png')!important;
 
     --deleted-nodes-background-image: url('../images/trash.png');
+
+    --taginput-background: rgba(255, 255, 255, 1)!important;
+    --taginput-border: 1px solid rgba(141, 141, 141, 0.2);
+    --taginput-boxshadow: none;
+    --taginput-color: #aaaab5;
+    --taginput-height: 26px;
 }
 :root[theme='dark'] {
     --body-text-color: #aaaab5;
@@ -97,7 +103,14 @@
     --zoom-out-background-image: url('../images/zoom-out-white.png')!important;
 
     --deleted-nodes-background-image: url('../images/trash-white.png');
+
+    --taginput-background: rgba(250, 250, 250, 0.2);
+    --taginput-border: none;
+    --taginput-boxshadow: none;
+    --taginput-color: #aaaab5;
+    --taginput-height: 26px;
 }
+
 
 
 body {
@@ -455,6 +468,14 @@ a:hover.app-more-link {
 
 .tags a:hover:before{
     border-color:transparent #555 transparent transparent;
+}
+
+#tagInputBox {
+    background-color: var(--taginput-background);
+    border: var(--taginput-border);
+    box-shadow: var(--taginput-boxshadow);
+    color: var(--taginput-color);
+    height: var(--taginput-height);
 }
 
 

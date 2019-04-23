@@ -4,6 +4,7 @@
 <%- include('dependencies/entries') %>
 <%- include('components/common/index') %>
 <%- include('components/entries/index') %>
+
 <body>
 <% include statsabove %>
 <div id="layout">
@@ -34,6 +35,8 @@
 
         <% } %>
 
+        <%- include('components/entries/ContextMenu') %>
+
         </div>
    </div>
      <div id='content'>
@@ -61,7 +64,6 @@
 
 </div>
 
-<%- include('components/entries/ContextMenu') %>
 <%- include('components/entries/Graph/Graph') %>
 <%- include('components/entries/Graph/GraphTagsLogic') %>
 <%- include('components/entries/Graph/GraphEditLogic') %>
