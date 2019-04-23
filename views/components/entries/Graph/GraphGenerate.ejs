@@ -317,6 +317,11 @@ function GraphFactory(){
                 return nodesOfStatement[statement];
             }
         }
+        this.getAllNodesOfStatement = function() {
+           
+            return nodesOfStatement
+           
+        }
         this.existNodesOfStatement = function(statement) {
             if (nodesOfStatement[statement]) {
                 return true;
@@ -369,51 +374,17 @@ sigma.parsers.json(
         },
         function(sigma) {                
             
+            // Add some stats for each node and edge and launch BC and community detection analytics algorithms
             graph().initNodesEdges(graph().updateMetrics);
   
-            // initialize autofill for hashtags and contexts - only after the graph is loaded
+            // Initialize autofill for hashtags and contexts - only after the graph is loaded
             autofill(graphFactory.getNodeNames(),contextNames);
-
-
-          
-
-            // let's now populate contextHandlers
-
-          
-
            
             // Drag nodes function initiated, so we can drag nodes
+            graph().dragNodes();
 
-            dragNodes();
-
-      
-
-
-          
-
-            // TODO make it possible for collaboration also
-
-            if (addcontext && interpret) {
-
-              $('.entry').hide();
-
-              for (var ite in statementsOfContext[current_context]) {
-
-                $('.entry[data-uid="' + statementsOfContext[current_context][ite] + '"]').each(function() {
-                  $(this).show();
-                });
-
-              }
-
-              // $('.entry').each(function() {
-              //   if ($(this).is(':hidden')) {
-              //     $(this).remove();
-              //   }
-              // });
-
-
-
-            }
+            // Remove the entries that belong to the addcontext parameter
+            entries().removeAddContext();
 
 
             // What happens when we click analytics pane
@@ -472,35 +443,18 @@ sigma.parsers.json(
                         graphFactory.addToPinnedNodes(nodeLabel);
                     }
                     else {   
-                        graphFactory.removeFromPinnedNodes(nodeLabel);
-                                              
+                        graphFactory.removeFromPinnedNodes(nodeLabel);                                    
                     }
 
                     // Let's send an event to all the collaborators in the chatroom
-                   // socket.emit('node click', {pinnedNodes: graphFactory.getPinnedNodes(), splicedNodes: splicedNodes, nodeLabel: nodeLabel});
-           
-
+                    socket.emit('node click', {pinnedNodes: graphFactory.getPinnedNodes()});
+                        
                     // If the window is wide enough to show the menu AND div with statements is not visible
-
-                    var isHidden = $("#statements").is(":hidden");
-
-                    // if (isHidden) {
-                    //
-                    //     var delayShow = 6000;
-                    //
-                    //     clearTimeout(inactiveTimeout);
-                    //     inactiveTimeout = setTimeout(showStatements, delayShow);
-                    //
-                    //     $('#graph-container').unbind('mousemove orientationchange scroll swipe tap swipeleft swiperight scrolltop');
-                    //     $('#graph-container').bind('mousemove orientationchange scroll swipe tap swipeleft swiperight scrolltop', function(){
-                    //         if (graphInteraction) {
-                    //             clearTimeout(inactiveTimeout);
-                    //             inactiveTimeout = setTimeout(showStatements, delayShow);
-                    //         }
-                    //     });
-                    //
-                    //
-                    // }
+                    if ($("#statements").is(":hidden") || $("#entries").css("visibility") === "hidden") {
+                        console.log('hidden')
+                        $('#livetext').show();
+                        $('#livetext').html('<em>open the entries to see the excerpts...</em>' + ' <span></span>');
+                    }
 
                 }
 

@@ -157,6 +157,17 @@ function entries() {
                 }
                 
         },
+        removeAddContext: function() {
+
+               if (addcontext && interpret) {
+                  $('.entry').hide();
+                    for (var ite in statementsOfContext[current_context]) {
+                      $('.entry[data-uid="' + statementsOfContext[current_context][ite] + '"]').each(function() {
+                        $(this).show();
+                      });
+                    }
+                }
+        },
         unfilter: function(that) {
             if (that) {
                 $(that).fadeIn(400);
@@ -209,11 +220,21 @@ function entries() {
               $(that).removeHighlight();
 
         },
+        checkVisibility: function() {
+            if ($("#statements").is(":hidden") || $("#entries").css("visibility") === "hidden") {
+                  return false;
+            }
+            else {
+                  return true;
+            }
+        },
         search: function(callback) {
 
            let totalEntriesMatched = 0;
 
            let nodeIDs_reversed = graphFactory.getNodeIDsRev();
+
+           let nodesOfStatement = graphFactory.getAllNodesOfStatement();
 
            $(".entry").each(function(){
 

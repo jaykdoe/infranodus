@@ -543,7 +543,39 @@ function graph() {
             sigma.instances(0).refresh();
             sigmaGraph().adjustLayout(5000);
 
-        }
+        },
+        dragNodes: function () {
+
+            var dragListener = sigma.plugins.dragNodes(sigma.instances(0), sigma.instances(0).renderers[0]);
+           
+            dragListener.bind('startdrag', function(event) {
+
+            });
+
+            dragListener.bind('drag', function(event) {
+
+              sigma_dragged = 1;
+
+            });
+
+            dragListener.bind('drop', function(event) {
+
+              // sigma.instances(0).refresh();
+
+              var new_forceatlas_options = forceatlas_options;
+
+              new_forceatlas_options.slowDown = 1000;
+              new_forceatlas_options.startingIterations = 0;
+
+              sigmaGraph().adjustLayout(5000);
+
+            });
+            
+            dragListener.bind('dragend', function(event) {
+
+            });
+
+          }
     }
 }
 
@@ -557,48 +589,6 @@ function graph() {
 
   });
 
-
- function dragNodes () {
-      var dragListener = sigma.plugins.dragNodes(sigma.instances(0), sigma.instances(0).renderers[0]);
-      dragListener.bind('startdrag', function(event) {
-
-      });
-      dragListener.bind('drag', function(event) {
-        sigma_dragged = 1;
-        if (sigma.instances(0).isForceAtlas2Running()) {
-
-          sigma.instances(0).stopForceAtlas2();
-          sigma.instances(0).killForceAtlas2();
-        }
-
-
-      });
-      dragListener.bind('drop', function(event) {
-
-
-        // sigma.instances(0).refresh();
-
-        var new_forceatlas_options = forceatlas_options;
-
-        new_forceatlas_options.slowDown = 1000;
-        new_forceatlas_options.startingIterations = 0;
-
-        sigma.instances(0).startForceAtlas2(new_forceatlas_options);
-
-        // Don't run it forever not to overheat :)
-
-        setTimeout(function() {
-
-            sigma.instances(0).stopForceAtlas2();
-            sigma.instances(0).killForceAtlas2();
-
-        }, 10000);
-
-     });
-      dragListener.bind('dragend', function(event) {
-
-      });
-    }
 
 
 
@@ -1807,6 +1797,16 @@ function sigmaGraph() {
                     sigma.instances(0).stopForceAtlas2();
                     sigma.instances(0).killForceAtlas2();
                     $('#improve-layout').removeClass('layout-on');
+                    if (timeout) {
+                      sigma.instances(0).startForceAtlas2(forceatlas_options);
+                      $('#improve-layout').addClass('layout-on');
+                      forcedatlas_running = true;
+                      setTimeout(function() {
+                        sigma.instances(0).stopForceAtlas2();
+                        sigma.instances(0).killForceAtlas2();
+                        $('#improve-layout').removeClass('layout-on');
+                     },parseInt(timeout));
+                    }
                     forcedatlas_running = false;
             }
             else {
