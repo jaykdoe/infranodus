@@ -225,28 +225,136 @@ function graph() {
               let e = edgesToAdd[edge];
 
               this.addEdge(edgesToAdd[edge]);
-                   
-              // Make a new index of nodes to statement
-              if (graphFactory.existNodesOfStatement(e.statement_id) == true) {
-                  if (graphFactory.existNodeInStatement(e.statement_id, e.source) == false)
-                      graphFactory.addNodeToStatement(e.statement_id, e.source);
-                  if (graphFactory.existNodeInStatement(e.statement_id, e.target) == false)
-                      graphFactory.addNodeToStatement(e.statement_id, e.target);
-              }
-              else {
-                  graphFactory.addNodeToStatement(e.statement_id, e.source); 
-                  graphFactory.addNodeToStatement(e.statement_id, e.target); 
-              }
 
+              this.updateEdgeStats(e);
+
+                  
+          }
+
+          callback();
+
+        },
+        initNodesEdges: function(callback) {
+            
+            let tot = 0;
+            let color_context = '#666';
+            let total_nodes = sigma.instances(0).graph.nodes().length;
+            let maxnodesize = 0;
+
+            sigma.instances(0).graph.nodes().forEach(function(nodes) {
+                var nodesize = 0;
+                var angle = Math.PI * 2 * tot / total_nodes;
+                nodes.x = Math.cos(angle);
+                nodes.y = Math.sin(angle);
+                nodes.size = sigma.instances(0).graph.degree(nodes.id);
+                nodesize = nodes.size;
+                if (maxnodesize < nodesize) maxnodesize = nodesize;
+                nodes.color = color_context;
+                
+                // Save for backup
+                nodes.originalColor = color_context;
+                nodes.originalLabel = nodes.label;
+
+                // Creating an index of node labels to IDs for filtering
+                graphFactory.addNode(nodes.label, nodes.id, nodes);
+
+                tot = tot + 1;
+               
+            });
+
+            // Now we get the context IDs from the graph - a little bit of a workaround
+            let suspects = [];
+            let nonsuspects = [];
+
+            let nodeIDs_rev = graphFactory.getNodeIDsRev();
+
+            let edgesList = [];
+
+            sigma.instances(0).graph.edges().forEach(function(e) {
+
+                // If an edge has a context prefix, one of its nodes is a context, but we don't know which yet
+
+                if (e.id.substr(0,7) == 'context') {
+                        if (suspects.indexOf(e.source) < 0) {
+                            suspects.push(e.source);
+                        }
+
+                        if (suspects.indexOf(e.target) < 0) {
+                            suspects.push(e.target);
+                        }
+
+                }
+
+                // If an edge doesn't have prefix context, for sure it has only nodes
+                else {
+                        if (nonsuspects.indexOf(e.source) < 0) {
+                            nonsuspects.push(e.source);
+                        }
+
+                        if (nonsuspects.indexOf(e.target) < 0) {
+                            nonsuspects.push(e.target);
+                        }
+                }
+
+                e.sourcename = nodeIDs_rev[e.source];
+                e.targetname = nodeIDs_rev[e.target];
+
+              });
+
+
+            // Find the difference between two arrays above, so we get contexts only
+            var contextids = _.difference(suspects, nonsuspects);
+
+
+            // Now show those nodes that are contexts bigger and with a special label
+
+            sigma.instances(0).graph.nodes().forEach(function(nodes) {
+
+                if (contextids.indexOf(nodes.id) > -1) {
+                    nodes.size = maxnodesize;
+                    nodes.originalLabel = 'context: ' + nodes.originalLabel;
+                    nodes.label = 'context: ' + nodes.label;
+                }
+
+            });
+
+            callback();
+          
+         
+
+        },
+        updateEdgeStats: function(e) {
+
+              // Make a new index of nodes to statement
+              for (let item of e.statement_id) {
+                    
+                    if (graphFactory.existNodesOfStatement(item) == true) {
+                        if (graphFactory.existNodeInStatement(item, e.source) == false)
+                            graphFactory.addNodeToStatement(item, e.source);
+                        if (graphFactory.existNodeInStatement(item, e.target) == false)
+                            graphFactory.addNodeToStatement(item, e.target);
+                    }
+                    else {
+                        graphFactory.addNodeToStatement(item, e.source);
+                        // avoid duplicates
+                        if (e.source != e.target) {
+                          graphFactory.addNodeToStatement(item, e.target);
+                        }
+                        
+                    }
+              }
+      
               // Which statements belong to which context / graph
               if (statementsOfContext[e.edge_context]) {
-                    if (statementsOfContext[e.edge_context].indexOf(e.statement_id[0]) < 0) {
-                      statementsOfContext[e.edge_context].push(e.statement_id[0]);
+                    for (let item of e.statement_id) {
+                      if (statementsOfContext[e.edge_context].indexOf(item) < 0) statementsOfContext[e.edge_context].push(item);
                     }
               }
               else {
                   statementsOfContext[e.edge_context] = [];
-                  statementsOfContext[e.edge_context].push(e.statement_id[0]);
+                  for (let item of e.statement_id) {
+                    statementsOfContext[e.edge_context].push(item);
+                  }
               }
 
 
@@ -262,9 +370,6 @@ function graph() {
                   contextNodeID[e.edge_context].push(e.source);
                   contextNodeID[e.edge_context].push(e.target);
               }
-          }
-
-          callback();
 
         },
         addNode: function(node) {
@@ -323,9 +428,12 @@ function graph() {
             let edge_data = [];
             let nodeIDs_rev = graphFactory.getNodeIDsRev();
 
+            // Let's record all the unique edges we've got
+            let edgesList = [];
+
             sigma.instances(0).graph.edges().forEach(function(e) {
 
-                var unique_edge_id = '';
+                let unique_edge_id = '';
 
                 // Let's see if the edge source in alphabetical order is further than its target and change places
 
@@ -334,6 +442,19 @@ function graph() {
                 }
                 else {
                     unique_edge_id = e.source + '-' + e.target;
+                }
+
+
+                // An edge linking these nodes already exists? Let's add their sizes (Sigma doesn't do this automatically)
+
+                if (edgesList[unique_edge_id]) {
+                    edgesList[unique_edge_id] += edgesList[unique_edge_id];
+                    e.size = e.weight + edgesList[unique_edge_id];
+                }
+                else {
+                    // New edge? Just create the edge weight parameter and assign the size
+                    edgesList[unique_edge_id] = e.weight;
+                    e.size = e.weight;
                 }
 
                 cyNodes.push({
