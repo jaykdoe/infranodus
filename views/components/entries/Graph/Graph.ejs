@@ -164,7 +164,7 @@ function graph() {
             sigma.instances(0).refresh();
 
         },
-        addNodes: function(nodesToAdd, callback){
+        addDeletedNodes: function(nodesToAdd, callback){
                    
             let nodeIDs = graphFactory.getNodeIDs();
             let nodeIDs_rev = graphFactory.getNodeIDsRev();
@@ -178,17 +178,12 @@ function graph() {
             
             // First, let's add nodes into the Sigma graph
 
+         
             for (let node in nodesToAdd) {
-           
-              sigma.instances(0).graph.addNode({
-                id: nodeIDs[nodesToAdd[node]],
-                label: nodesToAdd[node],
-                originalLabel: nodesToAdd[node],
-                size: 16,
-                x: Math.random(),
-                y: Math.random()
-              }); 
-
+              let n = {};
+              n.label = nodesToAdd[node];
+              n.id = graphFactory.getNodeID(nodesToAdd[node]);
+              this.addNode(n);
             }
 
             // Now, let's see if this node already had any edges from that graph before
@@ -220,13 +215,77 @@ function graph() {
             callback();
 
         },
+        addNodesEdges: function(nodesToAdd, edgesToAdd, callback) {
+          for (let node in nodesToAdd) {
+              this.addNode(nodesToAdd[node]);
+          }
+          
+          for (let edge in edgesToAdd) {
+
+              let e = edgesToAdd[edge];
+
+              this.addEdge(edgesToAdd[edge]);
+                   
+              // Make a new index of nodes to statement
+              if (graphFactory.existNodesOfStatement(e.statement_id) == true) {
+                  if (graphFactory.existNodeInStatement(e.statement_id, e.source) == false)
+                      graphFactory.addNodeToStatement(e.statement_id, e.source);
+                  if (graphFactory.existNodeInStatement(e.statement_id, e.target) == false)
+                      graphFactory.addNodeToStatement(e.statement_id, e.target);
+              }
+              else {
+                  graphFactory.addNodeToStatement(e.statement_id, e.source); 
+                  graphFactory.addNodeToStatement(e.statement_id, e.target); 
+              }
+
+              // Which statements belong to which context / graph
+              if (statementsOfContext[e.edge_context]) {
+                    if (statementsOfContext[e.edge_context].indexOf(e.statement_id[0]) < 0) {
+                      statementsOfContext[e.edge_context].push(e.statement_id[0]);
+                    }
+              }
+              else {
+                  statementsOfContext[e.edge_context] = [];
+                  statementsOfContext[e.edge_context].push(e.statement_id[0]);
+              }
+
+
+              // Make an index of nodes to context
+              if (contextNodeID[e.edge_context]) {
+                  if (contextNodeID[e.edge_context].indexOf(e.source) < 0)
+                      contextNodeID[e.edge_context].push(e.source);
+                  if (contextNodeID[e.edge_context].indexOf(e.target) < 0)
+                      contextNodeID[e.edge_context].push(e.target);
+              }
+              else {
+                  contextNodeID[e.edge_context] = [];
+                  contextNodeID[e.edge_context].push(e.source);
+                  contextNodeID[e.edge_context].push(e.target);
+              }
+          }
+
+          callback();
+
+        },
+        addNode: function(node) {
+          sigma.instances(0).graph.addNode({
+                id: node.id,
+                label: node.label,
+                originalLabel: node.label,
+                originalColor: color_context,
+                size: maxnodesize - 2,
+                x: Math.random(),
+                y: Math.random(),
+                color: color_context
+              }); 
+        },
         addEdge: function(edgeproc) {
             sigma.instances(0).graph.addEdge({
                 id: edgeproc.id,
                 source: edgeproc.source,
                 target: edgeproc.target,
                 weight: edgeproc.weight,
-                size: edgeproc.size,
+                size: edgeproc.weight,
                 statement_id: edgeproc.statement_id,
                 edge_context: edgeproc.edge_context
             });
@@ -348,16 +407,14 @@ function graph() {
             betweennessCentrality(cyElements, jsG);
 
             // Launch community detect algorithm
-            communityDetect();
-
-
-
+            communityDetect(false, false, graph().refreshGraph);
 
 
         },
-        updateEdges: function(){
+        refreshGraph: function() {
+            sigma.instances(0).refresh();
+            sigmaGraph().adjustLayout(5000);
 
-        
         }
     }
 }
@@ -542,7 +599,7 @@ function graph() {
 
         // Community Detect Function
 
-        function communityDetect (coming_from, node_origin) {
+        function communityDetect (coming_from, node_origin, callback) {
 
 // Construct a new Graphology graph object to calculate communities
 const grgraph = new graphology.Graph({type: 'undirected'});
@@ -1378,6 +1435,9 @@ $('#graphstats').html(diversitytext);
     resetGraphButton().onClick(resetGraph);
 
 
+
+    callback();
+
 // communityDetect function ends here
 }
 
@@ -1614,7 +1674,7 @@ function top_nodes_activate() {
 
 function sigmaGraph() {
     return {
-        adjustLayout: function() {
+        adjustLayout: function(timeout) {
             if (sigma.instances(0).isForceAtlas2Running()) {
                     sigma.instances(0).stopForceAtlas2();
                     sigma.instances(0).killForceAtlas2();
@@ -1626,6 +1686,13 @@ function sigmaGraph() {
                   sigma.instances(0).startForceAtlas2(forceatlas_options);
                   $('#improve-layout').addClass('layout-on');
                   forcedatlas_running = true;
+                  if (timeout) {
+                    setTimeout(function() {
+                        sigma.instances(0).stopForceAtlas2();
+                        sigma.instances(0).killForceAtlas2();
+                        $('#improve-layout').removeClass('layout-on');
+                    },parseInt(timeout));
+                  }
             }
         },
         abstractLayout: function() {

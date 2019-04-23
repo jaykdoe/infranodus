@@ -21,6 +21,8 @@ var interpret = getUrlVars()["interpret"];
 
 var abstract;
 
+var nodesOfStatement = {};
+
 // default most influential nodes are displayed according to Betwenness Centrality (bc) or Degree (degree)
 var most_influential = 'bc';
 
@@ -39,6 +41,8 @@ var background = getUrlVars()["background"];
 var walkthrough = getUrlVars()["walkthrough"];
 
 var customization = ' ';
+
+
 
 
 // Let's define some walkthrough tutorials, depending on the situation
@@ -127,9 +131,6 @@ var forcedatlas_running = false;
 
 // Create context-node index for filtering
 var contextNodeID = [];
-
-// Create statement-node index for filtering
-var nodesOfStatement = {};
 
 // Used to populate entry textfield
 var current_context_field = [];
@@ -260,24 +261,25 @@ socket.on('delete message', function(msg){
 
     // When searched for nodes in that statement, nothing will appear.
 
-    nodesOfStatement[msg.entryuid] = [];
+    graphFactory.removeNodesFromStatement(msg.entryuid);
 
     // Let's set up which nodes we will keep
-    var nodesToKeep = [];
+    let nodesToKeep = [];
 
     sigma.instances(0).graph.edges().forEach(function(e) {
 
-            // If a node appears in at least one statement, we add him in ToKeep list
+        // If a node appears in at least one statement, we add him in ToKeep list
         for (let item of e.statement_id) {
-            if (nodesOfStatement[item].indexOf(e.source) > -1) {
+            if (graphFactory.existNodeInStatement(item, e.source) == true) {
                 nodesToKeep.push(e.source);
             }
 
-            if (nodesOfStatement[item].indexOf(e.target) > -1) {
+            if (graphFactory.existNodeInStatement(item, e.target) == true) {
                 nodesToKeep.push(e.target);
             }
 
-            var statePosition = statementsOfContext[e.edge_context].indexOf(item);
+            let statePosition = statementsOfContext[e.edge_context].indexOf(item);
+
             if (statePosition < 0) {
                 statementsOfContext[e.edge_context].splice(statePosition, 1);
             }
@@ -299,7 +301,6 @@ socket.on('delete message', function(msg){
     });
 
  
-
     // Refresh the object and reload the layout
 
     sigma.instances(0).refresh();
@@ -314,10 +315,6 @@ socket.on('delete message', function(msg){
         sigma.instances(0).killForceAtlas2();
 
     }, 3000);
-
-    //console.log(newnodes);
-    // console.log(msg.graph.edges);
-    // console.log(sigma.graph.edges());
 
 
 });

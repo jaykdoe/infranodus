@@ -286,6 +286,7 @@ socket.on('node delete', function(msg){
 socket.on('node add', function(msg){
 
         let addingNodes = msg.addingNodes;
+        console.log(addingNodes)
         graphFactory.addDeletedNode(addingNodes);
 
 });

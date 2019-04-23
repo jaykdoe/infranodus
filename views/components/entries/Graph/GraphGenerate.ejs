@@ -27,6 +27,13 @@ function GraphFactory(){
         // These are the nodes that are currently in the stoplist
         let stopNodes = [];
 
+        // Create statement-node index for filtering
+        let nodesOfStatement = {};
+
+        // How many nodes and edges added per iteration
+        let nodesAdded = [];
+        let edgesAdded = [];
+
         this.addNode = function(name, id, n) {
             nodeIDs[name] = id;
             nodeIDs_rev[id] = name;
@@ -37,6 +44,14 @@ function GraphFactory(){
                 origNodeIDs_rev[n.id] = n.originalLabel;
             }
             return true;
+        }
+        this.existNode = function(name) {
+            if (nodeIDs[name]) {
+                return true;
+            }
+            else {
+                return false;
+            }
         }
         this.addEdge = function(e) {
             edgesDB.push(e);
@@ -63,15 +78,39 @@ function GraphFactory(){
             return true;
         }
         this.addDeletedNode = function(node) {
-           
             this.removeFromStopNodes(node);
             this.addNode(node, origNodeIDs[node]);
             this.initPinnedNodes(pinnedNodes);
             let nodesToAdd = [];
             nodesToAdd.push(node);
-            this.addGraphNodes(nodesToAdd);
+            this.addDeletedGraphNodes(nodesToAdd);
             return true;
 
+        }
+        this.addNewNodes = function(nodes, edges, statement) {
+            console.log('addnewnodes')
+            console.log(statement)
+            
+            let nodesToAdd = [];
+            let edgesToAdd = [];
+            for (let node in nodes) {
+                if (this.existNode(nodes[node].label) == false) {
+                    this.addNode(nodes[node].label, nodes[node].id, nodes[node]);
+                    nodesToAdd.push(nodes[node]);
+                    nodesAdded.push(nodes[node]);
+                }
+            }
+            if (statement) {
+                for (let edge in edges) {
+                    if (edges[edge].statement_id == statement) {
+                        edgesToAdd.push(edges[edge]);
+                        edgesAdded.push(edges[edge]);
+                    }
+                }
+            }
+            console.log(edgesToAdd);
+            this.addGraphNodesEdges(nodesToAdd, edgesToAdd);
+            return true;
         }
         this.getNodeIDs = function() {
             return nodeIDs;
@@ -100,20 +139,6 @@ function GraphFactory(){
             return edgesDB;
         }
 
-        this.updateGraphNodes = function(nodes) {
-             
-            // Update the graph nodes (delete or add)
-            // graph().updateNodes(nodes, graph().updateMetrics);
-           
-        //    graphUpdateNodes(nodes);
-        //    graphUpdateEdges() 
-           // reiterate through Sigma with the new parameter and only keep the nodes that are in DB FUNCTION like filter_graph
-           // reiterate through Sigma edges, only keep the according edges FUNCTION
-           // populate all the objects (Cytoscape, JxX, Graphology) FUNCTION
-           // possible with a callback to then update the Analytics like here               entries().search(entries().addHighlight);        
-           // Update the graph if needed (refresh + forceatlas)
-        }
-
 
         this.deleteGraphNodes = function(nodesToDelete) {
              
@@ -123,10 +148,16 @@ function GraphFactory(){
        
          }
 
-         this.addGraphNodes = function(nodesToAdd) {
-             
+         this.addDeletedGraphNodes = function(nodesToAdd) {
              // Update the graph nodes (delete or add)
-             graph().addNodes(nodesToAdd, graph().updateMetrics);
+             graph().addDeletedNodes(nodesToAdd, graph().updateMetrics);
+       
+         }
+
+         this.addGraphNodesEdges = function(nodesToAdd, edgesToAdd) {
+             
+             // Adding the new nodes
+             graph().addNodesEdges(nodesToAdd, edgesToAdd, graph().updateMetrics);
        
          }
   
@@ -277,6 +308,46 @@ function GraphFactory(){
             }
         }
 
+        this.addNodeToStatement = function(statement, node) {
+            if (!nodesOfStatement[statement]) {
+                nodesOfStatement[statement] = [];
+            }
+            nodesOfStatement[statement].push(node);
+            return true;
+        }
+        this.getNodesOfStatement = function(statement) {
+            if (statement) {
+                return nodesOfStatement[statement];
+            }
+        }
+        this.existNodesOfStatement = function(statement) {
+            if (nodesOfStatement[statement]) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        this.existNodeInStatement = function(statement, node) {
+            if (nodesOfStatement[statement].indexOf(node) >= 0) {
+                return true;
+            }
+            else {
+                return false;
+            }
+            
+        }
+        this.removeNodesFromStatement = function(statement) {
+            if (nodesOfStatement[statement]) {
+                nodesOfStatement[statement] = []
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+    
+
 }
 
 let graphFactory = new GraphFactory();
@@ -388,20 +459,20 @@ sigma.parsers.json(
                 // Make an index of nodes to statement
 
                 // For each statement that contains this edge
+
                 for (let item of e.statement_id) {
                            
-                  if (nodesOfStatement[item]) {
-                      if (nodesOfStatement[item].indexOf(e.source) < 0)
-                          nodesOfStatement[item].push(e.source);
-                      if (nodesOfStatement[item].indexOf(e.target) < 0)
-                          nodesOfStatement[item].push(e.target);
+                  if (graphFactory.getNodesOfStatement(item)) {
+                      if (graphFactory.existNodeInStatement(item, e.source) == false)
+                          graphFactory.addNodeToStatement(item, e.source);
+                      if (graphFactory.existNodeInStatement(item, e.target) == false)
+                          graphFactory.addNodeToStatement(item, e.target);
                   }
                   else {
-                      nodesOfStatement[item] = [];
-                      nodesOfStatement[item].push(e.source);
+                      graphFactory.addNodeToStatement(item, e.source);
                       // avoid duplicates
                       if (e.source != e.target) {
-                        nodesOfStatement[item].push(e.target);
+                        graphFactory.addNodeToStatement(item, e.target);
                       }
                       
                   }
@@ -605,25 +676,7 @@ sigma.parsers.json(
             if (background == 'dark') { $('#tagInputBox').css({'backgroundColor': 'rgba(250, 250, 250, 0.2)', 'border': 'none', 'box-shadow': 'none', 'color': '#aaaab5'}); }
             // Do ForceAtlasLayout
 
-            if (sigma.isForceAtlas2Running()) {
-                sigma.stopForceAtlas2();
-                sigma.killForceAtlas2();
-            }
-            else {
-              sigma.startForceAtlas2(forceatlas_options);
-            }
-
-
-            // Don't run it forever not to overheat :)
-
-            setTimeout(function() {
-                sigma.stopForceAtlas2();
-                sigma.killForceAtlas2();
-                downloadPNG();
-
-            },timeout);
-
-
+           
             // Drag nodes function initiated, so we can drag nodes
 
             dragNodes();
@@ -640,7 +693,7 @@ sigma.parsers.json(
 
             // Community detect algorithm
 
-            communityDetect();
+            communityDetect(false, false, graph().refreshGraph);
 
 
             // TODO make it possible for collaboration also

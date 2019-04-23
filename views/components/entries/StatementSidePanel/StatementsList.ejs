@@ -715,7 +715,7 @@ function entryClick (e) {
 
         let keepStatementID = e.currentTarget.dataset.uid;
 
-        console.log("Clicked on statement ID #");
+        console.log("Clicked on the statement ID #");
         console.log(keepStatementID);
 
         // Make only those edges visible that belong to the statement selected
@@ -747,7 +747,7 @@ function entryClick (e) {
             sigma.instances(0).graph.nodes().forEach(function(n) {
 
                 // Is there no contexts at all? Show the node.
-                if (nodesOfStatement[keepStatementID].indexOf(n.id) < 0)  {
+                if (graphFactory.existNodeInStatement(keepStatementID, n.id) == false)  {
                     n.color = deselected_nodes_color;
                     n.label = '';
                 }
