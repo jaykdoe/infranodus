@@ -250,33 +250,6 @@ socket.on('node delete', function(msg){
         $(this).removeAttr('style');
     });
 
-    if (sigma.instances(0).isForceAtlas2Running()) {
-        sigma.instances(0).stopForceAtlas2();
-        sigma.instances(0).killForceAtlas2();
-        setTimeout(function() {
-        sigma.instances(0).startForceAtlas2(forceatlas_options);
-        setTimeout(function() {
-
-            sigma.instances(0).stopForceAtlas2();
-            sigma.instances(0).killForceAtlas2();
-
-        }, 5000);
-    }, 1000);
-    }
-    else {
-
-        sigma.instances(0).startForceAtlas2(forceatlas_options);
-        setTimeout(function() {
-
-            sigma.instances(0).stopForceAtlas2();
-            sigma.instances(0).killForceAtlas2();
-
-        }, 5000);
-
-    }
-
-
-
 
 });
 

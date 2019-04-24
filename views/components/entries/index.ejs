@@ -40,7 +40,7 @@ var background = getUrlVars()["background"];
 
 var walkthrough = getUrlVars()["walkthrough"];
 
-var customization = ' ';
+
 
 
 
@@ -68,10 +68,6 @@ var inlanguage = '<%= user.inlanguage %>';
     if (!graphPalette) {
     graphPalette = '<%= user.palette %>';
     }
-
-    <% if (locals.user.customization) { %>
-    customization = '<%= user.customization %>';
-    <% } %>
 
     <% if (locals.user.maxnodes) { %>
     maxnodes = '<%= user.maxnodes %>';

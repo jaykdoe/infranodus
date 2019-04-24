@@ -154,14 +154,15 @@
 function graph() {
     return {
         deleteNodes: function(nodesToDelete, callback){
+           
             // Delete the nodes from the Sigma graph (the edges will get deleted automatically)
             sigma.instances(0).graph.nodes().forEach(function(n) {
                 if (nodesToDelete.indexOf(n.originalLabel) >= 0) {
-                  sigma.instances(0).graph.dropNode(n.id);
+                    sigma.instances(0).graph.dropNode(n.id);
                 }               
             });
-
-            sigma.instances(0).refresh();
+            
+            callback();
 
         },
         addDeletedNodes: function(nodesToAdd, callback){
@@ -177,8 +178,7 @@ function graph() {
             let stoplistNodes = graphFactory.getStopNodes();
             
             // First, let's add nodes into the Sigma graph
-
-         
+      
             for (let node in nodesToAdd) {
               let n = {};
               n.label = nodesToAdd[node];
@@ -321,9 +321,11 @@ function graph() {
                
             });
 
-            callback();
-          
-         
+            // Select previously selected nodes on the graph (from LocalStorage) or passed through parameters
+            graphFactory.getSelections();
+
+            // Launch the metrics calculation
+            callback();   
 
         },
         updateEdgeStats: function(e) {
@@ -1854,9 +1856,97 @@ function sigmaGraph() {
 
 
 
+        },
+        clickNode: function() {
+            
+            // When a node is clicked, we check for each node
+            // if it is a neighbor of the clicked one. If not,
+            // we set its color as grey, and else, it takes its
+            // original color.
+            // We do the same for the edges, and we only keep
+            // edges that have both extremities colored.
+
+            sigma.instances(0).bind('clickNode', function(e) {
+                
+                if (!sigma_dragged) {
+                  
+                  // A node was clicked, so we assume there was a meaningful graph interaction
+                  graphInteraction = 1;
+  
+                  var nodeLabel = e.data.node.originalLabel;
+  
+                  // TODO to check that
+                  if (interpret) {
+                    $('.entry').show();
+                  }
+  
+                  // If we click on the context node, just bring us to that context
+                  if (nodeLabel.substr(0,9) == 'context: ') {
+                      window.open('/' + current_user + '/' + nodeLabel.substr(9,nodeLabel.length) + '<% if (!perceivername) { %>/edit<% } %>',"_self");
+                  }
+                  else {
+  
+                      // Is the node pinned?
+                      if (graphFactory.checkIfPinned(nodeLabel) == false) {
+                          // Add to pinned and launch the whole filtering machinery
+                          graphFactory.addToPinnedNodes(nodeLabel);
+                      }
+                      else {   
+                          graphFactory.removeFromPinnedNodes(nodeLabel);                                    
+                      }
+  
+                      // Let's send an event to all the collaborators in the chatroom
+                      socket.emit('node click', {pinnedNodes: graphFactory.getPinnedNodes()});
+                          
+                      // If the window is wide enough to show the menu AND div with statements is not visible
+                      if ($("#statements").is(":hidden") || $("#entries").css("visibility") === "hidden") {
+                          console.log('hidden')
+                          $('#livetext').show();
+                          $('#livetext').html('<em>open the entries to see the excerpts...</em>' + ' <span></span>');
+                      }
+  
+                  }
+  
+                }
+  
+                // This is just to reset node drag parameter
+                sigma_dragged = 0;
+  
+  
+              });
+        },
+        highlightNode: function() {
+
+            // Show the node's label when we're over it
+            sigma.instances(0).bind('overNode', function(e) {
+                  e.data.node.label = e.data.node.originalLabel;
+                  sigma.instances(0).refresh();
+            });
+
+            // Hide node's label when we're out of it
+            sigma.bind('outNode', function(e) {
+                if (e.data.node.color != e.data.node.originalColor && graphFactory.checkIfPinned(e.data.node.originalLabel) == false) {
+                    e.data.node.label = '';
+                }
+                sigma.refresh();
+            });
         }
     }
 }
+
+// Add a method to the graph model that returns an
+// object with every neighbors of a node inside:
+
+sigma.classes.graph.addMethod('neighbors', function(nodeId) {
+    var k,
+            neighbors = {},
+            index = this.allNeighborsIndex[nodeId] || {};
+
+    for (k in index)
+        neighbors[k] = this.nodesIndex[k];
+
+    return neighbors;
+});
 
 
 

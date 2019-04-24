@@ -2,5 +2,40 @@
 <a href="javascript:" class="tooltip editorpane" title="graph analytics" id="analyticsbutton"><div id="analyticscaption"></div></a>
 
 <script>
+
+    let customization = ' ';
+
+<% if (locals.user && !locals.vieweduser) { %>
+
+    <% if (locals.user.customization) { %>
+    customization = '<%= user.customization %>';
+    <% } %>
+
+<% }  %>
+    
+
     $('#analyticscaption').html(customization);
+       
+    // What happens when we click analytics pane
+    $('#analyticsbutton').click(function(){
+        // Process logic and remember settings
+        $('#analytics').toggle('slide', function(){
+        if ($('#analytics').is(":visible")) {
+            localStorage.setItem('analytics', 1);
+            $('#analyticsbutton').addClass('analytics-on');
+            $('#analyticscaption').hide();
+
+        }
+        else {
+            localStorage.setItem('analytics', 0);
+            $('#analyticsbutton').removeClass('analytics-on')
+            $('#analyticscaption').show();
+        }
+        });
+
+    });
+            
+
+    $('#analytics').on('swipedown',function(){$('#analyticsbutton').trigger('click');});
+
 </script>

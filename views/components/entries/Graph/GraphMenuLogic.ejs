@@ -39,6 +39,8 @@ improveLayoutButton().onClick(adjustGraphLayout);
 abstractLayoutButton().onLoad();
 abstractLayoutButton().onClick(abstractGraphLayout);
 tutorialButton().onClick(activateTutorial);
+zoomInButton().onClick(zoomInGraph);
+zoomOutButton().onClick(zoomOutGraph);
 
 
 function graphButton() {
@@ -69,6 +71,22 @@ function tutorialButton() {
     return {
         onClick: function(onClick) {
             $('#walkthrough').on('click', onClick)
+        }
+    }
+}
+
+function zoomInButton() {
+    return {
+        onClick: function(onClick) {
+            $('#zoom-in').on('click', onClick);
+        }
+    }
+}
+
+function zoomOutButton() {
+    return {
+        onClick: function(onClick) {
+            $('#zoom-out').on('click', onClick);
         }
     }
 }
@@ -128,5 +146,24 @@ function externalNavigation() {
 
 
 }
+
+function zoomInGraph() {
+    let c = sigma.instances(0).camera;
+    sigma.misc.animation.camera(c, {
+        ratio: c.ratio / c.settings('zoomingRatio')
+        }, {
+        duration: 400
+    });
+}
+
+function zoomOutGraph() {
+    let c = sigma.instances(0).camera;   
+    sigma.misc.animation.camera(c, {
+        ratio: c.ratio * c.settings('zoomingRatio')
+    }, {
+        duration: 400
+    });
+}
+
 
 </script>

@@ -140,8 +140,7 @@ function GraphFactory(){
         this.deleteGraphNodes = function(nodesToDelete) {
              
              // Update the graph nodes (delete or add)
-             graph().deleteNodes(nodesToDelete);
-             graph().updateMetrics();
+             graph().deleteNodes(nodesToDelete, graph().updateMetrics);
        
          }
 
@@ -175,6 +174,9 @@ function GraphFactory(){
 
             // Perform filter statements function on the nodes selected
             entries().filter();
+
+            // Save to local storage
+            this.saveSelections();
 
             // Add search terms into the top graph search form
             nodeInputField().update(pinnedNodes.concat(notFoundNodes));
@@ -348,6 +350,95 @@ function GraphFactory(){
                 return false;
             }
         }
+
+        this.saveSelections = function() {
+
+            // Save all the selected nodes into the localStorage
+            if (localStorage.getItem("selections")) {
+                var localstore = JSON.parse(localStorage.getItem("selections"));
+            }
+            else {
+                var localstore = {};
+            }
+
+            var localstore_cell = {};
+
+            localstore_cell.stopnodes = this.getStopNodes();
+            localstore_cell.pinnednodes = this.getPinnedNodes();
+
+            if (this.existStopNodes == false && this.existPinnedNodes == false) {
+                delete localstore[window.location.href]
+            }
+            else {
+                localstore[window.location.href] = localstore_cell;
+            }
+
+            localStorage.setItem("selections",JSON.stringify(localstore));
+
+        }
+
+        this.getSelections = function() {
+
+            let selected_keywords = getUrlVars()["keywords"];
+
+            if (localStorage.getItem("selections")) {
+
+                let saved_selections = JSON.parse(localStorage.getItem("selections"));
+
+                let deletedNodes = saved_selections[window.location.href].stopnodes;
+                let pinnedNodes = saved_selections[window.location.href].pinnednodes;
+
+                // Do we have any saved selections stopNodes or pinnedNodes for this URL?
+                if (saved_selections[window.location.href]) {
+                                       
+                    this.deleteNodes(deletedNodes);
+                    this.initPinnedNodes(pinnedNodes);
+
+                }
+                else if (interpret) {
+                    
+                    // In case we're on the interpret or add context field, we might still want to load the original selections
+                    
+                    for (var url in saved_selections) {
+                        if (url.indexOf('/'+addcontext+'/') > -1) {
+                            let deletedNodes = saved_selections[url].stopnodes;
+                            let pinnedNodes = saved_selections[url].pinnednodes;
+                            if (deletedNodes.length > 0) {
+                                this.deleteNodes(deletedNodes);
+                            }
+                            else {
+                                if (pinnedNodes.length > 0) {
+                                    this.initPinnedNodes(pinnedNodes);
+                                }
+                            }
+                        }
+                    }
+                }
+                else if (selected_keywords && selected_keywords.length > 0) {
+                    
+                    let pinnedNodes = selected_keywords.split("+");
+
+
+                    if (pinnedNodes.length > 0) {
+                        this.initPinnedNodes(pinnedNodes);
+                    }
+
+
+                }
+
+            }
+            // TODO clear that
+            else if (selected_keywords && selected_keywords.length > 0) {
+            
+                let pinnedNodes = selected_keywords.split("+");
+
+                if (pinnedNodes.length > 0) {
+                    this.initPinnedNodes(pinnedNodes);
+                }
+
+
+            }
+    }
     
 
 }
@@ -373,9 +464,9 @@ sigma.parsers.json(
             }
         },
         function(sigma) {                
-            
+ 
             // Add some stats for each node and edge and launch BC and community detection analytics algorithms
-            graph().initNodesEdges(graph().updateMetrics);
+            graph().initNodesEdges(graph().updateMetrics);           
   
             // Initialize autofill for hashtags and contexts - only after the graph is loaded
             autofill(graphFactory.getNodeNames(),contextNames);
@@ -383,229 +474,21 @@ sigma.parsers.json(
             // Drag nodes function initiated, so we can drag nodes
             graph().dragNodes();
 
-            // Remove the entries that belong to the addcontext parameter
+            // Remove the entries that belong to the addcontext parameter (we need a graph for that data, that's why it's here)
             entries().removeAddContext();
 
+            // Select the neighbor nodes when a node is clicked
+            sigmaGraph().clickNode();
 
-            // What happens when we click analytics pane
-
-            $('#analyticsbutton').click(function(){
-                      // Process logic and remember settings
-                     $('#analytics').toggle('slide', function(){
-                       if ($('#analytics').is(":visible")) {
-                         localStorage.setItem('analytics', 1);
-                         $('#analyticsbutton').addClass('analytics-on');
-                         $('#analyticscaption').hide();
-
-                       }
-                       else {
-                         localStorage.setItem('analytics', 0);
-                         $('#analyticsbutton').removeClass('analytics-on')
-                         $('#analyticscaption').show();
-                       }
-                     });
-
-            });
-            
-
-            $('#analytics').on('swipedown',function(){$('#analyticsbutton').trigger('click');});
-
-            // When a node is clicked, we check for each node
-            // if it is a neighbor of the clicked one. If not,
-            // we set its color as grey, and else, it takes its
-            // original color.
-            // We do the same for the edges, and we only keep
-            // edges that have both extremities colored.
-
-            sigma.bind('clickNode', function(e) {
-                
-              if (!sigma_dragged) {
-                
-                // A node was clicked, so we assume there was a meaningful graph interaction
-                graphInteraction = 1;
-
-                var nodeLabel = e.data.node.originalLabel;
-
-                // TODO to check that
-                if (interpret) {
-                  $('.entry').show();
-                }
-
-                // If we click on the context node, just bring us to that context
-                if (nodeLabel.substr(0,9) == 'context: ') {
-                    window.open('/' + current_user + '/' + nodeLabel.substr(9,nodeLabel.length) + '<% if (!perceivername) { %>/edit<% } %>',"_self");
-                }
-                else {
-
-                    // Is the node pinned?
-                    if (graphFactory.checkIfPinned(nodeLabel) == false) {
-                        // Add to pinned and launch the whole filtering machinery
-                        graphFactory.addToPinnedNodes(nodeLabel);
-                    }
-                    else {   
-                        graphFactory.removeFromPinnedNodes(nodeLabel);                                    
-                    }
-
-                    // Let's send an event to all the collaborators in the chatroom
-                    socket.emit('node click', {pinnedNodes: graphFactory.getPinnedNodes()});
-                        
-                    // If the window is wide enough to show the menu AND div with statements is not visible
-                    if ($("#statements").is(":hidden") || $("#entries").css("visibility") === "hidden") {
-                        console.log('hidden')
-                        $('#livetext').show();
-                        $('#livetext').html('<em>open the entries to see the excerpts...</em>' + ' <span></span>');
-                    }
-
-                }
-
-              }
-
-              // This is just to reset node drag parameter
-              sigma_dragged = 0;
-
-
-            });
-
-
-            // Show node's label when we're over it
-
-            sigma.bind('overNode', function(e) {
-                e.data.node.label = e.data.node.originalLabel;
-                sigma.refresh();
-            });
-
-
-
-            // Hide node's label when we're out of it
-
-            sigma.bind('outNode', function(e) {
-                if (e.data.node.color != e.data.node.originalColor && graphFactory.checkIfPinned(e.data.node.originalLabel) == false) {
-                    e.data.node.label = '';
-                }
-                sigma.refresh();
-            });
-
-
-
-            // Zoom Graph Control
-
-            var c = sigma.camera;
-
-
-            $("#zoom-in").on('click', function(e) {
-                // Zoom in - single frame :
-                c.goTo({
-                    ratio: c.ratio / c.settings('zoomingRatio')
-                });
-            });
-
-            $("#zoom-out").on('click', function(e) {
-                // Zoom out - single frame :
-                c.goTo({
-                    ratio: c.ratio * c.settings('zoomingRatio')
-                });
-            });
-
-    
-
-            
-
-            // Forward from the graph function
-
-
-            // Select previously selected nodes on the graph (from LocalStorage) or passed through parameters
-            selectNodes();
-
-
-
+            // Select the node's label when we're over it and deselect when we're not
+            sigmaGraph().highlightNode();
+           
 
         }
 );
 
 
 
-// Add a method to the graph model that returns an
-// object with every neighbors of a node inside:
-
-sigma.classes.graph.addMethod('neighbors', function(nodeId) {
-    var k,
-            neighbors = {},
-            index = this.allNeighborsIndex[nodeId] || {};
-
-    for (k in index)
-        neighbors[k] = this.nodesIndex[k];
-
-    return neighbors;
-});
-
-
-// TODO if the nodes are deleted, we call community detection twice. Fix that.
-
-function selectNodes() {
-    var selected_keywords = getUrlVars()["keywords"];
-    if (localStorage.getItem("selections")) {
-
-            var saved_selections = JSON.parse(localStorage.getItem("selections"));
-
-            if (saved_selections[window.location.href]) {
-                
-                deletedNodes = saved_selections[window.location.href].stopnodes;
-                graphFactory.initPinnedNodes(saved_selections[window.location.href].pinnednodes);
-                
-                if (deletedNodes.length > 0) {
-                    socket.emit('node delete', {pinnedNodes: deletedNodes, delete_from: "localstorage"});
-                }
-                else {
-                    if (graphFactory.getPinnedNodes().length > 0) {
-                        filter_statements(graphFactory.getPinnedNodes());
-                    }
-                }
-
-            }
-            else if (interpret) {
-                console.log(saved_selections);
-                for (var boom in saved_selections) {
-                    if (boom.indexOf('/'+addcontext+'/') > -1) {
-                    deletedNodes = saved_selections[boom].stopnodes;
-                    pinnedNodes = saved_selections[boom].pinnednodes;
-                    console.log(deletedNodes);
-                    console.log(pinnedNodes);
-                    if (deletedNodes.length > 0) {
-                        socket.emit('node delete', {pinnedNodes: deletedNodes, delete_from: "localstorage"});
-                    }
-                    else {
-                        if (pinnedNodes.length > 0) {
-                        filter_statements(pinnedNodes);
-                        }
-                    }
-                    }
-                }
-            }
-            else if (selected_keywords && selected_keywords.length > 0) {
-                
-                pinnedNodes = selected_keywords.split("+");
-
-
-                if (pinnedNodes.length > 0) {
-                    filter_statements(pinnedNodes);
-                }
-
-
-            }
-
-            }
-            // TODO clear that
-            else if (selected_keywords && selected_keywords.length > 0) {
-               
-                pinnedNodes = selected_keywords.split("+");
-
-                if (pinnedNodes.length > 0) {
-                    filter_statements(pinnedNodes);
-                }
-
-
-            }
-}
 
 
 
