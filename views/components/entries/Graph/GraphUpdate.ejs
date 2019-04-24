@@ -259,8 +259,19 @@ socket.on('node delete', function(msg){
 socket.on('node add', function(msg){
 
         let addingNodes = msg.addingNodes;
-        console.log(addingNodes)
+        
         graphFactory.addDeletedNode(addingNodes);
+
+});
+
+
+
+// What happens when the user clicks on a node in the graph (this is caleld from sigma but processed here)
+// This is for collaboration only
+
+socket.on('node click', function(msg){
+
+        graphFactory.initPinnedNodes(msg.pinnedNodes);   
 
 });
 

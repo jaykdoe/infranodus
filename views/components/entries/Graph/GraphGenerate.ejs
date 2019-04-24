@@ -385,11 +385,12 @@ function GraphFactory(){
 
                 let saved_selections = JSON.parse(localStorage.getItem("selections"));
 
-                let deletedNodes = saved_selections[window.location.href].stopnodes;
-                let pinnedNodes = saved_selections[window.location.href].pinnednodes;
+               
 
                 // Do we have any saved selections stopNodes or pinnedNodes for this URL?
                 if (saved_selections[window.location.href]) {
+                    let deletedNodes = saved_selections[window.location.href].stopnodes;
+                    let pinnedNodes = saved_selections[window.location.href].pinnednodes;
                                        
                     this.deleteNodes(deletedNodes);
                     this.initPinnedNodes(pinnedNodes);
