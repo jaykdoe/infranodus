@@ -240,8 +240,8 @@
 
                 analytics += "<br><br><div class='headline'>Most Influential Words";
 
-
-                var toppbc_nodes = topbc_nodes.slice(0,4);
+                // Get the top BC nodes
+                var toppbc_nodes = graphFactory.getTopBCNodes(4);
 
                 console.log('Top betweenness centrality nnodes:')
                 console.log(toppbc_nodes);

@@ -29,7 +29,7 @@
 
             let bcmap = {};
 
-            topbc_nodes = [];
+            let topbc_nodes = [];
 
             // If no jsNetworkx object sent, calculate with Cytoscape
             if (!jsG) {
@@ -86,13 +86,11 @@
             console.log('Top betweenness centrality nodes:');
             console.log(topbc_nodes);
 
-            // Cut the top 5
-            topbc_nodes = topbc_nodes.slice(0,5);
+            graphFactory.updateTopBCNodes(topbc_nodes);
 
             let nodes_shown = 0
 
             let bcscore = 0;
-
 
             // Assign BC score to each node in the graph
             sigma.instances(0).graph.nodes().forEach(function(n) {

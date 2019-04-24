@@ -34,6 +34,9 @@ function GraphFactory(){
         let nodesAdded = [];
         let edgesAdded = [];
 
+        // Top betweenness centrality nodes
+        let topbc_nodes = [];
+
         this.addNode = function(name, id, n) {
             nodeIDs[name] = id;
             nodeIDs_rev[id] = name;
@@ -439,7 +442,21 @@ function GraphFactory(){
 
 
             }
-    }
+        }
+
+        this.updateTopBCNodes = function(nodes) {
+                topbc_nodes = nodes;
+                return true
+        }
+
+        this.getTopBCNodes = function(number) {
+            if (number && number > 0) {
+                return topbc_nodes.slice(0,number)
+            }
+            else {
+                return topbc_nodes;
+            }
+        }
     
 
 }
