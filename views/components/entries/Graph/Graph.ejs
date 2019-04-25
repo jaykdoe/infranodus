@@ -319,6 +319,7 @@ function graph() {
             });
 
             // Select previously selected nodes on the graph (from LocalStorage) or passed through parameters
+
             graphFactory.getSelections();
 
             // Launch the metrics calculation
@@ -414,20 +415,31 @@ function graph() {
         },
         updateMetrics: function() {
             
-            let nodes = graphFactory.getNodeIDsRev();
-
             // Cytoscape object renew
             let cyCollection = cy.elements();
             cy.remove(cyCollection);            
             let cyNodes = [];
 
-            // Add the nodes to Cytoscape array
-            for (let nid in nodes) {
+            // Community detection graph object from Graphology
+            let grgraph = new graphology.Graph({type: 'undirected'});
+
+            let node_data = [];
+
+            sigma.instances(0).graph.nodes().forEach(function(n) {
+
+                // Add nodes into the Louvain object
+                node_data.push(n.id);
+
+                // Add nodes into the Graphology object
+                grgraph.addNode(n.id);
+
+                // Add the nodes into a Cytoscape object
                 cyNodes.push({
                     group: "nodes",
-                    data: { id: nid, name: nodes[nid]}
+                    data: { id: n.id, name: n.originalLabel}
                 });
-            }
+
+            });
 
             // jsnetworkx object creation
             let jsGraphEdges = [];
@@ -436,6 +448,9 @@ function graph() {
 
             // Let's record all the unique edges we've got
             let edgesList = [];
+
+            let totalUnEdgesCount = 0;
+            let totalDiEdgesCount = 0;
 
             sigma.instances(0).graph.edges().forEach(function(e) {
 
@@ -513,10 +528,33 @@ function graph() {
                 
                     jsGraphEdges.push(edge_object);
 
+                    // The number of unique undirected edges
+                    if (e.source != e.target) {
+                      totalUnEdgesCount = totalUnEdgesCount + 1;
+                    }
+
                 }
 
+                // The number of unique directed edges
+                if (e.source != e.target) {
+                      totalDiEdgesCount = totalDiEdgesCount + 1;
+                }
+                
+
             });
+
+            // Save the number of edges into the stats object
+            graphFactory.setStats('edgesUndirected',totalUnEdgesCount);
+            graphFactory.setStats('edgesDirected', totalDiEdgesCount);
             
+            // Add the edges into the Graphology object
+            for (var i = 0; i < edge_data.length; i++) {
+                grgraph.addEdge(edge_data[i].source, edge_data[i].target, {weight: edge_data[i].weight});
+            }
+
+            // Object for louvain community detection
+            let lougraph = {node_data: node_data, edge_data: edge_data};
+
             // Add the array to the collection
             let cyElements = cy.add(cyNodes);
 
@@ -534,7 +572,7 @@ function graph() {
             betweennessCentrality(cyElements, jsG);
 
             // Launch community detect algorithm
-            communityDetect(false, false, graph().refreshGraph);
+            communityDetect(lougraph, grgraph, graph().refreshGraph);
 
 
         },

@@ -2,60 +2,15 @@
 
       // Community Detection Function
 
-      function communityDetect (coming_from, node_origin, callback) {
-
-                // Construct a new Graphology graph object to calculate communities
-                const grgraph = new graphology.Graph({type: 'undirected'});
-
-                // Reiterate nodes
-                var node_data = [];
-                sigma.instances(0).graph.nodes().forEach(function(n) {
-                    node_data.push(n.id);
-
-                    // Add nodes into the Graphology object
-                    grgraph.addNode(n.id);
-                });
-
-                var edge_data = [];
-
-                var totaledgescount = 0;
+      function communityDetect (lougraph, grgraph, callback) {
+ 
+                let node_data = lougraph.node_data;
+                let edge_data = lougraph.edge_data;
 
                 let nodeIDs_rev = graphFactory.getNodeIDsRev();
                 let nodeIDs = graphFactory.getNodeIDs();
 
-                // Reiterate edges
-                sigma.instances(0).graph.edges().forEach(function(e) {
-
-                    var matche = 0;
-
-                    for (var i = 0; i < edge_data.length; i++) {
-                        // replace && with || for undirected graph
-                    if ((edge_data[i].source == e.source && edge_data[i].target == e.target) || (edge_data[i].target == e.source && edge_data[i].source == e.target)) {
-                        matche = 1;
-                        edge_data[i].weight = edge_data[i].weight + parseInt(e.weight);
-                    }
-                    }
-                    if (matche == 0) {
-                    edge_data.push({source: e.source, target: e.target, weight: parseInt(e.weight)});
-
-                    }
-
-                    if (e.source != e.target) {
-                    totaledgescount = totaledgescount + 1;
-                    }
-
-
-                });
-
-                // Add edges into Graphology object
-                for (var i = 0; i < edge_data.length; i++) {
-                grgraph.addEdge(edge_data[i].source, edge_data[i].target, {weight: edge_data[i].weight});
-                }
-                // console.log(sigma.instances(0).graph.edges());
-
-                // console.log(node_data);
-                // console.log(edge_data);
-                // console.log(grgraph);
+                let totaledgescount = graphFactory.getStats('edgesUndirected');
 
                 if (node_data.length > 0 && edge_data.length > 0) {
 
