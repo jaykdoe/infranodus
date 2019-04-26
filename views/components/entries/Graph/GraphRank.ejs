@@ -92,8 +92,15 @@
 
             let bcscore = 0;
 
+            let degree_nodes = [];
+
             // Assign BC score to each node in the graph
             sigma.instances(0).graph.nodes().forEach(function(n) {
+
+                let node_degree = sigma.instances(0).graph.degree(n.id);
+
+                // Get the nodes with the highest degree
+                degree_nodes.push({key: n.id, label: n.label, degree: node_degree});
 
                 // Do we range the nodes by betweenness centrality?
                 if ((most_influential == 'bc' || most_influential == 'bc2') && topbc_nodes[0].bc > 0) {
@@ -112,13 +119,18 @@
                     n.bc = bcmap[n.id];
                 }
                 else {
-                    n.size = sigma.instances(0).graph.degree(n.id);
+                    n.size = node_degree;
                 }
 
             
             });
-            
 
+            // Sort the degree nodes by 
+            degree_nodes = _.sortBy(degree_nodes,'degree').reverse();
+
+            // Save into the global function
+            graphFactory.updateTopDegreeNodes(degree_nodes);
+        
             // Save components of the graph
             top_components = eles.components();
 

@@ -1,0 +1,81 @@
+<script>
+
+
+analyticsPanel = new AnalyticsPanel();
+
+function AnalyticsPanel() {
+
+        let analytics_communities = '';
+        let recommender
+    
+        this.populateCommunities = function(topp_communities) {
+                  
+                let comm_info = "1: ";    
+
+                for (var j = 0; j < topp_communities.length; j++) {
+
+                    for (var n = 0; n < topp_communities[j].nodes.length; n++) {
+                        comm_info += "<a href='#' class='community_node' community='"+topp_communities[j].id+"'>" + topp_communities[j].nodes[n].name + "</a> <div class='inlinesquare "+(topp_communities[j].id)+"'></div> ";
+                    }
+                    comm_info += " <br>" + (j + 2) + ": ";
+                }
+
+                comm_info = comm_info.slice(0, -7);
+                
+                $('#maintopics').html(comm_info);
+
+        }
+
+
+        this.populateInfluential = function(toppbc_nodes) {
+
+            let inf_info = '';
+
+            if ((most_influential == 'bc' || (most_influential == 'bc2') && toppbc_nodes[0].bc > 0)) {
+                $('#typeofinf').text('(highest betweenness centrality):');
+            }
+            else {
+                $('#typeofinf').text('(highest degree):');
+            }
+
+            for (var ind in toppbc_nodes) {
+                    if (toppbc_nodes[ind].bc > 0) {
+                        inf_info += '<div class="inlinesquare '+toppbc_nodes[ind].key+'"></div> <a href="#" class="top_nodes">' + toppbc_nodes[ind].label + '</a> &nbsp;';
+                    }
+            }
+
+            inf_info = inf_info.slice(0, -7);
+        
+            $('#mostinfluential').html(inf_info);
+
+        }
+
+
+        this.populateRecommendation = function(insight_nodes) {
+                       
+            let recommender_iterations = 2;    
+            let recommender = 'What is the relation between <br>';
+            recommender += "<div class='headline'>";
+
+            for (let cluster in insight_nodes) {
+
+                for (var n = 0; n < insight_nodes[cluster].nodes.length; n++) {
+                    if (recommender_iterations != 0) {
+                        recommender += "\"<a href='#' class='community_node' community='"+cluster+"'>" + insight_nodes[cluster].nodes[n].name +'</a>" - ';
+                    }
+                }
+               
+                recommender += '</div> and <br><div class="headline">';
+                
+            }
+
+            recommender += '</div>';
+
+            $('#recommendedquestion').html(recommender);
+
+        }
+
+
+}
+
+</script>

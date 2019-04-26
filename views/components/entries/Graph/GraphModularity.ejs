@@ -14,219 +14,154 @@
 
                 if (node_data.length > 0 && edge_data.length > 0) {
 
-                var community = jLouvain().nodes(node_data).edges(edge_data);
-                var community_assignment_result = community();
-                var node_ids = Object.keys(community_assignment_result['communities']);
-                var com_ass = {};
-                for (var key in community_assignment_result['communities']) {
-                    com_ass[nodeIDs_rev[key]] = community_assignment_result['communities'][key];
-                }
-                // console.log('Resulting Community Data', community_assignment_result['communities']);
-                console.log('Resulting Louvain Community Data', com_ass);
-                console.log('Final Louvain Modularity', community_assignment_result['modularity']);
+                    // Calculate Louvain community and modularity
 
-                // Get the graph back from Graphology with community attribute for nodes
-                var newgraph = louvain_process(grgraph);
+                    let community = jLouvain().nodes(node_data).edges(edge_data);
+                    let community_assignment_result = community();
+                    let node_ids = Object.keys(community_assignment_result['communities']);
+                    let com_ass = {};
 
-                // Convert community codes into integers
-                var louvain_communities = {};
-                var graphology_communities = [];
-
-                grgraph.forEachNode((node, attributes) => {
-                var tempo_comm = grgraph.getNodeAttribute(node,'community');
-                if (graphology_communities.indexOf(tempo_comm) == -1) {
-                    graphology_communities.push(tempo_comm);
-                }
-                louvain_communities[node] = graphology_communities.indexOf(tempo_comm);
-                });
-
-                // Let's calculate modularity
-                var modularity_score = louvain_modularity(newgraph)
-
-                var com_ass2 = {};
-                for (var key in louvain_communities) {
-                    com_ass2[nodeIDs_rev[key]] = louvain_communities[key];
-                }
-                console.log('Resulting Graphology Community Data', com_ass2);
-                console.log('Graphology modularity score:', modularity_score);
-
-                var node_ids = Object.keys(louvain_communities);
-
-                var max_community_number = 0;
-
-                var top_communities = {};
-
-                // We now add the new community integer ID to all the nodes in the Sigma graph
-
-                sigma.instances(0).graph.nodes().forEach(function(n) {
-
-                n.community = louvain_communities[n.id];
-
-                var commune = n.community;
-                if (!top_communities[commune]) {
-                    top_communities[commune] = []
-                }
-
-                top_communities[commune].push({id: n.id, name: n.originalLabel, degree: sigma.instances(0).graph.degree(n.id), bc: bc_nodes_map[n.id]});
-
-                max_community_number = max_community_number < louvain_communities[n.id] ? louvain_communities[n.id]: max_community_number;
-
-                });
-
-                console.log('Total communities: ');
-                console.log(parseInt(max_community_number + 1));
-
-
-                var topp_communities = {};
-
-                var all_communities = {};
-
-                for (var indd in top_communities) {
-                    if (!topp_communities[indd]) {
-                    topp_communities[indd] = {};
-                    all_communities[indd] = {};
-                    topp_communities[indd].id = indd;
-                    all_communities[indd].id = indd;
-                    topp_communities[indd].length = top_communities[indd].length;
-                    all_communities[indd].length = top_communities[indd].length;
-                    topp_communities[indd].nodes = top_communities[indd];
-                    all_communities[indd].nodes = top_communities[indd];
+                    for (let key in community_assignment_result['communities']) {
+                        com_ass[nodeIDs_rev[key]] = community_assignment_result['communities'][key];
                     }
-                }
+                    
+                    console.log('Resulting Louvain Community Data', com_ass);
+                    console.log('Final Louvain Modularity', community_assignment_result['modularity']);
 
-                topp_communities = _.sortBy(topp_communities,'length').reverse();
-                all_communities = _.sortBy(all_communities,'length').reverse();
+                    // Get the graph back from Graphology with community attribute for nodes
+                    let newgraph = louvain_process(grgraph);
 
+                    // Assign community number to every node
+                    let louvain_communities = {};
+                    let graphology_communities = [];
 
-                var advice_iterations = 4;
-                var recommender_iterations = 2;
-                if (topp_communities.length < advice_iterations) {
-                    advice_iterations = topp_communities.length;
-                }
+                    grgraph.forEachNode((node, attributes) => {
+                        let tempo_comm = grgraph.getNodeAttribute(node,'community');
+                        if (graphology_communities.indexOf(tempo_comm) == -1) {
+                            graphology_communities.push(tempo_comm);
+                        }
+                        louvain_communities[node] = graphology_communities.indexOf(tempo_comm);
+                    });
 
-                topp_communities = _.first(topp_communities,advice_iterations);
+                    // Let's calculate modularity for Graphology
+                    let modularity_score = louvain_modularity(newgraph);
 
-                var toppp_communities = [];
-
-                // Slice first 3 off every topp community
-
-                for (var j = 0; j < topp_communities.length; j++) {
-                    if (most_influential == 'bc2') {
-                    topp_communities[j].nodes = _.first(_.sortBy(topp_communities[j].nodes,'bc').reverse(),3);
+                    let com_ass2 = {};
+                    for (var key in louvain_communities) {
+                        com_ass2[nodeIDs_rev[key]] = louvain_communities[key];
                     }
-                    else {
-                    topp_communities[j].nodes = _.first(_.sortBy(topp_communities[j].nodes,'degree').reverse(),3);
+                    console.log('Resulting Graphology Community Data', com_ass2);
+                    console.log('Graphology modularity score:', modularity_score);
+
+                    node_ids = Object.keys(louvain_communities);
+
+                    let max_community_number = 0;
+
+                    let top_communities = {};
+
+                    // We now add the new community integer ID to all the nodes in the Sigma graph
+
+                    sigma.instances(0).graph.nodes().forEach(function(n) {
+
+                        n.community = louvain_communities[n.id];
+
+                        var commune = n.community;
+                        if (!top_communities[commune]) {
+                            top_communities[commune] = [];
+                        }
+
+                        top_communities[commune].push({id: n.id, name: n.originalLabel, degree: sigma.instances(0).graph.degree(n.id), bc: bc_nodes_map[n.id]});
+
+                        max_community_number = max_community_number < louvain_communities[n.id] ? louvain_communities[n.id]: max_community_number;
+
+                    });
+
+                    console.log('Total communities: ');
+                    console.log(parseInt(max_community_number + 1));
+  
+                    // Same as above, for backup purposes
+                    let all_communities = {};
+
+                    for (let indd in top_communities) {
+                        if (!all_communities[indd]) {
+                            all_communities[indd] = {};
+                            all_communities[indd].id = indd;
+                            all_communities[indd].length = top_communities[indd].length;
+                            all_communities[indd].nodes = top_communities[indd];
+                        }
                     }
-                }
+                    
+                    // Sort (and converts to array)
+                    all_communities = _.sortBy(all_communities,'length').reverse();
 
-                //console.log(topp_communities);
+                    // Sort all the nodes in every community by BC or degree influence
 
-                // Give it to the global
-                most_inf_comm_nodes = topp_communities;
+                    for (let j = 0; j < all_communities.length; j++) {
+                        if (most_influential == 'bc2') {
+                            all_communities[j].nodes = _.sortBy(all_communities[j].nodes,'bc').reverse();
+                        }
+                        else {
+                            all_communities[j].nodes = _.sortBy(all_communities[j].nodes,'degree').reverse();
+                        }
+                    }
 
-                // these are top nodes in each community
-                var top_nodes = [];
+                    // Save into the global parameter, to be extracted later
+                    graphFactory.saveAllCommunities(all_communities);
 
-                // TODO move parsing logic away from this function
+                    // How many communities will we show to the user
+                    let coms_to_show = 4;                    
+                    if (all_communities.length < coms_to_show) {
+                        coms_to_show = all_communities.length;
+                    }
 
+                    // Cut out the first N nodes from every community and get the top N communities
+                    let nodes_to_cut = 3;
+
+                    let topN_communities = graphFactory.getAllCommunities(coms_to_show, nodes_to_cut);
+
+                    // TODO might need to delete the topp_communities and most_inf_comm_nodes
+                    let topp_communities = topN_communities;
+
+                    // Give it to the global
+                    most_inf_comm_nodes = topp_communities;
+                    
+                    // Populate Analytics Panel with community information
+                    analyticsPanel.populateCommunities(topN_communities);
+
+                    // Create insight clusters from the community nodes
+                    graphFactory.createInsightClusters(topN_communities);
+
+                    // Populate Analytics Panel with insight recommendation
+                    analyticsPanel.populateRecommendation(graphFactory.getInsightClusters());
+
+  
+                    // console.log(top_nodes);
+                    //console.log(degree_nodes.slice(0,4));
+                    // TODO remove below
+                var recommender = '';
+                var recommender_start = '';
+                top_nodes = []
 
                 var recommender_start = 'next idea tip: what is the relation between "';
-                var recommender = '';
-                var analytics = "<div id='searchanalytics'>The following texts contain the nodes <div id='searchterms'></div><br><div class='headline'>" + current_user + "'s Texts:<br></div>";
-                analytics += '<div id="similarlist">n/a</div><br>';
-                analytics += "<div class='headline'>Others' Public Texts:<br></div>";
-                analytics += '<div id="similaroutside">none found</div><br>&nbsp;';
-                analytics += '</div>';
-
-                analytics += "<div id='mininganalytics'><div class='headline'>Main Topics</div> (according to Latent Dirichlet Allocation):<br>";
-                analytics += "<div id='topicsLDA'></div><br>";
-                analytics += "<div class='headline'>Most Influential Words</div> (main topics and words according to LDA):<br>";
-                analytics += "<div id='termsLDA'></div><br>";
-                analytics += "LDA works only for English-language texts at the moment. More support is coming soon, subscribe  @noduslabs to be informed.<br><br>";
-                analytics += "<button id='miningbutton' class='panelControlBtn' data-id='mining_analytics'>LDA Data</button> <button id='analbutton' class='panelControlBtn' data-id='analytics'>Graph Stats</button>";
-                analytics += "</div>";
-
-
-                analytics = analytics + "<div id='mainanalytics'><div class='headline'>Main Topics</div> (communities detected):<br>"
-                analytics += "1: "
-                for (var j = 0; j < topp_communities.length; j++) {
-
-                    for (var n = 0; n < topp_communities[j].nodes.length; n++) {
-                        if (recommender_iterations != 0) {
-                            recommender += "<a href='#' class='community_node' community='"+topp_communities[j].id+"'>" + topp_communities[j].nodes[n].name +'</a> - ';
-                        }
-                        analytics += "<a href='#' class='community_node' community='"+topp_communities[j].id+"'>" + topp_communities[j].nodes[n].name + "</a> <div class='inlinesquare "+(topp_communities[j].id)+"'></div> ";
-                        top_nodes.push(topp_communities[j].nodes[n].name);
-                    }
-                    if (recommender_iterations != 0) {
-                        recommender = recommender.slice(0, -3);
-                        if (j != recommender_iterations) {
-                        recommender += '"</div> and <br><div class="headline">"';
-                        }
-                        recommender_iterations = recommender_iterations - 1;
-                    }
-                    //  analytics = analytics.slice(0, -3);
-                    analytics += " <br>" + (j + 2) + ": ";
-                }
-
-                //recommender = recommender.slice(0, -10);
-                recommender += ''
-                analytics = analytics.slice(0, -7);
-
-
-
-                // Get the nodes with the highest degree
-                var degree_nodes = [];
-                sigma.instances(0).graph.nodes().forEach(function(n)  {
-                    degree_nodes.push({id: n.id, label: n.label, degree: sigma.instances(0).graph.degree(n.id)});
-                });
-
-                //console.log(degree_nodes);
-                degree_nodes = _.first(_.sortBy(degree_nodes,'degree').reverse(),9).slice(0,4);
-
-
-
-                // console.log(top_nodes);
-                //console.log(degree_nodes.slice(0,4));
-
 
 
                 // TODO to move parsing logic away from this function
 
-                analytics += "<br><br><div class='headline'>Most Influential Words";
 
-                // Get the top BC nodes
-                var toppbc_nodes = graphFactory.getTopBCNodes(4);
+                    // Get the top BC nodes
+                    let topInfluenceNodes = graphFactory.getTopBCNodes(4);
 
-                console.log('Top betweenness centrality nnodes:')
-                console.log(toppbc_nodes);
-
-                most_inf_nodes = toppbc_nodes;
-
-                // TODO   if (most_influential == 'bc' && toppbc_nodes[0].bc > 0) {
-
-                if ((most_influential == 'bc' || (most_influential == 'bc2') && toppbc_nodes[0].bc > 0)) {
-                    analytics += '</div> (highest betweenness centrality):<br>';
-                    for (var ind in toppbc_nodes) {
-                        if (toppbc_nodes[ind].bc > 0) {
-
-                        analytics += '<div class="inlinesquare '+toppbc_nodes[ind].key+'"></div> <a href="#" class="top_nodes">' + toppbc_nodes[ind].label + '</a> &nbsp;';
-
-                        }
-                    }
-                    analytics = analytics.slice(0, -7);
+                    console.log('Top betweenness centrality nnodes:')
+                    console.log(topInfluenceNodes);
 
 
-                }
-                else {
-                    analytics += '</div> (highest degree):<br>';
-                    for (var ind in degree_nodes) {
-                        analytics += '<div class="inlinesquare '+degree_nodes[ind].id+'"></div> <a href="#" class="top_nodes">' + degree_nodes[ind].label + '</a> &nbsp;';
-                    }
-                    analytics = analytics.slice(0, -7);
+
+                    most_inf_nodes = topInfluenceNodes;
+
+                    analyticsPanel.populateInfluential(topInfluenceNodes);
 
 
-                }
+                 
 
                 analytics += "<br><br><div class='headline'>Question to Ask:</div> <br>What is the relation between <br><div class='headline'>\"" + recommender + "\"</div>?";
 
@@ -238,8 +173,6 @@
 
                 // Add control buttons
 
-                analytics = '<div id="panelControllers"><ul><li><button id="analbutton" class="panelControlBtn" data-id="analytics">This Text</li><li><button id="searbutton" class="panelControlBtn" data-id="search_analytics">Related Texts</button></li></ul></div>' + analytics;
-
                 var currentPanel = 'analytics';
 
 
@@ -248,8 +181,8 @@
                 if (!localStorage.getItem('analytics') || localStorage.getItem('analytics') == 1) {
 
 
-                    $('#analytics').html(analytics);
-                    $('#analytics').show();
+                    // $('#analytics').html(analytics);
+                    // $('#analytics').show();
 
                     $("#analbutton").css('background','#ffffff');
                     $("#searbutton").css('background','#ededed');
@@ -278,10 +211,10 @@
                             }
                             else {
 
-                            if ((most_influential == 'bc' || most_influential == 'bc2') && toppbc_nodes[0].bc > 0) {
-                                for (var ind in toppbc_nodes) {
-                                    if (toppbc_nodes[ind].bc > 0) {
-                                    squery += toppbc_nodes[ind].label + '+';
+                            if ((most_influential == 'bc' || most_influential == 'bc2') && topInfluenceNodes[0].bc > 0) {
+                                for (var ind in topInfluenceNodes) {
+                                    if (topInfluenceNodes[ind].bc > 0) {
+                                    squery += topInfluenceNodes[ind].label + '+';
                                     }
                                 }
                             }
@@ -433,8 +366,8 @@
                 }
 
                 else {
-                    $('#analytics').html(analytics);
-                    $('#analytics').hide();
+                    // $('#analytics').html(analytics);
+                    // $('#analytics').hide();
                     $('#analyticsbutton').removeClass('analytics-on');
                     $('#analyticscaption').show();
                     $("#miningbutton").css('background','#ededed');
@@ -670,8 +603,8 @@
                 console.log(all_communities);
 
 
-                for (var bcid in toppbc_nodes) {
-                if (toppbc_nodes[bcid].bc > 0) {
+                for (var bcid in topInfluenceNodes) {
+                if (topInfluenceNodes[bcid].bc > 0) {
 
                 for (var comid in all_communities) {
                     // Open first community
@@ -681,7 +614,7 @@
                             for (var ccnodes in all_communities[comid].nodes) {
 
                                 // If the node's ID equals to the current BC node, add the marker
-                                if (all_communities[comid].nodes[ccnodes].id == toppbc_nodes[bcid].key) {
+                                if (all_communities[comid].nodes[ccnodes].id == topInfluenceNodes[bcid].key) {
                                 bc_dist.push(all_communities[comid].id);
                                 }
 
@@ -710,12 +643,12 @@
 
                 var num_nodes_component = ((top_components[0].nodes().length / totalnodescount).toFixed(2)*100).toFixed(0);
 
-                if ((modularity_score > 0.65 && diversityindex < 50) && ((bc_entropy >= 1.5) || (bc_entropy == 0 && toppbc_nodes[0].bc == 0) || (bc_entropy == 0 && num_nodes_component < 40))) {
+                if ((modularity_score > 0.65 && diversityindex < 50) && ((bc_entropy >= 1.5) || (bc_entropy == 0 && topInfluenceNodes[0].bc == 0) || (bc_entropy == 0 && num_nodes_component < 40))) {
                 diversity_score = 'Dispersed';
                 document.getElementById("biasRange").value = "100";
                 $('#biasRange').attr('class', 'slider dispersedslider');
                 }
-                else if ((modularity_score > 0.4 && diversityindex < 50) && ((bc_entropy >= 1.5) || (bc_entropy == 0 && toppbc_nodes[0].bc == 0) || (bc_entropy == 0 && num_nodes_component < 40))) {
+                else if ((modularity_score > 0.4 && diversityindex < 50) && ((bc_entropy >= 1.5) || (bc_entropy == 0 && topInfluenceNodes[0].bc == 0) || (bc_entropy == 0 && num_nodes_component < 40))) {
                 diversity_score = 'Diversified';
                 document.getElementById("biasRange").value = "67";
                 $('#biasRange').attr('class', 'slider diversedslider');

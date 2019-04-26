@@ -1,4 +1,36 @@
-<div id="analytics"></div>
+<div id="analytics">
+    <div id='searchanalytics'>The following texts contain the nodes <div id='searchterms'></div><br>
+        <div class='headline'>Current User's Texts:<br></div>
+        <div id="similarlist">n/a</div><br>
+        <div class='headline'>Others' Public Texts:<br></div>
+        <div id="similaroutside">none found</div><br>
+        <div id='mininganalytics'>
+            <div class='headline'>Main Topics</div> (according to Latent Dirichlet Allocation):<br>";
+            <div id='topicsLDA'></div><br>
+            <div class='headline'>Most Influential Words</div> (main topics and words according to LDA):<br>
+            <div id='termsLDA'></div><br>
+             LDA works only for English-language texts at the moment. More support is coming soon, subscribe  @noduslabs to be informed.<br><br>";
+            <button id='miningbutton' class='panelControlBtn' data-id='mining_analytics'>LDA Data</button> 
+            <button id='analbutton' class='panelControlBtn' data-id='analytics'>Graph Stats</button>
+        </div>
+    </div>
+    <div id="panelControllers">
+        <ul>
+            <li><button id="analbutton" class="panelControlBtn" data-id="analytics">This Text</li>
+            <li><button id="searbutton" class="panelControlBtn" data-id="search_analytics">Related Texts</button></li>
+        </ul>
+    </div>
+    <div id='mainanalytics'>
+        <div class='headline'>Main Topics</div> (communities detected):<br>
+        <div id="maintopics"></div><br>
+        <div class='headline'>Most Influential Words</div><div id="typeofinf"></div>
+        <div id="mostinfluential"></div><br>
+        <div class='headline'>Question to Ask:</div><br>
+        <div id="recommendedquestion"></div>
+    </div>
+
+</div>
+
 <a href="javascript:" class="tooltip editorpane" title="graph analytics" id="analyticsbutton"><div id="analyticscaption"></div></a>
 
 <script>

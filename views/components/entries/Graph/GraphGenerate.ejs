@@ -87,6 +87,12 @@ function GraphFactory(){
                 // Top betweenness centrality nodes
                 let topbc_nodes = [];
 
+                // All communities
+                let communities = [];
+
+                // Insight clusters
+                let insight_clusters = {};
+
                 // Graph statistics
                 let stats = {};
 
@@ -97,6 +103,30 @@ function GraphFactory(){
 
                 this.getStats = function(key) {
                     return stats[key];
+                }
+
+                this.saveAllCommunities = function(coms) {
+                    communities = coms;
+                    return true;
+                }
+                
+                this.getAllCommunities = function(number, top_nodes) {
+
+                    let proc_communities = communities;
+
+                    if (top_nodes) {
+                        for (let j = 0; j < proc_communities.length; j++) {
+                            proc_communities[j].nodes = _.first(proc_communities[j].nodes,top_nodes);
+                        }
+                    }
+
+                    if (number) {
+                        return _.first(proc_communities,number);
+                    }
+                    else {
+                        return proc_communities;
+                    }
+
                 }
         
                 this.addNode = function(name, id, n) {
@@ -138,7 +168,7 @@ function GraphFactory(){
                     }
                     // If we are deleting the nodes, we transform all the pinned ones, so they can be removed too
                     this.initPinnedNodes([]);
-                    
+
                     // this.updateGraphNodes(nodeIDs_rev);
 
                     // TODO this is a workaround, otherwise sigma doesn't have X parameters on initGraph
@@ -524,6 +554,72 @@ function GraphFactory(){
                     else {
                         return topbc_nodes;
                     }
+                }
+
+                this.updateTopDegreeNodes = function(nodes) {
+                      topDegree_nodes = nodes;
+                      return true;
+                }
+
+                this.getTopDegreeNodes = function(number) {
+                    if (number && number > 0) {
+                        return topDegree_nodes.slice(0,number)
+                    }
+                    else {
+                        return topDegree_nodes;
+                    }
+                }
+
+                this.createInsightClusters = function(most_inf_comm_nodes) {
+            
+                    let insight_nodes = {0: [], 1: []};
+
+                    if (most_inf_comm_nodes.length >= 2) {
+                        if (polysingularity_score == 'Diversified' || polysingularity_score == 'Dispersed') {
+                            insight_nodes[0] = most_inf_comm_nodes[0];
+                            insight_nodes[1] = most_inf_comm_nodes[1];
+                        }
+                        else {            
+                            let first_com = most_inf_comm_nodes[most_inf_comm_nodes.length-1];
+                            let second_com = most_inf_comm_nodes[most_inf_comm_nodes.length-2];
+                            insight_nodes[0] = first_com;
+                            insight_nodes[1] = second_com;                       
+                        }
+                    }
+                    else {
+                        if (most_inf_comm_nodes[0] && most_inf_comm_nodes[0].nodes && most_inf_comm_nodes[0].nodes.length > 1) {
+                            
+                            insight_nodes[0] = {nodes: [], length: 0, id: 0};
+                            insight_nodes[1] = {nodes: [], length: 0, id: 0};
+                            
+                            insight_nodes[0].id = most_inf_comm_nodes[0].id;
+                            insight_nodes[1].id = most_inf_comm_nodes[0].id;
+                            
+                            for (let i = 0; i < most_inf_comm_nodes[0].nodes.length; i++) {
+                                
+                                if (i <= insight_nodes[1].length) {
+                                    insight_nodes[0].nodes.push(most_inf_comm_nodes[0].nodes[i]);
+                                    insight_nodes[0].length += 1;
+                                }
+                                
+                                if ((most_inf_comm_nodes[0].nodes.length - 1 - i) > i) {
+                                    insight_nodes[1].nodes.push(most_inf_comm_nodes[0].nodes[most_inf_comm_nodes[0].nodes.length - 1 - i]);
+                                    insight_nodes[1].length += 1;
+                                }
+                            }
+                        }
+                        else {
+                            insight_nodes[0] = most_inf_comm_nodes[0];
+                            insight_nodes[1] = most_inf_comm_nodes[0];
+                        }
+                    }
+
+                    insight_clusters = insight_nodes;
+                
+                }
+
+                this.getInsightClusters = function() {
+                    return insight_clusters;
                 }
             
         
