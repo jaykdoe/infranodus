@@ -92,7 +92,9 @@ function GraphFactory(){
                 let topbc_nodes = [];
 
                 // All communities
-                let communities = [];
+                let all_communities = [];
+
+                let community_of_node = {};
 
                 // Insight clusters
                 let insight_clusters = {};
@@ -153,27 +155,44 @@ function GraphFactory(){
                 }
 
                 this.saveAllCommunities = function(coms) {
-                    communities = coms;
-                    return true;
+                    let new_communities = [];
+                    for (let c in coms) {
+                        new_communities.push(coms[c]);
+                    }
+                    all_communities = new_communities;
+                    
                 }
                 
                 this.getAllCommunities = function(number, top_nodes) {
 
-                    let proc_communities = communities;
+                    let proc_communities = [];
+
+                    for (let c in all_communities) {
+                        proc_communities[c] = {id: all_communities[c].id, length: 0, nodes: []};
+                    }
 
                     if (top_nodes) {
                         for (let j = 0; j < proc_communities.length; j++) {
-                            proc_communities[j].nodes = _.first(proc_communities[j].nodes,top_nodes);
+                            proc_communities[j].nodes = all_communities[j].nodes.slice(0, top_nodes);
+                            proc_communities[j].length = top_nodes;
                         }
                     }
-
                     if (number) {
-                        return _.first(proc_communities,number);
+                        proc_communities = proc_communities.slice(0,number);
+                        return proc_communities;
                     }
                     else {
                         return proc_communities;
                     }
 
+                }
+
+                this.saveCommunityOfNode = function(node) {
+                    community_of_node[node.originalLabel] = node.community;
+                }
+
+                this.getCommunityOfNode = function(name) {
+                    return community_of_node[name];
                 }
         
                 this.addNode = function(name, id, n) {

@@ -1379,7 +1379,7 @@ function filter_statements_summary(top_words, top_community_words, filter_origin
                         summary_helper += '<a href="#" class="top_nodes">' + entries_keywords[currentDiv][l].label + '</a>';
                       }
                       else if (entries_keywords[currentDiv][l].name) {
-                        summary_helper += '<a href="#" class="community_node" community="' + community_of_node[entries_keywords[currentDiv][l].name] + '">' + entries_keywords[currentDiv][l].name + '</a>';
+                        summary_helper += '<a href="#" class="community_node" community="' + graphFactory.getCommunityOfNode(entries_keywords[currentDiv][l].name) + '">' + entries_keywords[currentDiv][l].name + '</a>';
                       }
 
                   }

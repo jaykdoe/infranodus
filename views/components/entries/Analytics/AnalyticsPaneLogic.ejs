@@ -3,6 +3,8 @@
 
 analyticsPanel = new AnalyticsPanel();
 
+analyticsPanel.activatePanel();
+
 function AnalyticsPanel() {
 
         let analytics_communities = '';
@@ -81,6 +83,41 @@ function AnalyticsPanel() {
 
         }
 
+        this.colorTopics = function(palette) {
+            for (pall in palette) {
+                if (document.getElementsByClassName("inlinesquare " + pall)) {
+                    for (var i = 0; i < document.getElementsByClassName("inlinesquare " + pall).length; i++) {
+                        document.getElementsByClassName("inlinesquare " + pall)[i].style.backgroundColor=rgbToHex(palette[pall]._rgb[0],palette[pall]._rgb[1],palette[pall]._rgb[2]);
+                    }
+                }
+            }
+        }
+
+        this.activatePanel = function() {
+
+            if (!localStorage.getItem('analytics') || localStorage.getItem('analytics') == 1) {
+
+                $('#analytics').show();
+                $('#analyticsbutton').addClass('analytics-on');
+                $('#analyticscaption').hide();
+
+            }
+
+            else {
+            
+                $('#analyticsbutton').removeClass('analytics-on');
+                $('#analyticscaption').show();
+                $("#miningbutton").css('background','#ededed');
+
+            }
+
+            if ((hide_always || hide_edit || hide_when_small) && !show_analytics) {
+                $('#analytics').hide();
+                $('#analyticsbutton').removeClass('analytics-on');
+                $('#analyticscaption').show();
+            }
+        }
+
         this.activateButtons = function() {
 
             $('.panelControlBtn').on("click", function() {
@@ -97,11 +134,7 @@ function AnalyticsPanel() {
                     $("#miningbutton").css('background','#ededed');
                     $("#searbutton").css('background','#ffffff');
 
-                    
-
-               
-
-               
+                
 
                     });
                     currentPanel = ID;

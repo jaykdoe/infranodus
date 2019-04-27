@@ -104,9 +104,6 @@
   var eles;
  
 
-  var community_of_node = [];
-
-
   var sigma_dragged = 0;
 
 
@@ -662,7 +659,10 @@ function graph() {
 
             });
 
-          }
+        },
+        colorNodesCommunities: function(palette) {
+            
+        }
     }
 }
 
@@ -771,6 +771,13 @@ function sigmaGraph() {
   
                   // If we click on the context node, just bring us to that context
                   if (nodeLabel.substr(0,9) == 'context: ') {
+
+                        
+                        // TODO if not pinnedNodes are selected, make a search on this context 
+                        // TODO pin the nodes on this graph
+                        // TODO if pins are on, then proceed as below
+                        // TODO for mobile devices — first show, then the logic above
+
                         let add_url = '';
                   
                         if (nodeLabel.indexOf(', by') == -1) {

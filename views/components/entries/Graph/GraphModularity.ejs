@@ -57,7 +57,9 @@
 
                     let max_community_number = 0;
 
-                    let top_communities = {};
+                    let top_communities = [];
+
+                    let all_communities = [];
 
                     // We now add the new community integer ID to all the nodes in the Sigma graph
 
@@ -65,45 +67,41 @@
 
                         n.community = louvain_communities[n.id];
 
+                        graphFactory.saveCommunityOfNode(n);
+
                         var commune = n.community;
                         if (!top_communities[commune]) {
                             top_communities[commune] = [];
+                            all_communities[commune] = {id: commune, length: 0, nodes: []};
                         }
+                        
 
                         top_communities[commune].push({id: n.id, name: n.originalLabel, degree: sigma.instances(0).graph.degree(n.id), bc: bc_nodes_map[n.id]});
+                        all_communities[commune].nodes.push({id: n.id, name: n.originalLabel, degree: sigma.instances(0).graph.degree(n.id), bc: bc_nodes_map[n.id]});
+                        all_communities[commune].length += 1;
 
+                        // number of communities
                         max_community_number = max_community_number < louvain_communities[n.id] ? louvain_communities[n.id]: max_community_number;
 
                     });
 
                     console.log('Total communities: ');
                     console.log(parseInt(max_community_number + 1));
-  
-                    // Same as above, for backup purposes
-                    let all_communities = {};
-
-                    for (let indd in top_communities) {
-                        if (!all_communities[indd]) {
-                            all_communities[indd] = {};
-                            all_communities[indd].id = indd;
-                            all_communities[indd].length = top_communities[indd].length;
-                            all_communities[indd].nodes = top_communities[indd];
-                        }
-                    }
                     
                     // Sort (and converts to array)
-                    all_communities = _.sortBy(all_communities,'length').reverse();
+                   all_communities = _.sortBy(all_communities,'length').reverse();
 
                     // Sort all the nodes in every community by BC or degree influence
 
                     for (let j = 0; j < all_communities.length; j++) {
                         if (most_influential == 'bc2') {
-                            all_communities[j].nodes = _.sortBy(all_communities[j].nodes,'bc').reverse();
+                           all_communities[j].nodes = _.sortBy(all_communities[j].nodes,'bc').reverse();
                         }
                         else {
-                            all_communities[j].nodes = _.sortBy(all_communities[j].nodes,'degree').reverse();
+                           all_communities[j].nodes = _.sortBy(all_communities[j].nodes,'degree').reverse();
                         }
                     }
+
 
                     // Save into the global parameter, to be extracted later
                     graphFactory.saveAllCommunities(all_communities);
@@ -151,99 +149,22 @@
 
                     analyticsPanel.populateInfluential(topInfluenceNodes);
 
+                    // Send the default search setting to the Global Search
+                    // TODO take into account the polysingularity index
                     globalSearch.populateGlobalSearch(topInfluenceNodes);
 
+                    // Generate a nice fixed patterns for the communities
+                    let palette = generatePalette(graphPalette, max_community_number, background);
 
-                 
+                    // Color the topic boxes in the Analytics panel
+                    analyticsPanel.colorTopics(palette);
 
+                    // Color the nodes in the graph
+                    graph().colorNodesCommunities(palette);
+                    
 
-                // Add control buttons
-
-                var currentPanel = 'analytics';
-
-
-                    // Check analytics display
-
-                if (!localStorage.getItem('analytics') || localStorage.getItem('analytics') == 1) {
-
-
-
-
-                
-
-
-                    //localStorage.setItem('analytics', 1);
-                    $('#analyticsbutton').addClass('analytics-on');
-                    $('#analyticscaption').hide();
-                }
-
-                else {
-                    // $('#analytics').html(analytics);
-                    // $('#analytics').hide();
-                    $('#analyticsbutton').removeClass('analytics-on');
-                    $('#analyticscaption').show();
-                    $("#miningbutton").css('background','#ededed');
-
-                }
-
-                if ((hide_always || hide_edit || hide_when_small) && !show_analytics) {
-                    $('#analytics').hide();
-                    $('#analyticsbutton').removeClass('analytics-on');
-                    $('#analyticscaption').show();
-                }
-
-                //console.log(localStorage.getItem('analytics'));
-
-
-
-
-
-
-                // nice color palette
-                if (graphPalette == 'color') {
-                var palette = new DistinctColors({count: max_community_number + 1, lightMin: 60, lightMax: 75, chromaMin: 2, chromaMax: 15});
-                }
-                else if (graphPalette == 'mono') {
-                // subdued chromo
-                var palette = new DistinctColors({count: max_community_number + 1, lightMin: 40, lightMax: 60, chromaMin: 2, chromaMax: 8});
-                //
-                }
-                else if (graphPalette == 'contrast') {
-                // subdued chromo
-                if (background == 'dark') {
-                var palette = new DistinctColors({count: max_community_number + 1, lightMin: 75, lightMax: 95, chromaMin: 1, chromaMax: 8});
-                }
-                else {
-                var palette = new DistinctColors({count: max_community_number + 1, lightMin: 40, lightMax: 60, chromaMin: 1, chromaMax: 2});
-                }
-                //
-                }
-                // good chromo
-                else {
-                var palette = new DistinctColors({count: max_community_number + 1, lightMin: 70, chromaMin: 60, samples: 100});
-                }
-
-                var s_x = 0;
-                var s_y = 0;
-                var e_x = 0;
-                var e_y = 0;
-
-                //console.log(palette);
-                //  console.log(sigma.instances(0).graph.nodes()[54]);
-
-
-                for (pall in palette) {
-                    if (document.getElementsByClassName("inlinesquare " + pall)) {
-                    for (var i = 0; i < document.getElementsByClassName("inlinesquare " + pall).length; i++) {
-                        document.getElementsByClassName("inlinesquare " + pall)[i].style.backgroundColor=rgbToHex(palette[pall]._rgb[0],palette[pall]._rgb[1],palette[pall]._rgb[2]);
-                    }
-                    }
-                }
-
-                var totalnodescount = 0;
-                var addcontextcount = 0;
-                var nodesfirstcom = 0;
-                var nodessecondcom = 0;
+                    
+           
 
                 var diversityindex = 0;
 
@@ -252,10 +173,30 @@
                 var addcontext_nodes = [];
 
 
+                var totalnodescount = 0;
+                var addcontextcount = 0;
+                var nodesfirstcom = 0;
+                var nodessecondcom = 0;
+
+                console.log('all')
+                console.log(all_communities)
+
+                sigma.instances(0).graph.nodes().forEach(function(n) {
+                    if (n.community == all_communities[0].id) {
+                        nodesfirstcom = nodesfirstcom + 1;
+                    }
+                    if (all_communities[1]) {
+                        if (n.community == all_communities[1].id) {
+                            nodessecondcom = nodessecondcom + 1;
+                        }
+                    }
+                    totalnodescount = totalnodescount + 1;
+                });
+
+
                 sigma.instances(0).graph.nodes().forEach(function(n) {
              
 
-                community_of_node[n.originalLabel] = n.community;
 
                 n.originalColor = rgbToHex(palette[n.community]._rgb[0],palette[n.community]._rgb[1],palette[n.community]._rgb[2]);
 
@@ -282,24 +223,7 @@
                     nodeIDs[n.originalLabel] == n.id;
                 }
 
-                if (n.community == topp_communities[0].id) {
-                //  console.log(n.originalLabel + ' ' + n.x);
-                // TODO here we can calculate modularity
-                    s_x += n.x;
-                    s_y += n.y;
-                    //  console.log(s_x)
-                    nodesfirstcom = nodesfirstcom + 1;
-                }
-                if (topp_communities[1]) {
-                if (n.community == topp_communities[1].id) {
-                    e_x += n.x;
-                    e_y += n.y;
-
-                    nodessecondcom = nodessecondcom + 1;
-                }
-                }
-
-                totalnodescount = totalnodescount + 1;
+      
 
                 if (document.getElementsByClassName("inlinesquare " + n.id)[0] != undefined) {
                         document.getElementsByClassName("inlinesquare " + n.id)[0].style.backgroundColor=rgbToHex(palette[n.community]._rgb[0],palette[n.community]._rgb[1],palette[n.community]._rgb[2]);

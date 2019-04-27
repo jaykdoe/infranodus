@@ -90,6 +90,34 @@
         return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
     }
 
+    function generatePalette(type, colors, background) {
+            let palette;
+              
+            if (type == 'color') {
+                // nice color palette    
+                palette = new DistinctColors({count: colors + 1, lightMin: 60, lightMax: 75, chromaMin: 2, chromaMax: 15});
+            }
+            else if (type == 'mono') {
+                // subdued chromo
+                palette = new DistinctColors({count: colors + 1, lightMin: 40, lightMax: 60, chromaMin: 2, chromaMax: 8});
+            
+            }
+            else if (type == 'contrast') {
+                // subdued chromo
+                if (background == 'dark') {
+                    palette = new DistinctColors({count: colors + 1, lightMin: 75, lightMax: 95, chromaMin: 1, chromaMax: 8});
+                }
+                else {
+                    palette = new DistinctColors({count: colors + 1, lightMin: 40, lightMax: 60, chromaMin: 1, chromaMax: 2});
+                } 
+            }
+            else {
+                // good chromo
+                palette = new DistinctColors({count: colors + 1, lightMin: 70, chromaMin: 60, samples: 100});
+            }
+            return palette;
+    }
+
     function arrayToHashtagString(array) {
         
         let string = '';
