@@ -110,7 +110,11 @@ function filter_graph(pins){
 
                     }
 
-                    n.label = n.originalLabel;
+                
+
+                        n.label = n.originalLabel;
+                    
+                  
 
                 }
                 else  {
@@ -144,8 +148,9 @@ function filter_graph(pins){
             sigma.instances(0).graph.nodes().forEach(function(n) {
 
                 n.color = n.originalColor;
-                n.label = n.originalLabel;
-
+                if (!n.url) {
+                    n.label = n.originalLabel;
+                }
                 n.marked = 0;
 
             });

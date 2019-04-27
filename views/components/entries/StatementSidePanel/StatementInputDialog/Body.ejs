@@ -19,9 +19,17 @@
 <div id="search-panel">
     <form class="pure-form" id="searchform">
         <input type="text" id="search" size="14" maxlength="20" class="pure-input" placeholder="search...">
-        &nbsp;&nbsp;
-        <input type='submit' name="submit" value=">" class="pure-button pure-button-primary">
+           
+           
+        
+        <input type='hidden' name="submit" value=">" class="pure-button pure-button-primary">
     </form>
+        <a href="javascript:" id="searchnode" class="tooltip" title="find a node in the graph"></a>
+
+    <% if (!perceivername) { %>
+        <a href="javascript:" id="addnode" class="tooltip editorpane" title="add a node in the graph"></a>
+      <% } %>
+ 
 </div>
 
 <script>
@@ -203,15 +211,43 @@
                     .fail(function(res) {
                         displayAlert("Server Error: " + res.status + " " + res.statusText);
                     });
+            },
+            populateRecommendation: function(insight_nodes) {
+                  
+                let recommender = 'next idea tip: what is the relation between ';
+              
+
+                let iter = 0;    
+                for (let cluster in insight_nodes) {
+
+                    recommender += '"';
+                    for (var n = 0; n < insight_nodes[cluster].nodes.length; n++) {
+                        
+                        recommender += insight_nodes[cluster].nodes[n].name;
+                        if (n < insight_nodes[cluster].nodes.length - 1) { recommender += ' - '}
+                    
+                    }
+                    
+                    iter += 1;
+                    if (iter < Object.keys(insight_nodes).length) {
+                        recommender += '" and ';
+                    }
+                    
+                    
+                }
+
+                recommender += '"?';
+
+                $("#statement").attr("placeholder", recommender);
             } 
         }
     }
 
 
     function submitSearchForm(e) {
-
     
         e.preventDefault();
+
         // What are we searching?
         var searchPhrase = $('#search').val();
 
@@ -313,6 +349,62 @@
 
     });
 
+
+    // Memorize which interface option the user had on last time
+    if (localStorage.getItem('defaultbehavior') == 'add') {
+        $('#addnode').addClass('addnode-on');
+    }
+    else {
+        $('#searchnode').addClass('searchnode-on');
+    }
+
+
+    // What happens when we add a single node from the second editor on top
+
+    $("#addnode").on('click', function(e) {
+        console.log('clicked addone')
+        e.preventDefault();
+
+        $('#addnode').addClass('addnode-on');
+        $('#searchnode').removeClass('searchnode-on');
+        
+        $('#statement').val($('#search').val());
+        
+        document.getElementById('submitform').dispatchEvent(new Event('submit'));
+        
+        $('#search').val('');
+        $("#search").focus();
+
+    });
+
+    // What if we search for a node in the graph using the form 
+
+    $("#searchnode").on('click', function(e) {
+
+        e.preventDefault();
+
+        $('#addnode').removeClass('addnode-on');
+        $('#searchnode').addClass('searchnode-on');
+
+        localStorage.setItem('defaultbehavior', 'search');
+
+        var searchinput = $('#search').val();
+
+        // TODO implement lemmas search
+        if (searchinput.length > 0) {
+            var searchinarray = searchinput.split(' ');
+            for (var key in searchinarray) {
+                if (searchinarray[key].charAt(0) == '#') { searchinarray[key] = searchinarray[key].slice(1); }
+            }
+            searchinput = searchinarray.join(' ');
+            $('#search').val(searchinput);
+            submitSearchForm(e);
+        }
+        else {
+            alert('Please, enter the node name you want to find...');
+        }
+
+    });
 
 
 

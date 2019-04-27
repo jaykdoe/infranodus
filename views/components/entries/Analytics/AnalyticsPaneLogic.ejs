@@ -32,10 +32,10 @@ function AnalyticsPanel() {
             let inf_info = '';
 
             if ((most_influential == 'bc' || (most_influential == 'bc2') && toppbc_nodes[0].bc > 0)) {
-                $('#typeofinf').text('(highest betweenness centrality):');
+                $('#typeofinf').text('(highest betweenness, i.e. linking different topics):');
             }
             else {
-                $('#typeofinf').text('(highest degree):');
+                $('#typeofinf').text('(highest degree, i.e. most co-occurrences):');
             }
 
             for (var ind in toppbc_nodes) {
@@ -53,26 +53,152 @@ function AnalyticsPanel() {
 
         this.populateRecommendation = function(insight_nodes) {
                        
-            let recommender_iterations = 2;    
+            
             let recommender = 'What is the relation between <br>';
             recommender += "<div class='headline'>";
 
+            let iter = 0;    
             for (let cluster in insight_nodes) {
-
+                recommender += '"';
                 for (var n = 0; n < insight_nodes[cluster].nodes.length; n++) {
-                    if (recommender_iterations != 0) {
-                        recommender += "\"<a href='#' class='community_node' community='"+cluster+"'>" + insight_nodes[cluster].nodes[n].name +'</a>" - ';
-                    }
+                    
+                    recommender += "<a href='#' class='community_node' community='"+cluster+"'>" + insight_nodes[cluster].nodes[n].name +'</a>';
+                    if (n < insight_nodes[cluster].nodes.length - 1) { recommender += ' - '}
+                   
                 }
-               
-                recommender += '</div> and <br><div class="headline">';
+                
+                iter += 1;
+                if (iter < Object.keys(insight_nodes).length) {
+                    recommender += '"</div> and <br><div class="headline">';
+                }
+                
                 
             }
 
-            recommender += '</div>';
+            recommender += '"?</div>';
 
             $('#recommendedquestion').html(recommender);
 
+        }
+
+        this.activateButtons = function() {
+
+            $('.panelControlBtn').on("click", function() {
+
+                // What's the origin of the click?
+                var ID = $(this).attr('data-id');
+
+                if (ID == 'search_analytics') {
+                    
+                    $("#mainanalytics").fadeOut('fast', function() {
+                    $("#mininganalytics").fadeOut('fast');
+                    $("#searchanalytics").fadeIn('fast');
+                    $("#analbutton").css('background','#ededed');
+                    $("#miningbutton").css('background','#ededed');
+                    $("#searbutton").css('background','#ffffff');
+
+                    
+
+               
+
+               
+
+                    });
+                    currentPanel = ID;
+                }
+                else if (ID == 'analytics') {
+                    $("#searchanalytics").fadeOut('fast', function() {
+                    $("#mininganalytics").fadeOut('fast');
+                    $("#mainanalytics").fadeIn('fast');
+                    $("#analbutton").css('background','#ffffff');
+                    $("#searbutton").css('background','#ededed');
+                    $("#miningbutton").css('background','#ededed');
+                    });
+                    currentPanel = ID;
+                }
+                else if (ID == 'mining_analytics') {
+
+                    $("#searchanalytics").fadeOut('fast', function() {
+                    $("#mainanalytics").fadeOut('fast');
+                    $("#mininganalytics").fadeIn('fast');
+                    $("#analbutton").css('background','#ededed');
+                    $("#searbutton").css('background','#ededed');
+                    $("#miningbutton").css('background','#ffffff');
+
+                    var html = "n/a";
+
+                    $.getJSON("/api/" + current_user + "/lda/topics/" + current_context, function( data ) {
+                    var items = [];
+                    html = '';
+                    for (var i = 0; i < data.length; i++) {
+
+                        for (var j = 0; j < data[i].length; j++) {
+                        //console.log(nodeIDs[data[i][j].term]);
+                        items.push('<div class="inlinesquare ' + louvain_communities[nodeIDs[data[i][j].term]] + '"></div> <a href="#" class="top_nodes">' + data[i][j].term + '</a> &nbsp;');
+                        if (j == (data[i].length - 1)) {
+                            items.push('<br>')
+                        }
+                        }
+
+
+                    }
+
+
+                    $("#topicsLDA").html(items.join(""));
+
+                    $.getJSON("/api/" + current_user + "/lda/terms/" + current_context, function( data ) {
+                        var items = [];
+                        html = '';
+                        for (var i = 0; i < data.length; i++) {
+
+                        for (var j = 0; j < data[i].length; j++) {
+                            //console.log(nodeIDs[data[i][j].term]);
+                            items.push('<div class="inlinesquare ' + louvain_communities[nodeIDs[data[i][j].term]] + '"></div> <a href="#" class="top_nodes">' + data[i][j].term + '</a> &nbsp;');
+                            if (j == (data[i].length - 1)) {
+                            items.push('<br>')
+                            }
+                        }
+
+
+                        }
+
+
+                        $("#termsLDA").html(items.join(""));
+
+                        for (pall in palette) {
+                            if (document.getElementsByClassName("inlinesquare " + pall)) {
+                                for (var i = 0; i < document.getElementsByClassName("inlinesquare " + pall).length; i++) {
+
+                                document.getElementsByClassName("inlinesquare " + pall)[i].style.backgroundColor=rgbToHex(palette[pall]._rgb[0],palette[pall]._rgb[1],palette[pall]._rgb[2]);
+                                }
+                            }
+                        }
+                        top_nodes_activate();
+
+
+
+
+                    });
+
+
+
+
+
+
+                    });
+
+
+
+                    });
+                    currentPanel = ID;
+                }
+
+                else if (ID == 'request_analytics'){
+                    window.open('https://noduslabs.com/services/connections/', '_blank');
+                }
+
+
+            });
         }
 
 

@@ -20,11 +20,15 @@ sigma.parsers.json(
                 minEdgeSize: 0.5,
                 maxEdgeSize: 2,
                 labelThreshold: in_label_threshold,
-                defaultLabelColor: default_label_color
+                defaultLabelColor: default_label_color,
+                adjustSizes: true,
+                
             }
         },
         function(sigma) {                
- 
+            
+            CustomShapes.init(sigma);
+
             // Add some stats for each node and edge and launch BC and community detection analytics algorithms
             graph().initNodesEdges(graph().updateMetrics);           
   
@@ -96,6 +100,12 @@ function GraphFactory(){
                 // Graph statistics
                 let stats = {};
 
+                // Context nodes in the graph
+                let graphContextNodes = [];
+
+                // Context edges in the graph
+                let graphContextEdges = [];
+
                 this.setStats = function(key, value) {
                     stats[key] = value;
                     return true;
@@ -103,6 +113,43 @@ function GraphFactory(){
 
                 this.getStats = function(key) {
                     return stats[key];
+                }
+
+                this.addGraphContextNode = function(context) {
+                    
+                    if (graphContextNodes.indexOf(context.id) == -1) {
+                        graphContextNodes.push(context.id);
+                        graph().addContextNode(context);
+                    }
+                    
+                }
+
+                this.removeGraphContextNodes = function() {
+                    graphContextNodes = [];
+                    graphContextEdges = [];
+                    graph().removeContextNodes();
+                }
+
+                this.addGraphContextEdge = function(context, node) {
+                    
+                    let edge_id = context.id + '-' + node.id;
+                    let source_id = context.id;
+                    let target_id = node.id;
+
+                    if (graphContextEdges.indexOf(edge_id) == -1) {
+                        graphContextEdges.push(edge_id);
+                        graph().addContextEdge(edge_id, context.id, node.id, '');
+                    }
+                    
+                    
+                }
+
+                this.getGraphContextNodes = function() {
+                    return graphContextNodes;
+                }
+
+                this.getGraphContextEdges = function() {
+                    return graphContextEdges;
                 }
 
                 this.saveAllCommunities = function(coms) {

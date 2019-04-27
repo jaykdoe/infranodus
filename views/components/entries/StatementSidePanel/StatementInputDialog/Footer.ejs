@@ -49,11 +49,13 @@ function privacyLinkButton() {
 function deleteContextButton() {
     return {
         hide: function(){
+            $('#deletecontext').hide();
             $('#deletecontextbutton').hide();
          
         },
         show: function () {
             $('#deletecontextbutton').show()
+            $('#deletecontext').show();
         }
     }
 }

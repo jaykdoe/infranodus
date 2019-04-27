@@ -67,6 +67,12 @@
     --taginput-boxshadow: none;
     --taginput-color: #aaaab5;
     --taginput-height: 26px;
+
+    --globalsearch-background: url('../images/search.png');
+    --addnode-opacity: 1;
+
+    --globalsearchremove-background: url('../images/remove.png');
+    --addnode-opacity: 1;
 }
 :root[theme='dark'] {
     --body-text-color: #aaaab5;
@@ -109,6 +115,12 @@
     --taginput-boxshadow: none;
     --taginput-color: #aaaab5;
     --taginput-height: 26px;
+
+    --globalsearch-background: url('../images/search-white.png');
+    --addnode-opacity: 0.6;
+
+    --globalsearchremove-background: url('../images/remove-white.png');
+    --addnode-opacity: 0.6;
 }
 
 
@@ -685,6 +697,26 @@ button {
 
 }
 
+#typeofinf {
+    display: inline;
+}
+
+#analbutton {
+    background: #ffffff;
+}
+
+#searbutton {
+    background: #ededed;
+}
+
+#miningbutton {
+    background: #ededed;
+}
+
+#resetgraph {
+    background: #ededed;
+}
+
 #livetext {
   position: fixed;
   top: 80px;
@@ -903,17 +935,49 @@ button {
 
 
 #addnode {
+    float: left;
+    font-size: 8px; /* change this value to increase/decrease button size */
+    width: 23px;
+    height: 23px;
+    padding: 1em 0em 0em 0em;
+    z-index: 10;
+    opacity: var(--addnode-opacity);
+    background-image: var(--addnode-background);
+    background-repeat:no-repeat;
+    background-position:center;
+    
+}
+
+#globalsearchbutton {
     float: right;
     font-size: 8px; /* change this value to increase/decrease button size */
     width: 23px;
     height: 23px;
     padding: 0em 0em 0em 2em;
     z-index: 10;
-    opacity: var(--addnode-opacity);
-    background-image: var(--addnode-background);
+    opacity: var(--globalsearch-opacity);
+    background-image: var(--globalsearch-background);
     background-repeat:no-repeat;
     background-position:center;
+    
 }
+
+#globalsearchremove {
+    float: right;
+    font-size: 8px; /* change this value to increase/decrease button size */
+    width: 23px;
+    height: 23px;
+    padding: 0em 0em 0em 0em;
+    margin-right: -10px;
+    z-index: 10;
+    opacity: var(--globalsearchremove-opacity);
+    background-image: var(--globalsearchremove-background);
+    background-repeat:no-repeat;
+    background-position:center;
+    display: none;
+    
+}
+
 .addnode-on {
   opacity: 1!important;
   background-image: url('../images/add-blue.png')!important;
@@ -992,11 +1056,11 @@ padding: 0em 0em 1em 0em;
 
 
 #searchnode {
-    float: right;
+    float: left;
     font-size: 8px; /* change this value to increase/decrease button size */
     width: 23px;
     height: 23px;
-    padding: 0em 0em 0em 2em;
+    padding: 1em 0em 0em 4em;
     z-index: 10;
     opacity: 1!important;
     background-image: url('../images/search.png');
@@ -1181,7 +1245,7 @@ padding: 0em 0em 1em 0em;
 
 }
 
-#addnodeform {
+#globalsearchform {
   float: right;
   display: inline;
   z-index:99;
@@ -1194,7 +1258,7 @@ padding: 0em 0em 1em 0em;
   padding: 14px 5px 0px 0px;
 }
 
-#addnodeinput {
+#globalsearchinput {
   float: right;
   /* visibility: hidden; */
   z-index:99;

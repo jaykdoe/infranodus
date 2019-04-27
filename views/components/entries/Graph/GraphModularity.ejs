@@ -132,44 +132,30 @@
                     graphFactory.createInsightClusters(topN_communities);
 
                     // Populate Analytics Panel with insight recommendation
-                    analyticsPanel.populateRecommendation(graphFactory.getInsightClusters());
 
-  
-                    // console.log(top_nodes);
-                    //console.log(degree_nodes.slice(0,4));
-                    // TODO remove below
-                var recommender = '';
-                var recommender_start = '';
-                top_nodes = []
+                    let insightClusters = graphFactory.getInsightClusters();
 
-                var recommender_start = 'next idea tip: what is the relation between "';
+                    analyticsPanel.populateRecommendation(insightClusters);
 
-
-                // TODO to move parsing logic away from this function
-
+                    // Populate entries field
+                    addEntryForm().populateRecommendation(insightClusters);
 
                     // Get the top BC nodes
+                    // TODO implement Jenks-Breaks to calculate the optimal number of nodes shown
                     let topInfluenceNodes = graphFactory.getTopBCNodes(4);
 
                     console.log('Top betweenness centrality nnodes:')
                     console.log(topInfluenceNodes);
 
-
-
                     most_inf_nodes = topInfluenceNodes;
 
                     analyticsPanel.populateInfluential(topInfluenceNodes);
 
+                    globalSearch.populateGlobalSearch(topInfluenceNodes);
+
 
                  
 
-                analytics += "<br><br><div class='headline'>Question to Ask:</div> <br>What is the relation between <br><div class='headline'>\"" + recommender + "\"</div>?";
-
-                analytics += "<br><br><div id='graphstats'></div>";
-
-                analytics += "<br><br><button id='resetgraph' class='panelControlBtn'>Reset</button> &nbsp; <button id='miningbutton' class='panelControlBtn' data-id='mining_analytics'>LDA Data</button> &nbsp; <button id='requestbutton' class='panelControlBtn' data-id='request_analytics'>Custom Report</button>";
-
-                analytics += "</div>";
 
                 // Add control buttons
 
@@ -181,183 +167,9 @@
                 if (!localStorage.getItem('analytics') || localStorage.getItem('analytics') == 1) {
 
 
-                    // $('#analytics').html(analytics);
-                    // $('#analytics').show();
-
-                    $("#analbutton").css('background','#ffffff');
-                    $("#searbutton").css('background','#ededed');
-                    $("#miningbutton").css('background','#ededed');
-                    $("#resetgraph").css('background','#ededed');
 
 
-                        $('.panelControlBtn').on("click", function() {
-                        var ID = $(this).attr('data-id');
-                        if (ID == 'search_analytics') {
-                            $("#mainanalytics").fadeOut('fast', function() {
-                            $("#mininganalytics").fadeOut('fast');
-                            $("#searchanalytics").fadeIn('fast');
-                            $("#analbutton").css('background','#ededed');
-                            $("#miningbutton").css('background','#ededed');
-                            $("#searbutton").css('background','#ffffff');
-
-                            // Show similar texts following a search query on the Connections pane
-
-                            var squery = '';
-
-                            if (pinnedNodes.length > 0) {
-                            for (var i = 0; i < pinnedNodes.length; i++) {
-                                squery += pinnedNodes[i] + '+';
-                            }
-                            }
-                            else {
-
-                            if ((most_influential == 'bc' || most_influential == 'bc2') && topInfluenceNodes[0].bc > 0) {
-                                for (var ind in topInfluenceNodes) {
-                                    if (topInfluenceNodes[ind].bc > 0) {
-                                    squery += topInfluenceNodes[ind].label + '+';
-                                    }
-                                }
-                            }
-                            else {
-                                for (var ind in degree_nodes) {
-                                    squery += degree_nodes[ind].label + '+';
-                                }
-                            }
-                            }
-
-                            // Formed search query for JSON GET
-                            squery = squery.slice(0, -1);
-
-
-                            // Add search terms into the Statistics pane
-                            $("#searchterms").html('<em>' + squery.replace(/\+/g, ' ') + '</em>');
-
-                            // Request user's context graphs (texts) which contain either the top nodes or the selected ones
-                            console.log('<%=perceivername %>'); // public view
-                            console.log('<%=receivername %>'); // private view
-                            $.getJSON("/api/" + current_user + "/connectedcontexts/?keywords=" + squery + "&user=" + current_user, function( data ) {
-                            var items = [];
-                            $.each( data.slice(0,7), function( key, val ) {
-                                <% if (perceivername) { %>
-                                items.push("<a href='/<%= perceivername %>/" + val.name + "?keywords=" + squery + "'>" + val.name + "</a><br>");
-
-                                <% } else  { %>
-                                items.push("<a href='/<%= receivername %>/" + val.name + "/edit?keywords=" + squery + "'>" + val.name + "</a><br>");
-
-                                <% } %>
-                            });
-
-                            $("#similarlist").html(items.join(""));
-
-                            });
-
-                            // Request user's context graphs (texts) which contain either the top nodes or the selected ones
-                            $.getJSON("/api/connectedcontexts/?keywords=" + squery, function( data ) {
-                            var items = [];
-                            $.each( data.slice(0,7), function( key, val ) {
-                                items.push("<a href='/" + val[1] + "/" + val[0].name + "?keywords=" + squery + "'>" + val[0].name + "</a><br>");
-                            });
-
-                            $("#similaroutside").html(items.join(""));
-
-                            });
-
-                            });
-                            currentPanel = ID;
-                        }
-                        else if (ID == 'analytics') {
-                            $("#searchanalytics").fadeOut('fast', function() {
-                            $("#mininganalytics").fadeOut('fast');
-                            $("#mainanalytics").fadeIn('fast');
-                            $("#analbutton").css('background','#ffffff');
-                            $("#searbutton").css('background','#ededed');
-                            $("#miningbutton").css('background','#ededed');
-                            });
-                            currentPanel = ID;
-                        }
-                        else if (ID == 'mining_analytics') {
-
-                            $("#searchanalytics").fadeOut('fast', function() {
-                            $("#mainanalytics").fadeOut('fast');
-                            $("#mininganalytics").fadeIn('fast');
-                            $("#analbutton").css('background','#ededed');
-                            $("#searbutton").css('background','#ededed');
-                            $("#miningbutton").css('background','#ffffff');
-
-                            var html = "n/a";
-
-                            $.getJSON("/api/" + current_user + "/lda/topics/" + current_context, function( data ) {
-                            var items = [];
-                            html = '';
-                            for (var i = 0; i < data.length; i++) {
-
-                                for (var j = 0; j < data[i].length; j++) {
-                                //console.log(nodeIDs[data[i][j].term]);
-                                items.push('<div class="inlinesquare ' + louvain_communities[nodeIDs[data[i][j].term]] + '"></div> <a href="#" class="top_nodes">' + data[i][j].term + '</a> &nbsp;');
-                                if (j == (data[i].length - 1)) {
-                                    items.push('<br>')
-                                }
-                                }
-
-
-                            }
-
-
-                            $("#topicsLDA").html(items.join(""));
-
-                            $.getJSON("/api/" + current_user + "/lda/terms/" + current_context, function( data ) {
-                                var items = [];
-                                html = '';
-                                for (var i = 0; i < data.length; i++) {
-
-                                for (var j = 0; j < data[i].length; j++) {
-                                    //console.log(nodeIDs[data[i][j].term]);
-                                    items.push('<div class="inlinesquare ' + louvain_communities[nodeIDs[data[i][j].term]] + '"></div> <a href="#" class="top_nodes">' + data[i][j].term + '</a> &nbsp;');
-                                    if (j == (data[i].length - 1)) {
-                                    items.push('<br>')
-                                    }
-                                }
-
-
-                                }
-
-
-                                $("#termsLDA").html(items.join(""));
-
-                                for (pall in palette) {
-                                    if (document.getElementsByClassName("inlinesquare " + pall)) {
-                                        for (var i = 0; i < document.getElementsByClassName("inlinesquare " + pall).length; i++) {
-
-                                        document.getElementsByClassName("inlinesquare " + pall)[i].style.backgroundColor=rgbToHex(palette[pall]._rgb[0],palette[pall]._rgb[1],palette[pall]._rgb[2]);
-                                        }
-                                    }
-                                }
-                                top_nodes_activate();
-
-
-
-
-                            });
-
-
-
-
-
-
-                            });
-
-
-
-                            });
-                            currentPanel = ID;
-                        }
-
-                        else if (ID == 'request_analytics'){
-                            window.open('https://noduslabs.com/services/connections/', '_blank');
-                        }
-
-
-                        });
+                
 
 
                     //localStorage.setItem('analytics', 1);
@@ -382,9 +194,7 @@
 
                 //console.log(localStorage.getItem('analytics'));
 
-                var recommender_tip = $(recommender).text();
 
-                $("#statement").attr("placeholder", recommender_start + recommender_tip + "?").blur().focus();
 
 
 
@@ -443,9 +253,7 @@
 
 
                 sigma.instances(0).graph.nodes().forEach(function(n) {
-                if (top_nodes.indexOf(n.originalLabel) != -1) {
-
-                }
+             
 
                 community_of_node[n.originalLabel] = n.community;
 
@@ -457,9 +265,9 @@
                         if (graphFactory.checkIfSelected(n.originalLabel) == true) {
                             n.color = rgbToHex(palette[n.community]._rgb[0],palette[n.community]._rgb[1],palette[n.community]._rgb[2]);
                         }
-                        else if (coming_from == 'node add' && n.originalLabel == node_origin) {
-                            n.color = deselected_nodes_color;
-                        }
+                        // else if (coming_from == 'node add' && n.originalLabel == node_origin) {
+                        //     n.color = deselected_nodes_color;
+                        // }
                         else if (!nodeIDs[n.originalLabel]) {
                             n.color = rgbToHex(palette[n.community]._rgb[0],palette[n.community]._rgb[1],palette[n.community]._rgb[2]);
                         }

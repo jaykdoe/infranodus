@@ -391,6 +391,34 @@ function graph() {
                 color: color_context
               }); 
         },
+        addContextNode: function(context) {
+            
+            
+            let x = Math.random();
+            let y = Math.random();
+        
+          sigma.instances(0).graph.addNode({
+                id: context.id,
+                label: '',
+                originalLabel: 'context: ' + context.label,
+                originalColor: '#6689d0',
+                size: maxnodesize + 2,
+                x: x,
+                y: y,
+                type: 'square',
+                color: '#6689d0',
+                url: context.url
+            });
+            
+        },
+        removeContextNodes: function() {
+            sigma.instances(0).graph.nodes().forEach(function(n) {
+                if (n.url) {
+                    sigma.instances(0).graph.dropNode(n.id);
+                }
+            });
+            graph().refreshGraph();
+        },
         addEdge: function(edgeproc) {
             sigma.instances(0).graph.addEdge({
                 id: edgeproc.id,
@@ -400,6 +428,19 @@ function graph() {
                 size: edgeproc.weight,
                 statement_id: edgeproc.statement_id,
                 edge_context: edgeproc.edge_context
+            });
+            sigma.instances(0).graph.refresh();
+        },
+        addContextEdge: function(id,source,target,edge_context) {
+
+            sigma.instances(0).graph.addEdge({
+                id: id,
+                source: source,
+                target: target,
+                weight: 6,
+                size: 6,
+                statement_id: '',
+                edge_context: edge_context
             });
         },
         updateNodes: function(nodes, callback){
@@ -426,18 +467,23 @@ function graph() {
             let node_data = [];
 
             sigma.instances(0).graph.nodes().forEach(function(n) {
+                
+                // To avoid context: nodes
+                if (!n.url) {
 
-                // Add nodes into the Louvain object
-                node_data.push(n.id);
+                     // Add nodes into the Louvain object
+                    node_data.push(n.id);
 
-                // Add nodes into the Graphology object
-                grgraph.addNode(n.id);
+                    // Add nodes into the Graphology object
+                    grgraph.addNode(n.id);
 
-                // Add the nodes into a Cytoscape object
-                cyNodes.push({
-                    group: "nodes",
-                    data: { id: n.id, name: n.originalLabel}
-                });
+                    // Add the nodes into a Cytoscape object
+                    cyNodes.push({
+                        group: "nodes",
+                        data: { id: n.id, name: n.originalLabel}
+                    });
+                }
+               
 
             });
 
@@ -453,91 +499,95 @@ function graph() {
             let totalDiEdgesCount = 0;
 
             sigma.instances(0).graph.edges().forEach(function(e) {
+                // To only include the nodes which are not :context
+                if (e.edge_context) {
+                
+                    let unique_edge_id = '';
 
-                let unique_edge_id = '';
+                    // Let's see if the edge source in alphabetical order is further than its target and change places
 
-                // Let's see if the edge source in alphabetical order is further than its target and change places
-
-                if (e.source > e.target) {
-                    unique_edge_id = e.target + '-' + e.source;
-                }
-                else {
-                    unique_edge_id = e.source + '-' + e.target;
-                }
+                    if (e.source > e.target) {
+                        unique_edge_id = e.target + '-' + e.source;
+                    }
+                    else {
+                        unique_edge_id = e.source + '-' + e.target;
+                    }
 
 
-                // An edge linking these nodes already exists? Let's add their sizes (Sigma doesn't do this automatically)
+                    // An edge linking these nodes already exists? Let's add their sizes (Sigma doesn't do this automatically)
 
-                if (edgesList[unique_edge_id]) {
-                    edgesList[unique_edge_id] += edgesList[unique_edge_id];
-                    e.size = e.weight + edgesList[unique_edge_id];
-                }
-                else {
-                    // New edge? Just create the edge weight parameter and assign the size
-                    edgesList[unique_edge_id] = e.weight;
-                    e.size = e.weight;
-                }
+                    if (edgesList[unique_edge_id]) {
+                        edgesList[unique_edge_id] += edgesList[unique_edge_id];
+                        e.size = e.weight + edgesList[unique_edge_id];
+                    }
+                    else {
+                        // New edge? Just create the edge weight parameter and assign the size
+                        edgesList[unique_edge_id] = e.weight;
+                        e.size = e.weight;
+                    }
 
-                cyNodes.push({
-                    group: "edges",
-                    data: { id: unique_edge_id, source: e.source, target: e.target, weight: e.weight }
-                });
+                    cyNodes.push({
+                        group: "edges",
+                        data: { id: unique_edge_id, source: e.source, target: e.target, weight: e.weight }
+                    });
 
-                // TODO remove that, this is just to check data consistentency
-                e.sourcename = nodeIDs_rev[e.source];
-                e.targetname = nodeIDs_rev[e.target];
+                    // TODO remove that, this is just to check data consistentency
+                    e.sourcename = nodeIDs_rev[e.source];
+                    e.targetname = nodeIDs_rev[e.target];
 
-                var matche = 0;
+                    var matche = 0;
 
-                // Do we already have any edges saved for jsX? Reiterate
-                for (var i = 0; i < edge_data.length; i++) {
-                    // Found an edge that has the current edge's source/target combination?
-                    // replace && with || for undirected graph
-                    if ((edge_data[i].source == e.source && edge_data[i].target == e.target) || (edge_data[i].target == e.source && edge_data[i].source == e.target)) {
-                        
-                        // Do not add this age as new later
-                        matche = 1;
+                    // Do we already have any edges saved for jsX? Reiterate
+                    for (var i = 0; i < edge_data.length; i++) {
+                        // Found an edge that has the current edge's source/target combination?
+                        // replace && with || for undirected graph
+                        if ((edge_data[i].source == e.source && edge_data[i].target == e.target) || (edge_data[i].target == e.source && edge_data[i].source == e.target)) {
+                            
+                            // Do not add this age as new later
+                            matche = 1;
 
-                        // Add the weights together
-                        edge_data[i].weight += parseInt(e.weight);
+                            // Add the weights together
+                            edge_data[i].weight += parseInt(e.weight);
 
-                        // Reiterate through each jsX object and if found similar source/target combo, update the weight.
-                        for (var obj in jsGraphEdges) {
-                            if ((jsGraphEdges[obj][0] == e.source && jsGraphEdges[obj][1] == e.target) || (jsGraphEdges[obj][1] == e.source && jsGraphEdges[obj][0] == e.target)) {
-                                jsGraphEdges[obj][2].weight += parseInt(e.weight); 
+                            // Reiterate through each jsX object and if found similar source/target combo, update the weight.
+                            for (var obj in jsGraphEdges) {
+                                if ((jsGraphEdges[obj][0] == e.source && jsGraphEdges[obj][1] == e.target) || (jsGraphEdges[obj][1] == e.source && jsGraphEdges[obj][0] == e.target)) {
+                                    jsGraphEdges[obj][2].weight += parseInt(e.weight); 
+                                }
                             }
                         }
                     }
-                }
 
-                // This is the first time we see this edge
-                if (matche == 0) {
+                    // This is the first time we see this edge
+                    if (matche == 0) {
 
-                    // Add it into the graph
-                    edge_data.push({source: e.source, target: e.target, weight: parseInt(e.weight)});
+                        // Add it into the graph
+                        edge_data.push({source: e.source, target: e.target, weight: parseInt(e.weight)});
 
-                    // Add to jsnetworkx
+                        // Add to jsnetworkx
 
-                    let edge_params = {
-                        weight: parseInt(e.weight),
-                        sourcename: e.sourcename,
-                        targetname: e.targetname                     
-                    };
+                        let edge_params = {
+                            weight: parseInt(e.weight),
+                            sourcename: e.sourcename,
+                            targetname: e.targetname                     
+                        };
 
-                    let edge_object = [e.source, e.target, edge_params];
-                
-                    jsGraphEdges.push(edge_object);
+                        let edge_object = [e.source, e.target, edge_params];
+                    
+                        jsGraphEdges.push(edge_object);
 
-                    // The number of unique undirected edges
-                    if (e.source != e.target) {
-                      totalUnEdgesCount = totalUnEdgesCount + 1;
+                        // The number of unique undirected edges
+                        if (e.source != e.target) {
+                        totalUnEdgesCount = totalUnEdgesCount + 1;
+                        }
+
                     }
 
-                }
+                    // The number of unique directed edges
+                    if (e.source != e.target) {
+                        totalDiEdgesCount = totalDiEdgesCount + 1;
+                    }
 
-                // The number of unique directed edges
-                if (e.source != e.target) {
-                      totalDiEdgesCount = totalDiEdgesCount + 1;
                 }
                 
 
@@ -579,7 +629,7 @@ function graph() {
         refreshGraph: function() {
             sigma.instances(0).refresh();
             sigmaGraph().adjustLayout(5000);
-
+            
         },
         dragNodes: function () {
 
@@ -618,24 +668,39 @@ function graph() {
 
 
 
-
+var timeOutVar = '';
 
 function sigmaGraph() {
     return {
+        startLayout: function(timeout, terminator) {
+            if (terminator) {
+                clearTimeout(timeOutVar);
+            }
+            else {
+                timeOutVar = setTimeout(function() {
+                            sigma.instances(0).stopForceAtlas2();
+                            sigma.instances(0).killForceAtlas2();
+                            $('#improve-layout').removeClass('layout-on');
+                            console.log('stopped FA layout')
+                },parseInt(timeout));
+            }
+
+        }, 
         adjustLayout: function(timeout) {
+
             if (sigma.instances(0).isForceAtlas2Running()) {
+                    console.log('FA IS RUNNING')
+                    sigmaGraph().startLayout(timeout, 'stop');
                     sigma.instances(0).stopForceAtlas2();
                     sigma.instances(0).killForceAtlas2();
                     $('#improve-layout').removeClass('layout-on');
                     if (timeout) {
-                      sigma.instances(0).startForceAtlas2(forceatlas_options);
-                      $('#improve-layout').addClass('layout-on');
-                      forcedatlas_running = true;
-                      setTimeout(function() {
-                        sigma.instances(0).stopForceAtlas2();
-                        sigma.instances(0).killForceAtlas2();
-                        $('#improve-layout').removeClass('layout-on');
-                     },parseInt(timeout));
+                            setTimeout(function() {
+                                sigma.instances(0).startForceAtlas2(forceatlas_options);
+                                $('#improve-layout').addClass('layout-on');
+                                forcedatlas_running = true;
+                                sigmaGraph().startLayout(timeout);
+                            },200);                         
                     }
                     forcedatlas_running = false;
             }
@@ -645,11 +710,7 @@ function sigmaGraph() {
                   $('#improve-layout').addClass('layout-on');
                   forcedatlas_running = true;
                   if (timeout) {
-                    setTimeout(function() {
-                        sigma.instances(0).stopForceAtlas2();
-                        sigma.instances(0).killForceAtlas2();
-                        $('#improve-layout').removeClass('layout-on');
-                    },parseInt(timeout));
+                    sigmaGraph().startLayout(timeout);
                   }
             }
         },
@@ -710,7 +771,26 @@ function sigmaGraph() {
   
                   // If we click on the context node, just bring us to that context
                   if (nodeLabel.substr(0,9) == 'context: ') {
-                      window.open('/' + current_user + '/' + nodeLabel.substr(9,nodeLabel.length) + '<% if (!perceivername) { %>/edit<% } %>',"_self");
+                        let add_url = '';
+                  
+                        if (nodeLabel.indexOf(', by') == -1) {
+                            add_url += '/edit';
+                        }
+                        let pinnedNodes = graphFactory.getPinnedNodes();
+                        for (let pin in pinnedNodes) {
+                            if (pin == 0) {
+                                add_url += '?keywords=' + pinnedNodes[pin];
+                            }
+                            else {
+                                add_url += "+" + pinnedNodes[pin];
+                            }
+                        }
+                        if (e.data.node.url) {
+                            window.open(e.data.node.url + add_url,"_self");
+                        }
+                        else {
+                            window.open('/' + current_user + '/' + nodeLabel.substr(9,nodeLabel.length) + add_url,"_self");
+                        }
                   }
                   else {
   
@@ -728,9 +808,9 @@ function sigmaGraph() {
                           
                       // If the window is wide enough to show the menu AND div with statements is not visible
                       if ($("#statements").is(":hidden") || $("#entries").css("visibility") === "hidden") {
-                          console.log('hidden')
-                          $('#livetext').show();
-                          $('#livetext').html('<em>open the entries to see the excerpts...</em>' + ' <span></span>');
+                        // TODO blink the button
+                        //   $('#livetext').show();
+                        //   $('#livetext').html('<em>open the entries to see the excerpts...</em>' + ' <span></span>');
                       }
   
                   }
@@ -752,11 +832,12 @@ function sigmaGraph() {
             });
 
             // Hide node's label when we're out of it
-            sigma.bind('outNode', function(e) {
-                if (e.data.node.color != e.data.node.originalColor && graphFactory.checkIfPinned(e.data.node.originalLabel) == false) {
+            sigma.instances(0).bind('outNode', function(e) {
+                
+                if ((e.data.node.color != e.data.node.originalColor && graphFactory.checkIfPinned(e.data.node.originalLabel) == false) || e.data.node.url) {
                     e.data.node.label = '';
                 }
-                sigma.refresh();
+                sigma.instances(0).refresh();
             });
         }
     }
