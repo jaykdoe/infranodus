@@ -177,6 +177,12 @@ function GraphFactory(){
                             proc_communities[j].length = top_nodes;
                         }
                     }
+                    else {
+                        for (let j = 0; j < proc_communities.length; j++) {
+                            proc_communities[j].nodes = all_communities[j].nodes;
+                            proc_communities[j].length += all_communities[j].nodes.length;
+                        }
+                    }
                     if (number) {
                         proc_communities = proc_communities.slice(0,number);
                         return proc_communities;
