@@ -108,6 +108,9 @@ function GraphFactory(){
                 // Context edges in the graph
                 let graphContextEdges = [];
 
+                // Additional context nodes
+                let addcontextnodes = [];
+
                 this.setStats = function(key, value) {
                     stats[key] = value;
                     return true;
@@ -199,6 +202,13 @@ function GraphFactory(){
 
                 this.getCommunityOfNode = function(name) {
                     return community_of_node[name];
+                }
+
+                this.saveAddContextNodes = function(nodes) {
+                    addcontextnodes = nodes;
+                }
+                this.getAddContextNodes = function() {
+                    return addcontextnodes;
                 }
         
                 this.addNode = function(name, id, n) {

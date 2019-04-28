@@ -1094,6 +1094,10 @@ padding: 0em 0em 1em 0em;
     clear: both;
 }
 
+#totalnodescount, #graph_density, #average_degree, #graph_density, #average_degree, #diversity_score, #modularity_score, #nodesintoptopic, #top_components_length, #communities_number, #num_nodes_component, #influence_dispersal{
+    display: inline;
+}
+
 
 #submenu {
     position: fixed;

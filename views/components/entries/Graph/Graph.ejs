@@ -661,7 +661,119 @@ function graph() {
 
         },
         colorNodesCommunities: function(palette) {
-            
+
+            let pinnedNodes = graphFactory.getPinnedNodes();
+
+            let addcontextcount = 0;
+
+            let addcontext_nodes = [];
+
+            sigma.instances(0).graph.nodes().forEach(function(n) {
+
+                // Give original color to the node
+                n.originalColor = rgbToHex(palette[n.community]._rgb[0],palette[n.community]._rgb[1],palette[n.community]._rgb[2]);
+
+                // This node is not pinned?
+                if (graphFactory.checkIfPinned(n.originalLabel) == false) {
+
+                        // Are there any selected nodes?
+                        if (graphFactory.getSelectedNodes().length > 0) {
+
+                            // Is this node the one that is selected?
+                            if (graphFactory.checkIfSelected(n.originalLabel) == true) {
+                                // Color its visible color
+                                n.color = rgbToHex(palette[n.community]._rgb[0],palette[n.community]._rgb[1],palette[n.community]._rgb[2]);
+                            }
+
+                        }
+                        else {
+                            // The node is not pinned and is not selected, so we also make its visible color the same as the original
+                            n.color = rgbToHex(palette[n.community]._rgb[0],palette[n.community]._rgb[1],palette[n.community]._rgb[2]);
+                        }
+
+                }
+
+                // Color the particular node if it appears in the analytics panel
+                analyticsPanel.colorNode(n, palette);
+                
+
+                // TODO this could be taken out into a separate function, but it means reiterating through all the nodes again
+                // Check if the node is in additional context and if yes, give it a different color
+
+                if (contextNodeID[addcontext] && contextNodeID[current_context]) {
+                        if (interpret) {
+                            if (contextNodeID[current_context].indexOf(n.id) > -1) {
+
+                                if (!highlight) {
+                                    n.originalColor = '#90909f';
+
+                                    if (pinnedNodes.indexOf(n.label) == -1) {
+                                    if (graphFactory.getSelectedNodes().length == 0) {
+                                        n.color = '#90909f';  
+                                    }
+                                    }
+                                }
+                            }
+                            else {
+                                // This shows intersecting nodes
+                                if (highlight) {
+                                n.originalColor = highlight_addcontext;
+
+                                if (pinnedNodes.indexOf(n.label) == -1) {
+                                    if (graphFactory.getSelectedNodes().length == 0){
+                                        n.color = highlight_addcontext;
+                                    }
+                                }
+                                }
+                            }
+                            if (contextNodeID[addcontext].indexOf(n.id) > -1 && contextNodeID[current_context].indexOf(n.id) == -1) {
+                                addcontextcount = addcontextcount + 1;
+                                addcontext_nodes.push({id: n.id, label: n.originalLabel, size: n.size, community: n.community});
+                            }
+                        }
+                        else {
+                            if (!missing) {
+                                if (contextNodeID[addcontext].indexOf(n.id) > -1 && contextNodeID[current_context].indexOf(n.id) == -1) {
+                                    if (highlight) {
+                                        n.originalColor = highlight_addcontext;
+                                        n.color = highlight_addcontext;
+                                    }
+                                    else {
+                                        n.originalColor = color_addcontext;
+                                        n.color = color_addcontext;
+                                    }
+                                    addcontextcount = addcontextcount + 1;
+                                    addcontext_nodes.push({id: n.id, label: n.originalLabel, size: n.size, community: n.community});
+                                }
+                            }
+                            else {
+                                if (contextNodeID[addcontext].indexOf(n.id) == -1 && contextNodeID[current_context].indexOf(n.id) > -1) {
+                                    if (highlight) {
+                                        n.originalColor = highlight_addcontext;
+                                        n.color = highlight_addcontext;
+                                    }
+                                    else {
+                                        n.originalColor = color_addcontext;
+                                        n.color = color_addcontext;
+                                    }
+                                        addcontextcount = addcontextcount + 1;
+                                        addcontext_nodes.push({id: n.id, label: n.originalLabel, size: n.size, community: n.community});
+
+                                }
+                            }
+                        }
+
+                }
+
+
+             });
+
+             addcontext_nodes = _.sortBy(addcontext_nodes, 'size').reverse();
+             
+             // Save all additional context nodes into the graph
+             graphFactory.saveAddContextNodes(addcontext_nodes);
+
+
         }
     }
 }

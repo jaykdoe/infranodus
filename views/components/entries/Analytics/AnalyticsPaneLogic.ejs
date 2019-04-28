@@ -83,6 +83,22 @@ function AnalyticsPanel() {
 
         }
 
+        this.populateStats = function(totalnodescount, graph_density, average_degree, diversity_score, modularity_score, nodesintoptopic, communities_number, num_nodes_component, top_components_length, influence_dispersal) {
+            
+            $('#totalnodescount').text(totalnodescount);
+            $('#graph_density').text(graph_density);
+            $('#average_degree').text(average_degree);
+            $('#diversity_score').text(diversity_score);
+            $('#modularity_score').text(modularity_score);
+            $('#nodesintoptopic').text(nodesintoptopic);
+            $('#communities_number').text(communities_number);
+            $('#num_nodes_component').text(num_nodes_component);
+            $('#top_components_length').text(top_components_length);
+            $('#influence_dispersal').text(influence_dispersal);
+
+            
+        }
+
         this.colorTopics = function(palette) {
             for (pall in palette) {
                 if (document.getElementsByClassName("inlinesquare " + pall)) {
@@ -90,6 +106,12 @@ function AnalyticsPanel() {
                         document.getElementsByClassName("inlinesquare " + pall)[i].style.backgroundColor=rgbToHex(palette[pall]._rgb[0],palette[pall]._rgb[1],palette[pall]._rgb[2]);
                     }
                 }
+            }
+        }
+
+        this.colorNode = function(n, palette) {
+            if (document.getElementsByClassName("inlinesquare " + n.id)[0] != undefined) {
+                        document.getElementsByClassName("inlinesquare " + n.id)[0].style.backgroundColor=rgbToHex(palette[n.community]._rgb[0],palette[n.community]._rgb[1],palette[n.community]._rgb[2]);
             }
         }
 
