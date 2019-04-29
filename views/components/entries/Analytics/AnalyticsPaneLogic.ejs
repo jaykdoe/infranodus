@@ -99,6 +99,51 @@ function AnalyticsPanel() {
             
         }
 
+        this.populateAddContextInfo = function(addcontext_nodes, current_context, addcontext, addcontext_ratio) {
+            if (Object.keys(addcontext_nodes).length > 0) {
+
+                let addcontext_text = '';
+
+                if (addcontext_nodes['intersection'].length > 0) {
+                    addcontext_text += '<div class="headline">In both graphs:</div> ';
+                    if (addcontext_nodes['intersection'].length > 4) {
+                        addcontext_nodes['intersection'] = addcontext_nodes['intersection'].slice(0, 4);
+                    }
+                    for (let nnn = 0; nnn < addcontext_nodes['intersection'].length; nnn++) {
+                        addcontext_text += '<a href="#" class="top_nodes">' + addcontext_nodes['intersection'][nnn].label + '</a> - ';
+                    }
+                    addcontext_text = addcontext_text.slice(0, -3);
+                    addcontext_text += ' (' + addcontext_ratio['intersection'] + '% similar)';
+
+                }
+
+                if (addcontext_nodes['difference'].length > 0) {
+                    if (addcontext_text.length > 0) {
+                        addcontext_text += '<br>';
+                    }
+                    addcontext_text += '<div class="headline">In ' + addcontext + ' [2] but not in ' + current_context + ' [1]:</div> ';
+                    if (addcontext_nodes['difference'].length > 4) {
+                        addcontext_nodes['difference'] = addcontext_nodes['difference'].slice(0, 4);
+                    }
+                    for (let nnn = 0; nnn < addcontext_nodes['difference'].length; nnn++) {
+                        addcontext_text += '<a href="#" class="top_nodes">' + addcontext_nodes['difference'][nnn].label + '</a> - ';
+                    }
+                    addcontext_text = addcontext_text.slice(0, -3);
+                    addcontext_text += ' (total ' + addcontext_ratio['difference'] + '%)';
+
+                }
+
+          
+
+                addcontext_text += '<br><br>'
+
+                $("#addcontext_stats").html(addcontext_text);
+
+
+            }
+
+        }
+
         this.colorTopics = function(palette) {
             for (pall in palette) {
                 if (document.getElementsByClassName("inlinesquare " + pall)) {

@@ -184,6 +184,69 @@
                     global_totalnodes = totalnodescount;
 
 
+
+                    // Addcontext (added context) statistics: intersection and difference (in addcontext, but not in the original one)
+
+                    let addContextIntersection = [];
+                    let addContextDifference = [];
+
+                    let addContextInt_nodes = [];
+                    let addContextDiff_nodes = [];
+                    let addContextAll_nodes = [];
+                    let currentContextAll_nodes = [];
+
+                    let addcontext_ratio = {};
+
+                    let addcontext_nodes = {};
+
+                    if (addcontext) {
+                        addContextIntersection = _.intersection(contextNodeID[current_context],contextNodeID[addcontext]);
+                        addContextDifference = _.difference(contextNodeID[addcontext],contextNodeID[current_context]);
+
+
+                        for (let node in contextNodeID[addcontext]) {
+                            addContextAll_nodes.push({id: contextNodeID[addcontext][node], label: nodeIDs_rev[contextNodeID[addcontext][node]], size: graphFactory.getNodeSize(contextNodeID[addcontext][node])});
+                        }
+
+                        for (let node in contextNodeID[current_context]) {
+                            currentContextAll_nodes.push({id: contextNodeID[current_context][node], label: nodeIDs_rev[contextNodeID[current_context][node]], size: graphFactory.getNodeSize(contextNodeID[current_context][node])});
+                        }
+
+                        for (let node in addContextIntersection) {
+                            addContextInt_nodes.push({id: addContextIntersection[node], label: nodeIDs_rev[addContextIntersection[node]], size: graphFactory.getNodeSize(addContextIntersection[node])});
+                        }
+
+                        for (let node in addContextDifference) {
+                            addContextDiff_nodes.push({id: addContextDifference[node], label: nodeIDs_rev[addContextDifference[node]], size: graphFactory.getNodeSize(addContextDifference[node])});
+                        }
+
+                        addContextInt_nodes = _.sortBy(addContextInt_nodes, 'size').reverse();
+                        addContextDiff_nodes = _.sortBy(addContextDiff_nodes, 'size').reverse();
+
+                        let addContextInt_count = addContextInt_nodes.length;
+                        let addContextDiff_count = addContextDiff_nodes.length
+
+                        graphFactory.setStats('AddContextIntersectionNodes', addContextInt_count);
+                        graphFactory.setStats('AddContextDifferenceNodes', addContextDiff_count);
+
+                        var addContextIntRatio = parseFloat(((addContextInt_count) / totalnodescount).toFixed(2));
+                        var addContextDiffRatio = parseFloat(((addContextDiff_count) / addContextAll_nodes.length).toFixed(2));
+
+                        graphFactory.setStats('AddContextIntersectionRatio', addContextIntRatio);
+                        graphFactory.setStats('AddContextDifferenceRatio', addContextDiffRatio);
+
+                        graphFactory.setStats('TotalNodesAddContext', addContextAll_nodes.length);
+                        graphFactory.setStats('TotalNodesCurrentContext', currentContextAll_nodes.length);
+
+                        addcontext_nodes['intersection'] = addContextInt_nodes;
+                        addcontext_nodes['difference'] = addContextDiff_nodes;
+
+                        addcontext_ratio['intersection'] = (addContextIntRatio * 100).toFixed(0);
+                        addcontext_ratio['difference'] = (addContextDiffRatio * 100).toFixed(0);
+                    }
+
+
+
                     // Color the nodes in the graph to communities colors
                     // TODO this function also counts addcontext nodes, should be taken out
                     graph().colorNodesCommunities(palette);
@@ -329,32 +392,16 @@
                     analyticsPanel.populateStats(totalnodescount, graph_density, average_degree, diversity_score, modularity_score, nodesintoptopic, communities_number, num_nodes_component, top_components_length, influence_dispersal);
 
 
-                    // TODO addcontext move
-                    // if (addcontextcount > 0) {
+                    // Populate information about the additional contexts
 
-                    //     if (addcontext_nodes.length > 0) {
-                    //         var addcontext_text = '<div class="headline">In ' + addcontext + ' but not in ' + current_context + ':</div> ';
-                    //         if (addcontext_nodes.length > 4) {
-                    //             addcontext_nodes = addcontext_nodes.slice(0, 4);
-                    //         }
-                    //         for (var nnn = 0; nnn < addcontext_nodes.length; nnn++) {
-                    //             addcontext_text += '<a href="#" class="top_nodes">' + addcontext_nodes[nnn].label + '</a> - ';
-                    //         }
-                    //         addcontext_text = addcontext_text.slice(0, -3);
-                    //         addcontext_text += '<br><br>'
-                    //         diversitytext = addcontext_text + diversitytext;
-                    //     }
-
-                    //     var addindex = ((((totalnodescount - addcontextcount) / totalnodescount).toFixed(2))*100).toFixed(0);
-                    //     diversitytext += 'context ' + addcontext + ' uses ' + addindex + '% words from ' + current_context + ', ';
-
-                    // }
+                    analyticsPanel.populateAddContextInfo(addcontext_nodes, current_context, addcontext, addcontext_ratio);
 
 
-                    // end nonempty community if clause
+                    // Output all the stats into the console
 
                     console.log(graphFactory.getAllStats());
-                    
+
+
                 }
 
 

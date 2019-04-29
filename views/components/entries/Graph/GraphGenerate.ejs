@@ -68,6 +68,9 @@ function GraphFactory(){
                 // Variabls that contain the edges
                 let edgesDB = [];
                 let nodesDB = [];
+
+                // Variable that contains the node's size
+                let nodeSize = {}; // maps ID to the size
         
                 // These are the nodes that are selected
                 let pinnedNodes = [];
@@ -301,6 +304,14 @@ function GraphFactory(){
                     this.addGraphNodesEdges(nodesToAdd, edgesToAdd);
                     return true;
                 }
+
+                this.setNodeSize = function(n) {
+                    nodeSize[n.id] = n.size;
+                }
+                this.getNodeSize = function(node_id) {
+                    return nodeSize[node_id];
+                }
+
                 this.getNodeIDs = function() {
                     return nodeIDs;
                 }

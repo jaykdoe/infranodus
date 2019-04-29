@@ -122,6 +122,9 @@
                     n.size = node_degree;
                 }
 
+                // Save the node's size to the global parameters - based on degree or BC, depending on the above
+                graphFactory.setNodeSize(n);
+
             
             });
 
