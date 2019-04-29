@@ -1,33 +1,6 @@
 <script>
 
-  var jsonpath = '';
 
-  var maxnodes = '';
-
-  // Get the setting from user DB how many max nodes we show
-  <% if (maxnodes) { %>
-    maxnodes = <%= maxnodes %>;
-  <% } %>
-
-
-  // Path to the JSON graph file (specific context or a general one)
-  <% if (addcontext) { %>
-      jsonpath = '/api/user/nodes/<%= context %>?addcontext=<%= addcontext %>';
-      addcontext = "<%= addcontext %>";
-
-  <% } else if (showcontexts) { %>
-      jsonpath = '/api/user/nodes/<%= context %>?showcontexts=<%= showcontexts %>';
-      addcontext = "";
-
-  <% } else if (maxnodes) { %>
-      jsonpath = '/api/user/nodes/<%= context %>?maxnodes=<%= maxnodes %>';
-      maxnodes = '<%= maxnodes %>';
-      addcontext = "";
-
-  <% } else { %>
-      jsonpath = '/api/user/nodes/<%= context %>';
-      addcontext = "";
-  <% }  %>
 
   // Is the user going to look at somebody else's graph?
 
@@ -699,6 +672,7 @@ function graph() {
 
                 // Check if the node is in additional context and if yes, give it a different color
 
+               
                 if (contextNodeID[addcontext] && contextNodeID[current_context]) {
                     
                         // Are we on the interpret pane?
@@ -752,6 +726,7 @@ function graph() {
                                     }  
                                 }
                                 else {
+                                  
                                     // Only in one or the other? Unless highlight is ON, color them gray
                                     if (!highlight) {
                                         n.originalColor = deselected_nodes_color;
@@ -781,6 +756,7 @@ function graph() {
                         }
 
                 }
+
 
 
              });

@@ -72,6 +72,34 @@
             var hostsite = window.location.host;
 
             var addcontext = '';
+
+            var jsonpath = '';
+
+            var maxnodes = '';
+
+            // Get the setting from user DB how many max nodes we show
+            <% if (maxnodes) { %>
+            maxnodes = <%= maxnodes %>;
+            <% } %>
+
+            // Path to the JSON graph file (specific context or a general one)
+            <% if (addcontext) { %>
+                jsonpath = '/api/user/nodes/<%= context %>?addcontext=<%= addcontext %>';
+                addcontext = "<%= addcontext %>";
+
+            <% } else if (showcontexts) { %>
+                jsonpath = '/api/user/nodes/<%= context %>?showcontexts=<%= showcontexts %>';
+                addcontext = "";
+
+            <% } else if (maxnodes) { %>
+                jsonpath = '/api/user/nodes/<%= context %>?maxnodes=<%= maxnodes %>';
+                maxnodes = '<%= maxnodes %>';
+                addcontext = "";
+
+            <% } else { %>
+                jsonpath = '/api/user/nodes/<%= context %>';
+                addcontext = "";
+            <% }  %>
           
     </script>
     <link rel='stylesheet' href='/stylesheets/jquery.textcomplete.css' />
