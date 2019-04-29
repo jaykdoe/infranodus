@@ -5,6 +5,7 @@ analyticsPanel = new AnalyticsPanel();
 
 analyticsPanel.activatePanel();
 
+
 function AnalyticsPanel() {
 
         let analytics_communities = '';
@@ -282,117 +283,91 @@ function AnalyticsPanel() {
         
         }
 
-        this.activateButtons = function() {
+        this.activateButtons = function(current_user, current_context, louvain_communities, palette) {
+
+            let nodeIDs = graphFactory.getNodeIDs();
 
             $('.panelControlBtn').on("click", function() {
 
                 // What's the origin of the click?
                 var ID = $(this).attr('data-id');
 
-                if (ID == 'search_analytics') {
-                    
-                    $("#mainanalytics").fadeOut('fast', function() {
-                    $("#mininganalytics").fadeOut('fast');
-                    $("#searchanalytics").fadeIn('fast');
-                    $("#analbutton").css('background','#ededed');
-                    $("#miningbutton").css('background','#ededed');
-                    $("#searbutton").css('background','#ffffff');
-
-                
-
-                    });
-                    currentPanel = ID;
-                }
-                else if (ID == 'analytics') {
-                    $("#searchanalytics").fadeOut('fast', function() {
+                if (ID == 'analytics') {
+                  
                     $("#mininganalytics").fadeOut('fast');
                     $("#mainanalytics").fadeIn('fast');
                     $("#analbutton").css('background','#ffffff');
-                    $("#searbutton").css('background','#ededed');
                     $("#miningbutton").css('background','#ededed');
-                    });
                     currentPanel = ID;
+
                 }
                 else if (ID == 'mining_analytics') {
 
-                    $("#searchanalytics").fadeOut('fast', function() {
+                
                     $("#mainanalytics").fadeOut('fast');
                     $("#mininganalytics").fadeIn('fast');
                     $("#analbutton").css('background','#ededed');
-                    $("#searbutton").css('background','#ededed');
                     $("#miningbutton").css('background','#ffffff');
 
                     var html = "n/a";
 
                     $.getJSON("/api/" + current_user + "/lda/topics/" + current_context, function( data ) {
-                    var items = [];
-                    html = '';
-                    for (var i = 0; i < data.length; i++) {
-
-                        for (var j = 0; j < data[i].length; j++) {
-                        //console.log(nodeIDs[data[i][j].term]);
-                        items.push('<div class="inlinesquare ' + louvain_communities[nodeIDs[data[i][j].term]] + '"></div> <a href="#" class="top_nodes">' + data[i][j].term + '</a> &nbsp;');
-                        if (j == (data[i].length - 1)) {
-                            items.push('<br>')
-                        }
-                        }
-
-
-                    }
-
-
-                    $("#topicsLDA").html(items.join(""));
-
-                    $.getJSON("/api/" + current_user + "/lda/terms/" + current_context, function( data ) {
                         var items = [];
                         html = '';
                         for (var i = 0; i < data.length; i++) {
 
-                        for (var j = 0; j < data[i].length; j++) {
-                            //console.log(nodeIDs[data[i][j].term]);
-                            items.push('<div class="inlinesquare ' + louvain_communities[nodeIDs[data[i][j].term]] + '"></div> <a href="#" class="top_nodes">' + data[i][j].term + '</a> &nbsp;');
-                            if (j == (data[i].length - 1)) {
-                            items.push('<br>')
-                            }
-                        }
-
-
-                        }
-
-
-                        $("#termsLDA").html(items.join(""));
-
-                        for (pall in palette) {
-                            if (document.getElementsByClassName("inlinesquare " + pall)) {
-                                for (var i = 0; i < document.getElementsByClassName("inlinesquare " + pall).length; i++) {
-
-                                document.getElementsByClassName("inlinesquare " + pall)[i].style.backgroundColor=rgbToHex(palette[pall]._rgb[0],palette[pall]._rgb[1],palette[pall]._rgb[2]);
+                            for (var j = 0; j < data[i].length; j++) {
+                                //console.log(nodeIDs[data[i][j].term]);
+                                items.push('<div class="inlinesquare ' + louvain_communities[nodeIDs[data[i][j].term]] + '"></div> <a href="#" class="top_nodes">' + data[i][j].term + '</a> &nbsp;');
+                                if (j == (data[i].length - 1)) {
+                                    items.push('<br>')
                                 }
                             }
+
+
                         }
-                        top_nodes_activate();
+
+                        $("#topicsLDA").html(items.join(""));
+
+                        $.getJSON("/api/" + current_user + "/lda/terms/" + current_context, function( data ) {
+                            let items = [];
+                            html = '';
+                            for (var i = 0; i < data.length; i++) {
+                                for (var j = 0; j < data[i].length; j++) {
+                                        //console.log(nodeIDs[data[i][j].term]);
+                                        items.push('<div class="inlinesquare ' + louvain_communities[nodeIDs[data[i][j].term]] + '"></div> <a href="#" class="top_nodes">' + data[i][j].term + '</a> &nbsp;');
+                                    if (j == (data[i].length - 1)) {
+                                        items.push('<br>')
+                                    }
+                                }
+                            }
 
 
+                            $("#termsLDA").html(items.join(""));
 
+                            for (pall in palette) {
+                                if (document.getElementsByClassName("inlinesquare " + pall)) {
+                                    for (var i = 0; i < document.getElementsByClassName("inlinesquare " + pall).length; i++) {
+
+                                    document.getElementsByClassName("inlinesquare " + pall)[i].style.backgroundColor=rgbToHex(palette[pall]._rgb[0],palette[pall]._rgb[1],palette[pall]._rgb[2]);
+                                    }
+                                }
+                            }
+                            analyticsPanel.activateTopNodes();
+
+                        });
 
                     });
 
-
-
-
-
-
-                    });
-
-
-
-                    });
+                  
                     currentPanel = ID;
                 }
 
                 else if (ID == 'request_analytics'){
                     window.open('https://noduslabs.com/services/connections/', '_blank');
                 }
+
+                x
 
 
             });

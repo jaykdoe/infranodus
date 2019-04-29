@@ -401,6 +401,9 @@
 
                     console.log(graphFactory.getAllStats());
 
+                    // Activate buttons for LDA communities
+                    analyticsPanel.activateButtons(current_user, current_context, louvain_communities, palette);
+
                     // Set triggers on all the nodes in the Analytics pane
                     analyticsPanel.activateTopNodes();
 
