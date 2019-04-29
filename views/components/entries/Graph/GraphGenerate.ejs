@@ -117,7 +117,16 @@ function GraphFactory(){
                 }
 
                 this.getStats = function(key) {
-                    return stats[key];
+                    if (key) {
+                        return stats[key];
+                    }
+                    else {
+                        return false;
+                    }
+                }
+
+                this.getAllStats = function() {  
+                    return stats;
                 }
 
                 this.addGraphContextNode = function(context) {

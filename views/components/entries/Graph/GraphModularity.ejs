@@ -168,6 +168,7 @@
                     // Color the nodes in the graph
                     graph().colorNodesCommunities(palette);
                     
+
                     // Set the number of nodes in the first and second communities
                     graphFactory.setStats('FirstComNodes',all_communities[0].length);
                     let nodesfirstcom = graphFactory.getStats('FirstComNodes');
@@ -182,17 +183,24 @@
 
                     global_totalnodes = totalnodescount;
 
+
                     // Color the nodes in the graph to communities colors
                     // TODO this function also counts addcontext nodes, should be taken out
                     graph().colorNodesCommunities(palette);
 
 
-                    // Other stats calculation
+                    // Number of nodes in the top topic
 
                     var nodesintoptopic = 0;
 
                     nodesintoptopic = ((((nodesfirstcom) / totalnodescount).toFixed(2))*100).toFixed(0);
 
+                    nodesintoptopic = parseInt(nodesintoptopic);
+
+                    graphFactory.setStats('NodesInTopTopic', nodesintoptopic);
+
+
+                    // Graph density (not weighed)
 
                     let graph_density;
 
@@ -200,10 +208,34 @@
                         graph_density  = ((totaledgescount) / ((totalnodescount)*(totalnodescount - 1))).toFixed(3);
                     }
 
+                    graph_density = parseFloat(graph_density);
+
+                    graphFactory.setStats('GraphDensity', graph_density);
+
+
+                    // Average graph degree
+
                     let average_degree = (totaledgescount / totalnodescount).toFixed(2);
 
-                    var diversity_score = 0;
+                    average_degree = parseFloat(average_degree);
 
+                    graphFactory.setStats('AverageDegree', average_degree);
+
+
+                    // Percentage of nodes in the top connected component of the graph (giant component)
+
+                    top_components = _.sortBy(top_components, 'length').reverse();
+
+                    var num_nodes_component = ((top_components[0].nodes().length / totalnodescount).toFixed(2)*100).toFixed(0);
+
+                    num_nodes_component = parseFloat(num_nodes_component);
+
+                    graphFactory.setStats('NodesInTopComponent', num_nodes_component);
+   
+
+                    // Let's calculate the graph diversity (polysingulairty) score
+                    var diversity_score = 0;
+             
                     // TODO add degree distribution to the indexOf maybe through entropy of degree by nodes
 
                     var bc_dist = [];
@@ -244,47 +276,55 @@
 
                     var bc_entropy = shannon(bc_dist_string);
 
+                    bc_entropy = parseFloat(bc_entropy);
+
+                    graphFactory.setStats('BCEntropy', bc_entropy);
+
                     // TODO fix bug for two-digit communities
 
                     console.log('BC Entropy: ' + bc_entropy);
 
-                    var most_num_comm = [];
 
-                    top_components = _.sortBy(top_components, 'length').reverse();
 
-                    var num_nodes_component = ((top_components[0].nodes().length / totalnodescount).toFixed(2)*100).toFixed(0);
-
-                    if ((modularity_score > 0.65 && nodesintoptopic < 50) && ((bc_entropy >= 1.5) || (bc_entropy == 0 && topInfluenceNodes[0].bc == 0) || (bc_entropy == 0 && num_nodes_component < 40))) {
-                        diversity_score = 'Dispersed';
-                        document.getElementById("biasRange").value = "100";
-                        $('#biasRange').attr('class', 'slider dispersedslider');
-                    }
-                    else if ((modularity_score > 0.4 && nodesintoptopic < 50) && ((bc_entropy >= 1.5) || (bc_entropy == 0 && topInfluenceNodes[0].bc == 0) || (bc_entropy == 0 && num_nodes_component < 40))) {
-                        diversity_score = 'Diversified';
-                        document.getElementById("biasRange").value = "67";
-                        $('#biasRange').attr('class', 'slider diversedslider');
-                    }
-                    else if ((modularity_score < 0.4 && modularity_score > 0.2 && bc_entropy >= 0.5) || ((modularity_score > 0.4 && nodesintoptopic >= 50)  && bc_entropy >= 0.5) || (modularity_score > 0.4 && nodesintoptopic < 50 && bc_entropy > 0.5)) {
-                        diversity_score = 'Focused';
-                        document.getElementById("biasRange").value = "33";
-                        $('#biasRange').attr('class', 'slider focusedslider');
-                    }
-                    else {
-                        diversity_score = 'Biased';
-                        document.getElementById("biasRange").value = "1";
-                        $('#biasRange').attr('class', 'slider biasedslider');
-                    }
+                    // Calculate polysingularity score
+                    diversity_score = polysingularity().calculateScore(modularity_score, nodesintoptopic, bc_entropy, topInfluenceNodes, num_nodes_component);
+                    
                     // Set global parameter
                     polysingularity_score = diversity_score;
 
+                    graphFactory.setStats('PolysingularityScore', diversity_score);
+
                     
+
+                    // How influential nodes are dispersed among the communities
                     let influence_dispersal = ((bc_entropy/2).toFixed(1)*100).toFixed(0);
 
+                    influence_dispersal = parseFloat(influence_dispersal);
+
+                    graphFactory.setStats('InfluenceDispersal', influence_dispersal);
+
+
+                    // How many communities are there
                     let communities_number = all_communities.length;
 
+                    graphFactory.setStats('NumberOfCommunities', communities_number);
+
+
+                    // How many connected components are there in the graph?
                     let top_components_length = top_components.length;
 
-                    modularity_score = modularity_score.toFixed(2)
+                    graphFactory.setStats('NumberOfComponents', top_components_length);
+
+
+                    // Modularity of the graph 
+                    modularity_score = modularity_score.toFixed(2);
+
+                    modularity_score = parseFloat(modularity_score);
+
+                    graphFactory.setStats('ModularityScore', modularity_score);
+
+                    
+                    // Populate Analytics Panel data
 
                     analyticsPanel.populateStats(totalnodescount, graph_density, average_degree, diversity_score, modularity_score, nodesintoptopic, communities_number, num_nodes_component, top_components_length, influence_dispersal);
 
@@ -312,6 +352,9 @@
 
 
                     // end nonempty community if clause
+
+                    console.log(graphFactory.getAllStats());
+                    
                 }
 
 
