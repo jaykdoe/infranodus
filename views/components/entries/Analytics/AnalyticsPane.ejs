@@ -74,6 +74,14 @@
         });
 
     });
+
+    function resetGraphButton() {
+        return {
+            onClick: function(onClick){
+                $('#resetgraph').on('click', onClick);
+            }
+        }
+    }
             
 
     $('#analytics').on('swipedown',function(){$('#analyticsbutton').trigger('click');});

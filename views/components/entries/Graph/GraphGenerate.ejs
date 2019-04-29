@@ -114,6 +114,9 @@ function GraphFactory(){
                 // Additional context nodes
                 let addcontextnodes = [];
 
+                // Selected communities
+                let selectCommunities = [];
+
                 this.setStats = function(key, value) {
                     stats[key] = value;
                     return true;
@@ -387,6 +390,8 @@ function GraphFactory(){
                     // Add search terms into the bottom entry add field
                     addEntryForm().update(pinnedNodes.concat(notFoundNodes));       
         
+                    // Change selections in the analytics pane
+                    analyticsPanel.updateSelections(pinnedNodes);
                 }
         
                 // TODO write initiatilization for the delete nodes
@@ -669,6 +674,23 @@ function GraphFactory(){
                     }
                     else {
                         return topDegree_nodes;
+                    }
+                }
+
+                this.selectCommunity = function(community) {
+                    if (selectCommunities.indexOf(community) > -1) {
+                        selectCommunities.splice(selectCommunities.indexOf(community), 1);
+                    }
+                    else {
+                        selectCommunities.push(community);
+                    }
+                    graph().selectCommunities(selectCommunities);
+                }
+
+                this.clearSelectCommunity = function() {
+                    if (selectCommunities.length > 0) {
+                        selectCommunities = [];
+                        graph().selectCommunities(selectCommunities);
                     }
                 }
 

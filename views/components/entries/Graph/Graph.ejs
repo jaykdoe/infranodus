@@ -762,7 +762,74 @@ function graph() {
              });
 
 
-        }
+        },
+        selectCommunities: function(commClicked) {
+
+                let pinnedNodes = graphFactory.getPinnedNodes();
+                let selectedNods = graphFactory.getSelectedNodes();
+
+                // No pinned nodes on the graph?
+                if (pinnedNodes.length == 0) {
+         
+                    sigma.instances(0).graph.nodes().forEach(function(n) {
+
+                        // There are no communities selected and no pinned nodes?
+                        if (commClicked.length == 0) {
+                            n.color = n.originalColor;
+                            n.label = n.originalLabel;
+                        }
+                        else if (commClicked.indexOf(n.community.toString()) > -1) {
+                            // The node's community is in the selection? color it
+                            n.color = n.originalColor;
+                            n.label = n.originalLabel; 
+                        }
+                        else {
+                            // The node's community is not in the selection? Hide it
+                            n.color = deselected_nodes_color;
+                            n.label = '';
+                        }
+
+                    });
+
+
+                }
+                else {
+
+                    // We clicked on the community which is in the DB of clicked ones and We have some pinned nodes left
+
+                    sigma.instances(0).graph.nodes().forEach(function(n) {
+
+                         // There are no communities selected and no pinned nodes?
+                        if (commClicked.indexOf(n.community.toString()) > -1) {
+                            // The node's community is in the selection? color it
+                            n.color = n.originalColor;
+                            n.label = n.originalLabel; 
+                        }
+                        else {
+                            // The node's community is not in the selection? Hide it
+                            n.color = deselected_nodes_color;
+                            n.label = '';
+                        }
+
+                        if (graphFactory.checkIfPinned(n.originalLabel) == true) {
+                            n.color = '#0089e0';
+                            n.label = n.originalLabel;
+                        }
+                        if (graphFactory.checkIfSelected(n.originalLabel) == false) {
+                            n.color = n.originalColor;
+                            n.label = n.originalLabel;
+                        }
+
+
+                    });
+
+                    
+                }
+
+                sigma.instances(0).refresh();
+
+            
+            }
     }
 }
 

@@ -240,7 +240,8 @@ socket.on('graph reset', function(msg){
     graphFactory.initPinnedNodes();
     graphFactory.updateNotFoundNodes();
     graphFactory.updateSelectedNodes([]);
-    analyticsPanel().removeSelections();
+    graphFactory.clearSelectCommunity();
+    analyticsPanel.removeSelections();
     entries().unfilter();
      
 });
