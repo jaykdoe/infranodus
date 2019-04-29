@@ -829,7 +829,67 @@ function graph() {
                 sigma.instances(0).refresh();
 
             
-            }
+        },
+        selectEntries: function(entries_ids) {
+
+            let nodesOfStatement = graphFactory.getAllNodesOfStatement();
+
+            // Only show edges that belong to the entries filtered
+
+            sigma.instances(0).graph.edges().forEach(function(e) {
+                    let got_match = 0;
+                    for (let item of e.statement_id) {
+                      if (entries_ids.includes(item)) {
+                          got_match += 1;
+                      }
+                    }
+                    if (got_match > 0) {
+                        e.color = e.originalColor;
+                    }
+                    else {
+                        e.color = deselected_nodes_color;
+                    }
+
+            });
+
+            // Make only those nodes visible that belong to the statement selected
+            sigma.instances(0).graph.nodes().forEach(function(n) {
+
+                // Is there no contexts at all? Show the node.
+                for (var g = 0; g < entries_ids.length; g++) {
+                    if (!n.marked || n.marked == '0') {
+                        if (!nodesOfStatement[entries_ids[g]] || nodesOfStatement[entries_ids[g]].indexOf(n.id) < 0)  {
+                            n.color = deselected_nodes_color;
+                            n.label = '';
+                        }
+                        else {
+                            n.color = n.originalColor;
+                            n.label = n.originalLabel;
+                            n.marked = '1';
+                        }
+                    }
+                }
+            });
+
+            // Refresh the view
+            sigma.instances(0).refresh();
+
+        },
+        removeSelections: function() {
+            
+            sigma.instances(0).graph.edges().forEach(function(e) {
+                e.color = e.originalColor;
+            });
+
+            sigma.instances(0).graph.nodes().forEach(function(n) {
+                n.color = n.originalColor;
+                n.label = n.originalLabel;
+            });
+
+            // Refresh the view
+            sigma.instances(0).refresh();
+        }
+        // Add more functions here
     }
 }
 

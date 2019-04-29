@@ -142,4 +142,23 @@
         alert(message);
     }
 
+    function removeEmptyElements(obj) {
+        let newObj = [];
+        let idx = 0;
+        for (var propName in obj) {
+            let prop = obj[propName];
+
+            if (prop !== null
+            && prop !== undefined
+            && JSON.stringify(prop) != "[]" // not empty array
+            && JSON.stringify(prop) !== "{}") { // not empty obj
+            newObj[idx] = prop[0]; // we only need one object, NOTE can be an array if we decide to get more statemetns for each community
+            idx++;
+            }
+        }
+        return newObj;
+    }
+
+
+
 </script>

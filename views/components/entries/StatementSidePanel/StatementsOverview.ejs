@@ -18,6 +18,9 @@
 
 <script>
 
+    var currentStatementsView = 'OVERVIEW';
+
+
     $("#summary").click(function(e) {
         e.preventDefault();
 
@@ -35,32 +38,22 @@
             });
         });
         this.className = 'pure-menu-selected-top';
-        // Top community terms
+        
+        currentStatementsView = 'SUMMARY';
 
     });
 
     $("#insight").click(function(e) {
+      
         e.preventDefault();
 
-        var insight_nodes = [];
-
-        if (polysingularity_score == 'Diversified') {
-          if (most_inf_comm_nodes[0]) {
-            insight_nodes.push(most_inf_comm_nodes[0]);
-          }
-          if (most_inf_comm_nodes[1]) {
-            insight_nodes.push(most_inf_comm_nodes[1]);
-          }
+        let insight_nodes = [];
+    
+        let insight_clusters = graphFactory.getInsightClusters();
+        
+        for (let el in insight_clusters) {
+          insight_nodes.push(insight_clusters[el]);
         }
-        else {
-          if (most_inf_comm_nodes[most_inf_comm_nodes.length-1]) {
-            insight_nodes.push(most_inf_comm_nodes[most_inf_comm_nodes.length-1]);
-          }
-          if (most_inf_comm_nodes[most_inf_comm_nodes.length-2]) {
-            insight_nodes.push(most_inf_comm_nodes[most_inf_comm_nodes.length-2]);
-          }
-        }
-
 
         filter_statements_summary(most_inf_nodes, insight_nodes, 'insight');
 
@@ -72,9 +65,13 @@
         this.className = 'pure-menu-selected-top';
         // Top community terms
 
+        currentStatementsView = 'INSIGHT';
+
+
     });
 
     $("#overview").click(function(e) {
+      
         e.preventDefault();
         $('.entry').fadeIn(400);
         $('#topnav_items').each(function() {
@@ -85,11 +82,17 @@
         this.className = 'pure-menu-selected-top';
         entries().scroll();
 
-        if (pinnedNodes.length > 0) {
-          filter_statements(pinnedNodes);
+        if (graphFactory.existPinnedNodes() == true) {
+          graphFactory.initPinnedNodes(graphFactory.getPinnedNodes());
         }
+        else {
+          graph().removeSelections();
+        }
+        
         $('.summary').remove();
         $('#explanation').hide();
+
+        currentStatementsView = 'OVERVIEW';
     });
 
 

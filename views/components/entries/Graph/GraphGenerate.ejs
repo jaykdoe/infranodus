@@ -392,6 +392,13 @@ function GraphFactory(){
         
                     // Change selections in the analytics pane
                     analyticsPanel.updateSelections(pinnedNodes);
+
+                    if (currentStatementsView == 'INSIGHT') {
+                        entries().activateInsight();
+                    }
+                    else if (currentStatementsView == 'SUMMARY') {
+                        entries().activateSummary();
+                    }
                 }
         
                 // TODO write initiatilization for the delete nodes
@@ -697,6 +704,8 @@ function GraphFactory(){
                 this.createInsightClusters = function(most_inf_comm_nodes) {
             
                     let insight_nodes = {0: [], 1: []};
+
+                    let polysingularity_score = graphFactory.getStats('PolysingularityScore');
 
                     if (most_inf_comm_nodes.length >= 2) {
                         if (polysingularity_score == 'Diversified' || polysingularity_score == 'Dispersed') {

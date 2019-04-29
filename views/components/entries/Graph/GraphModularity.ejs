@@ -351,9 +351,6 @@
 
                     // Calculate polysingularity score
                     diversity_score = polysingularity().calculateScore(modularity_score, nodesintoptopic, bc_entropy, topInfluenceNodes, num_nodes_component);
-                    
-                    // Set global parameter
-                    polysingularity_score = diversity_score;
 
                     graphFactory.setStats('PolysingularityScore', diversity_score);
 

@@ -176,55 +176,7 @@ function filter_graph(pins){
         sigma.instances(0).refresh();
 
         // Let's play the graph MIDI sounds on selection
-
-        <% if (locals.user) { %>
-        <% if (locals.user.midi != undefined && locals.user.midi != 'off') { %>
-
-
-        console.log('using MIDI data ' + midi);
-        console.log('playing MIDI device:');
-        console.log(output);
-
-        var timecode = 0;
-
-        var note_node = midi.substr(10,2);
-        if (note_node.substr(1,1) == '0') {
-        note_node = note_node.substr(0,1) + '1';
-        }
-
-        var note_edge = midi.substr(12,2);
-        if (note_edge.substr(1,1) == '0') {
-        note_edge = note_edge.substr(0,1) + '1';
-        }
-
-
-
-        for (var m = 0; m < pins.length; m++) {
-
-
-            setTimeout(function () {
-            output.playNote(note_node, parseInt(midi.substr(0,2)));
-            output.stopNote(note_node, parseInt(midi.substr(0,2)), {time: "+500"});
-            console.log('playing a node note ' + note_node + ' at ' + timecode + ' on channel ' + parseInt(midi.substr(0,2)));
-            }, timecode);
-            timecode = getRandomInt(0,parseInt(midi.substr(6,4)));
-        }
-
-        var timecodea = 0;
-
-        for (var ed = 0; ed < toKeep.length; ed++) {
-
-            setTimeout(function () {
-            output.playNote(note_edge, parseInt(midi.substr(2,2)));
-            output.stopNote(note_edge, parseInt(midi.substr(2,2)), {time: "+500"});
-            console.log('playing an edge note ' + note_edge + ' at ' + timecodea + ' on ' + parseInt(midi.substr(2,2)));
-            }, timecodea);
-            timecodea = getRandomInt(0,parseInt(midi.substr(6,4)));
-
-        }
-
-        <% } %>
-        <% } %>
+        playNodesMIDI().selection(pins, toKeep);
 
 
 }
