@@ -400,7 +400,7 @@ function entries() {
         },
         updateExplanation: function(filter_origin) {
           
-          let polysingularity_score = graphFactory.getStats['PolysingularityScore'];
+          let polysingularity_score = graphFactory.getStats('PolysingularityScore');
 
           var explanation_html = 'The excerpts from the text containing the main topics and the most influential terms:';
 
@@ -422,6 +422,7 @@ function entries() {
 
           $('#explanation').show();
           $('#explanation').html(explanation_html);
+
         },
         activateInsight: function() {
           $('#insight').click();
@@ -525,12 +526,6 @@ function entryDoubleClick() {
 
         e.preventDefault();
 
-        // Get the content from the form edit and copy it into the switcher panel to show to the user
-
-        var _formcontent = $('#adds-content').html();
-
-        $("#switcher-panel").html(_formcontent);
-
         // Get the statement into the edit box at the top
         $("#statement").val($('.entry-text', e.currentTarget).text());
 
@@ -542,96 +537,202 @@ function entryDoubleClick() {
 
         $('#statementInputMenu').each(function() {
             $("li", this).each(function(i) {
-
                 $(this).removeClass('pure-menu-selected-top');
-
             });
-       });
+        });
 
 
+      // If no delete button is shown
 
+        if (addEntryFormFactory.getStatus() == 'add') {
 
-// Change / add buttons
-$('#submitbutton').hide();
+            // Add the edit, delete and cancel buttons
+            addEntryForm().switchToEdit();
 
-if (!$('#deletebutton').val()) {
+            // Add a hook on the Cancel button 
+            $("#cancelbutton").on('click', function(e) {
 
-    $("#submitform").append('<input type="submit" name="edit" value="edit" id="editbutton" class="pure-button"> <input type="submit" style="margin: 0px 8px;" name="delete" value="delete" id="deletebutton" > <input type="submit" name="cancel" value="cancel" id="cancelbutton" class="pure-button">');
+                e.preventDefault();
 
-    $('#deletecontextbutton').hide();
-    $('#privacy-link').hide();
-    $('#collaborate-link').hide();
-    $('#import-link').hide();
+                // Remove the buttons we added
+                addEntryForm().switchToAdd();
 
+                // Scroll the entries
+                entries().scroll();
 
+                // Remove the hidden timestamp field
+                $('input[name="timestamp"]').val('');
 
-    // Delete text from the form in case of Cancel, remove the buttons
+                // Populate contexts list next to statement add
 
-    $("#cancelbutton").on('click', function(e) {
+                let current_context_field = [];
 
-        e.preventDefault();
+                // Are we inside some context already?
 
-        $("#statement").val('');
-        $('#editbutton').remove();
-        $('#deletebutton').remove();
-        $('#cancelbutton').remove();
-        $('#submitbutton').show();
-        $('#deletecontextbutton').show();
-        $('#privacy-link').show();
-        $('#collaborate-link').show();
-        $('#import-link').show();
+                if ($("#context").val()) {
+                    current_context_field.push($("#context").val());
+                    $("#addedContexts").val($("#context").val());
+                }
 
-        entries().scroll();
+                else {
 
-        $('input[name="timestamp"]').val('');
+                    if (document.getElementById('context').value) {
+                        current_context_field.push(document.getElementById('context').value);
+                        $("#addedContexts").val(document.getElementById('context').value);
+                    }
 
-        // Populate contexts list next to statement add
+                    // if not, we're making the 'private' context default
+                    else {
+                        var lastcontexts = [];
+                        var laststatement = $(".entry:last").attr('data-uid');
+                        console.log(laststatement);
+                        for (var key in statementsOfContext) {
+                            var reiteratestatements = statementsOfContext[key];
+                            for (var i = 0; i< reiteratestatements.length; i++) {
+                                if (laststatement == reiteratestatements[i]) {
+                                    lastcontexts.push(key);
+                                    console.log(key);
+                                }
+                            }
 
-        current_context_field = [];
-
-        // Are we inside some context already?
-
-        if ($("#context").val()) {
-            current_context_field.push($("#context").val());
-            $("#addedContexts").val($("#context").val());
-        }
-
-        else {
-
-            if (document.getElementById('context').value) {
-                current_context_field.push(document.getElementById('context').value);
-                $("#addedContexts").val(document.getElementById('context').value);
-            }
-
-            // if not, we're making the 'private' context default
-            else {
-                var lastcontexts = [];
-                var laststatement = $(".entry:last").attr('data-uid');
-                console.log(laststatement);
-                for (var key in statementsOfContext) {
-                    var reiteratestatements = statementsOfContext[key];
-                    for (var i = 0; i< reiteratestatements.length; i++) {
-                        if (laststatement == reiteratestatements[i]) {
-                            lastcontexts.push(key);
-                            console.log(key);
+                        }
+                        if (lastcontexts[0] == 'help') {
+                            current_context_field = ['private'];
+                            $("#addedContexts").val('private');
+                        }
+                        else {
+                            current_context_field = lastcontexts;
+                            $("#addedContexts").val(current_context_field.join());
                         }
                     }
 
+                    addEntryFormFactory.setCurrentContexts(current_context_field);
+
+
                 }
-                if (lastcontexts[0] == 'help') {
-                    current_context_field = ['private'];
-                    $("#addedContexts").val('private');
-                }
-                else {
-                    current_context_field = lastcontexts;
-                    $("#addedContexts").val(current_context_field.join());
-                }
-            }
+
+
+                $("#addToContexts").tagHandler({
+                    assignedTags: addEntryFormFactory.getCurrentContexts(),
+                    availableTags: contextNames,
+                    autocomplete: true,
+                    afterAdd: function(tag) {
+                        addEntryFormFactory.addToCurrentContexts(tag);
+                        $("#addedContexts").val(addEntryFormFactory.getCurrentContexts().join());
+                        console.log('contexts in cancel field: ' + addEntryFormFactory.getCurrentContexts().join());
+                    }
+                });        
+
+
+            });
+
+            $("#deletebutton").on('click', function(e) {
+                e.preventDefault();
+
+                $('#statement').addClass('loading');
+
+                $('#deletebutton').attr('disabled', 'disabled');
+
+                $('input[name="timestamp"]').val('');
+
+
+                var formSubmit = $("#submitform").serialize() + '&delete=delete';
+
+                $.post('/post', formSubmit)
+                    .done(function(res) {
+                        //3. Receive the server response, no need to emit an event
+                        console.log(res);
+                        if (res.successmsg) {
+                            //4. Show the updated text
+                            selfPosted = '1';
+                            $('#statement').removeClass('loading');
+                            $('#deletebutton').removeAttr('disabled');
+                            socket.emit('delete message', {entryuid: res.statementid});
+                            $("#warnings").append('<p class="warning">The statement was deleted.</p>');
+                            $("#warnings").slideDown('slow');
+                            $('#cancelbutton').trigger('click');
+                            setTimeout(function() {
+                                $("#warnings").slideUp('slow');
+                                $("#warnings").text('');
+                            },2000);
+
+
+                        }
+                        else if (res.errormsg) {
+                            alert(res.errormsg);
+                        }
+                        else {
+                            alert('Something went wrong, please, try again...');
+                        }
+                    })
+                    .fail(function(res) {
+                        alert("Server Error: " + res.status + " " + res.statusText);
+                    });
+
+
+
+            });
+
+            $("#editbutton").on('click', function(e) {
+                e.preventDefault();
+
+                $('#statement').addClass('loading');
+
+                $('#editbutton').attr('disabled', 'disabled');
+
+                var statementToHide = $('#statementid').val();
+
+                $('[data-uid="' + statementToHide + '"]').slideUp();
+
+                var formSubmit = $("#submitform").serialize() + '&edit=edit';
+
+                $.post('/post', formSubmit)
+                    .done(function(res) {
+                        //3. Receive the server response, no need to emit an event
+                        if (res.entryuid) {
+                            //4. Show the updated text
+                            selfPosted = '1';
+                            $('#statement').removeClass('loading');
+                            $('#editbutton').removeAttr('disabled');
+                            $('#cancelbutton').trigger('click');
+                            socket.emit('chat message', {entryuid: JSON.parse(res.entryuid).data, entrytext: res.entrytext, graph: res.graph});
+                        }
+                        else if (res.errormsg) {
+                            alert(res.errormsg);
+                        }
+                        else {
+                            alert('Something went wrong, please, try again...');
+                        }
+                    })
+                    .fail(function(res) {
+                        alert("Server Error: " + res.status + " " + res.statusText);
+                    });
+
+            });
+
 
 
         }
 
 
+        current_context_field = [];
+
+        for (var key in statementsOfContext) {
+            var checkstatements = statementsOfContext[key];
+            for (var l = 0; l<checkstatements.length; l++) {
+                if (checkstatements[l] == e.currentTarget.dataset.uid) {
+                    current_context_field.push(key);
+                }
+            }
+
+        }
+
+        console.log('context of statement clicked: ' + current_context_field);
+
+        // Which contexts the statement should be in?
+        $("#addedContexts").val(current_context_field.join());
+
+        // Update the contexts list if anything changes in the context settings of the statement
 
         $("#addToContexts").tagHandler({
             assignedTags: current_context_field,
@@ -640,154 +741,16 @@ if (!$('#deletebutton').val()) {
             afterAdd: function(tag) {
                 current_context_field.push(tag);
                 $("#addedContexts").val(current_context_field.join());
-                console.log('contexts in cancel field: ' + current_context_field.join());
+                console.log('contexts in statement field: ' + current_context_field.join());
             }
         });
 
-        // TODO a better way of dealing with delete and edit - in the logic of everything else
 
-        submitFormProcess();
-
-
+        // Smoothly scroll up
+        $("html, body").animate({ scrollTop: 0 }, "slow");
 
 
-
-    });
-
-    $("#deletebutton").on('click', function(e) {
-        e.preventDefault();
-
-        $('#statement').addClass('loading');
-
-        $('#deletebutton').attr('disabled', 'disabled');
-
-        $('input[name="timestamp"]').val('');
-
-
-        var formSubmit = $("#submitform").serialize() + '&delete=delete';
-
-        $.post('/post', formSubmit)
-                .done(function(res) {
-                    //3. Receive the server response, no need to emit an event
-                    console.log(res);
-                    if (res.successmsg) {
-                        //4. Show the updated text
-                        selfPosted = '1';
-                        $('#statement').removeClass('loading');
-                        $('#deletebutton').removeAttr('disabled');
-                        socket.emit('delete message', {entryuid: res.statementid});
-                        $("#warnings").append('<p class="warning">The statement was deleted.</p>');
-                        $("#warnings").slideDown('slow');
-                        $('#cancelbutton').trigger('click');
-                        setTimeout(function() {
-                            $("#warnings").slideUp('slow');
-                            $("#warnings").text('');
-                        },2000);
-
-
-                    }
-                    else if (res.errormsg) {
-                        alert(res.errormsg);
-                    }
-                    else {
-                        alert('Something went wrong, please, try again...');
-                    }
-                })
-                .fail(function(res) {
-                    alert("Server Error: " + res.status + " " + res.statusText);
-                });
-
-
-
-    });
-
-    $("#editbutton").on('click', function(e) {
-        e.preventDefault();
-
-        $('#statement').addClass('loading');
-
-        $('#editbutton').attr('disabled', 'disabled');
-
-        var statementToHide = $('#statementid').val();
-
-        $('[data-uid="' + statementToHide + '"]').slideUp();
-
-        var formSubmit = $("#submitform").serialize() + '&edit=edit';
-
-        $.post('/post', formSubmit)
-                .done(function(res) {
-                    //3. Receive the server response, no need to emit an event
-                    if (res.entryuid) {
-                        //4. Show the updated text
-                        selfPosted = '1';
-                        $('#statement').removeClass('loading');
-                        $('#editbutton').removeAttr('disabled');
-                        $('#cancelbutton').trigger('click');
-                        socket.emit('chat message', {entryuid: JSON.parse(res.entryuid).data, entrytext: res.entrytext, graph: res.graph});
-                    }
-                    else if (res.errormsg) {
-                        alert(res.errormsg);
-                    }
-                    else {
-                        alert('Something went wrong, please, try again...');
-                    }
-                })
-                .fail(function(res) {
-                    alert("Server Error: " + res.status + " " + res.statusText);
-                });
-
-
-
-    });
-
-
-
-}
-
-
-current_context_field = [];
-
-for (var key in statementsOfContext) {
-    var checkstatements = statementsOfContext[key];
-    for (var l = 0; l<checkstatements.length; l++) {
-        if (checkstatements[l] == e.currentTarget.dataset.uid) {
-            current_context_field.push(key);
-        }
-    }
-
-}
-
-console.log('context of statement clicked: ' + current_context_field);
-
-// Which contexts the statement should be in?
-$("#addedContexts").val(current_context_field.join());
-
-// Update the contexts list if anything changes in the context settings of the statement
-
-$("#addToContexts").tagHandler({
-    assignedTags: current_context_field,
-    availableTags: contextNames,
-    autocomplete: true,
-    afterAdd: function(tag) {
-        current_context_field.push(tag);
-        $("#addedContexts").val(current_context_field.join());
-        console.log('contexts in statement field: ' + current_context_field.join());
-    }
-});
-
-
-// Smoothly scroll up
-$("html, body").animate({ scrollTop: 0 }, "slow");
-
-
-// THIS WAS BEFORE WHEN YOU CLICK A STATEMENT ONCE
-
-// Shall all statements inside Entry if clicked
-
-
-
-
-});
+      });
 }
 
 
@@ -975,6 +938,7 @@ function filter_statements_summary(top_words, top_community_words, filter_origin
               }
 
               // Update explanation above the entries
+              
               entries().updateExplanation(filter_origin);
               
               // Hide everything

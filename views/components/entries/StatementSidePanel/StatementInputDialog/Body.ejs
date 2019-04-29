@@ -34,11 +34,40 @@
 
 <script>
 
+    function AddEntryFormFactory() {
+        
+        let entryFormState = 'add';
+
+        // Used to populate entry textfield
+        let current_context_field = [];    
+
+        this.setToEdit = function () {
+            entryFormState = 'edit';
+        }
+        this.setToAdd = function () {
+            entryFormState = 'add';
+        }
+        this.getStatus = function() {
+            return entryFormState;
+        }
+
+        this.setCurrentContexts = function(contexts) {
+            current_context_field = contexts;
+        }
+
+        this.getCurrentContexts = function() {
+            return current_context_field;
+        }
+
+        this.addToCurrentContexts = function(context) {
+            current_context_field.push(context);
+        }
+    }
+
+    let addEntryFormFactory = new AddEntryFormFactory();
 
     let mute = getUrlVars()["mute"];
 
-    // Used to populate entry textfield
-    let current_context_field = [];
 
     // We will set a user for posting. If the posting user does not equal the user who's watching the graph, we force-add the statement into theirs (provided they collaborate)
     let postedby = '';
@@ -60,6 +89,12 @@
             },
             enable: function() {
                 $('#submitbutton').removeAttr('disabled');
+            },
+            show: function() {
+                $('#submitbutton').show();
+            },
+            hide: function() {
+                $('#submitbutton').hide();
             }
         }
     }
@@ -96,7 +131,7 @@
 
                 // Let's add the right context into the entry form
                 if (document.getElementById('context').value) {
-                    current_context_field = [document.getElementById('context').value];
+                    addEntryFormFactory.setCurrentContexts([document.getElementById('context').value]);
                     $("#addedContexts").val(document.getElementById('context').value);
                 }
 
@@ -115,15 +150,17 @@
 
                     }
                     if (lastcontexts[0] == 'help' || !lastcontexts[0]) {
-                        current_context_field = ['private'];
+                        addEntryFormFactory.setCurrentContexts(['private']);
                         $("#addedContexts").val('private');
                     }
 
                     else {
-                        current_context_field = lastcontexts;
-                        $("#addedContexts").val(current_context_field.join());
+                        addEntryFormFactory.setCurrentContexts(lastcontexts);
+                        $("#addedContexts").val(addEntryFormFactory.getCurrentContexts().join());
                     }
                 }
+
+                let current_context_field = addEntryFormFactory.getCurrentContexts();
 
                 // Let's add into the contexts field
                 $("#addToContexts").tagHandler({
@@ -134,6 +171,7 @@
                         current_context_field.push(tag);
                         $("#addedContexts").val(current_context_field.join());
                         console.log('contexts in hidden field: ' + current_context_field.join());
+                        addEntryFormFactory.setCurrentContexts(current_context_field);
                     },
                     afterDelete: function(tag) {
                         console.log('initiated delete from sigma');
@@ -144,8 +182,40 @@
                         }
                         $("#addedContexts").val(current_context_field.join());
                         console.log('contexts in hidden field: ' + current_context_field.join());
+                        addEntryFormFactory.setCurrentContexts(current_context_field);
+
                     }
                 });
+            },
+            switchToEdit: function() {
+                $("#submitform").append('<input type="submit" name="edit" value="edit" id="editbutton" class="pure-button"> <input type="submit" style="margin: 0px 8px;" name="delete" value="delete" id="deletebutton" > <input type="submit" name="cancel" value="cancel" id="cancelbutton" class="pure-button">');
+                
+                // Hide all the entry edit options
+                deleteContextButton().hide();
+                privacyLinkButton().hide();
+                collaborateButton().hide();
+                importLinkButton().hide();
+
+                submitButton().hide();
+
+                addEntryFormFactory.setToEdit();
+            },
+            switchToAdd: function() {
+                $("#statement").val('');
+                $('#editbutton').remove();
+                $('#deletebutton').remove();
+                $('#cancelbutton').remove();
+
+                // Show all the entry edit options
+                deleteContextButton().show();
+                privacyLinkButton().show();
+                collaborateButton().show();
+                importLinkButton().show();
+
+                // Show the submit button
+                submitButton().show()
+
+                addEntryFormFactory.setToAdd();
             },
             disable: function() {
                 $('#statement').addClass('loading');
