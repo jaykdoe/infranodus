@@ -297,6 +297,7 @@
                     if ($("#context").val()) {
                         current_context_field.push($("#context").val());
                         $("#addedContexts").val($("#context").val());
+                        populateContexts(current_context_field);
                     }
 
                     else {
@@ -307,9 +308,8 @@
                         // Let's get the most recent statement
                         let laststatement = $(".entry:last").attr('data-uid');
                         
-                        // Get all the contexts that this statement belongs to
-                        lastcontexts = graphFactory.getContextsOfStatement(laststatement);
-                        
+                        lastcontexts.push(contextNames[0]);
+
                         // If it doesn't exist or equals "help" (chatbot) then set to private
                         if (lastcontexts.length == 0 || lastcontexts[0] == 'help') {
                             current_context_field = ['private'];
@@ -321,36 +321,44 @@
                             $("#addedContexts").val(current_context_field.join());
                         }
 
+                        populateContexts(current_context_field);
+
+                    
+
                     }
 
-                    // Set global param
-                    addEntryFormFactory.setCurrentContexts(current_context_field);
+                    function populateContexts(current_context_field) {
 
-        
-                    // Let's add into the contexts field
-                    $("#addToContexts").tagHandler({
-                        assignedTags: addEntryFormFactory.getCurrentContexts(),
-                        availableTags: contextNames,
-                        autocomplete: true,
-                        afterAdd: function(tag) {
-                            current_context_field.push(tag);
-                            $("#addedContexts").val(current_context_field.join());
-                            console.log('contexts in hidden field: ' + current_context_field.join());
-                            addEntryFormFactory.setCurrentContexts(current_context_field);
-                        },
-                        afterDelete: function(tag) {
-                            console.log('initiated delete from sigma');
-                            for (var i=current_context_field.length-1; i>=0; i--) {
-                                if (current_context_field[i] === tag) {
-                                    current_context_field.splice(i, 1);
+                        // Set global param
+                        addEntryFormFactory.setCurrentContexts(current_context_field);
+
+                        // Let's add into the contexts field
+                        $("#addToContexts").tagHandler({
+                            assignedTags: addEntryFormFactory.getCurrentContexts(),
+                            availableTags: contextNames,
+                            autocomplete: true,
+                            afterAdd: function(tag) {
+                                current_context_field.push(tag);
+                                $("#addedContexts").val(current_context_field.join());
+                                console.log('contexts in hidden field: ' + current_context_field.join());
+                                addEntryFormFactory.setCurrentContexts(current_context_field);
+                            },
+                            afterDelete: function(tag) {
+                                console.log('initiated delete from sigma');
+                                for (var i=current_context_field.length-1; i>=0; i--) {
+                                    if (current_context_field[i] === tag) {
+                                        current_context_field.splice(i, 1);
+                                    }
                                 }
+                                $("#addedContexts").val(current_context_field.join());
+                                console.log('contexts in hidden field: ' + current_context_field.join());
+                                addEntryFormFactory.setCurrentContexts(current_context_field);
                             }
-                            $("#addedContexts").val(current_context_field.join());
-                            console.log('contexts in hidden field: ' + current_context_field.join());
-                            addEntryFormFactory.setCurrentContexts(current_context_field);
-                        }
-                    });
+                        });
 
+                    }
+
+       
             },
             disable: function() {
                 $('#statement').addClass('loading');
