@@ -274,7 +274,7 @@ function GraphFactory(){
 
                     // TODO this is a workaround, otherwise sigma doesn't have X parameters on initGraph
                     if (this.existStopNodes() == true) {
-                        this.deleteGraphNodes(this.getStopNodes());
+                        this.deleteGraphNodes(this.getStopNodes());          
                     }
 
                     return true;
@@ -514,7 +514,9 @@ function GraphFactory(){
                         return true;
                     }
                     else {
-                        return false;
+                        if (node) {
+                            return false;
+                        }
                     }
                 }
                 this.existStopNodes = function() {

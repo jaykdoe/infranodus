@@ -61,6 +61,23 @@ function graphTags() {
 
             htmlNodes = htmlNodes + '<div class="tagsend"></div></ul>';
 
+            if (graphFactory.existStopNodes() == true) {
+                if (background == 'dark') {
+                    $('#stopsave').addClass('stopsave-dark');
+                }
+                else {
+                    $('#stopsave').addClass('stopsave-on');
+                }
+            }
+            else {
+                if (background == 'dark') {
+                    $('#stopsave').removeClass('stopsave-dark');
+                }
+                else {
+                    $('#stopsave').removeClass('stopsave-on');
+                }
+            }
+
             $('#pinnednodeslist').html(htmlNodes);
 
             $('#stopnodeslist').html(stopNodesList);

@@ -156,11 +156,13 @@ function graph() {
               for (var i = 0; i < edgesDB.length; i++ ) {
                   if (edgesDB[i].source == nodeIDs[nodesToAdd[addingNodes]] || edgesDB[i].target == nodeIDs[nodesToAdd[addingNodes]]) {
                       edgeproc = edgesDB[i];
+   
                       // Do we have any stopwords?
+                      
                       if (stoplistNodes.length > 0) {
                           // Do connections only if target/source is not in the remaining stoplistNodes
-                          if (stoplistNodes.indexOf(nodeIDs_rev[edgeproc.source]) < 0 && stoplistNodes.indexOf(nodeIDs_rev[edgeproc.target]) < 0) {
-                                  this.addEdge(edgeproc);
+                          if (graphFactory.checkIfStopNode(nodeIDs_rev[edgeproc.source]) == false && graphFactory.checkIfStopNode(nodeIDs_rev[edgeproc.target]) == false) {
+                                this.addEdge(edgeproc);
                           }
                       }
                       else {
