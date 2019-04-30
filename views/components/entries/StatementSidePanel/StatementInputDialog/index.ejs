@@ -201,7 +201,7 @@ socket.on('chat message', function(msg){
     }
 
     // So let's add that entry to the #entries div
-    entries().append(msg.entrytext, msg.entryuid, msg.entryname, msg.posted_by, alien, chatbot);
+    entries().append(msg.entrytext, msg.entryuid, msg.entryname, msg.postedby, alien, chatbot);
 
     // Unfocus and reFocus again on the entry field
     addEntryForm().refocus();

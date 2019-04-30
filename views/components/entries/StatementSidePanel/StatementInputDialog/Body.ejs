@@ -396,6 +396,8 @@
                             addEntryForm().enable();
                             submitButton().enable();
 
+                            var postedby = userFactory.getLoggedInUser();
+                        
                             // This below if a few statements were posted
                             // TODO as we can now get all the s.uid back as an array this could be rewritten so no need for the condition after
                             if (res.entryuid == 'multiple') {
