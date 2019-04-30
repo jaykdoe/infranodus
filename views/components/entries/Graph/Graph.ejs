@@ -848,17 +848,15 @@ function graph() {
 
                 // Is there no contexts at all? Show the node.
                 for (var g = 0; g < entries_ids.length; g++) {
-                    if (!n.marked || n.marked == '0') {
-                        if (!nodesOfStatement[entries_ids[g]] || nodesOfStatement[entries_ids[g]].indexOf(n.id) < 0)  {
-                            n.color = deselected_nodes_color;
-                            n.label = '';
-                        }
-                        else {
-                            n.color = n.originalColor;
-                            n.label = n.originalLabel;
-                            n.marked = '1';
-                        }
+                    if (!nodesOfStatement[entries_ids[g]] || nodesOfStatement[entries_ids[g]].indexOf(n.id) < 0)  {
+                        n.color = deselected_nodes_color;
+                        n.label = '';
                     }
+                    else {
+                        n.color = n.originalColor;
+                        n.label = n.originalLabel;
+                    }
+                    
                 }
             });
 
