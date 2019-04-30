@@ -308,6 +308,9 @@ function GraphFactory(){
                             }
                         }
                     }
+                    console.log('nodesToAdd')
+                    console.log(nodesToAdd)
+                    console.log(edgesToAdd)
                     this.addGraphNodesEdges(nodesToAdd, edgesToAdd);
                     return true;
                 }
@@ -369,6 +372,9 @@ function GraphFactory(){
           
         
                 this.initPinnedNodes = function(nodes) {
+
+                    console.log('pinned nddes init')
+
                     if (nodes) {
                         pinnedNodes = nodes;
                     }
@@ -677,15 +683,17 @@ function GraphFactory(){
         
                         let saved_selections = JSON.parse(localStorage.getItem("selections"));
         
-                       
-        
                         // Do we have any saved selections stopNodes or pinnedNodes for this URL?
                         if (saved_selections[window.location.href]) {
                             let deletedNodes = saved_selections[window.location.href].stopnodes;
                             let pinnedNodes = saved_selections[window.location.href].pinnednodes;
-                                               
-                            this.deleteNodes(deletedNodes);
-                            this.initPinnedNodes(pinnedNodes);
+                            
+                            if (deletedNodes.length > 0) {
+                                this.deleteNodes(deletedNodes);
+                            }
+                            if (pinnedNodes.length > 0) {
+                                this.initPinnedNodes(pinnedNodes);
+                            }
         
                         }
                         else if (interpret) {

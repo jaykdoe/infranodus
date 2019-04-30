@@ -253,13 +253,14 @@ socket.on('delete message', function(msg){
 
     $("#statement").val('');
 
-    // When searched for nodes in that statement, nothing will appear.
-
+    // We remove the nodesOfStatement[statement] for that statement
+    // When searched for nodes in that statement, nothing will appear 
     graphFactory.removeNodesFromStatement(msg.entryuid);
 
     // Let's set up which nodes we will keep
     let nodesToKeep = [];
 
+    // Reiterate through Sigma
     sigma.instances(0).graph.edges().forEach(function(e) {
 
         // If a node appears in at least one statement, we add him in ToKeep list
@@ -283,29 +284,20 @@ socket.on('delete message', function(msg){
 
     });
 
-
+    let nodesToDelete = [];
     sigma.instances(0).graph.nodes().forEach(function(n) {
         if (nodesToKeep.indexOf(n.id) < 0) {
-            sigma.instances(0).graph.dropNode(n.id);
+            graphFactory.removeNode(n.originalLabel);
+            nodesToDelete.push(n.originalLabel);
         }
 
     });
 
- 
-    // Refresh the object and reload the layout
+    graphFactory.deleteGraphNodes(nodesToDelete);
 
-    sigma.instances(0).refresh();
 
-    sigma.instances(0).startForceAtlas2(forceatlas_options);
 
-    // Don't run it forever not to overheat :)
-
-    setTimeout(function() {
-
-        sigma.instances(0).stopForceAtlas2();
-        sigma.instances(0).killForceAtlas2();
-
-    }, 3000);
+    
 
 
 });

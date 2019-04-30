@@ -114,8 +114,11 @@ different
 do
 does
 doesn't
+doesn\'t
+
 doing
 don't
+don\'t
 don
 dont
 done
@@ -307,6 +310,8 @@ nothing
 novel
 now
 nowhere
+n't
+n\'t
 obviously
 of
 off
