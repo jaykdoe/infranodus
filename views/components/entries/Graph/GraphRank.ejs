@@ -9,7 +9,7 @@
     function betweennessCentrality (eles, jsG) {
 
             // Define collection for Cytoscape
-            var collection = cy.elements();
+            // var collection = cy.elements();
 
             // Calculate betweenness centrality for all the nodes
             var jsbc = jsnx.betweennessCentrality(jsG, {normalized: true, weight: 'weight'});
@@ -17,12 +17,13 @@
             
             let nodeIDs_rev = graphFactory.getNodeIDsRev();
 
-            var bc = eles.bc({
-                weight: function(edges) {
-                    return edges.data('weight');
-                },
-                directed: true
-            });
+            // BC calculation for Cytoscape
+            // var bc = eles.bc({
+            //     weight: function(edges) {
+            //         return edges.data('weight');
+            //     },
+            //     directed: true
+            // });
 
             let bcmin = 1;
             let bcmax = 0;
@@ -82,9 +83,6 @@
 
             // Sort all the top BC nodes descending
             topbc_nodes = _.sortBy(topbc_nodes, 'bc').reverse();
-
-            console.log('Top betweenness centrality nodes:');
-            console.log(topbc_nodes);
 
             graphFactory.updateTopBCNodes(topbc_nodes);
 

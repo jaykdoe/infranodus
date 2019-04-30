@@ -172,9 +172,9 @@ function graph() {
                     }
                 }
                 
-              }
+            }
 
-            sigma.instances(0).refresh();
+            // sigma.instances(0).refresh();
             
             // After the nodes and edges are added, call the graphMetrics
             callback();
@@ -350,6 +350,7 @@ function graph() {
                 y: Math.random(),
                 color: color_context
               }); 
+          //sigma.instances(0).refresh();
         },
         addContextNode: function(context) {
             
@@ -389,7 +390,7 @@ function graph() {
                 statement_id: edgeproc.statement_id,
                 edge_context: edgeproc.edge_context
             });
-            sigma.instances(0).refresh();
+            //sigma.instances(0).refresh();
         },
         addContextEdge: function(id,source,target,edge_context) {
 
@@ -553,6 +554,7 @@ function graph() {
 
             });
 
+            
             // Save the number of edges into the stats object
             graphFactory.setStats('edgesUndirected',totalUnEdgesCount);
             graphFactory.setStats('edgesDirected', totalDiEdgesCount);
@@ -583,7 +585,6 @@ function graph() {
 
             // Launch community detect algorithm
             communityDetect(lougraph, grgraph, graph().refreshGraph);
-
 
         },
         refreshGraph: function() {
