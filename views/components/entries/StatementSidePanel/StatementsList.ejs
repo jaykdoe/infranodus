@@ -18,6 +18,35 @@
 var currentEntriesPanelMode = "VISIBLE";
 
 
+function EntriesFactory() {
+
+    let currentSelections = []; // IDs
+
+    this.addToCurrentSelections = function(statement_id) {
+      currentSelections.push(statement_id);
+    }
+    this.getCurrentSelections = function() {
+      return currentSelections;
+    }
+    this.isInCurrentSelections = function(statement_id) {
+      if (currentSelections.indexOf(statement_id) > -1) {
+        return true;
+      }
+      else {
+        return false;
+      }
+    }
+    this.removeFromCurrentSelections = function(statement_id) {
+      let index = currentSelections.indexOf(statement_id);
+      currentSelections.splice(index,1);
+    }
+    this.removeCurrentSelections = function() {
+      currentSelections = [];
+    }
+
+}
+
+let entriesFactory = new EntriesFactory();
 
 if (localStorage.getItem('folded') == 1) {
     currentEntriesPanelMode = "HIDDEN"
@@ -26,15 +55,7 @@ if (localStorage.getItem('folded') == 1) {
 
 // Add the hooks to the newly rendered entries
 
-entries().onClick(entryClick);
-
-// If it's NOT some other user watching the graph, then statements can be edited. Otherwise - no.
-<% if (!perceivername) { %>
-
-entryDoubleClick();
-
-<% } %>
-
+entries().onClick(entrySelect);
 
 entries().changeTime();
 
@@ -134,6 +155,15 @@ function entries() {
         },
         onClick: function(onClick) {
             $('.entry').on('click', onClick);
+        },
+        onEditClick: function(onClick) {
+            $('.editentry').on('click', onClick);
+        },
+        onDoubleClick: function(onClick) {
+            $(".entry").on('doubletap', onClick);
+        },
+        onResetClick: function(onClick) {
+            $(".resetentry").on('click', onClick);
         },
         show: function() {
                 $("#entries").css('z-index','5');
@@ -454,54 +484,63 @@ function showEntries () {
 
 
 
-function entryClick (e) {
- 
-        // A parameter to check if we're taking off the flag
+function entrySelect (e) {
 
-        let alreadyClicked = null;
-
-        // Make all entries semitrasparent
-        
-        let pinnedNodes = graphFactory.getPinnedNodes();
-
-        if (pinnedNodes.length == 0) {
-
-            $(".entry").each(function() {
-                if ($(this).css('opacity') < 1) {
-                    $(this).css('opacity', '1');
-                    alreadyClicked = 1;
-                }
-                else {
-                    $(this).css('opacity', '0.3');
-                }
-            });
-
-            // The one clicked is not transparent
-
-            $(this).css('opacity','1');
-
-        }
+        e.stopPropagation();
 
         let keepStatementID = e.currentTarget.dataset.uid;
 
-        console.log("Clicked on the statement ID #");
-        console.log(keepStatementID);
+        if (!keepStatementID) {
+          entriesFactory.removeCurrentSelections();
+        }
+        else if (entriesFactory.isInCurrentSelections(keepStatementID) == true) {
+          entriesFactory.removeFromCurrentSelections(keepStatementID);
+        }
+        else {
+          entriesFactory.addToCurrentSelections(keepStatementID);
+        }
+        
+        let entries_to_select = [];
+        entries_to_select = entriesFactory.getCurrentSelections();
 
+        let pinnedNodes = graphFactory.getPinnedNodes();
+
+        $(".entry").each(function() {
+            if (entries_to_select.length == 0) {
+              $(this).css('opacity', '1');  
+              $('.entry-menu',this).hide();
+            }
+            else if (entriesFactory.isInCurrentSelections($(this).attr('data-uid')) == true) {
+              $(this).css('opacity', '1');  
+              $('.entry-menu',this).show();
+            } 
+            else {
+              $(this).css('opacity', '0.3');  
+              $('.entry-menu',this).hide();
+            }
+        });
+
+        if (keepStatementID) {
+          entries().onEditClick(editDeleteEntry);
+          entries().onResetClick(entrySelect);
+        }
+
+      
         // Make only those edges visible that belong to the statement selected
 
-        let entries_to_select = [];
-        entries_to_select.push(keepStatementID);
-
-        if (!alreadyClicked && pinnedNodes.length == 0) {
-            graph().selectEntries(entries_to_select);
+        if (entries_to_select.length > 0) {
+           graph().selectEntries(entries_to_select);
         }
-     
         else {
-            if (pinnedNodes.length == 0) {
-                graph().removeSelections();
-            }
-        }  
+          if (graphFactory.existPinnedNodes() == true) {
+            graphFactory.initPinnedNodes(pinnedNodes);
+          }
+          else {
+            graph().removeSelections();
+          }
+        }
 
+      
 }
 
 
@@ -521,13 +560,11 @@ function entryScroll (scroll_entry, undo_select) {
 }
 
 
-function entryDoubleClick() {
-
-    $(".entry").on('doubletap', function(e) {
+function editDeleteEntry(e) {
 
         e.preventDefault();
 
-        addEntryForm().populateEdit(e);
+        addEntryForm().populateEdit($(this).closest('div'));
 
         // If no delete button is shown
         if (addEntryFormFactory.getStatus() == 'add') {
@@ -553,8 +590,6 @@ function entryDoubleClick() {
         // Smoothly scroll up
         $("html, body").animate({ scrollTop: 0 }, "slow");
 
-
-      });
 }
 
 

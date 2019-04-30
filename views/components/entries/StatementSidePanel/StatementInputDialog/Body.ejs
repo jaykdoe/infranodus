@@ -164,14 +164,15 @@
                 addEntryFormFactory.setToAdd();
             },
             populateEdit: function(e) {
+
                 // Get the statement into the edit box at the top
-                $("#statement").val($('.entry-text', e.currentTarget).text());
+                $("#statement").val($('.entry-text', e).text());
 
                 // Retrieve that statement's ID into the hidden field (for edit or delete)
-                $('input[name="statementid"]').val(e.currentTarget.dataset.uid);
+                $('input[name="statementid"]').val(e.attr('data-uid'));
 
                 // Retrieve the date of the statement
-                $('input[name="timestamp"]').val(e.currentTarget.dataset.timestamp);
+                $('input[name="timestamp"]').val(e.attr('data-timestamp'));
 
             },
             onCancelClick: function(e) {
