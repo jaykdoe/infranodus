@@ -845,16 +845,19 @@ function graph() {
 
             // Make only those nodes visible that belong to the statement selected
             sigma.instances(0).graph.nodes().forEach(function(n) {
-
+                let got_match = 0;
                 // Is there no contexts at all? Show the node.
                 for (var g = 0; g < entries_ids.length; g++) {
-                    if (!nodesOfStatement[entries_ids[g]] || nodesOfStatement[entries_ids[g]].indexOf(n.id) < 0)  {
-                        n.color = deselected_nodes_color;
-                        n.label = '';
-                    }
-                    else {
+                    if (nodesOfStatement[entries_ids[g]] && nodesOfStatement[entries_ids[g]].indexOf(n.id) > -1)  {
                         n.color = n.originalColor;
                         n.label = n.originalLabel;
+                        got_match += 1;
+                    }
+                    else {
+                        if (got_match == 0) {
+                            n.color = deselected_nodes_color;
+                            n.label = '';
+                        }
                     }
                     
                 }
