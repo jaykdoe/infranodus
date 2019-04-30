@@ -162,6 +162,7 @@ function entries() {
 
                if (addcontext && interpret) {
                   $('.entry').hide();
+                  let statementsOfContext = graphFactory.getStatementsOfContext();
                     for (var ite in statementsOfContext[current_context]) {
                       $('.entry[data-uid="' + statementsOfContext[current_context][ite] + '"]').each(function() {
                         $(this).show();
@@ -526,225 +527,28 @@ function entryDoubleClick() {
 
         e.preventDefault();
 
-        // Get the statement into the edit box at the top
-        $("#statement").val($('.entry-text', e.currentTarget).text());
+        addEntryForm().populateEdit(e);
 
-        // Retrieve that statement's ID into the hidden field (for edit or delete)
-        $('input[name="statementid"]').val(e.currentTarget.dataset.uid);
-
-        // Retrieve the date of the statement
-        $('input[name="timestamp"]').val(e.currentTarget.dataset.timestamp);
-
-        $('#statementInputMenu').each(function() {
-            $("li", this).each(function(i) {
-                $(this).removeClass('pure-menu-selected-top');
-            });
-        });
-
-
-      // If no delete button is shown
-
+        // If no delete button is shown
         if (addEntryFormFactory.getStatus() == 'add') {
 
             // Add the edit, delete and cancel buttons
             addEntryForm().switchToEdit();
 
-            // Add a hook on the Cancel button 
-            $("#cancelbutton").on('click', function(e) {
+            // Add a hook on the cancel button
+            addEntryForm().onCancelClick();
+ 
+            // Add a hook on the delete button
+            addEntryForm().onDeleteClick();
 
-                e.preventDefault();
-
-                // Remove the buttons we added
-                addEntryForm().switchToAdd();
-
-                // Scroll the entries
-                entries().scroll();
-
-                // Remove the hidden timestamp field
-                $('input[name="timestamp"]').val('');
-
-                // Populate contexts list next to statement add
-
-                let current_context_field = [];
-
-                // Are we inside some context already?
-
-                if ($("#context").val()) {
-                    current_context_field.push($("#context").val());
-                    $("#addedContexts").val($("#context").val());
-                }
-
-                else {
-
-                    if (document.getElementById('context').value) {
-                        current_context_field.push(document.getElementById('context').value);
-                        $("#addedContexts").val(document.getElementById('context').value);
-                    }
-
-                    // if not, we're making the 'private' context default
-                    else {
-                        var lastcontexts = [];
-                        var laststatement = $(".entry:last").attr('data-uid');
-                        console.log(laststatement);
-                        for (var key in statementsOfContext) {
-                            var reiteratestatements = statementsOfContext[key];
-                            for (var i = 0; i< reiteratestatements.length; i++) {
-                                if (laststatement == reiteratestatements[i]) {
-                                    lastcontexts.push(key);
-                                    console.log(key);
-                                }
-                            }
-
-                        }
-                        if (lastcontexts[0] == 'help') {
-                            current_context_field = ['private'];
-                            $("#addedContexts").val('private');
-                        }
-                        else {
-                            current_context_field = lastcontexts;
-                            $("#addedContexts").val(current_context_field.join());
-                        }
-                    }
-
-                    addEntryFormFactory.setCurrentContexts(current_context_field);
-
-
-                }
-
-
-                $("#addToContexts").tagHandler({
-                    assignedTags: addEntryFormFactory.getCurrentContexts(),
-                    availableTags: contextNames,
-                    autocomplete: true,
-                    afterAdd: function(tag) {
-                        addEntryFormFactory.addToCurrentContexts(tag);
-                        $("#addedContexts").val(addEntryFormFactory.getCurrentContexts().join());
-                        console.log('contexts in cancel field: ' + addEntryFormFactory.getCurrentContexts().join());
-                    }
-                });        
-
-
-            });
-
-            $("#deletebutton").on('click', function(e) {
-                e.preventDefault();
-
-                $('#statement').addClass('loading');
-
-                $('#deletebutton').attr('disabled', 'disabled');
-
-                $('input[name="timestamp"]').val('');
-
-
-                var formSubmit = $("#submitform").serialize() + '&delete=delete';
-
-                $.post('/post', formSubmit)
-                    .done(function(res) {
-                        //3. Receive the server response, no need to emit an event
-                        console.log(res);
-                        if (res.successmsg) {
-                            //4. Show the updated text
-                            selfPosted = '1';
-                            $('#statement').removeClass('loading');
-                            $('#deletebutton').removeAttr('disabled');
-                            socket.emit('delete message', {entryuid: res.statementid});
-                            $("#warnings").append('<p class="warning">The statement was deleted.</p>');
-                            $("#warnings").slideDown('slow');
-                            $('#cancelbutton').trigger('click');
-                            setTimeout(function() {
-                                $("#warnings").slideUp('slow');
-                                $("#warnings").text('');
-                            },2000);
-
-
-                        }
-                        else if (res.errormsg) {
-                            alert(res.errormsg);
-                        }
-                        else {
-                            alert('Something went wrong, please, try again...');
-                        }
-                    })
-                    .fail(function(res) {
-                        alert("Server Error: " + res.status + " " + res.statusText);
-                    });
-
-
-
-            });
-
-            $("#editbutton").on('click', function(e) {
-                e.preventDefault();
-
-                $('#statement').addClass('loading');
-
-                $('#editbutton').attr('disabled', 'disabled');
-
-                var statementToHide = $('#statementid').val();
-
-                $('[data-uid="' + statementToHide + '"]').slideUp();
-
-                var formSubmit = $("#submitform").serialize() + '&edit=edit';
-
-                $.post('/post', formSubmit)
-                    .done(function(res) {
-                        //3. Receive the server response, no need to emit an event
-                        if (res.entryuid) {
-                            //4. Show the updated text
-                            selfPosted = '1';
-                            $('#statement').removeClass('loading');
-                            $('#editbutton').removeAttr('disabled');
-                            $('#cancelbutton').trigger('click');
-                            socket.emit('chat message', {entryuid: JSON.parse(res.entryuid).data, entrytext: res.entrytext, graph: res.graph});
-                        }
-                        else if (res.errormsg) {
-                            alert(res.errormsg);
-                        }
-                        else {
-                            alert('Something went wrong, please, try again...');
-                        }
-                    })
-                    .fail(function(res) {
-                        alert("Server Error: " + res.status + " " + res.statusText);
-                    });
-
-            });
-
-
+            // Add a hook on the edit button
+            addEntryForm().onEditClick();
 
         }
 
-
-        current_context_field = [];
-
-        for (var key in statementsOfContext) {
-            var checkstatements = statementsOfContext[key];
-            for (var l = 0; l<checkstatements.length; l++) {
-                if (checkstatements[l] == e.currentTarget.dataset.uid) {
-                    current_context_field.push(key);
-                }
-            }
-
-        }
-
-        console.log('context of statement clicked: ' + current_context_field);
-
-        // Which contexts the statement should be in?
-        $("#addedContexts").val(current_context_field.join());
-
-        // Update the contexts list if anything changes in the context settings of the statement
-
-        $("#addToContexts").tagHandler({
-            assignedTags: current_context_field,
-            availableTags: contextNames,
-            autocomplete: true,
-            afterAdd: function(tag) {
-                current_context_field.push(tag);
-                $("#addedContexts").val(current_context_field.join());
-                console.log('contexts in statement field: ' + current_context_field.join());
-            }
-        });
-
+        // Repopulate contexts field
+        addEntryForm().repopulateContexts();
+        
 
         // Smoothly scroll up
         $("html, body").animate({ scrollTop: 0 }, "slow");

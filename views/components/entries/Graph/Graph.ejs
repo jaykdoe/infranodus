@@ -59,10 +59,6 @@
 
 
 
-
-  // What are the concepts present in the graph?
-  var statementsOfContext = [];
-
   // Cytoscape object
 
   var elesnodes = [];
@@ -317,19 +313,11 @@ function graph() {
                     }
               }
       
-              // Which statements belong to which context / graph
-              if (statementsOfContext[e.edge_context]) {
-                    for (let item of e.statement_id) {
-                      if (statementsOfContext[e.edge_context].indexOf(item) < 0) statementsOfContext[e.edge_context].push(item);
-                    }
+              // Which statements belong to which context / graph         
+              for (let item of e.statement_id) {
+                 graphFactory.addStatementOfContext(e.edge_context, item);
               }
-              else {
-                  statementsOfContext[e.edge_context] = [];
-                  for (let item of e.statement_id) {
-                    statementsOfContext[e.edge_context].push(item);
-                  }
-              }
-
+           
 
               // Make an index of nodes to context
               if (contextNodeID[e.edge_context]) {

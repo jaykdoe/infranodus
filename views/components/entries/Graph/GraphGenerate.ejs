@@ -86,6 +86,9 @@ function GraphFactory(){
         
                 // Create statement-node index for filtering
                 let nodesOfStatement = {};
+
+                // Create statements of context object
+                let statementsOfContext = {}; // key is context, value is statement
         
                 // How many nodes and edges added per iteration
                 let nodesAdded = [];
@@ -560,6 +563,77 @@ function GraphFactory(){
                     if (nodesOfStatement[statement]) {
                         nodesOfStatement[statement] = []
                         return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+
+
+                this.addStatementOfContext = function(context, statement) {
+                    if (!statementsOfContext[context]) {
+                        statementsOfContext[context] = [];
+                    }
+                    if (this.existStatementOfContext(context, statement) == false) {
+                        statementsOfContext[context].push(statement);
+                        return true;
+                    }
+                }
+                this.getStatementsOfContext = function(context) {
+                    if (context) {
+                        return statementsOfContext[context];
+                    }
+                }
+                this.getAllStatementsOfContext = function() {
+                   
+                    return statementsOfContext;
+                   
+                }
+                this.getContextsOfStatement = function(statement) {
+                    let contexts = [];
+                    for (let context in statementsOfContext) {
+                        if (statementsOfContext[context].indexOf(statement) > -1) {
+                            contexts.push(context);
+                        }
+                    }
+                    return contexts;
+                }
+                this.existStatementsOfContext = function(context) {
+                    if (statementsOfContext[context]) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+                this.existStatementOfContext = function(context, statement) {
+                    if (statementsOfContext[context].indexOf(statement) >= 0) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                    
+                }
+                this.removeStatementsFromContext = function(context) {
+                    if (statementsOfContext[context]) {
+                        statementsOfContext[context] = []
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+                this.removeStatementFromContext = function(context, statement) {
+                    if (statementsOfContext[context]) {
+                        let index = statementsOfContext[context].indexOf(statement);
+                        if (index) {
+                            statementsOfContext[context].splice(index,1);
+                            return true;
+                        }
+                        else {
+                            return false;
+                        }              
                     }
                     else {
                         return false;

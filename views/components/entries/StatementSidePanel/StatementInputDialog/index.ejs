@@ -299,20 +299,7 @@ socket.on('chat message', function(msg){
     // TODO right now it doubles the code above
 
     // This is for special cases where the user is on a graph, but they are adding their own stuff to this graph into a new graph, so we only show the entries that he added, not the previous ones
-    if (addcontext && interpret) {
-
-      $('.entry').hide();
-
-      for (var ite in statementsOfContext[current_context]) {
-
-        $('.entry[data-uid="' + statementsOfContext[current_context][ite] + '"]').each(function() {
-          $(this).show();
-        });
-
-      }
-
-
-  }
+    entries().removeAddContext();
 
 
 });

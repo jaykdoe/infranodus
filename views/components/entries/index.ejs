@@ -264,6 +264,7 @@ socket.on('delete message', function(msg){
 
         // If a node appears in at least one statement, we add him in ToKeep list
         for (let item of e.statement_id) {
+           
             if (graphFactory.existNodeInStatement(item, e.source) == true) {
                 nodesToKeep.push(e.source);
             }
@@ -272,11 +273,7 @@ socket.on('delete message', function(msg){
                 nodesToKeep.push(e.target);
             }
 
-            let statePosition = statementsOfContext[e.edge_context].indexOf(item);
-
-            if (statePosition < 0) {
-                statementsOfContext[e.edge_context].splice(statePosition, 1);
-            }
+            graphFactory.removeStatementFromContext(e.edge_context, item);
 
             if (item == msg.entryuid) {
                 sigma.instances(0).graph.dropEdge(e.id);
