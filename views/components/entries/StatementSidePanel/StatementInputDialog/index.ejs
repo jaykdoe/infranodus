@@ -13,13 +13,9 @@
 <script>
 
 
-var currentStatementSidePanelMode = "EDIT"
+var currentStatementSidePanelMode = "EDIT";
 
-if (userFactory.getViewType() == 'external') {    
-    currentStatementSidePanelMode = "SEARCH"
-}
 
-changeModeTo(currentStatementSidePanelMode);
 
 function updateStatementSidePanel() {
     if(currentStatementSidePanelMode === "EDIT") switchToEdit()
@@ -32,6 +28,7 @@ function switchToSearch() {
     sidePanelContent().hide('#edit-panel');
     sidePanelContent().show('#search-panel');
     searchForm().autofill();
+    localStorage.setItem('entrypanel', 'search');
     changeEntriesHeight(200)
     hideFooter()
 }
@@ -41,6 +38,7 @@ function switchToEdit() {
         switchStatementMenu('adds');
         sidePanelContent().hide('#search-panel');
         sidePanelContent().show('#edit-panel');
+        localStorage.setItem('entrypanel', 'edit');
         // TODO: get the logic from entries.ejs starting from (topmenuaction == 'adds') {
         changeEntriesHeight(400)
         showFooter()    
@@ -133,6 +131,13 @@ function hideStatements() {
 }
 
 
+// Select the default view for entrycontrol
+
+if (userFactory.getViewType() == 'external' || localStorage.getItem('entrypanel') == 'search') {    
+    currentStatementSidePanelMode = "SEARCH"
+}
+
+changeModeTo(currentStatementSidePanelMode);
 
 // OnLoad get the right height for the entries elements — this depends on the form so it's here
 
@@ -157,6 +162,7 @@ $(window).resize(function() {
 
 // Make texarea automatically resizeable
 $('textarea').autosize();
+
 
 
 

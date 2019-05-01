@@ -438,4 +438,798 @@ function shannon(data) {
 
     }
 
+  // Initiate the graph object
+  var graphFactory = new GraphFactory();
+
+
+// Graph parameters object storage and functions
+
+function GraphFactory(){
+                
+                // Variables that contain all the current nodes (for easier search)
+                let nodeNames = [];
+                let nodeIDs = {}; // maps names (key) to IDs (values)
+                let nodeIDs_rev = {}; // maps IDs (key) to names (values)
+            
+                // Variables that contain only the original set
+                let origNodeIDs = {};
+                let origNodeIDs_rev = {};
+        
+                // Variabls that contain the edges
+                let edgesDB = [];
+                let nodesDB = [];
+
+                // Variable that contains the node's size
+                let nodeSize = {}; // maps ID to the size
+        
+                // These are the nodes that are selected
+                let pinnedNodes = [];
+        
+                // These are the nodes that were selected but not found (so gray pinnedNodes)
+                let notFoundNodes = [];
+        
+                // These are selected nodes for community detection (so that they're not colored)
+                let selectedNodes = [];
+        
+                // These are the nodes that are currently in the stoplist
+                let stopNodes = [];
+        
+                // Create statement-node index for filtering
+                let nodesOfStatement = {};
+
+                // Create statements of context object
+                let statementsOfContext = {}; // key is context, value is statement
+        
+                // How many nodes and edges added per iteration
+                let nodesAdded = [];
+                let edgesAdded = [];
+        
+                // Top betweenness centrality nodes
+                let topbc_nodes = [];
+
+                // All communities
+                let all_communities = [];
+
+                let community_of_node = {};
+
+                // Insight clusters
+                let insight_clusters = {};
+
+                // Graph statistics
+                let stats = {};
+
+                // Context nodes in the graph
+                let graphContextNodes = [];
+
+                // Context edges in the graph
+                let graphContextEdges = [];
+
+                // Additional context nodes
+                let addcontextnodes = [];
+
+                // Selected communities
+                let selectCommunities = [];
+
+                this.setStats = function(key, value) {
+                    stats[key] = value;
+                    return true;
+                }
+
+                this.getStats = function(key) {
+                    if (key) {
+                        return stats[key];
+                    }
+                    else {
+                        return false;
+                    }
+                }
+
+                this.getAllStats = function() {  
+                    return stats;
+                }
+
+                this.addGraphContextNode = function(context) {
+                    
+                    if (graphContextNodes.indexOf(context.id) == -1) {
+                        graphContextNodes.push(context.id);
+                        graph().addContextNode(context);
+                    }
+                    
+                }
+
+                this.removeGraphContextNodes = function() {
+                    graphContextNodes = [];
+                    graphContextEdges = [];
+                    graph().removeContextNodes();
+                }
+
+                this.addGraphContextEdge = function(context, node) {
+                    
+                    let edge_id = context.id + '-' + node.id;
+                    let source_id = context.id;
+                    let target_id = node.id;
+
+                    if (graphContextEdges.indexOf(edge_id) == -1) {
+                        graphContextEdges.push(edge_id);
+                        graph().addContextEdge(edge_id, context.id, node.id, '');
+                    }
+                    
+                    
+                }
+
+                this.getGraphContextNodes = function() {
+                    return graphContextNodes;
+                }
+
+                this.getGraphContextEdges = function() {
+                    return graphContextEdges;
+                }
+
+                this.saveAllCommunities = function(coms) {
+                    let new_communities = [];
+                    for (let c in coms) {
+                        new_communities.push(coms[c]);
+                    }
+                    all_communities = new_communities;
+                    
+                }
+                
+                this.getAllCommunities = function(number, top_nodes) {
+
+                    let proc_communities = [];
+
+                    for (let c in all_communities) {
+                        proc_communities[c] = {id: all_communities[c].id, length: 0, nodes: []};
+                    }
+
+                    if (top_nodes) {
+                        for (let j = 0; j < proc_communities.length; j++) {
+                            proc_communities[j].nodes = all_communities[j].nodes.slice(0, top_nodes);
+                            proc_communities[j].length = top_nodes;
+                        }
+                    }
+                    else {
+                        for (let j = 0; j < proc_communities.length; j++) {
+                            proc_communities[j].nodes = all_communities[j].nodes;
+                            proc_communities[j].length += all_communities[j].nodes.length;
+                        }
+                    }
+                    if (number) {
+                        proc_communities = proc_communities.slice(0,number);
+                        return proc_communities;
+                    }
+                    else {
+                        return proc_communities;
+                    }
+
+                }
+
+                this.saveCommunityOfNode = function(node) {
+                    community_of_node[node.originalLabel] = node.community;
+                }
+
+                this.getCommunityOfNode = function(name) {
+                    return community_of_node[name];
+                }
+
+                this.saveAddContextNodes = function(nodes) {
+                    addcontextnodes = nodes;
+                }
+                this.getAddContextNodes = function() {
+                    return addcontextnodes;
+                }
+        
+                this.addNode = function(name, id, n) {
+                    nodeIDs[name] = id;
+                    nodeIDs_rev[id] = name;
+                    nodeNames.push(name);
+                    if (n) {
+                        nodesDB.push(n);
+                        origNodeIDs[n.originalLabel] = n.id;
+                        origNodeIDs_rev[n.id] = n.originalLabel;
+                    }
+                    return true;
+                }
+                this.existNode = function(name) {
+                    if (nodeIDs[name]) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+                this.addEdge = function(e) {
+                    edgesDB.push(e);
+                    return true;
+                }
+                this.removeNode = function(name) {
+                    let nodeID = nodeIDs[name];
+                    delete nodeIDs[name];
+                    delete nodeIDs_rev[nodeID];
+                    nodeNames.splice(nodeNames.indexOf(name),1);
+                    return true;
+                }
+                this.deleteNodes = function(nodes) {
+                    for (let i in nodes) {
+                        this.addToStopNodes(nodes[i]);
+                        this.removeNode(nodes[i]);
+                        this.removeFromNotFoundNodes(nodes[i]);
+                        this.removeFromSelectedNodes(nodes[i]);
+                    }
+                    // If we are deleting the nodes, we transform all the pinned ones, so they can be removed too
+                    this.initPinnedNodes([]);
+
+                    // this.updateGraphNodes(nodeIDs_rev);
+
+                    // TODO this is a workaround, otherwise sigma doesn't have X parameters on initGraph
+                    if (this.existStopNodes() == true) {
+                        this.deleteGraphNodes(this.getStopNodes());          
+                    }
+
+                    return true;
+                }
+                this.addDeletedNode = function(node) {
+                    this.removeFromStopNodes(node);
+                    this.addNode(node, origNodeIDs[node]);
+                    this.initPinnedNodes(pinnedNodes);
+                    let nodesToAdd = [];
+                    nodesToAdd.push(node);
+                    this.addDeletedGraphNodes(nodesToAdd);
+                    return true;
+        
+                }
+                this.addNewNodes = function(nodes, edges, statement) {
+                    
+                    let nodesToAdd = [];
+                    let edgesToAdd = [];
+                    for (let node in nodes) {
+                        if (this.existNode(nodes[node].label) == false) {
+                            this.addNode(nodes[node].label, nodes[node].id, nodes[node]);
+                            nodesToAdd.push(nodes[node]);
+                            nodesAdded.push(nodes[node]);
+                        }
+                    }
+                    if (statement) {
+                        for (let edge in edges) {
+                            if (edges[edge].statement_id == statement) {
+                                edgesToAdd.push(edges[edge]);
+                                edgesAdded.push(edges[edge]);
+                            }
+                        }
+                    }
+      
+                    this.addGraphNodesEdges(nodesToAdd, edgesToAdd);
+                    return true;
+                }
+
+                this.setNodeSize = function(n) {
+                    nodeSize[n.id] = n.size;
+                }
+                this.getNodeSize = function(node_id) {
+                    return nodeSize[node_id];
+                }
+
+                this.getNodeIDs = function() {
+                    return nodeIDs;
+                }
+                this.getOrigNodes = function() {
+                    return nodesDB;
+                }
+                this.getOrigNodeIDs = function() {
+                    return origNodeIDs;
+                }
+                this.getOrigNodeIDsRev = function() {
+                    return origNodeIDs_rev;
+                }
+                this.getNodeID = function(name) {
+                    return nodeIDs[name];
+                }
+                this.getNodeIDsRev = function() {
+                    return nodeIDs_rev;
+                }
+        
+                this.getNodeNames = function() {
+                    return nodeNames;
+                }
+
+
+                this.getEdges = function() {
+                    return edgesDB;
+                }
+        
+        
+                this.deleteGraphNodes = function(nodesToDelete) {
+                     
+                     // Update the graph nodes (delete or add)
+                     graph().deleteNodes(nodesToDelete, graph().updateMetrics);
+               
+                 }
+        
+                 this.addDeletedGraphNodes = function(nodesToAdd) {
+                     // Update the graph nodes (delete or add)
+                     graph().addDeletedNodes(nodesToAdd, graph().updateMetrics);
+               
+                 }
+        
+                 this.addGraphNodesEdges = function(nodesToAdd, edgesToAdd) {
+                     
+                     // Adding the new nodes
+                     graph().addNodesEdges(nodesToAdd, edgesToAdd, graph().updateMetrics);
+               
+                 }
+          
+        
+                this.initPinnedNodes = function(nodes) {
+
+                    console.log('pinned nddes init')
+
+                    if (nodes) {
+                        pinnedNodes = nodes;
+                    }
+                    else {
+                        pinnedNodes = [];
+                    }
+                    
+                    // Select the pinned nodes on the graph and the adjacent ones 
+                    filter_graph(pinnedNodes);
+        
+                    // Add tags to the graph
+                    graphTags().update();
+        
+                    // Perform filter statements function on the nodes selected
+                    entries().filter();
+        
+                    // Save to local storage
+                    this.saveSelections();
+        
+                    // Add search terms into the top graph search form
+                    nodeInputField().update(pinnedNodes.concat(notFoundNodes));
+        
+                    // Add search terms into the bottom entry add field
+                    addEntryForm().update(pinnedNodes.concat(notFoundNodes));       
+        
+                    // Change selections in the analytics pane
+                    analyticsPanel.updateSelections(pinnedNodes);
+
+                    if (currentStatementsView == 'INSIGHT') {
+                        entries().activateInsight();
+                    }
+                    else if (currentStatementsView == 'SUMMARY') {
+                        entries().activateSummary();
+                    }
+                }
+        
+                // TODO write initiatilization for the delete nodes
+        
+                this.checkIfPinned = function(node) {
+                    if (pinnedNodes.indexOf(node) > -1) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+                this.addToPinnedNodes = function(name) {
+                    pinnedNodes.push(name);
+                    this.initPinnedNodes(pinnedNodes);
+                    return true;
+                }
+                this.removeFromPinnedNodes = function(name) {
+                    pinnedNodes.splice(pinnedNodes.indexOf(name),1);
+                    this.initPinnedNodes(pinnedNodes);
+                    return true;
+                }
+                this.getPinnedNodes = function() {
+                    return pinnedNodes;
+                }
+                this.getPinnedNode = function(position) {
+                    return pinnedNodes[position];
+                }
+                this.getLastPinnedNode = function() {
+                    return pinnedNodes[pinnedNodes.length - 1];
+                }
+                this.existPinnedNodes = function() {
+                    if (pinnedNodes && pinnedNodes.length > 0) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+        
+                this.updateNotFoundNodes = function(nodes) {
+                    if (!nodes) {
+                        notFoundNodes = [];
+                    }
+                    else {
+                        notFoundNodes = nodes;
+                        graphTags().update();
+                    }
+                    // Add tags to the graph
+                    return true;
+                }
+                this.addToNotFoundNodes = function(name) {
+                    notFoundNodes.push(name);
+                    return true;
+                }
+                this.removeFromNotFoundNodes = function(name) {
+                    notFoundNodes.splice(notFoundNodes.indexOf(name),1);
+                    return true;
+                }
+                this.getNotFoundNodes = function() {
+                    return notFoundNodes;
+                }
+                this.existNotFoundNodes = function() {
+                    if (notFoundNodes && notFoundNodes.length > 0) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+        
+                this.addToSelectedNodes = function(name) {
+                    selectedNodes.push(name);
+                    return true;
+                }
+                this.removeFromSelectedNodes = function(name) {
+                    selectedNodes.splice(selectedNodes.indexOf(name),1);
+                    return true;
+                }
+                this.getSelectedNodes = function() {
+                    return selectedNodes;
+                }
+                this.updateSelectedNodes = function(nodes) {
+                    selectedNodes = nodes;
+                    return true;
+                }
+                this.checkIfSelected = function(node) {
+                    if (selectedNodes.indexOf(node) > -1) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+        
+                this.addToStopNodes = function(name) {
+                    stopNodes.push(name);
+                    return true;
+                }
+                this.removeFromStopNodes = function(name) {
+                    stopNodes.splice(stopNodes.indexOf(name),1);
+                    return true;
+                }
+                this.getStopNodes = function() {
+                    return stopNodes;
+                }
+                this.checkIfStopNode = function(node) {
+                    if (stopNodes.indexOf(node) > -1) {
+                        return true;
+                    }
+                    else {
+                        if (node) {
+                            return false;
+                        }
+                    }
+                }
+                this.existStopNodes = function() {
+                    if (stopNodes && stopNodes.length > 0) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+        
+                this.addNodeToStatement = function(statement, node) {
+                    if (!nodesOfStatement[statement]) {
+                        nodesOfStatement[statement] = [];
+                    }
+                    nodesOfStatement[statement].push(node);
+                    return true;
+                }
+                this.getNodesOfStatement = function(statement) {
+                    if (statement) {
+                        return nodesOfStatement[statement];
+                    }
+                }
+                this.getAllNodesOfStatement = function() {
+                   
+                    return nodesOfStatement
+                   
+                }
+                this.existNodesOfStatement = function(statement) {
+                    if (nodesOfStatement[statement]) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+                this.existNodeInStatement = function(statement, node) {
+                    if (nodesOfStatement[statement].indexOf(node) >= 0) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                    
+                }
+                this.removeNodesFromStatement = function(statement) {
+                    if (nodesOfStatement[statement]) {
+                        nodesOfStatement[statement] = []
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+
+
+                this.addStatementOfContext = function(context, statement) {
+                    if (!statementsOfContext[context]) {
+                        statementsOfContext[context] = [];
+                    }
+                    if (this.existStatementOfContext(context, statement) == false) {
+                        statementsOfContext[context].push(statement);
+                        return true;
+                    }
+                }
+                this.getStatementsOfContext = function(context) {
+                    if (context) {
+                        return statementsOfContext[context];
+                    }
+                }
+                this.getAllStatementsOfContext = function() {
+                   
+                    return statementsOfContext;
+                   
+                }
+                this.getContextsOfStatement = function(statement) {
+                    let contexts = [];
+                    for (let context in statementsOfContext) {
+                        if (statementsOfContext[context].indexOf(statement) > -1) {
+                            contexts.push(context);
+                        }
+                    }
+                    return contexts;
+                }
+                this.existStatementsOfContext = function(context) {
+                    if (statementsOfContext[context]) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+                this.existStatementOfContext = function(context, statement) {
+                    if (statementsOfContext[context].indexOf(statement) >= 0) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                    
+                }
+                this.removeStatementsFromContext = function(context) {
+                    if (statementsOfContext[context]) {
+                        statementsOfContext[context] = []
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+                this.removeStatementFromContext = function(context, statement) {
+                    if (statementsOfContext[context]) {
+                        let index = statementsOfContext[context].indexOf(statement);
+                        if (index) {
+                            statementsOfContext[context].splice(index,1);
+                            return true;
+                        }
+                        else {
+                            return false;
+                        }              
+                    }
+                    else {
+                        return false;
+                    }
+                }
+        
+                this.saveSelections = function() {
+        
+                    // Save all the selected nodes into the localStorage
+                    if (localStorage.getItem("selections")) {
+                        var localstore = JSON.parse(localStorage.getItem("selections"));
+                    }
+                    else {
+                        var localstore = {};
+                    }
+        
+                    var localstore_cell = {};
+        
+                    localstore_cell.stopnodes = this.getStopNodes();
+                    localstore_cell.pinnednodes = this.getPinnedNodes();
+        
+                    if (this.existStopNodes == false && this.existPinnedNodes == false) {
+                        delete localstore[window.location.href]
+                    }
+                    else {
+                        localstore[window.location.href] = localstore_cell;
+                    }
+        
+                    localStorage.setItem("selections",JSON.stringify(localstore));
+        
+                }
+        
+                this.getSelections = function() {
+        
+                    let selected_keywords = getUrlVars()["keywords"];
+        
+                    if (localStorage.getItem("selections")) {
+        
+                        let saved_selections = JSON.parse(localStorage.getItem("selections"));
+        
+                        // Do we have any saved selections stopNodes or pinnedNodes for this URL?
+                        if (saved_selections[window.location.href]) {
+                            let deletedNodes = saved_selections[window.location.href].stopnodes;
+                            let pinnedNodes = saved_selections[window.location.href].pinnednodes;
+                            
+                            if (deletedNodes.length > 0) {
+                                this.deleteNodes(deletedNodes);
+                            }
+                            if (pinnedNodes.length > 0) {
+                                this.initPinnedNodes(pinnedNodes);
+                            }
+        
+                        }
+                        else if (interpret) {
+                            
+                            // In case we're on the interpret or add context field, we might still want to load the original selections
+                            
+                            for (var url in saved_selections) {
+                                if (url.indexOf('/'+addcontext+'/') > -1) {
+                                    let deletedNodes = saved_selections[url].stopnodes;
+                                    let pinnedNodes = saved_selections[url].pinnednodes;
+                                    if (deletedNodes.length > 0) {
+                                        this.deleteNodes(deletedNodes);
+                                    }
+                                    else {
+                                        if (pinnedNodes.length > 0) {
+                                            this.initPinnedNodes(pinnedNodes);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        else if (selected_keywords && selected_keywords.length > 0) {
+                            
+                            let pinnedNodes = selected_keywords.split("+");
+        
+        
+                            if (pinnedNodes.length > 0) {
+                                this.initPinnedNodes(pinnedNodes);
+                            }
+        
+        
+                        }
+        
+                    }
+                    // TODO clear that
+                    else if (selected_keywords && selected_keywords.length > 0) {
+                    
+                        let pinnedNodes = selected_keywords.split("+");
+        
+                        if (pinnedNodes.length > 0) {
+                            this.initPinnedNodes(pinnedNodes);
+                        }
+        
+        
+                    }
+                }
+        
+                this.updateTopBCNodes = function(nodes) {
+                        topbc_nodes = nodes;
+                        return true
+                }
+        
+                this.getTopBCNodes = function(number) {
+                    if (number && number > 0) {
+                        return topbc_nodes.slice(0,number)
+                    }
+                    else {
+                        return topbc_nodes;
+                    }
+                }
+
+                this.updateTopDegreeNodes = function(nodes) {
+                      topDegree_nodes = nodes;
+                      return true;
+                }
+
+                this.getTopDegreeNodes = function(number) {
+                    if (number && number > 0) {
+                        return topDegree_nodes.slice(0,number)
+                    }
+                    else {
+                        return topDegree_nodes;
+                    }
+                }
+
+                this.selectCommunity = function(community) {
+                    if (selectCommunities.indexOf(community) > -1) {
+                        selectCommunities.splice(selectCommunities.indexOf(community), 1);
+                    }
+                    else {
+                        selectCommunities.push(community);
+                    }
+                    graph().selectCommunities(selectCommunities);
+                }
+
+                this.clearSelectCommunity = function() {
+                    if (selectCommunities.length > 0) {
+                        selectCommunities = [];
+                        graph().selectCommunities(selectCommunities);
+                    }
+                }
+
+                this.createInsightClusters = function(most_inf_comm_nodes) {
+            
+                    let insight_nodes = {0: [], 1: []};
+
+                    let polysingularity_score = graphFactory.getStats('PolysingularityScore');
+
+                    if (most_inf_comm_nodes.length >= 2) {
+                        if (polysingularity_score == 'Diversified' || polysingularity_score == 'Dispersed') {
+                            insight_nodes[0] = most_inf_comm_nodes[0];
+                            insight_nodes[1] = most_inf_comm_nodes[1];
+                        }
+                        else {            
+                            let first_com = most_inf_comm_nodes[most_inf_comm_nodes.length-1];
+                            let second_com = most_inf_comm_nodes[most_inf_comm_nodes.length-2];
+                            insight_nodes[0] = first_com;
+                            insight_nodes[1] = second_com;                       
+                        }
+                    }
+                    else {
+                        if (most_inf_comm_nodes[0] && most_inf_comm_nodes[0].nodes && most_inf_comm_nodes[0].nodes.length > 1) {
+                            
+                            insight_nodes[0] = {nodes: [], length: 0, id: 0};
+                            insight_nodes[1] = {nodes: [], length: 0, id: 0};
+                            
+                            insight_nodes[0].id = most_inf_comm_nodes[0].id;
+                            insight_nodes[1].id = most_inf_comm_nodes[0].id;
+                            
+                            for (let i = 0; i < most_inf_comm_nodes[0].nodes.length; i++) {
+                                
+                                if (i <= insight_nodes[1].length) {
+                                    insight_nodes[0].nodes.push(most_inf_comm_nodes[0].nodes[i]);
+                                    insight_nodes[0].length += 1;
+                                }
+                                
+                                if ((most_inf_comm_nodes[0].nodes.length - 1 - i) > i) {
+                                    insight_nodes[1].nodes.push(most_inf_comm_nodes[0].nodes[most_inf_comm_nodes[0].nodes.length - 1 - i]);
+                                    insight_nodes[1].length += 1;
+                                }
+                            }
+                        }
+                        else {
+                            insight_nodes[0] = most_inf_comm_nodes[0];
+                            insight_nodes[1] = most_inf_comm_nodes[0];
+                        }
+                    }
+
+                    insight_clusters = insight_nodes;
+                
+                }
+
+                this.getInsightClusters = function() {
+                    return insight_clusters;
+                }
+
+
+        
+        }
+
 </script>
