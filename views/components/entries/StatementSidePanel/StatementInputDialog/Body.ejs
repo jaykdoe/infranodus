@@ -18,7 +18,7 @@
 
 <div id="search-panel">
     <form class="pure-form" id="searchform">
-        <input type="text" id="search" size="14" maxlength="20" class="pure-input" placeholder="search...">
+        <input type="text" id="search" size="14" maxlength="50" class="pure-input" placeholder="search...">
            
            
         
@@ -78,6 +78,8 @@
     
     searchForm().onSubmit(submitSearchForm);
 
+    searchForm().activate();
+
     addEntryForm().activate();
 
     addEntryForm().onSubmit(submitEditForm);
@@ -106,6 +108,21 @@
             },
             onSubmit: function(onSubmit) {   
                 $('#searchform').on('submit', onSubmit);
+            },
+            activate: function() {
+                  // Submit the form on enter
+                  $('#search').keypress(function(e){ 
+                         
+                    if(e.which == 13 && !e.shiftKey) {
+                        e.preventDefault();
+                        if (localStorage.getItem('defaultbehavior') == 'add') {
+                            $('#addnode').trigger('click');
+                        }
+                        else {
+                            $('#searchnode').trigger('click');
+                        }
+                    }
+                });
             }
         }
     }
@@ -578,12 +595,14 @@
     // What happens when we add a single node from the second editor on top
 
     $("#addnode").on('click', function(e) {
-        console.log('clicked addone')
+
         e.preventDefault();
 
         $('#addnode').addClass('addnode-on');
         $('#searchnode').removeClass('searchnode-on');
-        
+
+        localStorage.setItem('defaultbehavior', 'add');
+
         $('#statement').val($('#search').val());
         
         document.getElementById('submitform').dispatchEvent(new Event('submit'));
