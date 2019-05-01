@@ -17,8 +17,8 @@ sigma.parsers.json(
                 maxNodeSize: maxnodesize,
                 minEdgeSize: 0.5,
                 maxEdgeSize: 2,
-                labelThreshold: in_label_threshold,
-                defaultLabelColor: default_label_color,
+                labelThreshold: userFactory.getLabelThreshold(),
+                defaultLabelColor: userFactory.getGraphLabelColor(),
                 adjustSizes: true,
                 
             }

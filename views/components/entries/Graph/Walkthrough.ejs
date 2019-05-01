@@ -1,20 +1,20 @@
 <script>
 
+        // Initialize walkthrough
 
-     // Which walkthrough tutorial we want to see (pass through the URL global parameter )
+        initializeWalkthrough(userFactory.getWalkthrough());
 
-     if (walkthrough == 'default' || walkthrough == 'newcontext' || walkthrough == 'analytics' || walkthrough == "tldr" || walkthrough == "force") {
+        $("#walkthrough").click(function(e) {
+               e.preventDefault();
+               userFactory.setWalkthrough('default');
+               initializeWalkthrough(userFactory.getWalkthrough());
+          });
 
-            initializeWalkthrough();
+        // Begin walkthrough tour module for tutorial Help
+        
+         function initializeWalkthrough (walkthrough) {
 
-    }
- // BEGIN WALKTHROUGH Module for tutorial Help
-         // TODO move this out for sure
-
-         // Basic tutorial
-
-         
-         function initializeWalkthrough () {
+          if (walkthrough == 'default' || walkthrough == 'external' || walkthrough == 'newcontext' || walkthrough == 'analytics' || walkthrough == "tldr" || walkthrough == "force") {           
            // Instance the tour
              var tour = new Tour({
                storage: false,
@@ -447,7 +447,7 @@
                ]
              }
 
-             if (walkthroughtype=='external') {
+             if (walkthrough=='external') {
 
                var windowsize = $(window).width();
                if (windowsize <= 460) {
@@ -556,6 +556,7 @@
 
              // Start the tour
              tour.start();
+            }
 
            }
 </script>

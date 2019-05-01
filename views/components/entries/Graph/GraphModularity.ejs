@@ -163,7 +163,7 @@
                     globalSearch.populateGlobalSearch(topInfluenceNodes);
 
                     // Generate a nice fixed patterns for the communities
-                    let palette = generatePalette(userFactory.getGraphPalette(), max_community_number, background);
+                    let palette = generatePalette(userFactory.getGraphPalette(), max_community_number, userFactory.getBackground());
 
                     // Color the topic boxes in the Analytics panel
                     analyticsPanel.colorTopics(palette);
@@ -171,7 +171,6 @@
                     // Color the nodes in the graph
                     graph().colorNodesCommunities(palette);
                     
-
                     // Set the number of nodes in the first and second communities
                     graphFactory.setStats('FirstComNodes',all_communities[0].length);
                     let nodesfirstcom = graphFactory.getStats('FirstComNodes');

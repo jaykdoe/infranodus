@@ -11,24 +11,13 @@
         abstract = getUrlVars()["abstract"];
   }
 
-
-
-  // default label threshold
-  var in_label_threshold = 8;
-
-  var default_label_color = '#000000';
-
-  if (background == 'dark') {
-    default_label_color = '#ffffff';
-  }
-
   var minnodesize = 5;
   var maxnodesize = 16;
 
   if (abstract && abstract != 'no') {
       minnodesize = 1;
       maxnodesize = 1;
-      in_label_threshold = 20;
+      userFactory.setLabelThreshold(20);
   }
 
 

@@ -5,37 +5,31 @@
     <script src="/javascripts/jquery.min.js"></script>
     <script>
 
-    // initiate global user parameters
+    // Initiate Global User Settings
 
     let userFactory = new UserFactory();
 
     function UserFactory(){
 
         let loggedInUser = null;
-
         let watchedUser = null;
-
         let currentUser = '';
-
         let currentContext = '';
-
         let viewType = 'internal';
-
         let selfPosted = null;
-
         let forwardTo = 'https://www.google.com/search?q=';
-
         let hostSite = '';
-
         let addContext = '';
-
         let jsonPath = '';
-
         let maxNodes = '';
-
         let most_influential = 'bc';
-
         let graphPalette = '';
+        let walkthroughtype = '';
+        let inlanguage = 'auto';
+        let in_label_threshold = 8;
+        let midi = null;
+        let background = null;
+        let default_label_color = '#000000';
 
         this.getLoggedInUser = function() {
             return loggedInUser;
@@ -130,15 +124,49 @@
             return graphPalette;
         }
 
+        this.setWalkthrough = function(flag) {
+            walkthroughtype = flag;
+        }
+        this.getWalkthrough = function() {
+            return walkthroughtype;
+        }
 
+        this.setInLanguage = function(lang) {
+            inlanguage = lang;
+        }
+        this.getInLanguage = function() {
+            return inlanguage;
+        }
+
+        this.setLabelThreshold = function(num) {
+            in_label_threshold = num;
+        }
+        this.getLabelThreshold = function() {
+            return in_label_threshold;
+        }
+
+        this.setMidi = function(flag) {
+            midi = flag;
+        }
+        this.getMidi = function() {
+            return midi;
+        }
+
+        this.setBackground = function(type) {
+            background = type;
+        }
+        this.getBackground = function() {
+            return background;
+        }
+
+        this.setGraphLabelColor = function(color) {
+            default_label_color = color;
+        }
+        this.getGraphLabelColor = function() {
+            return default_label_color;
+        }
 
     }
-
-    // Are we watching somebody else's graph?
-    <% if (perceivername) { %>
-    userFactory.setViewType('external');
-    userFactory.setWatchedUser('<%= perceivername %>');
-    <% } %> 
 
     // Are we logged in?
     <% if (receivername) { %>
@@ -157,108 +185,73 @@
     // default most influential nodes are displayed according to Betwenness Centrality (bc) or Degree (degree)
     userFactory.setMostInfluential('bc');
 
-
     // Is the user going to look at somebody else's graph?
-
     <% if (perceivername) { %>
+        // Are we watching somebody else's graph?
+        userFactory.setViewType('external');
+        userFactory.setWatchedUser('<%= perceivername %>');
+
+        userFactory.setWalkthrough('external');
         <% if (showcontexts && maxnodes) { %>
-            userFactory.setJsonPath('/api/public/nodes/<%= perceivername %>/<%= context %>?showcontexts=<%= showcontexts %>&maxnodes=<%= maxnodes %>');
+        userFactory.setJsonPath('/api/public/nodes/<%= perceivername %>/<%= context %>?showcontexts=<%= showcontexts %>&maxnodes=<%= maxnodes %>');
         <% } else if (showcontexts) { %>
-            userFactory.setJsonPath('/api/public/nodes/<%= perceivername %>/<%= context %>?showcontexts=<%= showcontexts %>');
+        userFactory.setJsonPath('/api/public/nodes/<%= perceivername %>/<%= context %>?showcontexts=<%= showcontexts %>');
         <% } else if (maxnodes) { %>
-            userFactory.setJsonPath('/api/public/nodes/<%= perceivername %>/<%= context %>?maxnodes=<%= maxnodes %>');
+        userFactory.setJsonPath('/api/public/nodes/<%= perceivername %>/<%= context %>?maxnodes=<%= maxnodes %>');
         <% } else  { %>
-            <% if (locals.vieweduser && vieweduser.maxnodes) { %>
-                userFactory.setMaxNodes('<%= vieweduser.maxnodes %>');
-                userFactory.setJsonPath('/api/public/nodes/<%= perceivername %>/<%= context %>?maxnodes=<%= vieweduser.maxnodes %>');
-            <% } else { %>
-                userFactory.setJsonPath('/api/public/nodes/<%= perceivername %>/<%= context %>');
-            <% } %>
+        <% if (locals.vieweduser && vieweduser.maxnodes) { %>
+        userFactory.setMaxNodes('<%= vieweduser.maxnodes %>');
+        userFactory.setJsonPath('/api/public/nodes/<%= perceivername %>/<%= context %>?maxnodes=<%= vieweduser.maxnodes %>');
+        <% } else { %>
+        userFactory.setJsonPath('/api/public/nodes/<%= perceivername %>/<%= context %>');
         <% } %>
-
+    <% } %>
     <% } else { %>
-
         // Get the setting from user DB how many max nodes we show
         <% if (maxnodes) { %>
         userFactory.setMaxNodes('<%= maxnodes %>');
         <% } %>
-
         // Path to the JSON graph file (specific context or a general one)
         <% if (addcontext) { %>
         userFactory.setJsonPath('/api/user/nodes/<%= context %>?addcontext=<%= addcontext %>');
         userFactory.setAddContext('<%= addcontext %>');
-
         <% } else if (showcontexts) { %>
         userFactory.setJsonPath('/api/user/nodes/<%= context %>?showcontexts=<%= showcontexts %>');
-
         <% } else if (maxnodes) { %>
         userFactory.setJsonPath('/api/user/nodes/<%= context %>?maxnodes=<%= maxnodes %>');
         userFactory.setMaxNodes('<%= maxnodes %>');
-
         <% } else { %>
         userFactory.setJsonPath('/api/user/nodes/<%= context %>');
         <% }  %>
-
     <% } %>
 
-
-
-    // Let's define some walkthrough tutorials, depending on the situation
-    var walkthroughtype = 'default';
-
-    <% if (perceivername) { %>
-        walkthroughtype = 'external';
-    <% } %>
-
-    
     // Define the settings of the logged in user / not logged in user 
-
     <% if (locals.user && !locals.vieweduser) { %>
-    var inlanguage = '<%= user.inlanguage %>';
-
-        <% if (locals.user.label_threshold) { %>
-        in_label_threshold = '<%= user.label_threshold %>';
-        <% } %>
-
+    userFactory.setInLanguage('<%= user.inlanguage %>');
+    <% if (locals.user.label_threshold) { %>
+    userFactory.setLabelThreshold('<%= user.label_threshold %>');
+    <% } %>
         <% if (locals.user.midi) { %>
-        midi = '<%= user.midi %>';
+        userFactory.setMidi('<%= user.midi %>');
         <% } %>
-
         userFactory.setGraphPalette('<%= user.palette %>');
-  
         <% if (locals.user.maxnodes) { %>
         userFactory.setMaxNodes('<%= user.maxnodes %>');
         <% } %>
-
         <% if (!background) { %>
-        background = '<%= user.background %>';
+        userFactory.setBackground('<%= user.background %>');
         <% } %>
-
         <% if (locals.user.topnodes) { %>
         userFactory.setMostInfluential('<%= user.topnodes %>');
         <% } %>
-
-
     <% } else { %>
-
         <% if (locals.vieweduser) { %>
-
             userFactory.setMostInfluential('<%= vieweduser.topnodes %>');
-
-            in_label_threshold = '<%= vieweduser.label_threshold %>';
-
-
+            userFactory.setLabelThreshold('<%= vieweduser.label_threshold %>');
             userFactory.setGraphPalette('<%= vieweduser.palette %>');
-            
-
-            if (!background) {
-                background = '<%= vieweduser.background %>';
-            }
-
+            userFactory.setBackground('<%= vieweduser.background %>');
         <% } %>
-
-    <% } %>
-          
+    <% } %>          
     </script>
     <link rel='stylesheet' href='/stylesheets/jquery.textcomplete.css' />
     <link rel="stylesheet" href="/stylesheets/jquery-ui.min.css">

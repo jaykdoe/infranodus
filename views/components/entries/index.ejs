@@ -23,13 +23,11 @@ var abstract;
 
 var nodesOfStatement = {};
 
-
 var urlPath = location.pathname;
 
-var background = getUrlVars()["background"];
+if (getUrlVars()["background"]) userFactory.setBackground(getUrlVars()["background"]);
 
-var walkthrough = getUrlVars()["walkthrough"];
-
+if (getUrlVars()["walkthrough"]) userFactory.setWalkthrough(getUrlVars()["walkthrough"]);
 
 if (getUrlVars()["most_influential"] == 'bc' || getUrlVars()["most_influential"] == 'bc2' || getUrlVars()["most_influential"] == 'degree') {
     userFactory.setMostInfluential(getUrlVars()["most_influential"]);
@@ -105,10 +103,11 @@ function toggleTheme() {
         else {
             deselected_nodes_color = '#444';
         }
+        userFactory.setGraphLabelColor('#ffffff');
     }
 }
 
-if (background == 'dark') {
+if (userFactory.getBackground() == 'dark') {
     toggleTheme();
 }
 
