@@ -34,6 +34,8 @@ function AnalyticsPanel() {
 
             let inf_info = '';
 
+            let most_influential = userFactory.getMostInfluential();
+
             if ((most_influential == 'bc' || (most_influential == 'bc2') && toppbc_nodes[0].bc > 0)) {
                 $('#typeofinf').text('(highest betweenness, i.e. linking different topics):');
             }

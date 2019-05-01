@@ -189,7 +189,8 @@ function entries() {
                 
         },
         removeAddContext: function() {
-
+               let current_context = userFactory.getCurrentContext();
+               let addcontext = userFactory.getAddContext();
                if (addcontext && interpret) {
                   $('.entry').hide();
                   let statementsOfContext = graphFactory.getStatementsOfContext();

@@ -1,27 +1,6 @@
 <script>
 
 
-
-  // Is the user going to look at somebody else's graph?
-
-  <% if (perceivername) { %>
-      <% if (showcontexts && maxnodes) { %>
-          jsonpath = '/api/public/nodes/<%= perceivername %>/<%= context %>?showcontexts=<%= showcontexts %>&maxnodes=<%= maxnodes %>';
-      <% } else if (showcontexts) { %>
-          jsonpath = '/api/public/nodes/<%= perceivername %>/<%= context %>?showcontexts=<%= showcontexts %>';
-      <% } else if (maxnodes) { %>
-          jsonpath = '/api/public/nodes/<%= perceivername %>/<%= context %>?maxnodes=<%= maxnodes %>';
-      <% } else  { %>
-          <% if (locals.vieweduser && vieweduser.maxnodes) { %>
-              maxnodes = '<%= vieweduser.maxnodes %>';
-              jsonpath = '/api/public/nodes/<%= perceivername %>/<%= context %>?maxnodes=<%= vieweduser.maxnodes %>';
-          <% } else { %>
-              jsonpath = '/api/public/nodes/<%= perceivername %>/<%= context %>';
-          <% } %>
-  <% } %>
-  <% } %>
-
-
   // Do we show abstract graph and no nodes?
 
   <% if (locals.user && locals.user.abstract != undefined) { %>
@@ -626,6 +605,10 @@ function graph() {
         },
         colorNodesCommunities: function(palette) {
 
+            let current_context = userFactory.getCurrentContext();
+            let addcontext = userFactory.getAddContext();
+
+
             let pinnedNodes = graphFactory.getPinnedNodes();
 
             let addcontextcount = 0;
@@ -1015,7 +998,7 @@ function sigmaGraph() {
                             window.open(e.data.node.url + add_url,"_self");
                         }
                         else {
-                            window.open('/' + current_user + '/' + nodeLabel.substr(9,nodeLabel.length) + add_url,"_self");
+                            window.open('/' + userFactory.getCurrentUser() + '/' + nodeLabel.substr(9,nodeLabel.length) + add_url,"_self");
                         }
                   }
                   else {

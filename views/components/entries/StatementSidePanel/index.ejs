@@ -68,7 +68,7 @@ var link_hashtags = getUrlVars()["link_hashtags"];
 
 function replaceHashtags(hash){
         var replacementString = $.trim(hash);
-        return ' <a href="' + forwardTo + replacementString.substr(1) +'" class="app-concept-link" target="_blank">' + replacementString + '</a>';
+        return ' <a href="' + userFactory.getForwardTo() + replacementString.substr(1) +'" class="app-concept-link" target="_blank">' + replacementString + '</a>';
 }
 
 
@@ -79,7 +79,7 @@ if (link_hashtags) {
             // Retrieve the statement text from the entry, clean from html
             var originale = $(this).children('.entry-text').html();
             // Replace with hashtags
-            $(this).children('.entry-text').html(originale.replace(/#(\w+)/g,  " <a href='" + forwardTo + "$1' class='app-concept-link' target='_blank'>$&</a>"));
+            $(this).children('.entry-text').html(originale.replace(/#(\w+)/g,  " <a href='" + userFactory.getForwardTo() + "$1' class='app-concept-link' target='_blank'>$&</a>"));
 
         });
 }

@@ -124,7 +124,8 @@ function addTagTriggers() {
 
 $("#stopsave").on('click', function(e) {
     e.preventDefault;
-    window.location.href = "/settings?stopwords=" + encodeURIComponent(deletedNodes.join(' ')) + "&returncontext=" + current_context;
+    let deletedNodes = graphFactory.getStopNodes();
+    window.location.href = "/settings?stopwords=" + encodeURIComponent(deletedNodes.join(' ')) + "&returncontext=" + userFactory.getCurrentContext();
 });
 
 

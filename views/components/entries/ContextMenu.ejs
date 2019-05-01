@@ -21,6 +21,8 @@ populateContextMenu(contextNames);
 
 function populateContextMenu (contextNames) {
 
+        let current_context = userFactory.getCurrentContext();
+
         var switch_field = '';
 
         var context_filters = '';
@@ -321,7 +323,7 @@ function addContextTriggers() {
 
         function shiftClick (e) {
 
-            window.location = e.target.href + '?addcontext=' + current_context;
+            window.location = e.target.href + '?addcontext=' + userFactory.getCurrentContext();
 
         }
 
@@ -419,7 +421,7 @@ function addContextTriggers() {
                     }
 
 
-                    if (contextsToFilter.length < 1 && !$('#listall').hasClass('pure-menu-selected') && !(current_context)) {
+                    if (contextsToFilter.length < 1 && !$('#listall').hasClass('pure-menu-selected') && !(userFactory.getCurrentContext())) {
                         $('#listall').addClass('pure-menu-selected');
                     }
 

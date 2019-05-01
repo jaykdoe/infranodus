@@ -107,6 +107,8 @@ function nodeInputField() {
 }
 
 function findContexts(squery, pinnedNodes) {
+
+    let current_user = userFactory.getCurrentUser();
        
     $.getJSON("/api/" + current_user + "/connectedcontexts/?keywords=" + squery + "&user=" + current_user, function( data ) {
                           

@@ -15,7 +15,7 @@ var hide_when_small = getUrlVars()["hide_when_small"];
 
 var language = getUrlVars()["language"];
 
-var graphPalette = getUrlVars()["palette"];
+if (getUrlVars()["palette"]) userFactory.setGraphPalette(getUrlVars()["palette"]);
 
 var interpret = getUrlVars()["interpret"];
 
@@ -23,16 +23,6 @@ var abstract;
 
 var nodesOfStatement = {};
 
-// default most influential nodes are displayed according to Betwenness Centrality (bc) or Degree (degree)
-var most_influential = 'bc';
-
-<% if (locals.user && !locals.vieweduser && locals.user.topnodes) { %>
-most_influential = '<%= user.topnodes %>';
-<% } %>
-
-if (getUrlVars()["most_influential"] == 'bc' || getUrlVars()["most_influential"] == 'bc2' || getUrlVars()["most_influential"] == 'degree') {
-  most_influential = getUrlVars()["most_influential"];
-}
 
 var urlPath = location.pathname;
 
@@ -41,62 +31,9 @@ var background = getUrlVars()["background"];
 var walkthrough = getUrlVars()["walkthrough"];
 
 
-
-
-
-
-// Let's define some walkthrough tutorials, depending on the situation
-var walkthroughtype = 'default';
-
-<% if (perceivername) { %>
-    walkthroughtype = 'external';
-<% } %>
-
-// Some settings from routes/entries.js
-
-<% if (locals.user && !locals.vieweduser) { %>
-var inlanguage = '<%= user.inlanguage %>';
-
-    <% if (locals.user.label_threshold) { %>
-    in_label_threshold = '<%= user.label_threshold %>';
-    <% } %>
-
-    <% if (locals.user.midi) { %>
-    midi = '<%= user.midi %>';
-    <% } %>
-
-    if (!graphPalette) {
-    graphPalette = '<%= user.palette %>';
-    }
-
-    <% if (locals.user.maxnodes) { %>
-    maxnodes = '<%= user.maxnodes %>';
-    <% } %>
-
-    <% if (!background) { %>
-    background = '<%= user.background %>';
-    <% } %>
-
-
-<% } else { %>
-
-  <% if (locals.vieweduser) { %>
-
-    most_influential = '<%= vieweduser.topnodes %>';
-
-    in_label_threshold = '<%= vieweduser.label_threshold %>';
-
-    if (!graphPalette) {
-        graphPalette = '<%= vieweduser.palette %>';
-    }
-
-    if (!background) {
-        background = '<%= vieweduser.background %>';
-    }
-
-  <% } %>
-
-<% } %>
+if (getUrlVars()["most_influential"] == 'bc' || getUrlVars()["most_influential"] == 'bc2' || getUrlVars()["most_influential"] == 'degree') {
+    userFactory.setMostInfluential(getUrlVars()["most_influential"]);
+}
 
 
 // Socket.IO chat collaborate
@@ -162,7 +99,7 @@ function toggleTheme() {
     }
     else {
         document.documentElement.setAttribute('theme', 'dark');
-        if (graphPalette == 'contrast') {
+        if (userFactory.getGraphPalette() == 'contrast') {
             deselected_nodes_color = '#555';
         }
         else {
@@ -177,11 +114,11 @@ if (background == 'dark') {
 
 
  // Collaboration features realized using Socket.IO
-    // On connection to server get the id of the current chat "room", which is actually the folder/URL of the current user
+// On connection to server get the id of the current chat "room", which is actually the folder/URL of the current user
 
     socket.on('connect', function(){
-        console.log('connected');
-        socket.emit('login', {user: current_user, context: current_context, id: collaborate_matrix[collaborate_room]});
+        console.log('socket connected');
+        socket.emit('login', {user: userFactory.getCurrentUser(), context: userFactory.getCurrentContext(), id: collaborate_matrix[collaborate_room]});
     });
 
 
@@ -222,9 +159,8 @@ if (background == 'dark') {
 
     socket.on('tooMany', function(data){
 
-        console.log('one too many');
         alert('There are already 2 users working on this context and this is our max so far. If you think it is a mistake, please, check if any of your extra browser tabs are opened.');
-        window.location.href = 'http://' + hostsite + '/' + 'home' + '/edit';
+        window.location.href = 'http://' + userFactory.getHostSite() + '/' + 'home' + '/edit';
 
     });
 
@@ -427,13 +363,14 @@ function shannon(data) {
     // Download PNG (the graph isn't modified)
     function downloadPNG() {
       var canvaspng = document.querySelector('.sigma-scene');
+      let current_context = userFactory.getCurrentContext();
 
       document.querySelector('#downloadpng').href = canvaspng.toDataURL();
-      document.querySelector('#downloadpng').download = current_user + '_' + current_context + '.png';
+      document.querySelector('#downloadpng').download = userFactory.getCurrentUser() + '_' + current_context + '.png';
 
       document.querySelector('#downloadpng').addEventListener('click', function(ev) {
         document.querySelector('#downloadpng').href = canvaspng.toDataURL();
-        document.querySelector('#downloadpng').download = current_user + '_' + current_context + '.png';
+        document.querySelector('#downloadpng').download = userFactory.getCurrentUser() + '_' + current_context + '.png';
       }, false);
 
     }

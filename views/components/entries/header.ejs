@@ -5,7 +5,9 @@
     <script src="/javascripts/jquery.min.js"></script>
     <script>
 
-    // Global user parameters
+    // initiate global user parameters
+
+    let userFactory = new UserFactory();
 
     function UserFactory(){
 
@@ -13,15 +15,47 @@
 
         let watchedUser = null;
 
+        let currentUser = '';
+
+        let currentContext = '';
+
         let viewType = 'internal';
 
         let selfPosted = null;
 
+        let forwardTo = 'https://www.google.com/search?q=';
+
+        let hostSite = '';
+
+        let addContext = '';
+
+        let jsonPath = '';
+
+        let maxNodes = '';
+
+        let most_influential = 'bc';
+
+        let graphPalette = '';
+
         this.getLoggedInUser = function() {
             return loggedInUser;
-        }   
+        }    
         this.setLoggedInUser = function(name) {
             loggedInUser = name;
+        }
+
+        this.getCurrentUser = function() {
+            return currentUser;
+        }
+        this.setCurrentUser = function(name) {
+            currentUser = name;
+        }
+
+        this.getCurrentContext = function() {
+            return currentContext;
+        }
+        this.setCurrentContext = function(name) {
+            currentContext = name;
         }
 
         this.getWatchedUser = function() {
@@ -46,60 +80,184 @@
             selfPosted = value;
             return true;
         }
-       
+
+        this.setForwardTo = function(url) {
+            forwardTo = url;
+        }          
+        this.getForwardTo = function() {
+            return forwardTo;
+        }  
+
+        this.setHostSite = function(url) {
+            hostSite = url;
+        }          
+        this.getHostSite = function() {
+            return hostSite;
+        }  
+
+        this.setAddContext = function(name) {
+            addContext = name;
+        }          
+        this.getAddContext = function() {
+            return addContext;
+        }  
+
+        this.setJsonPath = function(url) {
+            jsonPath = url;
+        }          
+        this.getJsonPath = function() {
+            return jsonPath;
+        }  
+
+        this.setMaxNodes = function(nodes) {
+            maxNodes = nodes;
+        }          
+        this.getMaxNodes = function() {
+            return maxNodes;
+        }  
+
+        this.setMostInfluential = function(flag) {
+            most_influential = flag;
+        }
+        this.getMostInfluential = function() {
+            return most_influential;
+        }
+
+        this.setGraphPalette = function(flag) {
+            graphPalette = flag;
+        }
+        this.getGraphPalette = function() {
+            return graphPalette;
+        }
+
+
+
     }
 
-    let userFactory = new UserFactory();
+    // Are we watching somebody else's graph?
+    <% if (perceivername) { %>
+    userFactory.setViewType('external');
+    userFactory.setWatchedUser('<%= perceivername %>');
+    <% } %> 
+
+    // Are we logged in?
+    <% if (receivername) { %>
+    userFactory.setLoggedInUser('<%= receivername %>');
+    <% } %> 
+
+    // Set the current user
+    userFactory.setCurrentUser(window.location.pathname.replace(/^\/([^\/]*).*$/, '$1'));
+    
+    // Set the current context
+    userFactory.setCurrentContext('<%= context %>');
+    
+    // Set the current hostsite
+    userFactory.setHostSite(window.location.host);
+
+    // default most influential nodes are displayed according to Betwenness Centrality (bc) or Degree (degree)
+    userFactory.setMostInfluential('bc');
+
+
+    // Is the user going to look at somebody else's graph?
 
     <% if (perceivername) { %>
-        userFactory.setViewType('external');
-        userFactory.setWatchedUser('<%= perceivername %>');
-    <% } %> 
-
-    <% if (receivername) { %>
-        userFactory.setLoggedInUser('<%= receivername %>');
-    <% } %> 
-
-
-            var deletedNodes = [];
-
-            var forwardTo = 'https://www.google.com/search?q=';
-
-            // Get current context
-            var path = window.location.pathname;
-            var current_context = '<%= context %>';
-            var current_user = path.replace(/^\/([^\/]*).*$/, '$1');
-            var hostsite = window.location.host;
-
-            var addcontext = '';
-
-            var jsonpath = '';
-
-            var maxnodes = '';
-
-            // Get the setting from user DB how many max nodes we show
-            <% if (maxnodes) { %>
-            maxnodes = <%= maxnodes %>;
-            <% } %>
-
-            // Path to the JSON graph file (specific context or a general one)
-            <% if (addcontext) { %>
-                jsonpath = '/api/user/nodes/<%= context %>?addcontext=<%= addcontext %>';
-                addcontext = "<%= addcontext %>";
-
-            <% } else if (showcontexts) { %>
-                jsonpath = '/api/user/nodes/<%= context %>?showcontexts=<%= showcontexts %>';
-                addcontext = "";
-
-            <% } else if (maxnodes) { %>
-                jsonpath = '/api/user/nodes/<%= context %>?maxnodes=<%= maxnodes %>';
-                maxnodes = '<%= maxnodes %>';
-                addcontext = "";
-
+        <% if (showcontexts && maxnodes) { %>
+            userFactory.setJsonPath('/api/public/nodes/<%= perceivername %>/<%= context %>?showcontexts=<%= showcontexts %>&maxnodes=<%= maxnodes %>');
+        <% } else if (showcontexts) { %>
+            userFactory.setJsonPath('/api/public/nodes/<%= perceivername %>/<%= context %>?showcontexts=<%= showcontexts %>');
+        <% } else if (maxnodes) { %>
+            userFactory.setJsonPath('/api/public/nodes/<%= perceivername %>/<%= context %>?maxnodes=<%= maxnodes %>');
+        <% } else  { %>
+            <% if (locals.vieweduser && vieweduser.maxnodes) { %>
+                userFactory.setMaxNodes('<%= vieweduser.maxnodes %>');
+                userFactory.setJsonPath('/api/public/nodes/<%= perceivername %>/<%= context %>?maxnodes=<%= vieweduser.maxnodes %>');
             <% } else { %>
-                jsonpath = '/api/user/nodes/<%= context %>';
-                addcontext = "";
-            <% }  %>
+                userFactory.setJsonPath('/api/public/nodes/<%= perceivername %>/<%= context %>');
+            <% } %>
+        <% } %>
+
+    <% } else { %>
+
+        // Get the setting from user DB how many max nodes we show
+        <% if (maxnodes) { %>
+        userFactory.setMaxNodes('<%= maxnodes %>');
+        <% } %>
+
+        // Path to the JSON graph file (specific context or a general one)
+        <% if (addcontext) { %>
+        userFactory.setJsonPath('/api/user/nodes/<%= context %>?addcontext=<%= addcontext %>');
+        userFactory.setAddContext('<%= addcontext %>');
+
+        <% } else if (showcontexts) { %>
+        userFactory.setJsonPath('/api/user/nodes/<%= context %>?showcontexts=<%= showcontexts %>');
+
+        <% } else if (maxnodes) { %>
+        userFactory.setJsonPath('/api/user/nodes/<%= context %>?maxnodes=<%= maxnodes %>');
+        userFactory.setMaxNodes('<%= maxnodes %>');
+
+        <% } else { %>
+        userFactory.setJsonPath('/api/user/nodes/<%= context %>');
+        <% }  %>
+
+    <% } %>
+
+
+
+    // Let's define some walkthrough tutorials, depending on the situation
+    var walkthroughtype = 'default';
+
+    <% if (perceivername) { %>
+        walkthroughtype = 'external';
+    <% } %>
+
+    
+    // Define the settings of the logged in user / not logged in user 
+
+    <% if (locals.user && !locals.vieweduser) { %>
+    var inlanguage = '<%= user.inlanguage %>';
+
+        <% if (locals.user.label_threshold) { %>
+        in_label_threshold = '<%= user.label_threshold %>';
+        <% } %>
+
+        <% if (locals.user.midi) { %>
+        midi = '<%= user.midi %>';
+        <% } %>
+
+        userFactory.setGraphPalette('<%= user.palette %>');
+  
+        <% if (locals.user.maxnodes) { %>
+        userFactory.setMaxNodes('<%= user.maxnodes %>');
+        <% } %>
+
+        <% if (!background) { %>
+        background = '<%= user.background %>';
+        <% } %>
+
+        <% if (locals.user.topnodes) { %>
+        userFactory.setMostInfluential('<%= user.topnodes %>');
+        <% } %>
+
+
+    <% } else { %>
+
+        <% if (locals.vieweduser) { %>
+
+            userFactory.setMostInfluential('<%= vieweduser.topnodes %>');
+
+            in_label_threshold = '<%= vieweduser.label_threshold %>';
+
+
+            userFactory.setGraphPalette('<%= vieweduser.palette %>');
+            
+
+            if (!background) {
+                background = '<%= vieweduser.background %>';
+            }
+
+        <% } %>
+
+    <% } %>
           
     </script>
     <link rel='stylesheet' href='/stylesheets/jquery.textcomplete.css' />

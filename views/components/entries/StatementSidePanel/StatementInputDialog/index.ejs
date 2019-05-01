@@ -91,7 +91,7 @@ function sendToImport() {
     if (pinnedNodes.length > 0) {
         fornode = pinnedNodes.join("+");
     }
-    navigation().redirect('/import?context=' + current_context + '&fornode=' + fornode);
+    navigation().redirect('/import?context=' + userFactory.getCurrentContext() + '&fornode=' + fornode);
 }
 
 function changeModeToSearch() {changeModeTo('SEARCH')}

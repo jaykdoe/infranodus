@@ -94,25 +94,25 @@ if (abstract == 'yes') {
 }
 
 
-var graph_share_url = hostsite + '/' + current_user;
+var graph_share_url = userFactory.getHostSite() + '/' + userFactory.getCurrentUser();
 
-if (current_context) {
-    graph_share_url = graph_share_url + "/" + current_context + "?";
+if (userFactory.getCurrentContext()) {
+    graph_share_url = graph_share_url + "/" + userFactory.getCurrentContext() + "?";
 }
 
 if (background) {
     graph_share_url += 'background=' + background + '&';
 }
 
-if (most_influential) {
-    graph_share_url += '&most_influential=' + most_influential + '&';
+if (userFactory.getMostInfluential()) {
+    graph_share_url += '&most_influential=' + userFactory.getMostInfluential() + '&';
 }
 
-if (maxnodes) {
-    graph_share_url += '&maxnodes=' + maxnodes + '&';
+if (userFactory.getMaxNodes()) {
+    graph_share_url += '&maxnodes=' + userFactory.getMaxNodes() + '&';
 }
 
-var privacy_iframe = "<iframe width='100%' height='500' style='height: 500px' src='https://" + graph_share_url + "hide_always=1&link_hashtags=1&background=" + background + "&maxnodes=" + maxnodes + "' frameborder='0' allowfullscreen></iframe>";
+var privacy_iframe = "<iframe width='100%' height='500' style='height: 500px' src='https://" + graph_share_url + "hide_always=1&link_hashtags=1&background=" + background + "&maxnodes=" + userFactory.getMaxNodes() + "' frameborder='0' allowfullscreen></iframe>";
 
 var privacyform = '';
 
@@ -201,10 +201,10 @@ $('#collaborate-link').tooltipster({
     if (!collaborate_invite) {
         var collab_content = $('#collaborate-link').tooltipster('content');
 
-        var graph_share_url = hostsite + '/' + current_user;
+        var graph_share_url = userFactory.getHostSite() + '/' + userFactory.getCurrentUser();
 
-        if (current_context) {
-            graph_share_url = graph_share_url + "/" + current_context;
+        if (userFactory.getCurrentContext()) {
+            graph_share_url = graph_share_url + "/" + userFactory.getCurrentContext();
         }
 
 

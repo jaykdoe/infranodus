@@ -102,6 +102,8 @@
                 degree_nodes.push({key: n.id, label: n.label, degree: node_degree});
 
                 // Do we range the nodes by betweenness centrality?
+                let most_influential = userFactory.getMostInfluential();
+                
                 if ((most_influential == 'bc' || most_influential == 'bc2') && topbc_nodes[0].bc > 0) {
                 
                     // Does the BC value for this node = 0 or doesn't exist?
