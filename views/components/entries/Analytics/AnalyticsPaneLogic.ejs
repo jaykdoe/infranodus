@@ -184,7 +184,7 @@ function AnalyticsPanel() {
 
             }
 
-            if ((hide_always || hide_edit || hide_when_small) && !show_analytics) {
+            if ((userFactory.getViewOption('hide_always') || userFactory.getViewOption('hide_edit') || userFactory.getViewOption('hide_when_small')) && !userFactory.getViewOption('show_analytics')) {
                 $('#analytics').hide();
                 $('#analyticsbutton').removeClass('analytics-on');
                 $('#analyticscaption').show();

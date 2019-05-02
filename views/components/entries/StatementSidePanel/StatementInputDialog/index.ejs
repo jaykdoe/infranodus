@@ -138,9 +138,9 @@ changeModeTo(currentStatementSidePanelMode);
 
 // OnLoad get the right height for the entries elements — this depends on the form so it's here
 
-var uproll = $('#entryform').height();
+let uproll = $('#entryform').height();
 
-if (hide_edit) {
+if (userFactory.getViewOption('hide_edit')) {
   uproll = 50;
 }
 

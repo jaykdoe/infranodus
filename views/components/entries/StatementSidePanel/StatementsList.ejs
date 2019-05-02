@@ -180,7 +180,7 @@ function entries() {
                 $('#topnav').fadeOut();
                 localStorage.setItem('folded', 1);
                 // TODO move color to another function
-                if (background == 'dark') {
+                if (userFactory.getBackground() == 'dark') {
                     $('#statements-link').addClass('statements-link-on-dark');
                 }
                 else {

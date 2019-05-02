@@ -31,6 +31,8 @@
         let background = null;
         let default_label_color = '#000000';
 
+        let viewOptions = {};
+
         this.getLoggedInUser = function() {
             return loggedInUser;
         }    
@@ -166,6 +168,12 @@
             return default_label_color;
         }
 
+        this.setViewOption = function(option, value) {
+            viewOptions[option] = value;
+        }
+        this.getViewOption = function(option) {
+            return viewOptions[option];
+        }
     }
 
     // Are we logged in?

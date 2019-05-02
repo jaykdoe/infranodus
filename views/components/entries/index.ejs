@@ -1,19 +1,19 @@
 <script>
 
-// Initialize Socket.IO for websockets (using them for collabs but also to listen to events within the app )
+// Initialize Socket.IO for websockets (using them for collabs but also to listen to events within the app)
 var socket = io();
 
-var hide_always = getUrlVars()["hide_always"];
+userFactory.setViewOption('hide_always', getUrlVars()["hide_always"]);
 
-var hide_edit = getUrlVars()["hide_edit"];
+userFactory.setViewOption('hide_edit', getUrlVars()["hide_edit"]);
 
-var show_text = getUrlVars()["show_text"];
+userFactory.setViewOption('show_text', getUrlVars()["show_text"]);
 
-var show_analytics = getUrlVars()["analytics"];
+userFactory.setViewOption('show_analytics', getUrlVars()["analytics"]);
 
-var hide_when_small = getUrlVars()["hide_when_small"];
+userFactory.setViewOption('hide_when_small', getUrlVars()["hide_when_small"]);
 
-var language = getUrlVars()["language"];
+if (getUrlVars()["language"]) userFactory.setInLanguage(getUrlVars()["language"]);
 
 if (getUrlVars()["palette"]) userFactory.setGraphPalette(getUrlVars()["palette"]);
 
@@ -21,9 +21,7 @@ var interpret = getUrlVars()["interpret"];
 
 var abstract;
 
-var nodesOfStatement = {};
-
-var urlPath = location.pathname;
+userFactory.setViewOption('urlPath', location.pathname);
 
 if (getUrlVars()["background"]) userFactory.setBackground(getUrlVars()["background"]);
 
@@ -40,7 +38,7 @@ if (getUrlVars()["most_influential"] == 'bc' || getUrlVars()["most_influential"]
 
 var collaborate_matrix = {};
 
-var collaborate_room = urlPath + '/';
+var collaborate_room = userFactory.getViewOption('urlPath') + '/';
 
 var collaborate_id = '';
 
@@ -71,11 +69,6 @@ var contextNodeID = [];
 var most_inf_nodes = [];
 
 var most_inf_comm_nodes = {};
-
-
-// Loaded with graph only?
-
-var graphOnly = null;
 
 
 var adding_entry = false;

@@ -88,7 +88,7 @@ if (link_hashtags) {
 
 
 // Did we receive a global setting to hide the graph?
-if ((hide_always || hide_edit) && !show_text) {
+if ((userFactory.getViewOption('hide_always') || userFactory.getViewOption('hide_edit')) && !userFactory.getViewOption('show_text')) {
         if (checkStatementsPanelMode().visibility() == 'VISIBLE') {
             toggleStatementSidePanel();
         }           
@@ -96,7 +96,7 @@ if ((hide_always || hide_edit) && !show_text) {
 
 // Did we receive a global setting to hide when small only?
 
-if (hide_when_small && $(window).width() < 600) {
+if (userFactory.getViewOption('hide_when_small') && $(window).width() < 600) {
 
             if ($('#menuLink').is(':visible')) {
                 if (checkStatementsPanelMode().visibility() == 'VISIBLE') {
@@ -115,11 +115,11 @@ if (hide_when_small && $(window).width() < 600) {
     if (checkStatementsPanelMode().visibility() == 'VISIBLE') {
             toggleStatementSidePanel();
     }   
-    graphOnly = 1;
+    userFactory.setViewOption('graphOnly', true);
 <% } %>
 
 
-if (localStorage.getItem('graph') == 1 && !graphOnly && !hide_always && !hide_when_small) {
+if (localStorage.getItem('graph') == 1 && !userFactory.getViewOption('graphOnly') && !userFactory.getViewOption('hide_always') && !userFactory.getViewOption('hide_when_small')) {
             var isHidden__ = $("#statements").is(":hidden");
             if (!isHidden__) {
                 $('#statements').fadeOut();

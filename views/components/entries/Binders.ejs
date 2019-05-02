@@ -16,7 +16,7 @@
         // Then hide all the elements that have .editorpane class
         // This is for external view mode 
 
-        if (hide_edit) {
+        if (userFactory.getViewOption('hide_edit')) {
             $('.editorpane').each(function() {
                 $(this).hide();
             });

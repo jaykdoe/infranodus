@@ -3,15 +3,46 @@
 
 // This is for the option to emit and receive MIDI signals for the graph
 
+function MidiFactory() {
+    let output;
+    let input;
+
+    this.setOutput = function(device) {
+      output = device;
+    }
+    this.getOutput = function() {
+      return output;
+    }
+    this.existsOutput = function() {
+      if (output) { 
+        return true;
+      }
+      else {
+        return false;
+      }
+    }
+
+    this.setInput = function(device) {
+      input = device;
+    }
+    this.getInput = function() {
+      return input;
+    }
+    this.existsInput = function() {
+      if (input) { 
+        return true;
+      }
+      else {
+        return false;
+      }
+    }
+}
+
+let midiFactory = new MidiFactory();
+
 <% if (locals.user) { %>
     <% if (locals.user.midi != undefined && locals.user.midi != 'off') { %>
 
-        var output;
-        var input;
-
-        function getRandomInt(min, max) {
-          return Math.floor(Math.random() * (max - min + 1)) + min;
-        }
 
         WebMidi.enable(function (err) {
 
@@ -27,24 +58,26 @@
             console.log(WebMidi.outputs);
             console.log(WebMidi.time);
 
-            output = WebMidi.outputs[0];
+            midiFactory.setOutput(WebMidi.outputs[0]);
             console.log('midi substr ' + midi.substr(4,2));
 
             if (midi.substr(4,2) != '00') {
-              output = WebMidi.outputs[parseInt(midi.substr(4,2))];
+              midiFactory.setOutput(WebMidi.outputs[parseInt(midi.substr(4,2))]);
             }
 
-            if (output) {
+            if (midiFactory.existsOutput() == true) {
               console.log('MIDI device connected');
             }
             else {
               console.log('MIDI out device not connected');
             }
 
-            input = WebMidi.inputs[0];
+            midiFactory.setInput(WebMidi.inputs[0]);
 
-            if (input) {
+            if (midiFactory.existsInput() == true) {
 
+
+              let input = midiFactory.getInput();
               // Listen for a 'note on' message on all channels
               input.addListener('noteon', "all",
                 function (e) {
@@ -80,41 +113,47 @@ function playNodesMIDI() {
         <% if (locals.user.midi != undefined && locals.user.midi != 'off') { %>
         let midi = userFactory.getMidi();  
 
-        console.log('using MIDI data ' + midi);
-        console.log('playing MIDI device:');
-        console.log(output);
+        if (midi) {
+          let output = midiFactory.getOutput();
+          let input = midiFactory.getInput();
+          if (midiFactory.existsOutput() == true) {
+            console.log('using MIDI data ' + midi);
+            console.log('playing MIDI device:');
+            console.log(output);
 
-        var timecode = 0;
+            var timecode = 0;
 
-        var note_node = midi.substr(10,2);
-        if (note_node.substr(1,1) == '0') {
-        note_node = note_node.substr(0,1) + '1';
-        }
+            var note_node = midi.substr(10,2);
+            if (note_node.substr(1,1) == '0') {
+            note_node = note_node.substr(0,1) + '1';
+            }
 
-        var note_edge = midi.substr(12,2);
-        if (note_edge.substr(1,1) == '0') {
-        note_edge = note_edge.substr(0,1) + '1';
-        }
+            var note_edge = midi.substr(12,2);
+            if (note_edge.substr(1,1) == '0') {
+            note_edge = note_edge.substr(0,1) + '1';
+            }
 
-        for (var m = 0; m < pins.length; m++) {
-            setTimeout(function () {
-            output.playNote(note_node, parseInt(midi.substr(0,2)));
-            output.stopNote(note_node, parseInt(midi.substr(0,2)), {time: "+500"});
-            console.log('playing a node note ' + note_node + ' at ' + timecode + ' on channel ' + parseInt(midi.substr(0,2)));
-            }, timecode);
-            timecode = getRandomInt(0,parseInt(midi.substr(6,4)));
-        }
+            for (var m = 0; m < pins.length; m++) {
+                setTimeout(function () {
+                output.playNote(note_node, parseInt(midi.substr(0,2)));
+                output.stopNote(note_node, parseInt(midi.substr(0,2)), {time: "+500"});
+                console.log('playing a node note ' + note_node + ' at ' + timecode + ' on channel ' + parseInt(midi.substr(0,2)));
+                }, timecode);
+                timecode = getRandomInt(0,parseInt(midi.substr(6,4)));
+            }
 
-        var timecodea = 0;
+            var timecodea = 0;
 
-        for (var ed = 0; ed < toKeep.length; ed++) {
+            for (var ed = 0; ed < toKeep.length; ed++) {
 
-            setTimeout(function () {
-            output.playNote(note_edge, parseInt(midi.substr(2,2)));
-            output.stopNote(note_edge, parseInt(midi.substr(2,2)), {time: "+500"});
-            console.log('playing an edge note ' + note_edge + ' at ' + timecodea + ' on ' + parseInt(midi.substr(2,2)));
-            }, timecodea);
-            timecodea = getRandomInt(0,parseInt(midi.substr(6,4)));
+                setTimeout(function () {
+                output.playNote(note_edge, parseInt(midi.substr(2,2)));
+                output.stopNote(note_edge, parseInt(midi.substr(2,2)), {time: "+500"});
+                console.log('playing an edge note ' + note_edge + ' at ' + timecodea + ' on ' + parseInt(midi.substr(2,2)));
+                }, timecodea);
+                timecodea = getRandomInt(0,parseInt(midi.substr(6,4)));
+            }
+          }
         }
 
         <% } %>
@@ -129,43 +168,52 @@ function playNodesMIDI() {
 
           let midi = userFactory.getMidi();
 
-          console.log('using MIDI data ' + midi);
-          console.log('playing MIDI device:');
-          console.log(output);
+          if (midi) {
 
-          var timecode = 0;
+            let output = midiFactory.getOutput();
+            let input = midiFactory.getInput();
 
-          var note_node = midi.substr(10,2);
-          if (note_node.substr(1,1) == '0') {
-            note_node = note_node.substr(0,1) + '1';
-          }
+            if (midiFactory.existsOutput() == true) {
 
-          var note_edge = midi.substr(12,2);
-          if (note_edge.substr(1,1) == '0') {
-            note_edge = note_edge.substr(0,1) + '1';
-          }
+              console.log('using MIDI data ' + midi);
+              console.log('playing MIDI device:');
+              console.log(output);
 
-          for (var m = 0; m < nodes_added.length; m++) {
+              var timecode = 0;
 
-              setTimeout(function () {
-                output.playNote(note_node, parseInt(midi.substr(0,2)));
-                output.stopNote(note_node, parseInt(midi.substr(0,2)), {time: "+500"});
-                console.log('playing a node note ' + note_node + ' at ' + timecode + ' on channel ' + parseInt(midi.substr(0,2)));
-              }, timecode);
-              timecode = getRandomInt(0,parseInt(midi.substr(6,4)));
-          }
+              var note_node = midi.substr(10,2);
+              if (note_node.substr(1,1) == '0') {
+                note_node = note_node.substr(0,1) + '1';
+              }
 
-          var timecodea = 0;
+              var note_edge = midi.substr(12,2);
+              if (note_edge.substr(1,1) == '0') {
+                note_edge = note_edge.substr(0,1) + '1';
+              }
 
-          for (var ed = 0; ed < edges_added.length; ed++) {
+              for (var m = 0; m < nodes_added.length; m++) {
 
-              setTimeout(function () {
-                output.playNote(note_edge, parseInt(midi.substr(2,2)));
-                output.stopNote(note_edge, parseInt(midi.substr(2,2)), {time: "+500"});
-                console.log('playing an edge note ' + note_edge + ' at ' + timecodea + ' on ' + parseInt(midi.substr(2,2)));
-              }, timecodea);
-                timecodea = getRandomInt(0,parseInt(midi.substr(6,4)));
+                  setTimeout(function () {
+                    output.playNote(note_node, parseInt(midi.substr(0,2)));
+                    output.stopNote(note_node, parseInt(midi.substr(0,2)), {time: "+500"});
+                    console.log('playing a node note ' + note_node + ' at ' + timecode + ' on channel ' + parseInt(midi.substr(0,2)));
+                  }, timecode);
+                  timecode = getRandomInt(0,parseInt(midi.substr(6,4)));
+              }
 
+              var timecodea = 0;
+
+              for (var ed = 0; ed < edges_added.length; ed++) {
+
+                  setTimeout(function () {
+                    output.playNote(note_edge, parseInt(midi.substr(2,2)));
+                    output.stopNote(note_edge, parseInt(midi.substr(2,2)), {time: "+500"});
+                    console.log('playing an edge note ' + note_edge + ' at ' + timecodea + ' on ' + parseInt(midi.substr(2,2)));
+                  }, timecodea);
+                    timecodea = getRandomInt(0,parseInt(midi.substr(6,4)));
+
+              }
+            }
           }
 
           <% } %>
