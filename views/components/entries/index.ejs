@@ -583,6 +583,7 @@ function GraphFactory(){
 
                     // TODO this is a workaround, otherwise sigma doesn't have X parameters on initGraph
                     if (this.existStopNodes() == true) {
+                        console.log('we are deleting them')
                         this.deleteGraphNodes(this.getStopNodes());          
                     }
 
@@ -645,6 +646,9 @@ function GraphFactory(){
                 this.getOrigNodeIDs = function() {
                     return origNodeIDs;
                 }
+                this.getOrigNodeID = function(name) {
+                    return origNodeIDs[name];
+                }
                 this.getOrigNodeIDsRev = function() {
                     return origNodeIDs_rev;
                 }
@@ -666,7 +670,9 @@ function GraphFactory(){
         
         
                 this.deleteGraphNodes = function(nodesToDelete) {
-                     
+                     for (let name in nodesToDelete) {
+                        this.deleteUniqueEdgeWithNode(graphFactory.getOrigNodeID(nodesToDelete[name]));
+                     }
                      // Update the graph nodes (delete or add)
                      graph().deleteNodes(nodesToDelete, graph().updateMetrics);
                
@@ -1201,6 +1207,17 @@ function GraphFactory(){
                     }
                     else {
                         return false;
+                    }
+                }
+                this.deleteUniqueEdgeWithNode = function(node_id) {
+                    let toRemove = [];
+                    for (let edge in uniqueEdges) {
+                        if (uniqueEdges[edge].indexOf(node_id) > -1) {
+                            toRemove.push(uniqueEdges[edge]);
+                        }
+                    }
+                    for (let rid in toRemove) {
+                        uniqueEdges.splice(uniqueEdges.indexOf(toRemove[rid]),1);
                     }
                 }
 
