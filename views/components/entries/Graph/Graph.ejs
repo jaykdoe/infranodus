@@ -287,7 +287,7 @@ function graph() {
               for (let item of e.statement_id) {
                  graphFactory.addStatementOfContext(e.edge_context, item);
               }
-           
+
               // Make an index of nodes to context
               graphFactory.addNodeToContext(e.edge_context, e.source);
               graphFactory.addNodeToContext(e.edge_context, e.target);

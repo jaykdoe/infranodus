@@ -25,9 +25,10 @@ sigma.parsers.json(
         },
         function(sigma) {                
             
+            // Initiate custom shapes for the context nodes
             CustomShapes.init(sigma);
 
-            // Add some stats for each node and edge and launch BC and community detection analytics algorithms
+            // Add the nodes and edges into the graph and then calculate the statistics for each node and edge and launch BC and community detection analytics algorithms
             graph().initNodesEdges(graph().updateMetrics);           
   
             // Initialize autofill for hashtags and contexts - only after the graph is loaded
