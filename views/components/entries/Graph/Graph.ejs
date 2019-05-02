@@ -278,7 +278,7 @@ function graph() {
                     graphFactory.addNodeToContext(context, e.target);
 
                     // Make an index of nodes to statement
-                    for (let statement in context) {
+                    for (let statement in e.context_matrix[context]) {
                         if (graphFactory.existNodesOfStatement(statement) == true) {
                             if (graphFactory.existNodeInStatement(statement, e.source) == false)
                                 graphFactory.addNodeToStatement(statement, e.source);
@@ -805,17 +805,19 @@ function graph() {
             let nodesOfStatement = graphFactory.getAllNodesOfStatement();
 
             // Only show edges that belong to the entries filtered
-
             sigma.instances(0).graph.edges().forEach(function(e) {
                     let got_match = 0;
-                    for (let item of e.statement_id) {
-                      if (entries_ids.includes(item)) {
-                          got_match += 1;
-                      }
+                    for (let context in e.context_matrix) {
+                        for (let statement in e.context_matrix[context]) {
+                            if (entries_ids.indexOf(statement) >= 0) {console.log('got match')}
+                            if (entries_ids.includes(statement)) {
+                                got_match += 1;
+                            }
+                        }
                     }
                     if (got_match > 0) {
-                        e.color = e.originalColor;
-                    }
+                            e.color = e.originalColor;
+                        }
                     else {
                         e.color = deselected_nodes_color;
                     }
