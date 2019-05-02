@@ -149,13 +149,18 @@ function graph() {
 
         },
         addNodesEdges: function(nodesToAdd, edgesToAdd, callback) {
+            
+          // these nodes are not yet in the graph, so we're adding them to Sigma  
           for (let node in nodesToAdd) {
               this.addNode(nodesToAdd[node]);
           }
-          
+
+          // these edges (source/target/context) might be in the graph, but statement ID is def new
           for (let edge in edgesToAdd) {
 
               let e = edgesToAdd[edge];
+
+              // What if there's already an edge with the same source/target
 
               this.addEdge(edgesToAdd[edge]);
 
@@ -212,6 +217,7 @@ function graph() {
                 e.sourcename = nodeIDs_rev[e.source];
                 e.targetname = nodeIDs_rev[e.target];
 
+                // Let's store the edge stats for filtering purposes
                 graph().updateEdgeStats(e);
 
               });
@@ -265,36 +271,37 @@ function graph() {
         updateEdgeStats: function(e) {
 
               // Make a new index of nodes to statement
-              for (let item of e.statement_id) {
-                    
-                    if (graphFactory.existNodesOfStatement(item) == true) {
-                        if (graphFactory.existNodeInStatement(item, e.source) == false)
-                            graphFactory.addNodeToStatement(item, e.source);
-                        if (graphFactory.existNodeInStatement(item, e.target) == false)
-                            graphFactory.addNodeToStatement(item, e.target);
-                    }
-                    else {
-                        graphFactory.addNodeToStatement(item, e.source);
-                        // avoid duplicates
-                        if (e.source != e.target) {
-                          graphFactory.addNodeToStatement(item, e.target);
-                        }
-                        
-                    }
-              }
-      
-              // Which statements belong to which context / graph         
-              for (let item of e.statement_id) {
-                 graphFactory.addStatementOfContext(e.edge_context, item);
-              }
+              for (let context in e.context_matrix) {
 
-              // Make an index of nodes to context
-              graphFactory.addNodeToContext(e.edge_context, e.source);
-              graphFactory.addNodeToContext(e.edge_context, e.target);
-              
+                     // Make an index of nodes to context
+                    graphFactory.addNodeToContext(context, e.source);
+                    graphFactory.addNodeToContext(context, e.target);
+
+                    // Make an index of nodes to statement
+                    for (let statement in context) {
+                        if (graphFactory.existNodesOfStatement(statement) == true) {
+                            if (graphFactory.existNodeInStatement(statement, e.source) == false)
+                                graphFactory.addNodeToStatement(statement, e.source);
+                            if (graphFactory.existNodeInStatement(statement, e.target) == false)
+                                graphFactory.addNodeToStatement(statement, e.target);
+                        }
+                        else {
+                            graphFactory.addNodeToStatement(statement, e.source);
+                            // avoid duplicates
+                            if (e.source != e.target) {
+                                graphFactory.addNodeToStatement(statement, e.target);
+                            }
+                        }
+                        graphFactory.addStatementOfContext(context, statement);
+                    }             
+                    
+              }        
 
                // Add to EDGES db
                graphFactory.addEdge(e);
+
+               // Add to unique directed edges list
+               graphFactory.addToUniqueEdges(e.source, e.target);
 
         },
         addNode: function(node) {
@@ -339,15 +346,26 @@ function graph() {
             graph().refreshGraph();
         },
         addEdge: function(edgeproc) {
-            sigma.instances(0).graph.addEdge({
-                id: edgeproc.id,
-                source: edgeproc.source,
-                target: edgeproc.target,
-                weight: edgeproc.weight,
-                size: edgeproc.weight,
-                statement_id: edgeproc.statement_id,
-                edge_context: edgeproc.edge_context
-            });
+            
+            if (graphFactory.existsUniqueEdge(edgeproc.source,edgeproc.target) == false) { 
+                sigma.instances(0).graph.addEdge({
+                    id: edgeproc.id,
+                    source: edgeproc.source,
+                    target: edgeproc.target,
+                    weight: edgeproc.weight,
+                    size: edgeproc.weight,
+                    context_matrix: edgeproc.context_matrix
+                });
+            }
+            else {
+                sigma.instances(0).graph.edges().forEach(function(e) {
+                    if (e.source == edgeproc.source && e.target == edgeproc.target) {
+                        e.weight = edgeproc.weight;
+                        e.size = edgeproc.weight;
+                        e.context_matrix = edgeproc.context_matrix;
+                    }
+                });
+            }
             //sigma.instances(0).refresh();
         },
         addContextEdge: function(id,source,target,edge_context) {
@@ -358,8 +376,7 @@ function graph() {
                 target: target,
                 weight: 6,
                 size: 6,
-                statement_id: '',
-                edge_context: edge_context
+                context_matrix: edge_context
             });
         },
         updateNodes: function(nodes, callback){
@@ -419,7 +436,7 @@ function graph() {
 
             sigma.instances(0).graph.edges().forEach(function(e) {
                 // To only include the nodes which are not :context
-                if (e.edge_context) {
+                if (e.context_matrix) {
                 
                     let unique_edge_id = '';
 

@@ -377,6 +377,9 @@ function GraphFactory(){
                 let edgesDB = [];
                 let nodesDB = [];
 
+                // What are the unique directed edges we have
+                let uniqueEdges = [];
+
                 // Variable that contains the node's size
                 let nodeSize = {}; // maps ID to the size
         
@@ -400,10 +403,6 @@ function GraphFactory(){
 
                 // Create statements of context object
                 let statementsOfContext = {}; // key is context, value is statement
-        
-                // How many nodes and edges added per iteration
-                let nodesAdded = [];
-                let edgesAdded = [];
         
                 // Top betweenness centrality nodes
                 let topbc_nodes = [];
@@ -599,23 +598,30 @@ function GraphFactory(){
                     return true;
         
                 }
-                this.addNewNodes = function(nodes, edges, statement) {
+                this.addNewNodes = function(nodes, edges, of_statement) {
+                    
+                    // We will only add nodes that do not exist and only the edges that contain the ID of the statement we just added
                     
                     let nodesToAdd = [];
                     let edgesToAdd = [];
+                    
                     for (let node in nodes) {
                         if (this.existNode(nodes[node].label) == false) {
                             this.addNode(nodes[node].label, nodes[node].id, nodes[node]);
                             nodesToAdd.push(nodes[node]);
-                            nodesAdded.push(nodes[node]);
                         }
                     }
-                    if (statement) {
+                    if (of_statement) {
                         for (let edge in edges) {
-                            if (edges[edge].statement_id == statement) {
-                                edgesToAdd.push(edges[edge]);
-                                edgesAdded.push(edges[edge]);
-                            }
+                            
+                            for (let context in edges[edge].context_matrix)
+                            
+                                for (let statement in edges[edge].context_matrix[context]) {
+                                    if (statement == of_statement) {
+                                        // This is the edge we want to add as it is part of the statement we're adding
+                                        edgesToAdd.push(edges[edge]);
+                                    }
+                                }
                         }
                     }
       
@@ -1181,6 +1187,21 @@ function GraphFactory(){
                 }
                 this.getContextNodeIDs = function() {
                     return contextNodeID;
+                }
+
+                this.addToUniqueEdges = function(source,target) {
+                    uniqueEdges.push(source + '-' + target);
+                }
+                this.getAllUniqueEdges = function() {
+                    return uniqueEdges;
+                }
+                this.existsUniqueEdge = function(source,target) {
+                    if (uniqueEdges.indexOf(source + '-' + target) > -1) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
                 }
 
 

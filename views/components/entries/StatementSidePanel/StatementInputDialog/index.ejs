@@ -227,10 +227,12 @@ socket.on('chat message', function(msg){
         entries().scroll();
     }
 
-    // Add new nodes and edges
+    // Add new nodes and edges — these are all the nodes and edges of the graph, not newly added only
+    // TODO IMPROVEMENT maybe we could return only the new ones for efficiency
     var addednodes = msg.graph.nodes;
     var addededges = msg.graph.edges;
 
+    // Add to the stats and then add to the graph (inside graphFactory function)
     graphFactory.addNewNodes(addednodes, addededges, msg.entryuid);
 
     // This is for special cases where the user is on a graph, but they are adding their own stuff to this graph into a new graph, so we only show the entries that he added, not the previous ones
