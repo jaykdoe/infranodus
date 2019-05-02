@@ -30,6 +30,7 @@
         let midi = null;
         let background = null;
         let default_label_color = '#000000';
+        let interpret = null;
 
         let viewOptions = {};
 
@@ -173,6 +174,20 @@
         }
         this.getViewOption = function(option) {
             return viewOptions[option];
+        }
+
+        this.setInterpret = function(value) {
+            if (value && value.length > 0) {
+                interpret = value;
+            }
+        }
+        this.isInterpretOn = function() {
+            if (interpret) {
+                return true;
+            }
+            else {
+                return false;
+            }
         }
     }
 

@@ -288,20 +288,10 @@ function graph() {
                  graphFactory.addStatementOfContext(e.edge_context, item);
               }
            
-
               // Make an index of nodes to context
-              if (contextNodeID[e.edge_context]) {
-                  if (contextNodeID[e.edge_context].indexOf(e.source) < 0)
-                      contextNodeID[e.edge_context].push(e.source);
-                  if (contextNodeID[e.edge_context].indexOf(e.target) < 0)
-                      contextNodeID[e.edge_context].push(e.target);
-              }
-              else {
-                  contextNodeID[e.edge_context] = [];
-                  contextNodeID[e.edge_context].push(e.source);
-                  contextNodeID[e.edge_context].push(e.target);
-              }
-
+              graphFactory.addNodeToContext(e.edge_context, e.source);
+              graphFactory.addNodeToContext(e.edge_context, e.target);
+              
 
                // Add to EDGES db
                graphFactory.addEdge(e);
@@ -636,13 +626,13 @@ function graph() {
                 // Check if the node is in additional context and if yes, give it a different color
 
                
-                if (contextNodeID[addcontext] && contextNodeID[current_context]) {
+                if (graphFactory.existNodesInContext(addcontext) == true && graphFactory.existNodesInContext(current_context) == true) {
                     
                         // Are we on the interpret pane?
-                        if (interpret) {
+                        if (userFactory.isInterpretOn() == true) {
                             
                             // Is the node in the current meta_ context?
-                            if (contextNodeID[current_context].indexOf(n.id) > -1) {
+                            if (graphFactory.existsNodeInContext(current_context, n.id) == true) {
 
                                 // If no highlight is chosen, show that the node is in meta_
                                 if (!highlight) {
@@ -681,7 +671,7 @@ function graph() {
                             // We do NOT want to highlight the missing nodes, only the intersections
                             if (!missing) {
                                 // Is the node both in the addcontext and in the current_context?
-                                if (contextNodeID[addcontext].indexOf(n.id) > -1 && contextNodeID[current_context].indexOf(n.id) > -1) {
+                                if ((graphFactory.existsNodeInContext(addcontext, n.id) == true) && (graphFactory.existsNodeInContext(current_context, n.id) == true)) {
                                     // Highlight is on? Highlight intersection
                                     if (highlight) {
                                         n.originalColor = highlight_addcontext;
@@ -702,7 +692,7 @@ function graph() {
                                 // Let's highlight the missing nodes
 
                                 // If the node is in the addcontext but not in the original context we're comparing it to
-                                if (contextNodeID[addcontext].indexOf(n.id) > -1 && contextNodeID[current_context].indexOf(n.id) == -1) {
+                                if (graphFactory.existsNodeInContext(addcontext, n.id) == true && graphFactory.existsNodeInContext(current_context, n.id) == true) {
                                     // If highlight feature is on, highlight the DIFF nodes
                                     if (highlight) {
                                         n.originalColor = highlight_addcontext;
@@ -956,7 +946,7 @@ function sigmaGraph() {
                   var nodeLabel = e.data.node.originalLabel;
   
                   // TODO to check that
-                  if (interpret) {
+                  if (userFactory.isInterpretOn() == true) {
                     $('.entry').show();
                   }
   

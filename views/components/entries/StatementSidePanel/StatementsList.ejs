@@ -142,11 +142,11 @@ function entries() {
         append: function(text, id, name, posted_by, alien, chatbot) {
             let added_entry = '';
             if (!alien) { 
-              added_entry = "<div class='entry' style='display: none;' data-uid='" + id + "' data-hashtags='" + name + "'><p class='entry-text'>" + text + "</p><p class='entry-date'>by " + posted_by + " at " + moment().format('hh:mm:ss') + "</p><p class='entry-menu'>&nbsp;&nbsp;&nbsp;<a class='editentry' href='#'>edit/delete</a>&nbsp;&nbsp;&nbsp;<a class='resetentry' href='#'>reset selection</a></p><div class='separator'>&nbsp;</div><div id='" + id + "' class='hidden'></div></div>";
+              added_entry = "<div class='entry' style='display: none;' data-uid='" + id + "' data-hashtags='" + name + "'><p class='entry-text'>" + text + "</p><p class='entry-date'>by " + posted_by + " at " + moment().format('hh:mm:ss') + "</p><p class='entry-menu'>&nbsp;&nbsp;&nbsp;<a class='editentry' href='#'>edit</a>&nbsp;&nbsp;&nbsp;<a class='resetentry' href='#'>deselect</a></p><div class='separator'>&nbsp;</div><div id='" + id + "' class='hidden'></div></div>";
             }
             else {
               if (!chatbot) 
-                added_entry = "<div class='entry alien' style='display: none; margin-left: 50px' data-uid='" + id + "' data-hashtags='" + name + "'><p class='entry-text gray'>" + text + "</p><p class='entry-date gray'>by " + posted_by + " at " + moment().format('hh:mm:ss') + "</p><p class='entry-menu'>&nbsp;&nbsp;&nbsp;<a class='editentry' href='#'>edit/delete</a>&nbsp;&nbsp;&nbsp;<a class='resetentry' href='#'>reset selection</a></p><div class='separator'>&nbsp;</div><div id='" + id + "' class='hidden'></div></div>";
+                added_entry = "<div class='entry alien' style='display: none; margin-left: 50px' data-uid='" + id + "' data-hashtags='" + name + "'><p class='entry-text gray'>" + text + "</p><p class='entry-date gray'>by " + posted_by + " at " + moment().format('hh:mm:ss') + "</p><p class='entry-menu'>&nbsp;&nbsp;&nbsp;<a class='editentry' href='#'>edit</a>&nbsp;&nbsp;&nbsp;<a class='resetentry' href='#'>deselect</a></p><div class='separator'>&nbsp;</div><div id='" + id + "' class='hidden'></div></div>";
               else {
                 added_entry =  "<div class='entry alien' style='display: none; margin-left: 50px' data-uid='" + id + "'><p class='entry-text gray'>" + text + "</p><p class='entry-date gray'>help tip &nbsp;<em></em><a href='javascript:' class='disablehelp'>disable</a></em></p><div class='separator'>&nbsp;</div><div id='" + id + "' class='hidden'></div></div>";
               }
@@ -191,13 +191,13 @@ function entries() {
         removeAddContext: function() {
                let current_context = userFactory.getCurrentContext();
                let addcontext = userFactory.getAddContext();
-               if (addcontext && interpret) {
+               if (addcontext && userFactory.isInterpretOn() == true) {
                   $('.entry').hide();
-                  let statementsOfContext = graphFactory.getStatementsOfContext();
-                    for (var ite in statementsOfContext[current_context]) {
-                      $('.entry[data-uid="' + statementsOfContext[current_context][ite] + '"]').each(function() {
-                        $(this).show();
-                      });
+                  let statementsOfContext = graphFactory.getStatementsOfContext(current_context);
+                      for (var ite in statementsOfContext) {
+                        $('.entry[data-uid="' + statementsOfContext[ite] + '"]').each(function() {
+                          $(this).show();
+                        });                    
                     }
                 }
         },

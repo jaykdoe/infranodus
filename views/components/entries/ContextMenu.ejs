@@ -394,14 +394,6 @@ function addContextTriggers() {
                         contextsToFilter.splice(filterIndex, 1);
                     }
 
-                    //TODO WTF is that?
-                  /*  // Let's remove the nodes that belong to the removed context from the contextNodes
-                    contextNodeID[to_remove_clean].forEach(function(element){
-                        var index = $.inArray(element, contextNodes);
-                        if (index>=0) contextNodes.splice(index, 1);
-                    });*/
-
-
                      // Create context query for jQuery
                     var contextstring = '';
 
@@ -500,11 +492,11 @@ function addContextTriggers() {
 
                     contextsToFilter.forEach(function(element){
 
-                        if (contextNodeID[element].indexOf(e.source) > -1) {
+                        if (graphFactory.existsNodeInContext(element,e.source) == true) {
                             keepNodes.push(e.source);
                         }
 
-                        if (contextNodeID[element].indexOf(e.target) > -1) {
+                        if (graphFactory.existsNodeInContext(element,e.target) == true) {
                             keepNodes.push(e.target);
                         }
 

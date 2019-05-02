@@ -204,6 +204,9 @@
                     let addcontext_nodes = {};
 
                     if (addcontext) {
+
+                        let contextNodeID = graphFactory.getContextNodeIDs();
+                        
                         addContextIntersection = _.intersection(contextNodeID[current_context],contextNodeID[addcontext]);
                         addContextDifference = _.difference(contextNodeID[addcontext],contextNodeID[current_context]);
                         

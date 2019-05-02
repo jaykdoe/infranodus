@@ -3,34 +3,28 @@
 // Initialize Socket.IO for websockets (using them for collabs but also to listen to events within the app)
 var socket = io();
 
+// Settings for the general interface view (used for display/embed)
 userFactory.setViewOption('hide_always', getUrlVars()["hide_always"]);
-
 userFactory.setViewOption('hide_edit', getUrlVars()["hide_edit"]);
-
 userFactory.setViewOption('show_text', getUrlVars()["show_text"]);
-
 userFactory.setViewOption('show_analytics', getUrlVars()["analytics"]);
-
 userFactory.setViewOption('hide_when_small', getUrlVars()["hide_when_small"]);
-
-if (getUrlVars()["language"]) userFactory.setInLanguage(getUrlVars()["language"]);
-
-if (getUrlVars()["palette"]) userFactory.setGraphPalette(getUrlVars()["palette"]);
-
-var interpret = getUrlVars()["interpret"];
-
-var abstract;
-
 userFactory.setViewOption('urlPath', location.pathname);
 
+// Important settings for the graph view (used in rendering)
+if (getUrlVars()["language"]) userFactory.setInLanguage(getUrlVars()["language"]);
+if (getUrlVars()["palette"]) userFactory.setGraphPalette(getUrlVars()["palette"]);
 if (getUrlVars()["background"]) userFactory.setBackground(getUrlVars()["background"]);
-
 if (getUrlVars()["walkthrough"]) userFactory.setWalkthrough(getUrlVars()["walkthrough"]);
-
 if (getUrlVars()["most_influential"] == 'bc' || getUrlVars()["most_influential"] == 'bc2' || getUrlVars()["most_influential"] == 'degree') {
     userFactory.setMostInfluential(getUrlVars()["most_influential"]);
 }
 
+// Important switch that shows whether we're in the "interpretation" mode where we build one graph on top of another
+if (getUrlVars()["interpret"]) userFactory.setInterpret(getUrlVars()["interpret"]);
+
+// Abstract visualization — 
+var abstract;
 
 // Socket.IO chat collaborate
 
@@ -55,11 +49,6 @@ var color_context = '#666';
 
 var forcedatlas_running = false;
 
-
-
-
-// Create context-node index for filtering
-var contextNodeID = [];
 
 
 
@@ -367,8 +356,8 @@ function shannon(data) {
 
     }
 
-  // Initiate the graph object
-  var graphFactory = new GraphFactory();
+// Initiate the graph object
+var graphFactory = new GraphFactory();
 
 
 // Graph parameters object storage and functions
@@ -405,6 +394,9 @@ function GraphFactory(){
         
                 // Create statement-node index for filtering
                 let nodesOfStatement = {};
+
+                // Create a list of nodes for each context
+                let contextNodeID = {};
 
                 // Create statements of context object
                 let statementsOfContext = {}; // key is context, value is statement
@@ -1013,12 +1005,12 @@ function GraphFactory(){
                             }
         
                         }
-                        else if (interpret) {
+                        else if (userFactory.isInterpretOn() == true) {
                             
                             // In case we're on the interpret or add context field, we might still want to load the original selections
                             
                             for (var url in saved_selections) {
-                                if (url.indexOf('/'+addcontext+'/') > -1) {
+                                if (url.indexOf('/'+userFactory.getAddContext()+'/') > -1) {
                                     let deletedNodes = saved_selections[url].stopnodes;
                                     let pinnedNodes = saved_selections[url].pinnednodes;
                                     if (deletedNodes.length > 0) {
@@ -1155,6 +1147,40 @@ function GraphFactory(){
 
                 this.getInsightClusters = function() {
                     return insight_clusters;
+                }
+
+                this.existNodesInContext = function(context) {
+                    if (contextNodeID[context] && contextNodeID[context].length > 0) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+
+                this.existsNodeInContext = function(context, node_id) {
+                    if (contextNodeID[context] && contextNodeID[context].indexOf(node_id) >= 0) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+
+                this.addNodeToContext = function(context, node_id) {
+                    if (!contextNodeID[context]) {
+                        contextNodeID[context] = [];
+                    }
+                    if (contextNodeID[context].indexOf(node_id) == -1) {
+                        contextNodeID[context].push(node_id);
+                    }
+                }
+
+                this.getNodesInContext = function(context) {
+                    return contextNodeID[context];
+                }
+                this.getContextNodeIDs = function() {
+                    return contextNodeID;
                 }
 
 
