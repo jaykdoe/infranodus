@@ -1,27 +1,51 @@
 <script>
 
-        function checkStatementsPanelMode() {
-            return {
-                visibility: function() {
-                    if ($("#statements").is(":visible")) {
-                            return 'VISIBLE'
-                    }
-                    else {
-                            return 'HIDDEN'
-                    }
-                }
-            }    
-        }
+
+         // Initiate Statements Panel     
+         const statementsPanelFactory = (() => {
+          function StatementsPanelFactory() {
+
+              let statementsPanelVisibility = "VISIBLE"; 
+
+                              
+              this.changeStatementsModeTo = function(mode) {
+                  statementsPanelVisibility = mode;
+                  if(statementsPanelVisibility === "HIDDEN") statements().hide();
+                  if(statementsPanelVisibility === "VISIBLE") statements().show();
+              }
+
+              // Initialization functions
+              this.initializeStatements = function() {
+
+                // Add the hooks to the newly rendered entries
+                statements().onClick(entrySelect);
+                statements().changeTime();
+
+                // Hide the whole panel if needed
+                if (localStorage.getItem('folded') == 1) {
+                  this.changeStatementsModeTo('HIDDEN');
+                }  
+              }
+
+              this.initializeStatements();
+ 
+
+          }
+
+          return new StatementsPanelFactory();
+
+        })();
+
         
         function toggleStatementSidePanel() {
         
-            if (checkStatementsPanelMode().visibility() == checkEntriesMode().visibility()) {
+            if (statements().isPanelVisible() == statements().areVisible()) {
                 toggleStatements();
             }
             $("#statements").fadeToggle();
             
             
-            if (checkStatementsPanelMode().visibility() == checkEntriesMode().visibility() && checkStatementsPanelMode().visibility() == 'HIDDEN') {
+            if (statements().isPanelVisible() == statements().areVisible() && statements().isPanelVisible() == 'HIDDEN') {
                 localStorage.setItem('graph', 1);
                 $("#graph-link").toggleClass('graph-highlight','add');
             }
@@ -79,7 +103,7 @@
         
         // Did we receive a global setting to hide the graph?
         if ((userFactory.getViewOption('hide_always') || userFactory.getViewOption('hide_edit')) && !userFactory.getViewOption('show_text')) {
-                if (checkStatementsPanelMode().visibility() == 'VISIBLE') {
+                if (statements().isPanelVisible() == 'VISIBLE') {
                     toggleStatementSidePanel();
                 }           
         }
@@ -89,7 +113,7 @@
         if (userFactory.getViewOption('hide_when_small') && $(window).width() < 600) {
         
                     if ($('#menuLink').is(':visible')) {
-                        if (checkStatementsPanelMode().visibility() == 'VISIBLE') {
+                        if (statements().isPanelVisible() == 'VISIBLE') {
                             toggleStatementSidePanel();
                         }   
                     }
@@ -102,7 +126,7 @@
         // Are we loading the page to only show the graph?
         
         <% if (background == '1' || background == 'graph') { %>
-            if (checkStatementsPanelMode().visibility() == 'VISIBLE') {
+            if (statements().isPanelVisible() == 'VISIBLE') {
                     toggleStatementSidePanel();
             }   
             userFactory.setViewOption('graphOnly', true);

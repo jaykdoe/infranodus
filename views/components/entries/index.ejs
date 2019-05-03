@@ -459,7 +459,7 @@ const graphFactory = (() => {
                     graphTags().update();
         
                     // Perform filter statements function on the nodes selected
-                    entries().filter();
+                    statements().filter();
         
                     // Save to local storage
                     this.saveSelections();
@@ -474,10 +474,10 @@ const graphFactory = (() => {
                     analyticsPanel.updateSelections(pinnedNodes);
 
                     if (currentStatementsView == 'INSIGHT') {
-                        entries().activateInsight();
+                        statements().activateInsight();
                     }
                     else if (currentStatementsView == 'SUMMARY') {
-                        entries().activateSummary();
+                        statements().activateSummary();
                     }
                 }
         

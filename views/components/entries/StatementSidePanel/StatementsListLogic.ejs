@@ -1,109 +1,47 @@
-
 <script>
 
-        var currentEntriesPanelMode = "VISIBLE";
-        
-        
-        function EntriesFactory() {
-        
-            let currentSelections = []; // IDs
-        
-            this.addToCurrentSelections = function(statement_id) {
-              currentSelections.push(statement_id);
-            }
-            this.getCurrentSelections = function() {
-              return currentSelections;
-            }
-            this.isInCurrentSelections = function(statement_id) {
-              if (currentSelections.indexOf(statement_id) > -1) {
-                return true;
+        // Initiate the statements constructor
+
+        const statementsFactory = (() => {
+          function StatementsFactory() {
+
+              let currentSelections = []; // IDs
+
+              // Setting parameters for selecting the entries and associated actions
+
+              this.addToCurrentSelections = function(statement_id) {
+                currentSelections.push(statement_id);
               }
-              else {
-                return false;
+              this.getCurrentSelections = function() {
+                return currentSelections;
               }
-            }
-            this.removeFromCurrentSelections = function(statement_id) {
-              let index = currentSelections.indexOf(statement_id);
-              currentSelections.splice(index,1);
-            }
-            this.removeCurrentSelections = function() {
-              currentSelections = [];
-            }
-        
-        }
-        
-        let entriesFactory = new EntriesFactory();
-        
-        if (localStorage.getItem('folded') == 1) {
-            currentEntriesPanelMode = "HIDDEN"
-            changeEntriesModeTo(currentEntriesPanelMode);
-        }    
-        
-        // Add the hooks to the newly rendered entries
-        
-        entries().onClick(entrySelect);
-        
-        entries().changeTime();
-        
-        function userMessages() {
-          return {
-            display: function(message) {
-              $("#warnings").append('<p class="warning">' + message + '</p>');
-              $("#warnings").slideDown('slow');
-            },
-            clear: function() {
-        
-            }
-          }
-        }
-                
-        function changeEntriesModeTo(mode) {
-            currentEntriesPanelMode = mode
-            updateEntriesPanel()
-        }
-        
-        function checkEntriesMode() {
-            return {
-                visibility: function() {
-                    if ($("#entries").css('visibility') == 'hidden') {
-                            return 'HIDDEN'
-                    }
-                    else if ($("#entries").css('visibility') == 'visible') {
-                            return 'VISIBLE'
-                    }
+              this.isInCurrentSelections = function(statement_id) {
+                if (currentSelections.indexOf(statement_id) > -1) {
+                  return true;
                 }
-            }    
-        }
-        
-        function updateEntriesPanel() {
-            if(currentEntriesPanelMode === "HIDDEN") entries().hide();
-            if(currentEntriesPanelMode === "VISIBLE") entries().show();
-        }
-        
-        function infiniteEntriesScroll() {
-        
-              var speed_scroll = 1000;
-              var max_scroll = $('#entries')[0].scrollHeight - $('#entries').height();
-              var current_scroll = ($('#entries').scrollTop());
-              var scroll_to = max_scroll;
-              var num_entries =  $('.entry').length;
-        
-              if (current_scroll == max_scroll) {
-                  $('#entries').scrollTop(0);
-                  current_scroll = $('#entries').scrollTop();
+                else {
+                  return false;
+                }
               }
-                
-              var play_time = Math.round(((max_scroll - current_scroll)/max_scroll) * num_entries * speed_scroll);
+              this.removeFromCurrentSelections = function(statement_id) {
+                let index = currentSelections.indexOf(statement_id);
+                currentSelections.splice(index,1);
+              }
+              this.removeCurrentSelections = function() {
+                currentSelections = [];
+              }
+ 
+
+          }
+
+          return new StatementsFactory();
+
+        })();
+
+           
+        // The different functions that can be performed on the statements
         
-              entries().scroll(play_time, scroll_to, 'linear', infiniteEntriesScroll);
-              
-        
-        }
-        
-        
-        
-        
-        function entries() {
+        function statements() {
             return {
                 fillSpace: function(heightToReduce){
                     $('#entries').css({height:  $(window).height() - heightToReduce});
@@ -121,6 +59,34 @@
         
                     $("#entries").animate({ scrollTop: scrollTo }, speed, type, onEnd);            
         
+                },
+                infiniteScroll: function() {
+                    let speed_scroll = 1000;
+                    let max_scroll = $('#entries')[0].scrollHeight - $('#entries').height();
+                    let current_scroll = ($('#entries').scrollTop());
+                    let scroll_to = max_scroll;
+                    let num_entries =  $('.entry').length;
+              
+                    if (current_scroll == max_scroll) {
+                        $('#entries').scrollTop(0);
+                        current_scroll = $('#entries').scrollTop();
+                    }
+                      
+                    let play_time = Math.round(((max_scroll - current_scroll)/max_scroll) * num_entries * speed_scroll);
+              
+                    statements().scroll(play_time, scroll_to, 'linear', statements().infiniteScroll);
+                },
+                selectScrolledOnGraph: function(scroll_entry, undo_select) {        
+                    // TODO BUG fix scroll on http://localhost:3000/news/english/edit#
+                    if (graphFactory.existPinnedNodes() == false && !undo_select) {
+                      graph().selectEntries(scroll_entry);
+                    }
+                    else {
+                        if (graphFactory.existPinnedNodes() == false) {
+                          graph().removeSelections();
+                        }
+                    }
+                
                 },
                 stopAnimation: function() {
                     $("#entries").stop();
@@ -203,11 +169,11 @@
                   else {
                           
                     if (graphFactory.existPinnedNodes() == false) {
-                      entries().unfilter();
-                      entries().removeHighlight('.entry');
+                      statements().unfilter();
+                      statements().removeHighlight('.entry');
                     }
                     else {
-                      entries().searchPinned(entries().addHighlight);        
+                      statements().searchPinned(statements().addHighlight);        
                     }
         
                   }
@@ -293,11 +259,11 @@
                       }
         
                       if (matchedThisEntry == 1) {
-                          entries().unfilter(this);
+                          statements().unfilter(this);
                           callback(this, graphFactory.getPinnedNodes());
                       }
                       else {
-                          entries().filter(this);
+                          statements().filter(this);
                       }
         
                   });
@@ -356,12 +322,12 @@
                                 }
         
                                 if (matchedentry == 1) {
-                                  entries().unfilter(this);
+                                  statements().unfilter(this);
                                   graphFactory.updateNotFoundNodes(notFoundNodes);
                                   callback(this, allSelectedNodes);
                                 }
                                 else {
-                                  entries().filter(this);
+                                  statements().filter(this);
                                 }
                                 
                         });
@@ -401,11 +367,11 @@
                                   }
         
                                   if (matchedThisEntry == 1) {
-                                      entries().unfilter(this);
+                                      statements().unfilter(this);
                                       callback(this, graphFactory.getPinnedNodes());
                                   }
                                   else {
-                                      entries().filter(this);
+                                      statements().filter(this);
                                   }
         
                             });
@@ -447,27 +413,45 @@
                 },
                 activateSummary: function() {
                   $('#summary').click();
+                },
+                showWarning: function(message) {
+                  $("#warnings").append('<p class="warning">' + message + '</p>');
+                  $("#warnings").slideDown('slow');
+                },
+                hideWarning: function(timer) {
+                  if (timer) {
+                    setTimeout(function() {
+                          $("#warnings").slideUp('slow');
+                          $("#warnings").text('');
+                    },parseInt(timer));
+                  }
+                  else {
+                    $("#warnings").slideUp('slow');
+                    $("#warnings").text('');
+                  }
+                },
+                isPanelVisible: function() {
+                    if ($("#statements").is(":visible")) {
+                          return 'VISIBLE'
+                    }
+                    else {
+                          return 'HIDDEN'
+                    }
+                },
+                areVisible: function() {
+                    if ($("#entries").css('visibility') == 'hidden') {
+                            return 'HIDDEN'
+                    }
+                    else if ($("#entries").css('visibility') == 'visible') {
+                            return 'VISIBLE'
+                    }
                 }
+
                 // add more functions
             }
         }
         
         
-        
-        function showStatements () {
-            var isHidden_ = $("#statements").is(":hidden");
-            if (isHidden_) {
-                $('#statements').fadeIn();
-                $("#graph-link").toggleClass('graph-highlight','remove');
-            }
-        }
-        
-        function showEntries () {
-            var isHidden_ = $("#entries").is(":hidden");
-            if (isHidden_) {
-                $('#entries').fadeIn();
-            }
-        }
         
         
         
@@ -478,17 +462,17 @@
                 let keepStatementID = e.currentTarget.dataset.uid;
         
                 if (!keepStatementID) {
-                  entriesFactory.removeCurrentSelections();
+                  statementsFactory.removeCurrentSelections();
                 }
-                else if (entriesFactory.isInCurrentSelections(keepStatementID) == true) {
-                  entriesFactory.removeFromCurrentSelections(keepStatementID);
+                else if (statementsFactory.isInCurrentSelections(keepStatementID) == true) {
+                  statementsFactory.removeFromCurrentSelections(keepStatementID);
                 }
                 else {
-                  entriesFactory.addToCurrentSelections(keepStatementID);
+                  statementsFactory.addToCurrentSelections(keepStatementID);
                 }
                 
                 let entries_to_select = [];
-                entries_to_select = entriesFactory.getCurrentSelections();
+                entries_to_select = statementsFactory.getCurrentSelections();
         
                 let pinnedNodes = graphFactory.getPinnedNodes();
         
@@ -497,7 +481,7 @@
                       $(this).css('opacity', '1');  
                       $('.entry-menu',this).hide();
                     }
-                    else if (entriesFactory.isInCurrentSelections($(this).attr('data-uid')) == true) {
+                    else if (statementsFactory.isInCurrentSelections($(this).attr('data-uid')) == true) {
                       $(this).css('opacity', '1');  
                       $('.entry-menu',this).show();
                     } 
@@ -508,8 +492,8 @@
                 });
         
                 if (keepStatementID) {
-                  entries().onEditClick(editDeleteEntry);
-                  entries().onResetClick(entrySelect);
+                  statements().onEditClick(editDeleteEntry);
+                  statements().onResetClick(entrySelect);
                 }
         
               
@@ -529,22 +513,7 @@
               
         }
         
-        
-        function entryScroll (scroll_entry, undo_select) {
-        
-            // TODO BUG fix scroll on http://localhost:3000/news/english/edit#
-        
-            if (graphFactory.existPinnedNodes() == false && !undo_select) {
-               graph().selectEntries(scroll_entry);
-            }
-            else {
-                if (graphFactory.existPinnedNodes() == false) {
-                   graph().removeSelections();
-                }
-            }
-        
-        }
-        
+                
         
         function editDeleteEntry(e) {
         
@@ -763,7 +732,7 @@
         
                       // Update explanation above the entries
                       
-                      entries().updateExplanation(filter_origin, most_inf_nodes_str);
+                      statements().updateExplanation(filter_origin, most_inf_nodes_str);
                       
                       // Hide everything
         

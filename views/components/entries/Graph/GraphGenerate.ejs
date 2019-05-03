@@ -38,7 +38,7 @@ sigma.parsers.json(
             graph().dragNodes();
 
             // Remove the entries that belong to the addcontext parameter (we need a graph for that data, that's why it's here)
-            entries().removeAddContext();
+            statements().removeAddContext();
 
             // Select the neighbor nodes when a node is clicked
             sigmaGraph().clickNode();

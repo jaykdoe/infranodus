@@ -62,7 +62,7 @@
                 });
             });
             this.className = 'pure-menu-selected-top';
-            entries().scroll();
+            statements().scroll();
     
             if (graphFactory.existPinnedNodes() == true) {
               graphFactory.initPinnedNodes(graphFactory.getPinnedNodes());
@@ -99,7 +99,7 @@
                   //  result2 += " " +  checkInView($(e),true);
                 });
     
-                entryScroll(ventries);
+                statements().selectScrolledOnGraph(ventries);
     
                 if (!$(this).is(':animated')) {
     

@@ -172,7 +172,7 @@
                     addEntryForm().switchToAdd();
 
                     // Scroll the entries
-                    entries().scroll();
+                    statements().scroll();
 
                     // Remove the hidden timestamp field
                     $('input[name="timestamp"]').val('');
@@ -212,15 +212,9 @@
                                 $('#statement').removeClass('loading');
                                 $('#deletebutton').removeAttr('disabled');
                                 socket.emit('delete message', {entryuid: res.statementid});
-                                $("#warnings").append('<p class="warning">The statement was deleted.</p>');
-                                $("#warnings").slideDown('slow');
+                                statements.showWarning('The statement was deleted.');
                                 $('#cancelbutton').trigger('click');
-                                setTimeout(function() {
-                                    $("#warnings").slideUp('slow');
-                                    $("#warnings").text('');
-                                },2000);
-
-
+                                statements.hideWarning(2000);
                             }
                             else if (res.errormsg) {
                                 alert(res.errormsg);
@@ -389,7 +383,7 @@
                             if (res.entryuid == 'multiple') {
                                 socket.emit('chat message', {postedby: postedby, entryuid: 'multiplesocket', entrytext: res.entrycontent, graph: res.graph});
                                 if (res.successmsg) {
-                                   userMessages().display('Please, reload the page after a few seconds to see the graph.');
+                                   statements().showWarning('Please, reload the page after a few seconds to see the graph.');
                                 }
                                 setTimeout(function() {
                                     location.reload();

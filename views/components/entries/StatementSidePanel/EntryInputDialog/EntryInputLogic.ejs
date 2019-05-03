@@ -41,7 +41,7 @@
         }
         
         function changeEntriesHeight(height) {
-            entries().fillSpace(height);
+            statements().fillSpace(height);
         }
         
         function changeSidePanelHeight(height) {
@@ -132,17 +132,17 @@
           uproll = 50;
         }
         
-        entries().fillSpace(uproll + 100);
+        statements().fillSpace(uproll + 100);
         
         // Scroll down all the entries
         
-        entries().scroll();
+        statements().scroll();
         
         // Do the same with when the window is resized 
         
         $(window).resize(function() {
-            entries().fillSpace(uproll + 100);
-            entries().scroll();
+            statements().fillSpace(uproll + 100);
+            statements().scroll();
         });
         
         // Make texarea automatically resizeable
@@ -189,7 +189,7 @@
             }
         
             // So let's add that entry to the #entries div
-            entries().append(msg.entrytext, msg.entryuid, msg.entryname, msg.postedby, alien, chatbot);
+            statements().append(msg.entrytext, msg.entryuid, msg.entryname, msg.postedby, alien, chatbot);
         
             // Unfocus and reFocus again on the entry field
             addEntryForm().refocus();
@@ -198,19 +198,19 @@
             // One click will filter the nodes / edges of the statement on the graph
             // Doubleclick will open the edit pane
         
-            entries().onClick(entrySelect);
+            statements().onClick(entrySelect);
         
             if (dynamic_watch == 1 && dynamic_graph == 1) {
               $('#watch-link').trigger('click');
               setTimeout(function() {
-                entries().scroll();
+                statements().scroll();
               }, 500);
               setTimeout(function() {
                 $('#watch-link').trigger('click');
               }, 4000);
             }
             else {
-                entries().scroll();
+                statements().scroll();
             }
         
             // Add new nodes and edges — these are all the nodes and edges of the graph, not newly added only
@@ -222,7 +222,7 @@
             graphFactory.addNewNodes(addednodes, addededges, msg.entryuid);
         
             // This is for special cases where the user is on a graph, but they are adding their own stuff to this graph into a new graph, so we only show the entries that he added, not the previous ones
-            entries().removeAddContext();
+            statements().removeAddContext();
         
             // Play MIDI notes
             playNodesMIDI().addition(addednodes, addededges);

@@ -10,11 +10,11 @@
     }
 
     function toggleStatements() {  
-        if (checkEntriesMode().visibility() == 'VISIBLE') {
-            entries().hide();
+        if (statements().areVisible() == 'VISIBLE') {
+            statements().hide();
         }
-        else if (checkEntriesMode().visibility() == 'HIDDEN') {
-            entries().show();
+        else if (statements().areVisible() == 'HIDDEN') {
+            statements().show();
         }
     }
 
@@ -70,7 +70,7 @@
         dynamic_graph = 0;
         //localStorage.setItem('timer',0);
         $('#timer-link').removeClass('timer-link-on');
-        entryScroll('',true);
+        statements().selectScrolledOnGraph('',true);
         if (dynamic_watch == 1) {
           $("#watch-link").trigger('click');
         }
@@ -95,7 +95,7 @@
                 $("#timer-link").trigger('click');
             }
 
-            infiniteEntriesScroll();
+            statements().infiniteScroll();
 
         }
 
@@ -103,7 +103,7 @@
 
             dynamic_watch = 0;
             $('#watch-link').removeClass('watch-link-on');
-            entries().stopAnimation();
+            statements().stopAnimation();
 
         }
     });
