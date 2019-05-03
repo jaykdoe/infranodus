@@ -118,7 +118,7 @@ function filter_graph(pins){
 
                 }
                 else  {
-                    n.color = deselected_nodes_color;
+                    n.color = userFactory.getGraphOption('deselected_nodes_color');
                     n.label = '';
                 }
 
@@ -131,7 +131,7 @@ function filter_graph(pins){
                         e.color = e.originalColor;
                     }
                     else {
-                        e.color = deselected_nodes_color;
+                        e.color = userFactory.getGraphOption('deselected_nodes_color');
                     }
             });
 

@@ -212,14 +212,12 @@ socket.on('chat message', function(msg){
 
     entries().onClick(entrySelect);
 
-    adding_entry = true;
     if (dynamic_watch == 1 && dynamic_graph == 1) {
       $('#watch-link').trigger('click');
       setTimeout(function() {
         entries().scroll();
       }, 500);
       setTimeout(function() {
-        adding_entry = false;
         $('#watch-link').trigger('click');
       }, 4000);
     }

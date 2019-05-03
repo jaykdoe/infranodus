@@ -543,7 +543,7 @@ function addContextTriggers() {
                 }
                 else {
                     // Otherwise (the edge IS in the list for removal), so we color the edge invisible
-                    e.color = deselected_nodes_color;
+                    e.color = userFactory.getGraphOption('deselected_nodes_color');
                 }
 
 
@@ -567,7 +567,7 @@ function addContextTriggers() {
 
                 // The node is not in the list to keep? Hide it!
                 else if (nodesToKeep.indexOf(n.id) < 0)  {
-                    n.color = deselected_nodes_color;
+                    n.color = userFactory.getGraphOption('deselected_nodes_color');
                     n.label = '';
                 }
 

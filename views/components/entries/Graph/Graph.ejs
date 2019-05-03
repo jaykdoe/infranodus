@@ -594,6 +594,8 @@ function graph() {
 
             let addcontext_nodes = [];
 
+            let deselected_nodes_color = userFactory.getGraphOption('deselected_nodes_color');
+
             sigma.instances(0).graph.nodes().forEach(function(n) {
 
                 // Give original color to the node

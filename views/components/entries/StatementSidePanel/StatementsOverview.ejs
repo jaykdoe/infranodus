@@ -30,7 +30,7 @@
         // // Top community nodes
         // console.log(topp_communities);
 
-        filter_statements_summary(graphFactory.getTopBCNodes(4), most_inf_comm_nodes);
+        filter_statements_summary(graphFactory.getTopBCNodes(4), graphFactory.getAllCommunities(null, null, 'auto'));
 
         $('#topnav_items').each(function() {
             $("li", this).each(function(i) {
@@ -103,6 +103,7 @@
         if (dynamic_graph == 1) {
 
           var ventries = [];
+          let scroll_signal;
 
             $('#entries').children(".entry").each(function(){
                 var vresult;

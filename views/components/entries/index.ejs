@@ -43,29 +43,6 @@ var collaborate_html = '';
 var collaborate_storage = JSON.parse(localStorage.getItem("collaborate"));
 
 
-var color_context = '#666';
-
-
-
-
-
-
-// These are for Summary / Insight functionality in StatementView and StatementEntry fields
-
-
-var most_inf_comm_nodes = {};
-
-
-var adding_entry = false;
-
-
-var scroll_signal;
-
-
-// Bias index / Diversity / Polysingularity Score. Used in StatementEntry and StatementOverview and the Graph
-
-var deselected_nodes_color = '#ddd';
-
 
 // Change the theme
 
@@ -76,10 +53,10 @@ function toggleTheme() {
     else {
         document.documentElement.setAttribute('theme', 'dark');
         if (userFactory.getGraphPalette() == 'contrast') {
-            deselected_nodes_color = '#555';
+            userFactory.setGraphOption(deselected_nodes_color,'#555');
         }
         else {
-            deselected_nodes_color = '#444';
+            userFactory.setGraphOption(deselected_nodes_color,'#444');
         }
         userFactory.setGraphOption('default_label_color','#ffffff');
     }
@@ -337,20 +314,20 @@ function shannon(data) {
 }
 
 
-    // Download PNG (the graph isn't modified)
-    function downloadPNG() {
-      var canvaspng = document.querySelector('.sigma-scene');
-      let current_context = userFactory.getCurrentContext();
+// Download PNG (the graph isn't modified)
+function downloadPNG() {
+    var canvaspng = document.querySelector('.sigma-scene');
+    let current_context = userFactory.getCurrentContext();
 
-      document.querySelector('#downloadpng').href = canvaspng.toDataURL();
-      document.querySelector('#downloadpng').download = userFactory.getCurrentUser() + '_' + current_context + '.png';
+    document.querySelector('#downloadpng').href = canvaspng.toDataURL();
+    document.querySelector('#downloadpng').download = userFactory.getCurrentUser() + '_' + current_context + '.png';
 
-      document.querySelector('#downloadpng').addEventListener('click', function(ev) {
-        document.querySelector('#downloadpng').href = canvaspng.toDataURL();
-        document.querySelector('#downloadpng').download = userFactory.getCurrentUser() + '_' + current_context + '.png';
-      }, false);
+    document.querySelector('#downloadpng').addEventListener('click', function(ev) {
+    document.querySelector('#downloadpng').href = canvaspng.toDataURL();
+    document.querySelector('#downloadpng').download = userFactory.getCurrentUser() + '_' + current_context + '.png';
+    }, false);
 
-    }
+}
 
 // Initiate the graph object
 var graphFactory = new GraphFactory();
@@ -490,8 +467,18 @@ function GraphFactory(){
                     
                 }
                 
-                this.getAllCommunities = function(number, top_nodes) {
+                this.getAllCommunities = function(number, top_nodes, setting) {
 
+                    if (!top_nodes && setting) {
+                        top_nodes = 3;
+                    }
+                    if (!number && setting) {
+                        number = 4;                    
+                        if (all_communities.length < 4) {
+                            number = all_communities.length;
+                        }
+                    }
+                    
                     let proc_communities = [];
 
                     for (let c in all_communities) {
