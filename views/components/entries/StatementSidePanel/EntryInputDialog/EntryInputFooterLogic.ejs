@@ -1,14 +1,14 @@
 <script>
-    function privacyLinkButton() {
-        return {
-                hide: function(){
-                    $('#privacy-link').hide();
-                
-                },
-                show: function () {
-                    $('#privacy-link').show();
+        function privacyLinkButton() {
+            return {
+                    hide: function(){
+                        $('#privacy-link').hide();
+                    
+                    },
+                    show: function () {
+                        $('#privacy-link').show();
+                    }
                 }
-            }
         }
         
         function deleteContextButton() {
@@ -53,14 +53,14 @@
             }
         }
         
-        
+    
+        var graph_share_url = userFactory.getHostSite() + '/' + userFactory.getCurrentUser();
+
         if (userFactory.getGraphOption('abstract') == 'true') {
                     graph_share_url += '&abstract=true&hide_always=1&';
         }
         
-        
-        var graph_share_url = userFactory.getHostSite() + '/' + userFactory.getCurrentUser();
-        
+            
         if (userFactory.getCurrentContext()) {
             graph_share_url = graph_share_url + "/" + userFactory.getCurrentContext() + "?";
         }

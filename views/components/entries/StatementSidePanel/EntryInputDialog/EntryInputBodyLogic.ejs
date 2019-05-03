@@ -1,47 +1,43 @@
 <script>
 
 
-    function AddEntryFormFactory() {
+    const addEntryFormFactory = (() => {
         
-        let entryFormState = 'add';
+        function AddEntryFormFactory() {
+        
+            let entryFormState = 'add';
 
-        // Used to populate entry textfield
-        let current_context_field = [];    
+            // Used to populate entry textfield
+            let current_context_field = [];    
 
-        this.setToEdit = function () {
-            entryFormState = 'edit';
+            this.setToEdit = function () {
+                entryFormState = 'edit';
+            }
+            this.setToAdd = function () {
+                entryFormState = 'add';
+            }
+            this.getStatus = function() {
+                return entryFormState;
+            }
+
+            this.setCurrentContexts = function(contexts) {
+                current_context_field = contexts;
+            }
+
+            this.getCurrentContexts = function() {
+                return current_context_field;
+            }
+
+            this.addToCurrentContexts = function(context) {
+                current_context_field.push(context);
+            }
         }
-        this.setToAdd = function () {
-            entryFormState = 'add';
-        }
-        this.getStatus = function() {
-            return entryFormState;
-        }
 
-        this.setCurrentContexts = function(contexts) {
-            current_context_field = contexts;
-        }
+        return new AddEntryFormFactory();
 
-        this.getCurrentContexts = function() {
-            return current_context_field;
-        }
-
-        this.addToCurrentContexts = function(context) {
-            current_context_field.push(context);
-        }
-    }
-
-    let addEntryFormFactory = new AddEntryFormFactory();
-
-    let mute = getUrlVars()["mute"];
+    })();
 
 
-    // We will set a user for posting. If the posting user does not equal the user who's watching the graph, we force-add the statement into theirs (provided they collaborate)
-    let postedby = '';
-
-    <% if (receivername) { %>
-    postedby = '<%= receivername %>';
-    <% } %>
     
     searchForm().onSubmit(submitSearchForm);
 
@@ -51,24 +47,6 @@
 
     addEntryForm().onSubmit(submitEditForm);
 
-
-
-    function submitButton() {
-        return {
-            disable: function() {
-                $('#submitbutton').attr('disabled', 'disabled');
-            },
-            enable: function() {
-                $('#submitbutton').removeAttr('disabled');
-            },
-            show: function() {
-                $('#submitbutton').show();
-            },
-            hide: function() {
-                $('#submitbutton').hide();
-            }
-        }
-    }
 
     function searchForm() {
         return {
@@ -376,7 +354,7 @@
                             addEntryForm().enable();
                             submitButton().enable();
 
-                            var postedby = userFactory.getLoggedInUser();
+                            let postedby = userFactory.getLoggedInUser();
                         
                             // This below if a few statements were posted
                             // TODO as we can now get all the s.uid back as an array this could be rewritten so no need for the condition after
@@ -560,7 +538,7 @@
         voiceInputPanel().update();
 
         // is urlvars mute off? in this case we submit this entry
-        if (!mute) {
+        if (!userFactory.getViewOption('mute') || userFactory.getViewOption('mute') == '') {
             userFactory.updateSelfPosted('true');
             addEntryForm().post();
         }
@@ -570,6 +548,7 @@
             addEntryForm().enable();
             submitButton().enable();
             addEntryForm().clear();
+            let postedby = userFactory.getLoggedInUser();
             socket.emit('chat message', {mute: 1, postedby: postedby, entryuid: '', entrytext: $('#statement').val(), graph: '' });
         }
 
@@ -577,25 +556,28 @@
         
     }
 
-
-    // Textarea select conversion to hashtags
-
-    // For now it's disabled, but will be enabled for bulk statement correction later
-
-    var getSelected = function(){
-        var t = '';
-        if(window.getSelection) {
-            t = window.getSelection();
-        } else if(document.getSelection) {
-            t = document.getSelection();
-        } else if(document.selection) {
-            t = document.selection.createRange().text;
+    function submitButton() {
+        return {
+            disable: function() {
+                $('#submitbutton').attr('disabled', 'disabled');
+            },
+            enable: function() {
+                $('#submitbutton').removeAttr('disabled');
+            },
+            show: function() {
+                $('#submitbutton').show();
+            },
+            hide: function() {
+                $('#submitbutton').hide();
+            }
         }
-        return t;
     }
 
 
+    // Entry edit form conversion to hashtags
+
     $("#statement").select(function(eventObject) {
+
         var selectedText = getSelected().toString();
 
         var statementReplace = $("#statement").val();
@@ -624,7 +606,7 @@
     }
 
 
-    // What happens when we add a single node from the second editor on top
+    // What happens when we add a single node from the short find editor
 
     $("#addnode").on('click', function(e) {
 
@@ -644,7 +626,7 @@
 
     });
 
-    // What if we search for a node in the graph using the form 
+    // What if we search for a node in the graph using the find editor 
 
     $("#searchnode").on('click', function(e) {
 

@@ -310,6 +310,7 @@
     userFactory.setViewOption('show_analytics', getUrlVars()["analytics"]);
     userFactory.setViewOption('hide_when_small', getUrlVars()["hide_when_small"]);
     userFactory.setViewOption('urlPath', location.pathname);
+    userFactory.setViewOption('mute', getUrlVars()["mute"]);
 
     if (getUrlVars()["link_hashtags"]) userFactory.setViewOption('link_hashtags', getUrlVars()["link_hashtags"]);
 
