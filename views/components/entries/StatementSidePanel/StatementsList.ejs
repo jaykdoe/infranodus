@@ -430,7 +430,7 @@ function entries() {
 
           
         },
-        updateExplanation: function(filter_origin) {
+        updateExplanation: function(filter_origin, most_inf_nodes_str) {
           
           let polysingularity_score = graphFactory.getStats('PolysingularityScore');
 
@@ -766,9 +766,8 @@ function filter_statements_summary(top_words, top_community_words, filter_origin
                 entries_keywords[entries_shown[s].id] = entries_shown[s].origin;
               }
 
-              var most_inf_nodes_str = '';
-              console.log('Most influential nodes:')
-              console.log(most_inf_nodes);
+              let most_inf_nodes = graphFactory.getTopBCNodes(4);
+              let most_inf_nodes_str = '';
               for (var l = 0; l < most_inf_nodes.length; l++) {
                 most_inf_nodes_str += most_inf_nodes[l].label;
                 if (l < most_inf_nodes.length - 1) {
@@ -778,7 +777,7 @@ function filter_statements_summary(top_words, top_community_words, filter_origin
 
               // Update explanation above the entries
               
-              entries().updateExplanation(filter_origin);
+              entries().updateExplanation(filter_origin, most_inf_nodes_str);
               
               // Hide everything
 

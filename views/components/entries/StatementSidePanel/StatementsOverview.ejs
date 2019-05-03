@@ -30,7 +30,7 @@
         // // Top community nodes
         // console.log(topp_communities);
 
-        filter_statements_summary(most_inf_nodes, most_inf_comm_nodes);
+        filter_statements_summary(graphFactory.getTopBCNodes(4), most_inf_comm_nodes);
 
         $('#topnav_items').each(function() {
             $("li", this).each(function(i) {
@@ -55,7 +55,7 @@
           insight_nodes.push(insight_clusters[el]);
         }
 
-        filter_statements_summary(most_inf_nodes, insight_nodes, 'insight');
+        filter_statements_summary(graphFactory.getTopBCNodes(4), insight_nodes, 'insight');
 
         $('#topnav_items').each(function() {
             $("li", this).each(function(i) {
