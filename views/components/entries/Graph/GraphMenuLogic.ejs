@@ -103,7 +103,7 @@ function abstractLayoutButton() {
              $('#abstract-layout').on('click', onClick)
         },
         onLoad: function() {
-            if (abstract && abstract != 'no') {
+            if (userFactory.getGraphOption('abstract') && userFactory.getGraphOption('abstract') != 'no') {
                 $('#abstract-layout').addClass('abstract-on');  
             }
         }

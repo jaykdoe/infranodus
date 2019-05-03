@@ -22,9 +22,7 @@ if (getUrlVars()["most_influential"] == 'bc' || getUrlVars()["most_influential"]
 
 // Important switch that shows whether we're in the "interpretation" mode where we build one graph on top of another
 if (getUrlVars()["interpret"]) userFactory.setInterpret(getUrlVars()["interpret"]);
-
-// Abstract visualization — 
-var abstract;
+if (getUrlVars()["abstract"]) userFactory.setGraphOption('abstract',getUrlVars()["abstract"]);
 
 // Socket.IO chat collaborate
 
@@ -47,7 +45,6 @@ var collaborate_storage = JSON.parse(localStorage.getItem("collaborate"));
 
 var color_context = '#666';
 
-var forcedatlas_running = false;
 
 
 
@@ -85,7 +82,7 @@ function toggleTheme() {
         else {
             deselected_nodes_color = '#444';
         }
-        userFactory.setGraphLabelColor('#ffffff');
+        userFactory.setGraphOption('default_label_color','#ffffff');
     }
 }
 

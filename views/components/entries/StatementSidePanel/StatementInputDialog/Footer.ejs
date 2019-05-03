@@ -89,8 +89,8 @@ function importLinkButton() {
 }
 
 
-if (abstract == 'yes') {
-            graph_share_url += '&abstract=yes&hide_always=1&';
+if (userFactory.getGraphOption('abstract') == 'true') {
+            graph_share_url += '&abstract=true&hide_always=1&';
 }
 
 

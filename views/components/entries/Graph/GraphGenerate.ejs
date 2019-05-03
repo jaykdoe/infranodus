@@ -13,12 +13,12 @@ sigma.parsers.json(
                 type: 'canvas'
             },
             settings: {
-                minNodeSize: minnodesize,
-                maxNodeSize: maxnodesize,
+                minNodeSize: userFactory.getGraphOption('minnodesize'),
+                maxNodeSize: userFactory.getGraphOption('maxnodesize'),
                 minEdgeSize: 0.5,
                 maxEdgeSize: 2,
-                labelThreshold: userFactory.getLabelThreshold(),
-                defaultLabelColor: userFactory.getGraphLabelColor(),
+                labelThreshold: userFactory.getGraphOption('in_label_threshold'),
+                defaultLabelColor: userFactory.getGraphOption('default_label_color'),
                 adjustSizes: true,
                 
             }

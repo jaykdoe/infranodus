@@ -33,6 +33,11 @@
         let interpret = null;
 
         let viewOptions = {};
+        let graphOptions = { 
+            minnodesize: 5,
+            maxnodesize: 16
+        }
+
 
         this.getLoggedInUser = function() {
             return loggedInUser;
@@ -141,13 +146,6 @@
             return inlanguage;
         }
 
-        this.setLabelThreshold = function(num) {
-            in_label_threshold = num;
-        }
-        this.getLabelThreshold = function() {
-            return in_label_threshold;
-        }
-
         this.setMidi = function(flag) {
             midi = flag;
         }
@@ -162,12 +160,6 @@
             return background;
         }
 
-        this.setGraphLabelColor = function(color) {
-            default_label_color = color;
-        }
-        this.getGraphLabelColor = function() {
-            return default_label_color;
-        }
 
         this.setViewOption = function(option, value) {
             viewOptions[option] = value;
@@ -189,6 +181,22 @@
                 return false;
             }
         }
+
+        this.setGraphOption = function(option,value) {
+            if (option == 'abstract' && value != 'no') {
+                graphOptions['abstract'] = 'true';
+                graphOptions['minnodesize'] = 1;
+                graphOptions['maxnodesize'] = 1;
+                graphOptions['in_label_threshold'] = 20;
+            }
+            else {
+                graphOptions[option] = value;
+            }
+        }
+        this.getGraphOption = function(option) {
+            return graphOptions[option];
+        }
+
     }
 
     // Are we logged in?
@@ -251,9 +259,12 @@
     // Define the settings of the logged in user / not logged in user 
     <% if (locals.user && !locals.vieweduser) { %>
     userFactory.setInLanguage('<%= user.inlanguage %>');
-    <% if (locals.user.label_threshold) { %>
-    userFactory.setLabelThreshold('<%= user.label_threshold %>');
-    <% } %>
+        <% if (locals.user.abstract != undefined) { %>
+        userFactory.setGraphOption('abstract','<%=locals.user.abstract%>');
+        <% } %>
+        <% if (locals.user.label_threshold) { %>
+        userFactory.setGraphOption('in_label_threshold','<%= user.label_threshold %>');
+        <% } %>
         <% if (locals.user.midi) { %>
         userFactory.setMidi('<%= user.midi %>');
         <% } %>
@@ -269,8 +280,11 @@
         <% } %>
     <% } else { %>
         <% if (locals.vieweduser) { %>
+            <% if (vieweduser.abstract != undefined) { %>
+            userFactory.setGraphOption('abstract','<%=vieweduser.abstract%>');
+            <% } %>    
             userFactory.setMostInfluential('<%= vieweduser.topnodes %>');
-            userFactory.setLabelThreshold('<%= vieweduser.label_threshold %>');
+            userFactory.setGraphOption('in_label_threshold','<%= vieweduser.label_threshold %>');
             userFactory.setGraphPalette('<%= vieweduser.palette %>');
             userFactory.setBackground('<%= vieweduser.background %>');
         <% } %>
