@@ -8,199 +8,204 @@
 
     // Initiate Global User Settings
 
-    let userFactory = new UserFactory();
+    const userFactory = (() => {
 
-    function UserFactory(){
+        function UserFactory(){
 
-        let loggedInUser = null;
-        let watchedUser = null;
-        let currentUser = '';
-        let currentContext = '';
-        let viewType = 'internal';
-        let selfPosted = null;
-        let forwardTo = 'https://www.google.com/search?q=';
-        let hostSite = '';
-        let addContext = '';
-        let jsonPath = '';
-        let maxNodes = '';
-        let most_influential = 'bc';
-        let graphPalette = '';
-        let walkthroughtype = '';
-        let inlanguage = 'auto';
-        let in_label_threshold = 8;
-        let midi = null;
-        let background = null;
-        let default_label_color = '#000000';
-        let interpret = null;
+            let loggedInUser = null;
+            let watchedUser = null;
+            let currentUser = '';
+            let currentContext = '';
+            let viewType = 'internal';
+            let selfPosted = null;
+            let forwardTo = 'https://www.google.com/search?q=';
+            let hostSite = '';
+            let addContext = '';
+            let jsonPath = '';
+            let maxNodes = '';
+            let most_influential = 'bc';
+            let graphPalette = '';
+            let walkthroughtype = '';
+            let inlanguage = 'auto';
+            let in_label_threshold = 8;
+            let midi = null;
+            let background = null;
+            let default_label_color = '#000000';
+            let interpret = null;
 
-        let viewOptions = {};
-        let graphOptions = { 
-            minnodesize: 5,
-            maxnodesize: 16,
-            deselected_nodes_color: '#ddd',
-            color_context: '#666'
-        }
-
-
-        this.getLoggedInUser = function() {
-            return loggedInUser;
-        }    
-        this.setLoggedInUser = function(name) {
-            loggedInUser = name;
-        }
-
-        this.getCurrentUser = function() {
-            return currentUser;
-        }
-        this.setCurrentUser = function(name) {
-            currentUser = name;
-        }
-
-        this.getCurrentContext = function() {
-            return currentContext;
-        }
-        this.setCurrentContext = function(name) {
-            currentContext = name;
-        }
-
-        this.getWatchedUser = function() {
-            return watchedUser;
-        }  
-        this.setWatchedUser = function(name) {
-            watchedUser = name;
-        }
-
-        this.setViewType = function(type) {
-            viewType = type;
-            return true;
-        }
-        this.getViewType = function() {
-            return viewType;
-        }
-
-        this.getSelfPosted = function() {
-            return selfPosted;
-        }
-        this.updateSelfPosted = function(value) {
-            selfPosted = value;
-            return true;
-        }
-
-        this.setForwardTo = function(url) {
-            forwardTo = url;
-        }          
-        this.getForwardTo = function() {
-            return forwardTo;
-        }  
-
-        this.setHostSite = function(url) {
-            hostSite = url;
-        }          
-        this.getHostSite = function() {
-            return hostSite;
-        }  
-
-        this.setAddContext = function(name) {
-            addContext = name;
-        }          
-        this.getAddContext = function() {
-            return addContext;
-        }  
-
-        this.setJsonPath = function(url) {
-            jsonPath = url;
-        }          
-        this.getJsonPath = function() {
-            return jsonPath;
-        }  
-
-        this.setMaxNodes = function(nodes) {
-            maxNodes = nodes;
-        }          
-        this.getMaxNodes = function() {
-            return maxNodes;
-        }  
-
-        this.setMostInfluential = function(flag) {
-            most_influential = flag;
-        }
-        this.getMostInfluential = function() {
-            return most_influential;
-        }
-
-        this.setGraphPalette = function(flag) {
-            graphPalette = flag;
-        }
-        this.getGraphPalette = function() {
-            return graphPalette;
-        }
-
-        this.setWalkthrough = function(flag) {
-            walkthroughtype = flag;
-        }
-        this.getWalkthrough = function() {
-            return walkthroughtype;
-        }
-
-        this.setInLanguage = function(lang) {
-            inlanguage = lang;
-        }
-        this.getInLanguage = function() {
-            return inlanguage;
-        }
-
-        this.setMidi = function(flag) {
-            midi = flag;
-        }
-        this.getMidi = function() {
-            return midi;
-        }
-
-        this.setBackground = function(type) {
-            background = type;
-        }
-        this.getBackground = function() {
-            return background;
-        }
-
-
-        this.setViewOption = function(option, value) {
-            viewOptions[option] = value;
-        }
-        this.getViewOption = function(option) {
-            return viewOptions[option];
-        }
-
-        this.setInterpret = function(value) {
-            if (value && value.length > 0) {
-                interpret = value;
+            let viewOptions = {};
+            let graphOptions = { 
+                minnodesize: 5,
+                maxnodesize: 16,
+                deselected_nodes_color: '#ddd',
+                color_context: '#666'
             }
-        }
-        this.isInterpretOn = function() {
-            if (interpret) {
+
+
+            this.getLoggedInUser = function() {
+                return loggedInUser;
+            }    
+            this.setLoggedInUser = function(name) {
+                loggedInUser = name;
+            }
+
+            this.getCurrentUser = function() {
+                return currentUser;
+            }
+            this.setCurrentUser = function(name) {
+                currentUser = name;
+            }
+
+            this.getCurrentContext = function() {
+                return currentContext;
+            }
+            this.setCurrentContext = function(name) {
+                currentContext = name;
+            }
+
+            this.getWatchedUser = function() {
+                return watchedUser;
+            }  
+            this.setWatchedUser = function(name) {
+                watchedUser = name;
+            }
+
+            this.setViewType = function(type) {
+                viewType = type;
                 return true;
             }
-            else {
-                return false;
+            this.getViewType = function() {
+                return viewType;
             }
+
+            this.getSelfPosted = function() {
+                return selfPosted;
+            }
+            this.updateSelfPosted = function(value) {
+                selfPosted = value;
+                return true;
+            }
+
+            this.setForwardTo = function(url) {
+                forwardTo = url;
+            }          
+            this.getForwardTo = function() {
+                return forwardTo;
+            }  
+
+            this.setHostSite = function(url) {
+                hostSite = url;
+            }          
+            this.getHostSite = function() {
+                return hostSite;
+            }  
+
+            this.setAddContext = function(name) {
+                addContext = name;
+            }          
+            this.getAddContext = function() {
+                return addContext;
+            }  
+
+            this.setJsonPath = function(url) {
+                jsonPath = url;
+            }          
+            this.getJsonPath = function() {
+                return jsonPath;
+            }  
+
+            this.setMaxNodes = function(nodes) {
+                maxNodes = nodes;
+            }          
+            this.getMaxNodes = function() {
+                return maxNodes;
+            }  
+
+            this.setMostInfluential = function(flag) {
+                most_influential = flag;
+            }
+            this.getMostInfluential = function() {
+                return most_influential;
+            }
+
+            this.setGraphPalette = function(flag) {
+                graphPalette = flag;
+            }
+            this.getGraphPalette = function() {
+                return graphPalette;
+            }
+
+            this.setWalkthrough = function(flag) {
+                walkthroughtype = flag;
+            }
+            this.getWalkthrough = function() {
+                return walkthroughtype;
+            }
+
+            this.setInLanguage = function(lang) {
+                inlanguage = lang;
+            }
+            this.getInLanguage = function() {
+                return inlanguage;
+            }
+
+            this.setMidi = function(flag) {
+                midi = flag;
+            }
+            this.getMidi = function() {
+                return midi;
+            }
+
+            this.setBackground = function(type) {
+                background = type;
+            }
+            this.getBackground = function() {
+                return background;
+            }
+
+
+            this.setViewOption = function(option, value) {
+                viewOptions[option] = value;
+            }
+            this.getViewOption = function(option) {
+                return viewOptions[option];
+            }
+
+            this.setInterpret = function(value) {
+                if (value && value.length > 0) {
+                    interpret = value;
+                }
+            }
+            this.isInterpretOn = function() {
+                if (interpret) {
+                    return true;
+                }
+                else {
+                    return false;
+                }
+            }
+
+            this.setGraphOption = function(option,value) {
+                if (option == 'abstract' && value != 'no') {
+                    graphOptions['abstract'] = 'true';
+                    graphOptions['minnodesize'] = 1;
+                    graphOptions['maxnodesize'] = 1;
+                    graphOptions['in_label_threshold'] = 20;
+                }
+                else {
+                    graphOptions[option] = value;
+                }
+            }
+            this.getGraphOption = function(option) {
+                return graphOptions[option];
+            }
+
         }
 
-        this.setGraphOption = function(option,value) {
-            if (option == 'abstract' && value != 'no') {
-                graphOptions['abstract'] = 'true';
-                graphOptions['minnodesize'] = 1;
-                graphOptions['maxnodesize'] = 1;
-                graphOptions['in_label_threshold'] = 20;
-            }
-            else {
-                graphOptions[option] = value;
-            }
-        }
-        this.getGraphOption = function(option) {
-            return graphOptions[option];
-        }
+        return new UserFactory();
 
-    }
+    })();
+
 
     // Are we logged in?
     <% if (receivername) { %>

@@ -1,41 +1,50 @@
 <script>
 
-// Contains Socket.IO activation and graphFactory global graph settings
+/* 
+Contains Socket.IO activation and graphFactory global graph settings.
+globalFactory has to be loaded above all else as it's referenced to from other functions.
+*/
 
 // Initialize Socket.IO for websockets (using them for collabs but also to listen to events within the app)
-var socket = io();
+const socket = io();
 
-// This matrix relates each URL path to each unique chat that can happen within that room
+// Collaboration options
+const collabFactory = (() => {
 
-function CollabFactory() {
-    let collaborate_matrix = {};
-    let collaborate_room = userFactory.getViewOption('urlPath') + '/';
-    let collaborate_id = '';
+    function CollabFactory() {
+        let collaborate_matrix = {};
+        let collaborate_room = userFactory.getViewOption('urlPath') + '/';
+        let collaborate_id = '';
 
-    this.setCollabMatrix = function(room, collab_id) {
-        collaborate_matrix[room] = collab_id;
+        this.setCollabMatrix = function(room, collab_id) {
+            collaborate_matrix[room] = collab_id;
+        }
+        this.getCollabMatrixForRoom = function(room) {
+            return collaborate_matrix[room];
+        }
+        this.getCollabMatrix = function() {
+            return collaborate_matrix;
+        }
+
+        this.getCollabRoom = function() {
+            return collaborate_room;
+        }
+
+        this.getCollabId = function() {
+            return collaborate_id;
+        }
+        this.setCollabId = function(id) {
+            collaborate_id = id;
+        }
+
     }
-    this.getCollabMatrixForRoom = function(room) {
-        return collaborate_matrix[room];
-    }
-    this.getCollabMatrix = function() {
-        return collaborate_matrix;
-    }
 
-    this.getCollabRoom = function() {
-        return collaborate_room;
-    }
+    return new CollabFactory();
 
-    this.getCollabId = function() {
-        return collaborate_id;
-    }
-    this.setCollabId = function(id) {
-        collaborate_id = id;
-    }
+})();
 
-}
 
-let collabFactory = new CollabFactory();
+// Initiate the collaboration settings
 
 // On connection to server get the id of the current chat "room", which is actually the folder/URL of the current user
 
@@ -88,14 +97,11 @@ socket.on('tooMany', function(data){
 });
 
 
-
 // Initiate the graph object
-var graphFactory = new GraphFactory();
+const graphFactory = (() => {
 
-
-// Graph parameters object storage and functions
-
-function GraphFactory(){
+    // Graph parameters object storage and functions
+    function GraphFactory(){
                 
                 // Variables that contain all the current nodes (for easier search)
                 let nodeNames = [];
@@ -967,5 +973,11 @@ function GraphFactory(){
 
         
         }
+
+        return new GraphFactory();
+
+})(); 
+
+
 
 </script>
