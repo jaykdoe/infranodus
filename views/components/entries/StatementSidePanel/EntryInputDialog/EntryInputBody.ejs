@@ -1,0 +1,33 @@
+ 
+<div id="edit-panel">
+    <form action='/post' name='submitform' id="submitform" method='post' class='pure-form'>
+
+            <textarea columns="40" rows="4" name='entry[body]' id="statement" placeholder='type in some words or #hashtags to see how they connect'><% if (url) { %><%= urltitle %> <%= url %><% } %></textarea>
+            <div id="addToContextsLabel">in context:</div>
+            <ul id="addToContexts"></ul>
+            <input type="hidden" id="addedContexts" name="addedContexts">
+            <input type="hidden" id="context" name="context" value="<%= context %>">
+            <input type="hidden" id="selectedContexts" name="selectedContexts" value="">
+            <input type="hidden" id="statementid" name="statementid" value="">
+            <input type="hidden" name="timestamp" value="">
+            &nbsp;<br>
+            <input type='submit' id="submitbutton" name="btnSubmit" value="save" class="pure-button pure-button-primary">
+
+    </form>
+</div>
+
+<div id="search-panel">
+    <form class="pure-form" id="searchform">
+        <input type="text" id="search" size="14" maxlength="50" class="pure-input" placeholder="search...">
+           
+           
+        
+        <input type='hidden' name="submit" value=">" class="pure-button pure-button-primary">
+    </form>
+        <a href="javascript:" id="searchnode" class="tooltip" title="find a node in the graph"></a>
+
+    <% if (!perceivername) { %>
+        <a href="javascript:" id="addnode" class="tooltip editorpane" title="add a node in the graph"></a>
+      <% } %>
+ 
+</div>

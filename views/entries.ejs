@@ -59,11 +59,18 @@
 
 <%- include('components/entries/StatementSidePanel/StatementsOverviewLogic'); %>    
 <%- include('components/entries/StatementSidePanel/StatementsListLogic'); %> 
-<%- include('components/entries/StatementSidePanel/StatementInputDialog/EntryInputLogic'); %>    
+
+<%- include('components/entries/StatementSidePanel/EntryInputDialog/EntryInputHeaderLogic',
+    {perceivername, addcontext, context}); %>
+<%- include('components/entries/StatementSidePanel/EntryInputDialog/EntryInputFooterLogic',
+    {perceivername, context, contextpublic}); %>
+<%- include('components/entries/StatementSidePanel/EntryInputDialog/EntryInputBodyLogic',
+    {perceivername, url, urltitle}); %> 
+<%- include('components/entries/StatementSidePanel/EntryInputDialog/EntryInputLogic'); %>   
+
 <%- include('components/entries/StatementSidePanel/StatementsPanelLogic',
     {entries, perceivername, addcontext, context, contextpublic, url, urltitle}); %> 
    
-
 <%- include('components/entries/Graph/Graph') %>
 <%- include('components/entries/StatementMenuLogic'); %>
 <%- include('components/entries/Analytics/PolysingularityLogic') %>
