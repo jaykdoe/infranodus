@@ -64,14 +64,18 @@
 
 <%- include('components/entries/StatementSidePanel/EntryInputDialog/EntryInputBodyLogic'); %> 
 <%- include('components/entries/StatementSidePanel/EntryInputDialog/EntryInputHeaderLogic'); %>
-<%- include('components/entries/StatementSidePanel/EntryInputDialog/EntryInputFooterLogic',
-    {perceivername, context, contextpublic}); %>
-
+<%- include('components/entries/StatementSidePanel/EntryInputDialog/EntryInputFooterLogic'); %>
 <%- include('components/entries/StatementSidePanel/EntryInputDialog/EntryInputLogic'); %>   
-
- 
    
+<%- include('components/entries/Analytics/GraphRank') %>
+<%- include('components/entries/Analytics/GraphModularity') %>
+
 <%- include('components/entries/Graph/Graph') %>
+<%- include('components/entries/Graph/GraphGenerate') %>
+<%- include('components/entries/Graph/GraphUpdate') %>
+
+<%- include('components/entries/Analytics/AnalyticsPaneLogic') %>
+
 <%- include('components/entries/StatementMenuLogic'); %>
 <%- include('components/entries/Analytics/PolysingularityLogic') %>
 <%- include('components/entries/Graph/GraphTagsLogic') %>

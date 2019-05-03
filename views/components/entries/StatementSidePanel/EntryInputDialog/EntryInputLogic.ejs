@@ -1,10 +1,32 @@
 <script>
+        
+        // Instance of the add entry panel 
 
-        var currentStatementSidePanelMode = "EDIT";
+        const addEntryPanelFactory = (() => {   
+            function AddEntryPanelFactory() {
+                let currentAddEntryPanelMode = "EDIT";
+
+                this.setMode = function(mode) {
+                    currentAddEntryPanelMode = mode;
+                    updateStatementSidePanel();
+                }
+                this.getMode = function() {
+                    return currentAddEntryPanelMode;
+                }
+
+                this.init = function() {
+                    this.setMode(currentAddEntryPanelMode);
+                }
+
+            }
+            return new AddEntryPanelFactory();
+        })();
+
+        addEntryPanelFactory.init();
         
         function updateStatementSidePanel() {
-            if(currentStatementSidePanelMode === "EDIT") switchToEdit()
-            if(currentStatementSidePanelMode === "SEARCH") switchToSearch()
+            if(addEntryPanelFactory.getMode() === "EDIT") switchToEdit()
+            if(addEntryPanelFactory.getMode() === "SEARCH") switchToSearch()
            
         }
         
@@ -67,8 +89,7 @@
         }
         
         function changeModeTo(mode) {
-            currentStatementSidePanelMode = mode
-            updateStatementSidePanel()
+            addEntryPanelFactory.setMode(mode);
         }
         
         function sendToImport() {
@@ -83,13 +104,12 @@
         function changeModeToEdit() {changeModeTo('EDIT')}
         function changeModeToInterpret() {changeModeTo('INTERPRET')}
         function togglePanel() {
-            if (currentStatementSidePanelMode === 'SEARCH') {
-                currentStatementSidePanelMode = 'EDIT'
+            if (addEntryPanelFactory.getMode() === 'SEARCH') {
+                addEntryPanelFactory.setMode('EDIT');
             }
-            else if (currentStatementSidePanelMode === 'EDIT') {
-                currentStatementSidePanelMode = 'SEARCH';
+            else if (addEntryPanelFactory.getMode() === 'EDIT') {
+                addEntryPanelFactory.setMode('SEARCH');
             }
-            changeModeTo(currentStatementSidePanelMode);
         }
         
         findsButton().onClick(changeModeToSearch);
@@ -119,10 +139,9 @@
         // Select the default view for entrycontrol
         
         if (userFactory.getViewType() == 'external' || localStorage.getItem('entrypanel') == 'search') {    
-            currentStatementSidePanelMode = "SEARCH"
+            addEntryPanelFactory.setMode("SEARCH");
         }
         
-        changeModeTo(currentStatementSidePanelMode);
         
         // OnLoad get the right height for the entries elements — this depends on the form so it's here
         
