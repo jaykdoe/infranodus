@@ -41,12 +41,22 @@
                 color_context: '#666'
             }
 
+            let contextPublic = false;
+
 
             this.getLoggedInUser = function() {
                 return loggedInUser;
             }    
             this.setLoggedInUser = function(name) {
                 loggedInUser = name;
+            }
+            this.isLoggedIn = function() {
+                if (loggedInUser && loggedInUser != '') {
+                    return true;
+                }
+                else {
+                    return false;
+                }
             }
 
             this.getCurrentUser = function() {
@@ -61,6 +71,14 @@
             }
             this.setCurrentContext = function(name) {
                 currentContext = name;
+            }
+            this.isInContext = function() {
+                if (currentContext && currentContext != '') {
+                    return true;
+                }
+                else {
+                    return false;
+                }
             }
 
             this.getWatchedUser = function() {
@@ -200,6 +218,13 @@
                 return graphOptions[option];
             }
 
+            this.setContextPublic = function(mode) {
+                contextPublic = mode;
+            }
+            this.isContextPublic = function() {
+                return contextPublic;
+            }
+
         }
 
         return new UserFactory();
@@ -301,6 +326,11 @@
     <% if (onlygraph == '1' || onlygraph == 'graph') { %>
             userFactory.setViewOption('graphOnly', true);
     <% } %>
+
+    <% if (contextpublic && context) { %>
+            userFactory.setContextPublic(true);
+    <% } %>    
+        
     
     
     // Settings for the general interface view (used for display/embed)

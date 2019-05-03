@@ -38,12 +38,44 @@ function GlobalSearch() {
 
 let globalSearch = new GlobalSearch();
 
+
+function globalSearchForm() {
+  return {
+      submit: function() {
+
+        var squery = '';
+      
+        let pinnedNodes = [];
+    
+        if ($('#globalsearchinput').val().length > 0) {
+
+          pinnedNodes = graphFactory.getPinnedNodes();
+
+          // Let's formulate the query
+          for (var i = 0; i < pinnedNodes.length; i++) {
+            squery += pinnedNodes[i] + '+';
+          }
+          
+        }
+        else {
+          squery = globalSearch.getDefaultSearchQuery();
+          pinnedNodes = squery.split('+');
+          graphFactory.initPinnedNodes(pinnedNodes);
+        }
+
+        squery = squery.slice(0, -1);
+
+        findContexts(squery, pinnedNodes);
+
+      }
+  }
+}
+
 // What happens when we search for a node in the graph?
 
 $("#globalsearchbutton").on('click', function(e) {
-        
-        document.getElementById('globalsearchform').dispatchEvent(new Event('submit'));
-
+ 
+        globalSearchForm().submit();
 });
 
 $("#globalsearchremove").on('click', function(e) {
@@ -55,34 +87,8 @@ $("#globalsearchremove").on('click', function(e) {
 
 $('#globalsearchform').submit(function(e) {
 
-        
-      e.preventDefault(); // to stop the form from submitting
 
-      var squery = '';
-      
-      let pinnedNodes = [];
-   
-      if ($('#globalsearchinput').val().length > 0) {
-
-        pinnedNodes = graphFactory.getPinnedNodes();
-
-        // Let's formulate the query
-        for (var i = 0; i < pinnedNodes.length; i++) {
-          squery += pinnedNodes[i] + '+';
-        }
-        
-      }
-      else {
-         squery = globalSearch.getDefaultSearchQuery();
-         pinnedNodes = squery.split('+');
-         graphFactory.initPinnedNodes(pinnedNodes);
-      }
-
-      squery = squery.slice(0, -1);
-
-      findContexts(squery, pinnedNodes);
-    
-    
+      globalSearchForm().submit();
 
 });
 

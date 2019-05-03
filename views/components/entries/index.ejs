@@ -14,7 +14,10 @@ const collabFactory = (() => {
     function CollabFactory() {
         let collaborate_matrix = {};
         let collaborate_room = userFactory.getViewOption('urlPath') + '/';
-        let collaborate_id = '';
+        let collaborate_invite = '';
+        let collaborate_id = Math.round((Math.random() * 1000000));
+
+        let collaborate_storage = JSON.parse(localStorage.getItem("collaborate"));    
 
         this.setCollabMatrix = function(room, collab_id) {
             collaborate_matrix[room] = collab_id;
@@ -34,7 +37,44 @@ const collabFactory = (() => {
             return collaborate_id;
         }
         this.setCollabId = function(id) {
-            collaborate_id = id;
+            if (id && id.length > 0) {
+                collaborate_id = id;
+            }
+        }
+        this.existsCollabId = function() {
+            if (collaborate_id && collaborate_id.length > 0) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+        this.setCollabInvite = function(id) {
+            if (id && id.length > 0) {
+                collaborate_id = id;
+                collaborate_invite = id;
+            }
+        }
+        this.existsCollabInvite = function() {
+            if (collaborate_invite && collaborate_invite.length > 0) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+        this.existsCollabStorage = function() {
+            if (collaborate_storage && collaborate_storage.length > 0) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        this.getCollabStorage = function() {
+            return collaborate_storage;
         }
 
     }
@@ -42,6 +82,29 @@ const collabFactory = (() => {
     return new CollabFactory();
 
 })();
+
+// get a URL if applicable for the collaboration setting
+collabFactory.setCollabInvite(getUrlVars()["collaborate"]);
+
+// set the collab matrix    
+collabFactory.setCollabMatrix(collabFactory.getCollabRoom(), collabFactory.getCollabId());
+        
+// there was no URL for collaboration        
+if (collabFactory.existsCollabInvite() == false) {
+
+    if (collabFactory.existsCollabStorage() == true) {
+
+        if (collabFactory.getCollabStorage()[collabFactory.getCollabRoom()]) {
+            if (collabFactory.getCollabStorage()[collabFactory.getCollabRoom()].length > 0) {
+                collabFactory.getCollabMatrixForRoom(collabFactory.getCollabRoom(),collabFactory.getCollabStorage()[collabFactory.getCollabRoom()]);
+                collabFactory.setCollabId(collabFactory.getCollabMatrixForRoom(collabFactory.getCollabRoom()).split("/").pop());
+            }
+        }
+    }
+
+    // Now in case the original user reloads the page by error, they'll get the new collaborate ID, so we avoid that by storing their data
+    localStorage.setItem("collaborate", JSON.stringify(collabFactory.getCollabMatrix()));
+}
 
 
 // Initiate the collaboration settings
