@@ -18,7 +18,7 @@
               this.initializeStatements = function() {
 
                 // Add the hooks to the newly rendered entries
-                statements().onClick(entrySelect);
+                statements().onClick(statements().select);
                 statements().changeTime();
 
                 // Hide the whole panel if needed

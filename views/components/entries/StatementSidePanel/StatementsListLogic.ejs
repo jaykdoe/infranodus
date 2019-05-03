@@ -1,6 +1,6 @@
 <script>
 
-        // Initiate the statements constructor
+        // Initiate the statements constructor (entries added into the left side-panel)
 
         const statementsFactory = (() => {
           function StatementsFactory() {
@@ -87,6 +87,63 @@
                         }
                     }
                 
+                },
+                select: function(e) {
+                    
+                    // What happens when a statement is selected on the graph
+
+                    e.stopPropagation();
+                    
+                    let keepStatementID = e.currentTarget.dataset.uid;
+
+                    if (!keepStatementID) {
+                      statementsFactory.removeCurrentSelections();
+                    }
+                    else if (statementsFactory.isInCurrentSelections(keepStatementID) == true) {
+                      statementsFactory.removeFromCurrentSelections(keepStatementID);
+                    }
+                    else {
+                      statementsFactory.addToCurrentSelections(keepStatementID);
+                    }
+                    
+                    let entries_to_select = [];
+                    entries_to_select = statementsFactory.getCurrentSelections();
+
+                    let pinnedNodes = graphFactory.getPinnedNodes();
+
+                    $(".entry").each(function() {
+                        if (entries_to_select.length == 0) {
+                          $(this).css('opacity', '1');  
+                          $('.entry-menu',this).hide();
+                        }
+                        else if (statementsFactory.isInCurrentSelections($(this).attr('data-uid')) == true) {
+                          $(this).css('opacity', '1');  
+                          $('.entry-menu',this).show();
+                        } 
+                        else {
+                          $(this).css('opacity', '0.3');  
+                          $('.entry-menu',this).hide();
+                        }
+                    });
+
+                    if (keepStatementID) {
+                      statements().onEditClick(statements().editDeleteStatement);
+                      statements().onResetClick(statements().select);
+                    }
+
+                  
+                    // Make only those edges visible that belong to the statement selected
+                    if (entries_to_select.length > 0) {
+                      graph().selectEntries(entries_to_select);
+                    }
+                    else {
+                      if (graphFactory.existPinnedNodes() == true) {
+                        graphFactory.initPinnedNodes(pinnedNodes);
+                      }
+                      else {
+                        graph().removeSelections();
+                      }
+                    }
                 },
                 stopAnimation: function() {
                     $("#entries").stop();
@@ -445,378 +502,44 @@
                     else if ($("#entries").css('visibility') == 'visible') {
                             return 'VISIBLE'
                     }
+                },
+                editDeleteStatement: function(e) {
+
+                      e.preventDefault();
+
+                      console.log(e);
+
+                      addEntryForm().populateEdit($(this).closest('div'));
+
+                      // If no delete button is shown
+                      if (addEntryFormFactory.getStatus() == 'add') {
+
+                          // Add the edit, delete and cancel buttons
+                          addEntryForm().switchToEdit();
+
+                          // Add a hook on the cancel button
+                          addEntryForm().onCancelClick();
+
+                          // Add a hook on the delete button
+                          addEntryForm().onDeleteClick();
+
+                          // Add a hook on the edit button
+                          addEntryForm().onEditClick();
+
+                      }
+
+                      // Repopulate contexts field
+                      addEntryForm().repopulateContexts();
+
+
+                      // Smoothly scroll up
+                      $("html, body").animate({ scrollTop: 0 }, "slow");
                 }
 
-                // add more functions
+                // add more functions here, but don't forget the comma }, 
             }
         }
-        
-        
-        
-        
-        
-        function entrySelect (e) {
-        
-                e.stopPropagation();
-        
-                let keepStatementID = e.currentTarget.dataset.uid;
-        
-                if (!keepStatementID) {
-                  statementsFactory.removeCurrentSelections();
-                }
-                else if (statementsFactory.isInCurrentSelections(keepStatementID) == true) {
-                  statementsFactory.removeFromCurrentSelections(keepStatementID);
-                }
-                else {
-                  statementsFactory.addToCurrentSelections(keepStatementID);
-                }
-                
-                let entries_to_select = [];
-                entries_to_select = statementsFactory.getCurrentSelections();
-        
-                let pinnedNodes = graphFactory.getPinnedNodes();
-        
-                $(".entry").each(function() {
-                    if (entries_to_select.length == 0) {
-                      $(this).css('opacity', '1');  
-                      $('.entry-menu',this).hide();
-                    }
-                    else if (statementsFactory.isInCurrentSelections($(this).attr('data-uid')) == true) {
-                      $(this).css('opacity', '1');  
-                      $('.entry-menu',this).show();
-                    } 
-                    else {
-                      $(this).css('opacity', '0.3');  
-                      $('.entry-menu',this).hide();
-                    }
-                });
-        
-                if (keepStatementID) {
-                  statements().onEditClick(editDeleteEntry);
-                  statements().onResetClick(entrySelect);
-                }
-        
-              
-                // Make only those edges visible that belong to the statement selected
-                if (entries_to_select.length > 0) {
-                   graph().selectEntries(entries_to_select);
-                }
-                else {
-                  if (graphFactory.existPinnedNodes() == true) {
-                    graphFactory.initPinnedNodes(pinnedNodes);
-                  }
-                  else {
-                    graph().removeSelections();
-                  }
-                }
-        
-              
-        }
-        
-                
-        
-        function editDeleteEntry(e) {
-        
-                e.preventDefault();
-        
-                addEntryForm().populateEdit($(this).closest('div'));
-        
-                // If no delete button is shown
-                if (addEntryFormFactory.getStatus() == 'add') {
-        
-                    // Add the edit, delete and cancel buttons
-                    addEntryForm().switchToEdit();
-        
-                    // Add a hook on the cancel button
-                    addEntryForm().onCancelClick();
-         
-                    // Add a hook on the delete button
-                    addEntryForm().onDeleteClick();
-        
-                    // Add a hook on the edit button
-                    addEntryForm().onEditClick();
-        
-                }
-        
-                // Repopulate contexts field
-                addEntryForm().repopulateContexts();
-                
-        
-                // Smoothly scroll up
-                $("html, body").animate({ scrollTop: 0 }, "slow");
-        
-        }
-        
-        
-        
-        // Summary and Insight statement actions
-        
-        var summary_statements = [];
-        
-        
-        function filter_statements_summary(top_words, top_community_words, filter_origin) {
-              
-              console.log('Filtering Summary top words');
-              console.log(top_words);
-              console.log(top_community_words);
-        
-              // Let's first filter statements that contain all the most influential top_words
-              // If all 4 are nowhere to be found, we reiterate until at least the first 3, 2, 1 is found.
-              // Save that
-        
-              var found_statements = [];
-        
-              var com_statements = {0:[],1:[],2:[],3:[],4:[]};
-        
-              var current_community;
-        
-              var entries_shown = [];
-        
-              var entries_ids = [];
-              var entries_keywords = [];
-        
-        
-              if (filter_origin == 'insight') {
-        
-        
-                for (var i = 0; i < top_community_words.length; i++) {
-        
-                  current_community = i;
-                  find_statement(top_community_words[i].nodes,1+i);
-                }
-        
-              }
-              else {
-        
-                // Get the statements with the top BC words only
-                find_statement(top_words,0);
-              }
-        
-              function find_statement(key_terms, sweetch) {
-        
-                  let nodesfound = 0;
-        
-                  // Find the first entry that contains ALL the key_terms
-        
-                  $(".entry").each(function(){
-        
-                    // We did not find any statements with top BC nodes yet OR we did not find any statements of coms 
-                    if ((found_statements.length < 1 && sweetch == 0) || (sweetch > 0 && com_statements[sweetch].length < 1)) {
-        
-                      let currentDiv = $(this).attr('data-uid');
-        
-        
-                      let originaltext = $(this).children('.entry-text').html();
-                      let statement_hashtags = $(this).attr('data-hashtags');
-                      let currentTimecode = $(this).attr('data-timestamp');
-        
-                      for (let j = 0; j < key_terms.length; j++) {
-        
-                          var search_lemma;
-                          // TODO lemmas
-                          // var search_lemma = window.jstemmer(pinnedNodes[j]);
-        
-                          if (sweetch == 0) {
-                            search_lemma = key_terms[j].label;
-                          }
-                          else {
-                            search_lemma = key_terms[j].name;
-                          }
-        
-                          // Does this search lemma exist in this statement's hashtags?
-                          if (statement_hashtags.toLowerCase().indexOf(search_lemma.toLowerCase()) > -1) {
-                              nodesfound += 1;
-                          }
-        
-                          // We found all the nodes we needed in this statement
-                          if (nodesfound == key_terms.length) {
-                              if (sweetch == 0) {
-                                // Searching for top_nodes only? Add this to Top Nodes Statements 
-                                found_statements.push({text: originaltext, id: currentDiv, time: currentTimecode, origin: key_terms});
-                              }
-                              else if (sweetch > 0) {
-                                // Searching for community nodes? Add this to Community Nodes Statements
-                                com_statements[sweetch].push({text: originaltext, id: currentDiv, time: currentTimecode, origin: key_terms});
-                              }
-                          }
-        
-                          // We reached the end of the cycle and not all the search words are present in an entry, nullify the counter
-                          if ((j == key_terms.length - 1) && nodesfound != key_terms.length) {
-                            nodesfound = 0;
-                          }
-        
-                      }
-                    }
-        
-                  });
-        
-                  // We are searching for top nodes only and we found at least 1 statement, which has them all 
-        
-                  if ((sweetch == 0 && found_statements.length > 0)) {
-        
-                        console.log('Found influential node statements:');
-                        console.log(found_statements);
-        
-                        for (let s = 0; s < found_statements.length; s++) {
-                            entries_shown.push(found_statements[s]);
-                        }
-        
-                        nodesfound = 0;
-        
-                        // Ok, now let's search through each community
-        
-                        for (let i = 0; i < top_community_words.length; i++) {
-        
-                          current_community = i;
-                          find_statement(top_community_words[i].nodes,1+i);
-        
-                          // TODO for when 3 words are not found
-        
-                          // if (nodesfound == top_community_words[i].nodes.length) {
-                          //   console.log('found community statemenets');
-                          //   console.log(a_statements);
-                          // }
-                          // else {
-                          //   top_community_words[i].nodes = top_community_words[i].nodes.slice(0,-1);
-                          //   find_statement(top_community_words[i].nodes,1+i);
-                          // }
-        
-                        }
-        
-        
-                  }
-                  else if (sweetch > 0 && nodesfound == key_terms.length) {
-        
-                    // We are looking for top_community nodes and found all the words 
-        
-                    // Did we reach the end of all the words?
-        
-                    if (current_community == top_community_words.length -1) {       
-        
-                      com_statements = removeEmptyElements(com_statements);
-        
-                      console.log('Main cluster topics:');
-                      console.log(com_statements);
-        
-        
-                      for (var s = 0; s < com_statements.length; s++) {
-                        entries_shown.push(com_statements[s]);
-                      }
-        
-        
-                      function timeSortFunction(a,b) {
-                          if (a.time < b.time)    
-                              return -1;
-                          if (a.time > b.time)
-                              return 1;
-                          return 0;
-                      }
-        
-                      entries_shown.sort(timeSortFunction);
-        
-                      console.log(entries_shown);
-        
-                      for (var s = 0; s < entries_shown.length; s++) {
-                        entries_ids.push(entries_shown[s].id);
-                        entries_keywords[entries_shown[s].id] = entries_shown[s].origin;
-                      }
-        
-                      let most_inf_nodes = graphFactory.getTopBCNodes(4);
-                      let most_inf_nodes_str = '';
-                      for (var l = 0; l < most_inf_nodes.length; l++) {
-                        most_inf_nodes_str += most_inf_nodes[l].label;
-                        if (l < most_inf_nodes.length - 1) {
-                          most_inf_nodes_str += ', ';
-                        }
-                      }
-        
-                      // Update explanation above the entries
-                      
-                      statements().updateExplanation(filter_origin, most_inf_nodes_str);
-                      
-                      // Hide everything
-        
-                      $('.entry').hide();
-        
-                      // Only show what fits into the entries we found
-        
-                      $(".entry").each(function(){
-        
-                          var currentDiv = $(this).attr('data-uid');
-                          if (entries_ids.includes(currentDiv)) {
-        
-                            $(this).fadeIn(400);
-        
-                          // TODO clear up the entry text like in the above -
-                          // 1. break into sentences; 2. find the first concentrate pf words; 3. keep it. 4. either create new ones or div the part non-relevant and make it opacity low or remove fully
-        
-                            var summary_helper = '';
-        
-                            for (var l = 0; l < entries_keywords[currentDiv].length; l++) {
-        
-        
-                                if (summary_helper.length > 0) {
-                                  summary_helper += ', '
-                                }
-                                if (entries_keywords[currentDiv][l].label) {
-                                  summary_helper += '<a href="#" class="top_nodes">' + entries_keywords[currentDiv][l].label + '</a>';
-                                }
-                                else if (entries_keywords[currentDiv][l].name) {
-                                  summary_helper += '<a href="#" class="community_node" community="' + graphFactory.getCommunityOfNode(entries_keywords[currentDiv][l].name) + '">' + entries_keywords[currentDiv][l].name + '</a>';
-                                }
-        
-                            }
-        
-                            if($(this).find('.summary').length == 0){
-        
-        
-                              $(this).prepend( "<div class='summary'>key terms: " + summary_helper + "</div>" );
-        
-                              //console.log(entries_keywords[currentDiv]);
-                            }
-        
-                          }
-        
-                      });
-        
-        
-                      document.getElementById('entries').scrollTop = 0;
-                      analyticsPanel.activateTopNodes();
-        
-                      console.log('top info');
-                      console.log(top_community_words);
-        
-        
-                      // Make only those edges visible that belong to the statement selected
-        
-                      if (graphFactory.existPinnedNodes() == false) {
-        
-                          graph().selectEntries(entries_ids);
-                        
-                      }
-        
-        
-        
-                    }
-        
-                  }
-                  else {
-                    // All the top nodes cannot be found for Top Influence Nodes or for Top Comm, so we cut the list and search again
-                    if (sweetch == 0) {
-                      top_words = top_words.slice(0, -1);
-                      find_statement(top_words,0)
-                    }
-                    else if (sweetch > 0) {
-                        let reduced_query = key_terms.slice(0,-1);
-                        find_statement(reduced_query,sweetch);
-                    }
-                  }
-        
-        
-              }
-        
-        
-        }
+      
         
         
     </script>

@@ -198,7 +198,7 @@
             // One click will filter the nodes / edges of the statement on the graph
             // Doubleclick will open the edit pane
         
-            statements().onClick(entrySelect);
+            statements().onClick(statements().select);
         
             if (dynamic_watch == 1 && dynamic_graph == 1) {
               $('#watch-link').trigger('click');
