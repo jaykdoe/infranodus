@@ -1,7 +1,7 @@
 <script>
 
 
-         // Initiate Statements Panel     
+         // Declare Statements Panel     
          const statementsPanelFactory = (() => {
           function StatementsPanelFactory() {
 
@@ -27,11 +27,14 @@
                     statementsPanel().toggleStatementsPanel();
                 }
 
+                // What about the local storage view graph only?
+                if (localStorage.getItem('graph') == 1) {
+                    statementsPanel().toggleStatementsPanel();
+                }
+
 
               }
 
-              this.initializePanel();
- 
 
           }
 
@@ -39,13 +42,17 @@
 
         })();
 
+        // Initialize Statements Panel Functions on load 
+
+        statementsPanelFactory.initializePanel();
+
         
         function statementsPanel() {
             return {
                 toggleStatementsPanel: function() {
 
                     $("#statements").fadeToggle();
-                    
+        
 
                     // The whole statements panel is hidden as well as the statements themselves
                     if (statementsPanel().isPanelVisible() == 'VISIBLE') {
@@ -55,6 +62,7 @@
                     }
                     else {
                         localStorage.setItem('graph', 0);
+                        console.log('SHOWING')
                         statements().show();
                         $("#graph-link").toggleClass('graph-highlight','remove');
                         statementsPanelFactory.setStatementsPanelVisibility('VISIBLE');
@@ -89,21 +97,6 @@
         }
         
             
-        
-          
-
-        
-
-        
-        // Are we loading the page to only show the graph?
        
-              
-        if (localStorage.getItem('graph') == 1 && !userFactory.getViewOption('graphOnly') && !userFactory.getViewOption('hide_always') && !userFactory.getViewOption('hide_when_small')) {
-            var isHidden__ = $("#statements").is(":hidden");
-            if (!isHidden__) {
-                $('#statements').fadeOut();
-                $("#graph-link").toggleClass('graph-highlight','add');
-            }
-        }
         
 </script>
