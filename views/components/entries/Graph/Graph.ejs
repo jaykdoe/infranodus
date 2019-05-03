@@ -794,7 +794,6 @@ function graph() {
                     let got_match = 0;
                     for (let context in e.context_matrix) {
                         for (let statement in e.context_matrix[context]) {
-                            if (entries_ids.indexOf(statement) >= 0) {console.log('got match')}
                             if (entries_ids.includes(statement)) {
                                 got_match += 1;
                             }

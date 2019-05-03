@@ -199,8 +199,9 @@
             // Doubleclick will open the edit pane
         
             statements().onClick(statements().select);
-        
-            if (dynamic_watch == 1 && dynamic_graph == 1) {
+
+            // Scroll to the newly added statement if the dynamic graph option is on
+            if (userFactory.getGraphOption('dynamic_watch') == 1 && userFactory.getGraphOption('dynamic_graph') == 1) {
               $('#watch-link').trigger('click');
               setTimeout(function() {
                 statements().scroll();

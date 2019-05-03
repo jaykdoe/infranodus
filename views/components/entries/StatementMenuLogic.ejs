@@ -46,23 +46,21 @@
 
     // It basically makes only the nodes / edges of the graph visible that the user is currently seeing in the statements div
 
-    var dynamic_graph = 0;
 
-    var dynamic_watch = 0;
 
     $("#timer-link").click(function(e) {
-      if (dynamic_graph == 0) {
+      if (!userFactory.getGraphOption('dynamic_graph') || userFactory.getGraphOption('dynamic_graph') == 0) {
         //localStorage.setItem('timer',1);
-        dynamic_graph = 1;
+        userFactory.setGraphOption('dynamic_graph', 1);
         $('#timer-link').addClass('timer-link-on');
         $('#entries').scrollTop($('#entries').scrollTop() + 1);
       }
       else {
-        dynamic_graph = 0;
+        userFactory.setGraphOption('dynamic_graph', 0);
         //localStorage.setItem('timer',0);
         $('#timer-link').removeClass('timer-link-on');
         statements().selectScrolledOnGraph('',true);
-        if (dynamic_watch == 1) {
+        if (userFactory.getGraphOption('dynamic_watch') == 1) {
           $("#watch-link").trigger('click');
         }
 
@@ -76,13 +74,13 @@
 
     $("#watch-link").click(function(e) {
 
-        if (dynamic_watch == 0) {
+        if (!userFactory.getGraphOption('dynamic_watch') || userFactory.getGraphOption('dynamic_watch') == 0) {
 
-            dynamic_watch = 1;
+            userFactory.setGraphOption('dynamic_watch', 1);
 
             $('#watch-link').addClass('watch-link-on');
 
-            if (dynamic_graph == 0) {
+            if (!userFactory.getGraphOption('dynamic_graph') || userFactory.getGraphOption('dynamic_graph') == 0) {
                 $("#timer-link").trigger('click');
             }
 
@@ -92,7 +90,7 @@
 
         else  {
 
-            dynamic_watch = 0;
+            userFactory.setGraphOption('dynamic_watch', 0);
             $('#watch-link').removeClass('watch-link-on');
             statements().stopAnimation();
 

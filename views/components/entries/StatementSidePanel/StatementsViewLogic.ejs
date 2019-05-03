@@ -1,7 +1,4 @@
-<script>
-
-        var currentStatementsView = 'OVERVIEW';
-    
+<script>    
     
         $("#summary").click(function(e) {
             e.preventDefault();
@@ -21,7 +18,7 @@
             });
             this.className = 'pure-menu-selected-top';
             
-            currentStatementsView = 'SUMMARY';
+            statementsPanelFactory.setCurrentStatementsView('SUMMARY');
     
         });
     
@@ -47,7 +44,7 @@
             this.className = 'pure-menu-selected-top';
             // Top community terms
     
-            currentStatementsView = 'INSIGHT';
+            statementsPanelFactory.setCurrentStatementsView('INSIGHT');
     
     
         });
@@ -74,54 +71,10 @@
             $('.summary').remove();
             $('#explanation').hide();
     
-            currentStatementsView = 'OVERVIEW';
+            statementsPanelFactory.setCurrentStatementsView('OVERVIEW');
         });
     
     
-        // If the dynamic graph function is on, when the user scrolls the statements, she sees the graph unfold
-    
-        $("#entries").scroll(function() { //.box is the class of the div
-            dynamic_graph = ''; // TODO BUG 
-            if (dynamic_graph == 1) {
-    
-              var ventries = [];
-              let scroll_signal;
-    
-                $('#entries').children(".entry").each(function(){
-                    var vresult;
-                    vresult = checkInView(this,true);
-                    if (vresult == true) {
-                        if (ventries.indexOf($(this).attr('data-uid')) == -1) {
-                            ventries.push($(this).attr('data-uid'));
-                        }
-                    }
-    
-                  //  result2 += " " +  checkInView($(e),true);
-                });
-    
-                statements().selectScrolledOnGraph(ventries);
-    
-                if (!$(this).is(':animated')) {
-    
-                  var current_scroll = ($(this).scrollTop());
-                  var max_scroll = $(this)[0].scrollHeight - $(this).height();
-    
-                  if (current_scroll == max_scroll && scroll_signal != 'bottom') {
-                    $(this).scrollTop(0);
-                    scroll_signal = 'top';
-                  }
-                  else if (current_scroll == 0 && scroll_signal != 'top') {
-                    $(this).scrollTop($(this)[0].scrollHeight);
-                    scroll_signal = 'bottom';
-                  }
-    
-                }
-            }
-    
-        });
-
-
-
 
         // This function is launched when the user clicks Essence / Overview / Insight 
         // It filters out the statements that contain top words / top community words                

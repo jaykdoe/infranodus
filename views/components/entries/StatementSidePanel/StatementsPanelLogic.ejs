@@ -1,11 +1,14 @@
 <script>
 
 
-         // Declare Statements Panel     
+         // Declare Statements Panel  (statements + entries)
+         
          const statementsPanelFactory = (() => {
           function StatementsPanelFactory() {
 
               let statementsPanelVisibility = "VISIBLE"; 
+
+              let currentStatementsView = 'OVERVIEW';
                               
               this.toggleStatementsPanelTo = function() {
                     statementsPanel().toggleStatementsPanel();
@@ -16,6 +19,13 @@
               }
               this.getStatementsPanelVisibility = function() {
                   return statementsPanelVisibility;
+              }
+
+              this.getCurrentStatementsView = function() {
+                  return currentStatementsView;
+              }
+              this.setCurrentStatementsView = function(mode) {
+                   currentStatementsView = mode;
               }
 
               // Initialize on load
@@ -46,6 +56,7 @@
 
         statementsPanelFactory.initializePanel();
 
+        // Some functions to be performed on the statements panel (statements + entries)
         
         function statementsPanel() {
             return {

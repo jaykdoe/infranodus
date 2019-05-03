@@ -473,10 +473,10 @@ const graphFactory = (() => {
                     // Change selections in the analytics pane
                     analyticsPanel.updateSelections(pinnedNodes);
 
-                    if (currentStatementsView == 'INSIGHT') {
+                    if (statementsPanelFactory.getCurrentStatementsView() == 'INSIGHT') {
                         statements().activateInsight();
                     }
-                    else if (currentStatementsView == 'SUMMARY') {
+                    else if (statementsPanelFactory.getCurrentStatementsView() == 'SUMMARY') {
                         statements().activateSummary();
                     }
                 }
