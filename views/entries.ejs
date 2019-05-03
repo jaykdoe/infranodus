@@ -29,14 +29,14 @@
             <%- include('components/common/menu', {contextlist:contextlist}); %>
         <% } %>
         <%- include('components/entries/ContextMenu') %>
-        
+
         </div>
    </div>
      <div id='content'>
 
           <%- include('components/entries/StatementMenu'); %>
                      
-          <%- include('components/entries/StatementSidePanel/index',
+          <%- include('components/entries/StatementSidePanel/StatementsPanel',
                 {entries, perceivername, addcontext, context, contextpublic, url, urltitle}); %>
 
           <%- include('components/entries/Graph/GraphCanvas'); %>
@@ -56,6 +56,13 @@
       </div>
 
 </div>
+
+<%- include('components/entries/StatementSidePanel/StatementsOverviewLogic'); %>    
+<%- include('components/entries/StatementSidePanel/StatementsListLogic'); %> 
+<%- include('components/entries/StatementSidePanel/StatementInputDialog/EntryInputLogic'); %>    
+<%- include('components/entries/StatementSidePanel/StatementsPanelLogic',
+    {entries, perceivername, addcontext, context, contextpublic, url, urltitle}); %> 
+   
 
 <%- include('components/entries/Graph/Graph') %>
 <%- include('components/entries/StatementMenuLogic'); %>

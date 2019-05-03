@@ -804,7 +804,7 @@ function graph() {
                             e.color = e.originalColor;
                         }
                     else {
-                        e.color = deselected_nodes_color;
+                        e.color = userFactory.getGraphOption('deselected_nodes_color');
                     }
 
             });
@@ -821,7 +821,7 @@ function graph() {
                     }
                     else {
                         if (got_match == 0) {
-                            n.color = deselected_nodes_color;
+                            n.color = userFactory.getGraphOption('deselected_nodes_color');
                             n.label = '';
                         }
                     }

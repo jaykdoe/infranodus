@@ -1,0 +1,853 @@
+
+<script>
+
+        var currentEntriesPanelMode = "VISIBLE";
+        
+        
+        function EntriesFactory() {
+        
+            let currentSelections = []; // IDs
+        
+            this.addToCurrentSelections = function(statement_id) {
+              currentSelections.push(statement_id);
+            }
+            this.getCurrentSelections = function() {
+              return currentSelections;
+            }
+            this.isInCurrentSelections = function(statement_id) {
+              if (currentSelections.indexOf(statement_id) > -1) {
+                return true;
+              }
+              else {
+                return false;
+              }
+            }
+            this.removeFromCurrentSelections = function(statement_id) {
+              let index = currentSelections.indexOf(statement_id);
+              currentSelections.splice(index,1);
+            }
+            this.removeCurrentSelections = function() {
+              currentSelections = [];
+            }
+        
+        }
+        
+        let entriesFactory = new EntriesFactory();
+        
+        if (localStorage.getItem('folded') == 1) {
+            currentEntriesPanelMode = "HIDDEN"
+            changeEntriesModeTo(currentEntriesPanelMode);
+        }    
+        
+        // Add the hooks to the newly rendered entries
+        
+        entries().onClick(entrySelect);
+        
+        entries().changeTime();
+        
+        function userMessages() {
+          return {
+            display: function(message) {
+              $("#warnings").append('<p class="warning">' + message + '</p>');
+              $("#warnings").slideDown('slow');
+            },
+            clear: function() {
+        
+            }
+          }
+        }
+                
+        function changeEntriesModeTo(mode) {
+            currentEntriesPanelMode = mode
+            updateEntriesPanel()
+        }
+        
+        function checkEntriesMode() {
+            return {
+                visibility: function() {
+                    if ($("#entries").css('visibility') == 'hidden') {
+                            return 'HIDDEN'
+                    }
+                    else if ($("#entries").css('visibility') == 'visible') {
+                            return 'VISIBLE'
+                    }
+                }
+            }    
+        }
+        
+        function updateEntriesPanel() {
+            if(currentEntriesPanelMode === "HIDDEN") entries().hide();
+            if(currentEntriesPanelMode === "VISIBLE") entries().show();
+        }
+        
+        function infiniteEntriesScroll() {
+        
+              var speed_scroll = 1000;
+              var max_scroll = $('#entries')[0].scrollHeight - $('#entries').height();
+              var current_scroll = ($('#entries').scrollTop());
+              var scroll_to = max_scroll;
+              var num_entries =  $('.entry').length;
+        
+              if (current_scroll == max_scroll) {
+                  $('#entries').scrollTop(0);
+                  current_scroll = $('#entries').scrollTop();
+              }
+                
+              var play_time = Math.round(((max_scroll - current_scroll)/max_scroll) * num_entries * speed_scroll);
+        
+              entries().scroll(play_time, scroll_to, 'linear', infiniteEntriesScroll);
+              
+        
+        }
+        
+        
+        
+        
+        function entries() {
+            return {
+                fillSpace: function(heightToReduce){
+                    $('#entries').css({height:  $(window).height() - heightToReduce});
+                },
+                changeTime: function() {
+                    $(".entry-date").each(function() {
+                        var convertedTime = timeConverter($(this).text()) ;
+                        $(this).text(convertedTime);
+                    });
+                },
+                scroll: function(speed, scrollTo, type, onEnd) {
+                    if (!speed) speed = 1000; // scroll speed in ms
+                    if (!scrollTo) scrollTo = $('#entries')[0].scrollHeight;
+                    if (!type) type = 'swing'; // can also be 'linear'
+        
+                    $("#entries").animate({ scrollTop: scrollTo }, speed, type, onEnd);            
+        
+                },
+                stopAnimation: function() {
+                    $("#entries").stop();
+                },
+                append: function(text, id, name, posted_by, alien, chatbot) {
+                    let added_entry = '';
+                    if (!alien) { 
+                      added_entry = "<div class='entry' style='display: none;' data-uid='" + id + "' data-hashtags='" + name + "'><p class='entry-text'>" + text + "</p><p class='entry-date'>by " + posted_by + " at " + moment().format('hh:mm:ss') + "</p><p class='entry-menu'>&nbsp;&nbsp;&nbsp;<a class='editentry' href='#'>edit</a>&nbsp;&nbsp;&nbsp;<a class='resetentry' href='#'>deselect</a></p><div class='separator'>&nbsp;</div><div id='" + id + "' class='hidden'></div></div>";
+                    }
+                    else {
+                      if (!chatbot) 
+                        added_entry = "<div class='entry alien' style='display: none; margin-left: 50px' data-uid='" + id + "' data-hashtags='" + name + "'><p class='entry-text gray'>" + text + "</p><p class='entry-date gray'>by " + posted_by + " at " + moment().format('hh:mm:ss') + "</p><p class='entry-menu'>&nbsp;&nbsp;&nbsp;<a class='editentry' href='#'>edit</a>&nbsp;&nbsp;&nbsp;<a class='resetentry' href='#'>deselect</a></p><div class='separator'>&nbsp;</div><div id='" + id + "' class='hidden'></div></div>";
+                      else {
+                        added_entry =  "<div class='entry alien' style='display: none; margin-left: 50px' data-uid='" + id + "'><p class='entry-text gray'>" + text + "</p><p class='entry-date gray'>help tip &nbsp;<em></em><a href='javascript:' class='disablehelp'>disable</a></em></p><div class='separator'>&nbsp;</div><div id='" + id + "' class='hidden'></div></div>";
+                      }
+                    }
+                    $(added_entry).appendTo($('#entries')).slideDown("fast");
+                },
+                onClick: function(onClick) {
+                    $('.entry').on('click', onClick);
+                },
+                onEditClick: function(onClick) {
+                    $('.editentry').on('click', onClick);
+                },
+                onDoubleClick: function(onClick) {
+                    $(".entry").on('doubletap', onClick);
+                },
+                onResetClick: function(onClick) {
+                    $(".resetentry").on('click', onClick);
+                },
+                show: function() {
+                        $("#entries").css('z-index','5');
+                        $("#entries").css('visibility','visible');
+                        $('#topnav').fadeIn();
+                        localStorage.setItem('folded', 0);
+                        // TODO move color to another function
+                        $('#statements-link').removeClass('statements-link-on-dark');
+                        $('#statements-link').removeClass('statements-link-on');
+                },
+                hide: function() {
+                        $("#entries").css('z-index','-2'); 
+                        $("#entries").css('visibility','hidden');
+                        $('#topnav').fadeOut();
+                        localStorage.setItem('folded', 1);
+                        // TODO move color to another function
+                        if (userFactory.getBackground() == 'dark') {
+                            $('#statements-link').addClass('statements-link-on-dark');
+                        }
+                        else {
+                            $('#statements-link').addClass('statements-link-on');
+                        }
+                        
+                },
+                removeAddContext: function() {
+                       let current_context = userFactory.getCurrentContext();
+                       let addcontext = userFactory.getAddContext();
+                       if (addcontext && userFactory.isInterpretOn() == true) {
+                          $('.entry').hide();
+                          let statementsOfContext = graphFactory.getStatementsOfContext(current_context);
+                              for (var ite in statementsOfContext) {
+                                $('.entry[data-uid="' + statementsOfContext[ite] + '"]').each(function() {
+                                  $(this).show();
+                                });                    
+                            }
+                        }
+                },
+                unfilter: function(that) {
+                    if (that) {
+                        $(that).fadeIn(400);
+                    }
+                    else {
+                        $('.entry').fadeIn(400);
+                    }
+                },
+                filter: function(that) {
+        
+                  if (that) {
+                    $(that).fadeOut(400);
+                  }
+                  else {
+                          
+                    if (graphFactory.existPinnedNodes() == false) {
+                      entries().unfilter();
+                      entries().removeHighlight('.entry');
+                    }
+                    else {
+                      entries().searchPinned(entries().addHighlight);        
+                    }
+        
+                  }
+                },
+                addHighlight: function(that, nodesToHighlight) {
+        
+                  // No nodes sent to highlight? Then highlight the pinned ones
+                  if (!nodesToHighlight) {
+                    let nodesToHighlight = graphFactory.getPinnedNodes();
+                  }
+        
+                  // Have to do this, so we don't add extra spans
+                  $(that).removeHighlight();
+        
+                  for (let i = 0; i < nodesToHighlight.length; i++) {
+                      // TODO instead identify the language setting and use jstemmer for that 
+                      if (nodesToHighlight[i].match(/[а-яА-Я]/)) {
+                        $(that).highlight(window.jstemmer(nodesToHighlight[i]));
+                      }
+                      else {
+                        $(that).highlight(nodesToHighlight[i]);
+                      }
+                  }
+        
+                },
+                removeHighlight: function(that) {
+        
+                      // Remove highlight everywhere
+                      $(that).removeHighlight();
+        
+                },
+                checkVisibility: function() {
+                    if ($("#statements").is(":hidden") || $("#entries").css("visibility") === "hidden") {
+                          return false;
+                    }
+                    else {
+                          return true;
+                    }
+                },
+                searchPinned: function(callback) {
+        
+                   let totalEntriesMatched = 0;
+        
+                   let nodeIDs_reversed = graphFactory.getNodeIDsRev();
+        
+                   let nodesOfStatement = graphFactory.getAllNodesOfStatement();
+        
+                   $(".entry").each(function(){
+        
+                      // What is the current statement ID for the entry?
+                      let currentDiv = $(this).attr('data-uid');
+        
+                      // Retrieve the statement text from the entry, clean from html
+                      let originaltext = $(this).children('.entry-text').html();
+        
+                      // How many entries in total were matched?
+                      let matchedThisEntry = 0;
+        
+                      // How many nodes we found in this entry?
+                      let nodesfound = 0;
+        
+                      // For each node present in this statement:
+                      for (let item in nodesOfStatement[currentDiv]) {
+        
+                        let nmarker = nodesOfStatement[currentDiv][item]; //
+        
+                        // Is this node in pinnedNodes?
+                        if (graphFactory.checkIfPinned(nodeIDs_reversed[nmarker]) == true) {
+                          
+                          nodesfound = nodesfound + 1;
+                          // The number of nodes found in this entry equals the number of pinned nodes?
+                          if (nodesfound == graphFactory.getPinnedNodes().length) {
+        
+                              // Then this entry has the full match
+                              matchedThisEntry = 1;
+        
+                              totalEntriesMatched += 1;
+        
+                          }
+        
+                        }
+        
+                      }
+        
+                      if (matchedThisEntry == 1) {
+                          entries().unfilter(this);
+                          callback(this, graphFactory.getPinnedNodes());
+                      }
+                      else {
+                          entries().filter(this);
+                      }
+        
+                  });
+        
+                  if (totalEntriesMatched == 0) {
+        
+                      // Logic #1:
+                      // If no matches are found, let's find entries that have at least one pinned node and one intersection of the pinned ones
+        
+                      // Let's choose the previous node
+                      let lastNode = graphFactory.getLastPinnedNode();
+        
+                      // Get the neighbor nodes in the graph for the previous node, but not including it
+                      let nnodes = sigma.instances(0).graph.neighbors(graphFactory.getNodeID(lastNode));
+        
+                      let selectedNNodes = [];
+        
+                      // We create an array from the neighbors of that previous node
+                      for (let key in nnodes) {
+                          selectedNNodes.push(nnodes[key].originalLabel);
+                      }
+        
+                      // We then find the inersection between the nodes that were connected to the last selected pinnedNode and the neightbors of the one before that one
+                      let overlapNodes = [];
+                      overlapNodes = _.intersection(selectedNNodes, graphFactory.getSelectedNodes());  
+                      
+                      // Let's now create an object for all the nodes selected on the graph to highlight
+                      let allSelectedNodes = [];
+                      allSelectedNodes = _.union(overlapNodes,graphFactory.getPinnedNodes());
+                      
+                      $(".entry").each(function(){
+                                
+                                let matchedentry = 0;
+                                let currentDiv = $(this).attr('data-uid');
+        
+                                let notFoundNodes = [];
+        
+                                // For each node present in this statement:
+                                for (let item in nodesOfStatement[currentDiv]) {
+                                  let nmarker = nodesOfStatement[currentDiv][item];
+        
+                                  // At least one node in that statement belongs to the intersection?
+                                  if (overlapNodes.indexOf(nodeIDs_reversed[nmarker]) > -1) {
+        
+                                    // Yes? then reiterate through the other nodes in there and see if it either contains at least one of the pinnedNodes or the last node?
+                                    for (var node in nodesOfStatement[currentDiv]) {
+                                      var n2marker = nodesOfStatement[currentDiv][node];
+                                      // Yes? the entry has a match
+                                      if (graphFactory.checkIfPinned(nodeIDs_reversed[n2marker]) == true || lastNode == nodeIDs_reversed[n2marker]) {
+                                          matchedentry = 1;
+                                          totalEntriesMatched += 1;
+                                          notFoundNodes.push(nodeIDs_reversed[nmarker]);
+                                      }
+                                    }
+                                  }
+                                }
+        
+                                if (matchedentry == 1) {
+                                  entries().unfilter(this);
+                                  graphFactory.updateNotFoundNodes(notFoundNodes);
+                                  callback(this, allSelectedNodes);
+                                }
+                                else {
+                                  entries().filter(this);
+                                }
+                                
+                        });
+                        
+                        // We didn't find any matches that would contain the neighbors of any of those nodes and at least one
+        
+                        if (totalEntriesMatched == 0) {
+        
+                              // Logic #2:
+                              // We then select all the pins, their neighborhoods, and show the statements that contain both of those words
+        
+                              $(".entry").each(function(){
+        
+                                  // What is the current statement ID for the entry?
+                                  let currentDiv = $(this).attr('data-uid');
+        
+                                  // Retrieve the statement text from the entry, clean from html
+                                  let originaltext = $(this).children('.entry-text').html();
+        
+                                  // How many entries in total were matched?
+                                  let matchedThisEntry = 0;
+        
+                                  // For each node present in this statement:
+                                  for (let item in nodesOfStatement[currentDiv]) {
+        
+                                    let nmarker = nodesOfStatement[currentDiv][item]; //
+        
+                                    // Is this node in pinnedNodes?
+                                    if (graphFactory.checkIfPinned(nodeIDs_reversed[nmarker]) == true) {
+                                      
+                                          // Then this entry has the full match
+                                          matchedThisEntry = 1;
+                                      
+        
+                                    }
+        
+                                  }
+        
+                                  if (matchedThisEntry == 1) {
+                                      entries().unfilter(this);
+                                      callback(this, graphFactory.getPinnedNodes());
+                                  }
+                                  else {
+                                      entries().filter(this);
+                                  }
+        
+                            });
+        
+                        }
+        
+                  }
+        
+                  
+                },
+                updateExplanation: function(filter_origin, most_inf_nodes_str) {
+                  
+                  let polysingularity_score = graphFactory.getStats('PolysingularityScore');
+        
+                  var explanation_html = 'The excerpts from the text containing the main topics and the most influential terms:';
+        
+                  if (filter_origin == 'insight') {
+                    if (polysingularity_score == 'Dispersed') {
+                      explanation_html = "This discourse's structure is <strong>" + polysingularity_score + "</strong>. <br><br>To increase coherency, you can make connections between different separated clusters of key terms and statements. For example, the ones below:";
+                    }
+                    else if (polysingularity_score == 'Diversified') {
+                      explanation_html = "This discourse's structure is <strong>" + polysingularity_score + "</strong>. It has a balanced representation of several perspectives. <br><br>You can make it more focused if you develop the ideas around the main keywords — <strong>" + most_inf_nodes_str + "</strong> — or by identifying the structural gaps between the less represented clusters and making new connections between them (to focus) or going deeper into them (to diversify even more). Like the ones below:";
+                    }
+                    else if (polysingularity_score == 'Focused') {
+                      explanation_html = "This discourse's structure is <strong>" + polysingularity_score + "</strong>. While it has several perspectives, it is focused on one. <br><br>You can make it more diversified if you identify the structural gaps in the graph and make connections between them — that's where the new ideas may be. For example, these two sets of key terms and statements below:";
+                    }
+                    else if (polysingularity_score == 'Biased') {
+                      explanation_html = "This discourse's structure is <strong>" + polysingularity_score + "</strong>. It's leaning towards and promotes a certain perspective, circulating around the most influential words — <strong>" + most_inf_nodes_str + "</strong>. <br><br>You could further develop and make connections between the different perspectives (indicated with colored topical clusters) into this discourse to make it more diversified. For example, the ones below:";
+                    }
+                    // There is a structural gap and a potential for a new idea between these two sets of key terms and statements below:
+                  }
+        
+                  $('#explanation').show();
+                  $('#explanation').html(explanation_html);
+        
+                },
+                activateInsight: function() {
+                  $('#insight').click();
+                },
+                activateSummary: function() {
+                  $('#summary').click();
+                }
+                // add more functions
+            }
+        }
+        
+        
+        
+        function showStatements () {
+            var isHidden_ = $("#statements").is(":hidden");
+            if (isHidden_) {
+                $('#statements').fadeIn();
+                $("#graph-link").toggleClass('graph-highlight','remove');
+            }
+        }
+        
+        function showEntries () {
+            var isHidden_ = $("#entries").is(":hidden");
+            if (isHidden_) {
+                $('#entries').fadeIn();
+            }
+        }
+        
+        
+        
+        function entrySelect (e) {
+        
+                e.stopPropagation();
+        
+                let keepStatementID = e.currentTarget.dataset.uid;
+        
+                if (!keepStatementID) {
+                  entriesFactory.removeCurrentSelections();
+                }
+                else if (entriesFactory.isInCurrentSelections(keepStatementID) == true) {
+                  entriesFactory.removeFromCurrentSelections(keepStatementID);
+                }
+                else {
+                  entriesFactory.addToCurrentSelections(keepStatementID);
+                }
+                
+                let entries_to_select = [];
+                entries_to_select = entriesFactory.getCurrentSelections();
+        
+                let pinnedNodes = graphFactory.getPinnedNodes();
+        
+                $(".entry").each(function() {
+                    if (entries_to_select.length == 0) {
+                      $(this).css('opacity', '1');  
+                      $('.entry-menu',this).hide();
+                    }
+                    else if (entriesFactory.isInCurrentSelections($(this).attr('data-uid')) == true) {
+                      $(this).css('opacity', '1');  
+                      $('.entry-menu',this).show();
+                    } 
+                    else {
+                      $(this).css('opacity', '0.3');  
+                      $('.entry-menu',this).hide();
+                    }
+                });
+        
+                if (keepStatementID) {
+                  entries().onEditClick(editDeleteEntry);
+                  entries().onResetClick(entrySelect);
+                }
+        
+              
+                // Make only those edges visible that belong to the statement selected
+                if (entries_to_select.length > 0) {
+                   graph().selectEntries(entries_to_select);
+                }
+                else {
+                  if (graphFactory.existPinnedNodes() == true) {
+                    graphFactory.initPinnedNodes(pinnedNodes);
+                  }
+                  else {
+                    graph().removeSelections();
+                  }
+                }
+        
+              
+        }
+        
+        
+        function entryScroll (scroll_entry, undo_select) {
+        
+            // TODO BUG fix scroll on http://localhost:3000/news/english/edit#
+        
+            if (graphFactory.existPinnedNodes() == false && !undo_select) {
+               graph().selectEntries(scroll_entry);
+            }
+            else {
+                if (graphFactory.existPinnedNodes() == false) {
+                   graph().removeSelections();
+                }
+            }
+        
+        }
+        
+        
+        function editDeleteEntry(e) {
+        
+                e.preventDefault();
+        
+                addEntryForm().populateEdit($(this).closest('div'));
+        
+                // If no delete button is shown
+                if (addEntryFormFactory.getStatus() == 'add') {
+        
+                    // Add the edit, delete and cancel buttons
+                    addEntryForm().switchToEdit();
+        
+                    // Add a hook on the cancel button
+                    addEntryForm().onCancelClick();
+         
+                    // Add a hook on the delete button
+                    addEntryForm().onDeleteClick();
+        
+                    // Add a hook on the edit button
+                    addEntryForm().onEditClick();
+        
+                }
+        
+                // Repopulate contexts field
+                addEntryForm().repopulateContexts();
+                
+        
+                // Smoothly scroll up
+                $("html, body").animate({ scrollTop: 0 }, "slow");
+        
+        }
+        
+        
+        
+        // Summary and Insight statement actions
+        
+        var summary_statements = [];
+        
+        
+        function filter_statements_summary(top_words, top_community_words, filter_origin) {
+              
+              console.log('Filtering Summary top words');
+              console.log(top_words);
+              console.log(top_community_words);
+        
+              // Let's first filter statements that contain all the most influential top_words
+              // If all 4 are nowhere to be found, we reiterate until at least the first 3, 2, 1 is found.
+              // Save that
+        
+              var found_statements = [];
+        
+              var com_statements = {0:[],1:[],2:[],3:[],4:[]};
+        
+              var current_community;
+        
+              var entries_shown = [];
+        
+              var entries_ids = [];
+              var entries_keywords = [];
+        
+        
+              if (filter_origin == 'insight') {
+        
+        
+                for (var i = 0; i < top_community_words.length; i++) {
+        
+                  current_community = i;
+                  find_statement(top_community_words[i].nodes,1+i);
+                }
+        
+              }
+              else {
+        
+                // Get the statements with the top BC words only
+                find_statement(top_words,0);
+              }
+        
+              function find_statement(key_terms, sweetch) {
+        
+                  let nodesfound = 0;
+        
+                  // Find the first entry that contains ALL the key_terms
+        
+                  $(".entry").each(function(){
+        
+                    // We did not find any statements with top BC nodes yet OR we did not find any statements of coms 
+                    if ((found_statements.length < 1 && sweetch == 0) || (sweetch > 0 && com_statements[sweetch].length < 1)) {
+        
+                      let currentDiv = $(this).attr('data-uid');
+        
+        
+                      let originaltext = $(this).children('.entry-text').html();
+                      let statement_hashtags = $(this).attr('data-hashtags');
+                      let currentTimecode = $(this).attr('data-timestamp');
+        
+                      for (let j = 0; j < key_terms.length; j++) {
+        
+                          var search_lemma;
+                          // TODO lemmas
+                          // var search_lemma = window.jstemmer(pinnedNodes[j]);
+        
+                          if (sweetch == 0) {
+                            search_lemma = key_terms[j].label;
+                          }
+                          else {
+                            search_lemma = key_terms[j].name;
+                          }
+        
+                          // Does this search lemma exist in this statement's hashtags?
+                          if (statement_hashtags.toLowerCase().indexOf(search_lemma.toLowerCase()) > -1) {
+                              nodesfound += 1;
+                          }
+        
+                          // We found all the nodes we needed in this statement
+                          if (nodesfound == key_terms.length) {
+                              if (sweetch == 0) {
+                                // Searching for top_nodes only? Add this to Top Nodes Statements 
+                                found_statements.push({text: originaltext, id: currentDiv, time: currentTimecode, origin: key_terms});
+                              }
+                              else if (sweetch > 0) {
+                                // Searching for community nodes? Add this to Community Nodes Statements
+                                com_statements[sweetch].push({text: originaltext, id: currentDiv, time: currentTimecode, origin: key_terms});
+                              }
+                          }
+        
+                          // We reached the end of the cycle and not all the search words are present in an entry, nullify the counter
+                          if ((j == key_terms.length - 1) && nodesfound != key_terms.length) {
+                            nodesfound = 0;
+                          }
+        
+                      }
+                    }
+        
+                  });
+        
+                  // We are searching for top nodes only and we found at least 1 statement, which has them all 
+        
+                  if ((sweetch == 0 && found_statements.length > 0)) {
+        
+                        console.log('Found influential node statements:');
+                        console.log(found_statements);
+        
+                        for (let s = 0; s < found_statements.length; s++) {
+                            entries_shown.push(found_statements[s]);
+                        }
+        
+                        nodesfound = 0;
+        
+                        // Ok, now let's search through each community
+        
+                        for (let i = 0; i < top_community_words.length; i++) {
+        
+                          current_community = i;
+                          find_statement(top_community_words[i].nodes,1+i);
+        
+                          // TODO for when 3 words are not found
+        
+                          // if (nodesfound == top_community_words[i].nodes.length) {
+                          //   console.log('found community statemenets');
+                          //   console.log(a_statements);
+                          // }
+                          // else {
+                          //   top_community_words[i].nodes = top_community_words[i].nodes.slice(0,-1);
+                          //   find_statement(top_community_words[i].nodes,1+i);
+                          // }
+        
+                        }
+        
+        
+                  }
+                  else if (sweetch > 0 && nodesfound == key_terms.length) {
+        
+                    // We are looking for top_community nodes and found all the words 
+        
+                    // Did we reach the end of all the words?
+        
+                    if (current_community == top_community_words.length -1) {       
+        
+                      com_statements = removeEmptyElements(com_statements);
+        
+                      console.log('Main cluster topics:');
+                      console.log(com_statements);
+        
+        
+                      for (var s = 0; s < com_statements.length; s++) {
+                        entries_shown.push(com_statements[s]);
+                      }
+        
+        
+                      function timeSortFunction(a,b) {
+                          if (a.time < b.time)    
+                              return -1;
+                          if (a.time > b.time)
+                              return 1;
+                          return 0;
+                      }
+        
+                      entries_shown.sort(timeSortFunction);
+        
+                      console.log(entries_shown);
+        
+                      for (var s = 0; s < entries_shown.length; s++) {
+                        entries_ids.push(entries_shown[s].id);
+                        entries_keywords[entries_shown[s].id] = entries_shown[s].origin;
+                      }
+        
+                      let most_inf_nodes = graphFactory.getTopBCNodes(4);
+                      let most_inf_nodes_str = '';
+                      for (var l = 0; l < most_inf_nodes.length; l++) {
+                        most_inf_nodes_str += most_inf_nodes[l].label;
+                        if (l < most_inf_nodes.length - 1) {
+                          most_inf_nodes_str += ', ';
+                        }
+                      }
+        
+                      // Update explanation above the entries
+                      
+                      entries().updateExplanation(filter_origin, most_inf_nodes_str);
+                      
+                      // Hide everything
+        
+                      $('.entry').hide();
+        
+                      // Only show what fits into the entries we found
+        
+                      $(".entry").each(function(){
+        
+                          var currentDiv = $(this).attr('data-uid');
+                          if (entries_ids.includes(currentDiv)) {
+        
+                            $(this).fadeIn(400);
+        
+                          // TODO clear up the entry text like in the above -
+                          // 1. break into sentences; 2. find the first concentrate pf words; 3. keep it. 4. either create new ones or div the part non-relevant and make it opacity low or remove fully
+        
+                            var summary_helper = '';
+        
+                            for (var l = 0; l < entries_keywords[currentDiv].length; l++) {
+        
+        
+                                if (summary_helper.length > 0) {
+                                  summary_helper += ', '
+                                }
+                                if (entries_keywords[currentDiv][l].label) {
+                                  summary_helper += '<a href="#" class="top_nodes">' + entries_keywords[currentDiv][l].label + '</a>';
+                                }
+                                else if (entries_keywords[currentDiv][l].name) {
+                                  summary_helper += '<a href="#" class="community_node" community="' + graphFactory.getCommunityOfNode(entries_keywords[currentDiv][l].name) + '">' + entries_keywords[currentDiv][l].name + '</a>';
+                                }
+        
+                            }
+        
+                            if($(this).find('.summary').length == 0){
+        
+        
+                              $(this).prepend( "<div class='summary'>key terms: " + summary_helper + "</div>" );
+        
+                              //console.log(entries_keywords[currentDiv]);
+                            }
+        
+                          }
+        
+                      });
+        
+        
+                      document.getElementById('entries').scrollTop = 0;
+                      analyticsPanel.activateTopNodes();
+        
+                      console.log('top info');
+                      console.log(top_community_words);
+        
+        
+                      // Make only those edges visible that belong to the statement selected
+        
+                      if (graphFactory.existPinnedNodes() == false) {
+        
+                          graph().selectEntries(entries_ids);
+                        
+                      }
+        
+        
+        
+                    }
+        
+                  }
+                  else {
+                    // All the top nodes cannot be found for Top Influence Nodes or for Top Comm, so we cut the list and search again
+                    if (sweetch == 0) {
+                      top_words = top_words.slice(0, -1);
+                      find_statement(top_words,0)
+                    }
+                    else if (sweetch > 0) {
+                        let reduced_query = key_terms.slice(0,-1);
+                        find_statement(reduced_query,sweetch);
+                    }
+                  }
+        
+        
+              }
+        
+        
+        }
+        
+        
+    </script>

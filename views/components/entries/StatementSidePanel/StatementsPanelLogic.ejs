@@ -1,0 +1,120 @@
+<script>
+
+        function checkStatementsPanelMode() {
+            return {
+                visibility: function() {
+                    if ($("#statements").is(":visible")) {
+                            return 'VISIBLE'
+                    }
+                    else {
+                            return 'HIDDEN'
+                    }
+                }
+            }    
+        }
+        
+        function toggleStatementSidePanel() {
+        
+            if (checkStatementsPanelMode().visibility() == checkEntriesMode().visibility()) {
+                toggleStatements();
+            }
+            $("#statements").fadeToggle();
+            
+            
+            if (checkStatementsPanelMode().visibility() == checkEntriesMode().visibility() && checkStatementsPanelMode().visibility() == 'HIDDEN') {
+                localStorage.setItem('graph', 1);
+                $("#graph-link").toggleClass('graph-highlight','add');
+            }
+            else {
+                localStorage.setItem('graph', 0);
+                $("#graph-link").toggleClass('graph-highlight','remove');
+            }
+        
+        
+            if (!localStorage.getItem('analytics')) {
+        
+                $('#analytics').toggle('slide', function(){
+        
+                    if ($('#analytics').is(":visible")) {
+                            $('#analyticsbutton').addClass('analytics-on');
+                            $('#analyticscaption').hide();         
+                    }
+                    else {
+                            $('#analyticsbutton').removeClass('analytics-on');
+                            $('#analyticscaption').show();           
+                    }
+        
+                });
+            }
+        
+        }
+        
+        
+        
+        var link_hashtags = getUrlVars()["link_hashtags"];
+        
+        
+        // Replace hashtags function
+        
+        function replaceHashtags(hash){
+                var replacementString = $.trim(hash);
+                return ' <a href="' + userFactory.getForwardTo() + replacementString.substr(1) +'" class="app-concept-link" target="_blank">' + replacementString + '</a>';
+        }
+        
+        
+        var hashRegex = /(?:\s|^)(?:#(?!\d+(?:\s|$)))(\w+)(?=\s|$)/gi;
+        
+        if (link_hashtags) {
+                $(".entry").each(function() {
+                    // Retrieve the statement text from the entry, clean from html
+                    var originale = $(this).children('.entry-text').html();
+                    // Replace with hashtags
+                    $(this).children('.entry-text').html(originale.replace(/#(\w+)/g,  " <a href='" + userFactory.getForwardTo() + "$1' class='app-concept-link' target='_blank'>$&</a>"));
+        
+                });
+        }
+        
+        
+        
+        
+        // Did we receive a global setting to hide the graph?
+        if ((userFactory.getViewOption('hide_always') || userFactory.getViewOption('hide_edit')) && !userFactory.getViewOption('show_text')) {
+                if (checkStatementsPanelMode().visibility() == 'VISIBLE') {
+                    toggleStatementSidePanel();
+                }           
+        }
+        
+        // Did we receive a global setting to hide when small only?
+        
+        if (userFactory.getViewOption('hide_when_small') && $(window).width() < 600) {
+        
+                    if ($('#menuLink').is(':visible')) {
+                        if (checkStatementsPanelMode().visibility() == 'VISIBLE') {
+                            toggleStatementSidePanel();
+                        }   
+                    }
+        
+                    $('#analytics').hide();
+                    $('#analyticsbutton').removeClass('analytics-on');
+                    $('#analyticscaption').show();
+        }
+        
+        // Are we loading the page to only show the graph?
+        
+        <% if (background == '1' || background == 'graph') { %>
+            if (checkStatementsPanelMode().visibility() == 'VISIBLE') {
+                    toggleStatementSidePanel();
+            }   
+            userFactory.setViewOption('graphOnly', true);
+        <% } %>
+        
+        
+        if (localStorage.getItem('graph') == 1 && !userFactory.getViewOption('graphOnly') && !userFactory.getViewOption('hide_always') && !userFactory.getViewOption('hide_when_small')) {
+                    var isHidden__ = $("#statements").is(":hidden");
+                    if (!isHidden__) {
+                        $('#statements').fadeOut();
+                        $("#graph-link").toggleClass('graph-highlight','add');
+                    }
+        }
+        
+</script>
