@@ -1,0 +1,111 @@
+<script>
+
+    toggleStatementsButton().onClick(toggleStatements);
+    addContextButton().onClick(addContext);
+
+    // Are we viewing additional context?
+
+    if (userFactory.getAddContext()) {
+        $('#addcontext-link').addClass('addcontext-visible');
+    }
+
+    function toggleStatements() {  
+        if (checkEntriesMode().visibility() == 'VISIBLE') {
+            entries().hide();
+        }
+        else if (checkEntriesMode().visibility() == 'HIDDEN') {
+            entries().show();
+        }
+    }
+
+    function addContext() {
+        if ($(".addcontext-on").is(":visible")) {
+                $('#addcontext-link').removeClass('addcontext-on');
+            }
+        else {
+                $('#addcontext-link').addClass('addcontext-on');
+        }
+
+    }
+
+    function toggleStatementsButton() {
+        return {
+            onClick: function(onClick){
+                $('#statements-link').on('click', onClick)
+            }
+        }
+    }
+
+    function addContextButton() {
+        return {
+            onClick: function(onClick){
+                $('#addcontext-link').on('click', onClick)
+            }
+        }
+    }
+
+
+
+    // Dynamic graph functionality
+
+    if (localStorage.getItem('timer') == 1) {
+          ($("#timer-link").trigger('click'));
+    }
+
+
+    // It basically makes only the nodes / edges of the graph visible that the user is currently seeing in the statements div
+
+    var dynamic_graph = 0;
+
+    var dynamic_watch = 0;
+
+    $("#timer-link").click(function(e) {
+      if (dynamic_graph == 0) {
+        //localStorage.setItem('timer',1);
+        dynamic_graph = 1;
+        $('#timer-link').addClass('timer-link-on');
+        $('#entries').scrollTop($('#entries').scrollTop() + 1);
+      }
+      else {
+        dynamic_graph = 0;
+        //localStorage.setItem('timer',0);
+        $('#timer-link').removeClass('timer-link-on');
+        entryScroll('',true);
+        if (dynamic_watch == 1) {
+          $("#watch-link").trigger('click');
+        }
+
+      }
+
+    });
+
+
+
+    // Dynamically watch the graph unfold
+
+    $("#watch-link").click(function(e) {
+
+        if (dynamic_watch == 0) {
+
+            dynamic_watch = 1;
+
+            $('#watch-link').addClass('watch-link-on');
+
+            if (dynamic_graph == 0) {
+                $("#timer-link").trigger('click');
+            }
+
+            infiniteEntriesScroll();
+
+        }
+
+        else  {
+
+            dynamic_watch = 0;
+            $('#watch-link').removeClass('watch-link-on');
+            entries().stopAnimation();
+
+        }
+    });
+
+</script>
