@@ -1,21 +1,12 @@
 <script>
 
-    toggleStatementsButton().onClick(toggleStatements);
+    toggleStatementsButton().onClick(statements().toggleStatements);
     addContextButton().onClick(addContext);
 
     // Are we viewing additional context?
 
     if (userFactory.getAddContext()) {
         $('#addcontext-link').addClass('addcontext-visible');
-    }
-
-    function toggleStatements() {  
-        if (statements().areVisible() == 'VISIBLE') {
-            statements().hide();
-        }
-        else if (statements().areVisible() == 'HIDDEN') {
-            statements().show();
-        }
     }
 
     function addContext() {

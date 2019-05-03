@@ -114,7 +114,7 @@ exports.list = function(req, res, next) {
             contextpublic: contextpublic,
             contextlist: contextslist,
             showcontexts: req.query.showcontexts,
-            background: req.query.background,
+            onlygraph: req.query.onlygraph,
             maxnodes: req.query.maxnodes,
             url: req.query.url,
             urltitle: req.query.urltitle,

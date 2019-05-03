@@ -279,8 +279,8 @@
         userFactory.setGraphPalette('<%= user.palette %>');
         <% if (locals.user.maxnodes) { %>
         userFactory.setMaxNodes('<%= user.maxnodes %>');
-        <% } %>
-        <% if (!background) { %>
+        <% } %>        
+        <% if (locals.user.maxnodes) { %>
         userFactory.setBackground('<%= user.background %>');
         <% } %>
         <% if (locals.user.topnodes) { %>
@@ -297,6 +297,10 @@
             userFactory.setBackground('<%= vieweduser.background %>');
         <% } %>
     <% } %>   
+
+    <% if (onlygraph == '1' || onlygraph == 'graph') { %>
+            userFactory.setViewOption('graphOnly', true);
+    <% } %>
     
     
     // Settings for the general interface view (used for display/embed)
@@ -307,10 +311,18 @@
     userFactory.setViewOption('hide_when_small', getUrlVars()["hide_when_small"]);
     userFactory.setViewOption('urlPath', location.pathname);
 
+    if (getUrlVars()["link_hashtags"]) userFactory.setViewOption('link_hashtags', getUrlVars()["link_hashtags"]);
+
     // Important settings for the graph view (used in rendering)
     if (getUrlVars()["language"]) userFactory.setInLanguage(getUrlVars()["language"]);
     if (getUrlVars()["palette"]) userFactory.setGraphPalette(getUrlVars()["palette"]);
-    if (getUrlVars()["background"]) userFactory.setBackground(getUrlVars()["background"]);
+    if (getUrlVars()["background"]) {
+        userFactory.setBackground(getUrlVars()["background"]);
+        // Legacy:
+        if (getUrlVars()["background"] == 'graph' || getUrlVars()["background"] == '1') {
+            userFactory.setViewOption('graphOnly', true);
+        }
+    }
     if (getUrlVars()["walkthrough"]) userFactory.setWalkthrough(getUrlVars()["walkthrough"]);
     if (getUrlVars()["most_influential"] == 'bc' || getUrlVars()["most_influential"] == 'bc2' || getUrlVars()["most_influential"] == 'degree') {
         userFactory.setMostInfluential(getUrlVars()["most_influential"]);

@@ -34,7 +34,7 @@ else if (go_next_site == 'twitter') {
     userFactory.setForwardTo('http://twitter.com/search?q=');
 }
 
-graphButton().onClick(toggleStatementSidePanel);
+graphButton().onClick(statementsPanel().toggleStatementsPanel);
 goNextButton().onClick(externalNavigation);
 improveLayoutButton().onClick(adjustGraphLayout);
 abstractLayoutButton().onLoad();

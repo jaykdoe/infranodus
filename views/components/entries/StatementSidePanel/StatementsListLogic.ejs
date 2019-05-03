@@ -7,6 +7,8 @@
 
               let currentSelections = []; // IDs
 
+              let statementsVisibility = 'VISIBLE';
+
               // Setting parameters for selecting the entries and associated actions
 
               this.addToCurrentSelections = function(statement_id) {
@@ -30,6 +32,29 @@
               this.removeCurrentSelections = function() {
                 currentSelections = [];
               }
+
+              this.toggleStatementsTo = function(mode) {
+                  statementsVisibility = mode;
+                  if(statementsVisibility === "HIDDEN") statements().hide();
+                  if(statementsVisibility === "VISIBLE") statements().show();
+              }
+
+              // Initialize this function on load
+              
+              this.initializeStatements = function() {
+
+                statements().linkHashtags();
+                statements().onClick(statements().select);
+                statements().changeTime();
+
+                // Check if the statements should be hidden
+                if (localStorage.getItem('folded') == 1) {
+                    this.toggleStatementsTo('HIDDEN');
+                }  
+
+              }
+
+              this.initializeStatements();
  
 
           }
@@ -43,6 +68,18 @@
         
         function statements() {
             return {
+                linkHashtags: function() {
+                    // Do we link hashtags in statements?
+                    if (userFactory.getViewOption('link_hashtags')) {
+                            $(".entry").each(function() {
+                                // Retrieve the statement text from the entry, clean from html
+                                let originale = $(this).children('.entry-text').html();
+                                // Replace with hashtags
+                                $(this).children('.entry-text').html(originale.replace(/#(\w+)/g,  " <a href='" + userFactory.getForwardTo() + "$1' class='app-concept-link' target='_blank'>$&</a>"));            
+                            });
+                    }
+                    
+                },
                 fillSpace: function(heightToReduce){
                     $('#entries').css({height:  $(window).height() - heightToReduce});
                 },
@@ -184,6 +221,7 @@
                         $('#statements-link').removeClass('statements-link-on');
                 },
                 hide: function() {
+                        
                         $("#entries").css('z-index','-2'); 
                         $("#entries").css('visibility','hidden');
                         $('#topnav').fadeOut();
@@ -196,6 +234,14 @@
                             $('#statements-link').addClass('statements-link-on');
                         }
                         
+                },
+                toggleStatements() {  
+                    if (statements().areVisible() == 'VISIBLE') {
+                        statementsFactory.toggleStatementsTo('HIDDEN');
+                    }
+                    else if (statements().areVisible() == 'HIDDEN') {
+                        statementsFactory.toggleStatementsTo('VISIBLE');
+                    }
                 },
                 removeAddContext: function() {
                        let current_context = userFactory.getCurrentContext();
@@ -486,14 +532,6 @@
                     $("#warnings").slideUp('slow');
                     $("#warnings").text('');
                   }
-                },
-                isPanelVisible: function() {
-                    if ($("#statements").is(":visible")) {
-                          return 'VISIBLE'
-                    }
-                    else {
-                          return 'HIDDEN'
-                    }
                 },
                 areVisible: function() {
                     if ($("#entries").css('visibility') == 'hidden') {

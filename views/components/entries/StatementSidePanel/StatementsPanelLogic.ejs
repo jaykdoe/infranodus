@@ -6,28 +6,31 @@
           function StatementsPanelFactory() {
 
               let statementsPanelVisibility = "VISIBLE"; 
-
                               
-              this.changeStatementsModeTo = function(mode) {
+              this.toggleStatementsPanelTo = function() {
+                    statementsPanel().toggleStatementsPanel();
+              }
+
+              this.setStatementsPanelVisibility = function(mode) {
                   statementsPanelVisibility = mode;
-                  if(statementsPanelVisibility === "HIDDEN") statements().hide();
-                  if(statementsPanelVisibility === "VISIBLE") statements().show();
+              }
+              this.getStatementsPanelVisibility = function() {
+                  return statementsPanelVisibility;
               }
 
-              // Initialization functions
-              this.initializeStatements = function() {
+              // Initialize on load
+              this.initializePanel = function() {
 
-                // Add the hooks to the newly rendered entries
-                statements().onClick(statements().select);
-                statements().changeTime();
+                // Did we receive a global setting to hide the graph?
+                if (((userFactory.getViewOption('hide_always') || userFactory.getViewOption('hide_edit')) && !userFactory.getViewOption('show_text')) || ((userFactory.getViewOption('hide_when_small') && $(window).width() < 600) || (userFactory.getViewOption('graphOnly') == 'graph' || userFactory.getViewOption('graphOnly') == '1'))) {   
+                    // Hide the whole Statements (edit) panel as well
+                    statementsPanel().toggleStatementsPanel();
+                }
 
-                // Hide the whole panel if needed
-                if (localStorage.getItem('folded') == 1) {
-                  this.changeStatementsModeTo('HIDDEN');
-                }  
+
               }
 
-              this.initializeStatements();
+              this.initializePanel();
  
 
           }
@@ -37,108 +40,70 @@
         })();
 
         
-        function toggleStatementSidePanel() {
-        
-            if (statements().isPanelVisible() == statements().areVisible()) {
-                toggleStatements();
-            }
-            $("#statements").fadeToggle();
-            
-            
-            if (statements().isPanelVisible() == statements().areVisible() && statements().isPanelVisible() == 'HIDDEN') {
-                localStorage.setItem('graph', 1);
-                $("#graph-link").toggleClass('graph-highlight','add');
-            }
-            else {
-                localStorage.setItem('graph', 0);
-                $("#graph-link").toggleClass('graph-highlight','remove');
-            }
-        
-        
-            if (!localStorage.getItem('analytics')) {
-        
-                $('#analytics').toggle('slide', function(){
-        
-                    if ($('#analytics').is(":visible")) {
-                            $('#analyticsbutton').addClass('analytics-on');
-                            $('#analyticscaption').hide();         
+        function statementsPanel() {
+            return {
+                toggleStatementsPanel: function() {
+
+                    $("#statements").fadeToggle();
+                    
+
+                    // The whole statements panel is hidden as well as the statements themselves
+                    if (statementsPanel().isPanelVisible() == 'VISIBLE') {
+                        localStorage.setItem('graph', 1);
+                        $("#graph-link").toggleClass('graph-highlight','add');
+                        statementsPanelFactory.setStatementsPanelVisibility('HIDDEN');
                     }
                     else {
-                            $('#analyticsbutton').removeClass('analytics-on');
-                            $('#analyticscaption').show();           
+                        localStorage.setItem('graph', 0);
+                        statements().show();
+                        $("#graph-link").toggleClass('graph-highlight','remove');
+                        statementsPanelFactory.setStatementsPanelVisibility('VISIBLE');
                     }
-        
-                });
+
+                    // Are statements and entry edit pane both in the same status?
+                    if (statementsPanel().isPanelVisible() != statements().areVisible()) {
+                        statements().toggleStatements();
+                    }
+                         
+                    if (!localStorage.getItem('analytics')) {
+                
+                        $('#analytics').toggle('slide', function(){
+                
+                            if ($('#analytics').is(":visible")) {
+                                    $('#analyticsbutton').addClass('analytics-on');
+                                    $('#analyticscaption').hide();         
+                            }
+                            else {
+                                    $('#analyticsbutton').removeClass('analytics-on');
+                                    $('#analyticscaption').show();           
+                            }
+                
+                        });
+                    }
+                },
+                isPanelVisible: function() {
+                    return statementsPanelFactory.getStatementsPanelVisibility();
+                }
             }
         
         }
         
+            
         
+          
+
         
-        var link_hashtags = getUrlVars()["link_hashtags"];
-        
-        
-        // Replace hashtags function
-        
-        function replaceHashtags(hash){
-                var replacementString = $.trim(hash);
-                return ' <a href="' + userFactory.getForwardTo() + replacementString.substr(1) +'" class="app-concept-link" target="_blank">' + replacementString + '</a>';
-        }
-        
-        
-        var hashRegex = /(?:\s|^)(?:#(?!\d+(?:\s|$)))(\w+)(?=\s|$)/gi;
-        
-        if (link_hashtags) {
-                $(".entry").each(function() {
-                    // Retrieve the statement text from the entry, clean from html
-                    var originale = $(this).children('.entry-text').html();
-                    // Replace with hashtags
-                    $(this).children('.entry-text').html(originale.replace(/#(\w+)/g,  " <a href='" + userFactory.getForwardTo() + "$1' class='app-concept-link' target='_blank'>$&</a>"));
-        
-                });
-        }
-        
-        
-        
-        
-        // Did we receive a global setting to hide the graph?
-        if ((userFactory.getViewOption('hide_always') || userFactory.getViewOption('hide_edit')) && !userFactory.getViewOption('show_text')) {
-                if (statements().isPanelVisible() == 'VISIBLE') {
-                    toggleStatementSidePanel();
-                }           
-        }
-        
-        // Did we receive a global setting to hide when small only?
-        
-        if (userFactory.getViewOption('hide_when_small') && $(window).width() < 600) {
-        
-                    if ($('#menuLink').is(':visible')) {
-                        if (statements().isPanelVisible() == 'VISIBLE') {
-                            toggleStatementSidePanel();
-                        }   
-                    }
-        
-                    $('#analytics').hide();
-                    $('#analyticsbutton').removeClass('analytics-on');
-                    $('#analyticscaption').show();
-        }
+
         
         // Are we loading the page to only show the graph?
-        
-        <% if (background == '1' || background == 'graph') { %>
-            if (statements().isPanelVisible() == 'VISIBLE') {
-                    toggleStatementSidePanel();
-            }   
-            userFactory.setViewOption('graphOnly', true);
-        <% } %>
-        
-        
+       
+              
         if (localStorage.getItem('graph') == 1 && !userFactory.getViewOption('graphOnly') && !userFactory.getViewOption('hide_always') && !userFactory.getViewOption('hide_when_small')) {
-                    var isHidden__ = $("#statements").is(":hidden");
-                    if (!isHidden__) {
-                        $('#statements').fadeOut();
-                        $("#graph-link").toggleClass('graph-highlight','add');
-                    }
+            var isHidden__ = $("#statements").is(":hidden");
+            if (!isHidden__) {
+                $('#statements').fadeOut();
+                $("#graph-link").toggleClass('graph-highlight','add');
+            }
         }
         
 </script>
