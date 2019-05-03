@@ -242,4 +242,58 @@ socket.on('chat message', function(msg){
 
 });
 
+
+
+// This is called when an entry is deleted
+
+socket.on('delete message', function(msg){
+
+    $('[data-uid="' + msg.entryuid + '"]').fadeOut();
+
+    $("#statement").val('');
+
+    // We remove the nodesOfStatement[statement] for that statement
+    // When searched for nodes in that statement, nothing will appear 
+    graphFactory.removeNodesFromStatement(msg.entryuid);
+
+    // Let's set up which nodes we will keep
+    let nodesToKeep = [];
+
+    // Reiterate through Sigma
+    sigma.instances(0).graph.edges().forEach(function(e) {
+
+        // If a node appears in at least one statement, we add him in ToKeep list
+        for (let item of e.statement_id) {
+        
+            if (graphFactory.existNodeInStatement(item, e.source) == true) {
+                nodesToKeep.push(e.source);
+            }
+
+            if (graphFactory.existNodeInStatement(item, e.target) == true) {
+                nodesToKeep.push(e.target);
+            }
+
+            graphFactory.removeStatementFromContext(e.edge_context, item);
+
+            if (item == msg.entryuid) {
+                sigma.instances(0).graph.dropEdge(e.id);
+            }
+            
+        }
+
+    });
+
+    let nodesToDelete = [];
+    sigma.instances(0).graph.nodes().forEach(function(n) {
+        if (nodesToKeep.indexOf(n.id) < 0) {
+            graphFactory.removeNode(n.originalLabel);
+            nodesToDelete.push(n.originalLabel);
+        }
+
+    });
+
+    graphFactory.deleteGraphNodes(nodesToDelete);
+
+});
+
 </script>

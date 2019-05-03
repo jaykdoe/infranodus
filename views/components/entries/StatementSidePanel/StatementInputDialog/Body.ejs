@@ -476,6 +476,75 @@
                 recommender += '"?';
 
                 $("#statement").attr("placeholder", recommender);
+            },
+            autofill: function(nodeNames,contextNames) {
+               
+
+                $('#statement').textcomplete([
+                    { // hashtags-concepts
+                        words: nodeNames,
+                        match: /\B#(\w*)$/,
+                        search: function (term, callback) {
+                            callback($.map(this.words, function (word) {
+                                return word.indexOf(term) === 0 ? word : null;
+                            }));
+                        },
+                        index: 1,
+                        replace: function (word) {
+
+                            return '#' + word + ' ';
+
+                        }
+                    },
+                    { // html
+                        mentions: contextNames,
+                        match: /\B@(\w*)$/,
+                        search: function (term, callback) {
+                            callback($.map(this.mentions, function (mention) {
+                                return mention.indexOf(term) === 0 ? mention : null;
+                            }));
+                        },
+                        index: 1,
+                        replace: function (mention) {
+                            return '@' + mention + ' ';
+                        }
+                    },
+                    { // hashtags-concepts
+                        words: nodeNames,
+                        match: /\b(\w{2,})$/,
+                        search: function (term, callback) {
+                            callback($.map(this.words, function (word) {
+                                return word.indexOf(term) === 0 ? word : null;
+                            }));
+                        },
+                        index: 1,
+                        replace: function (word) {
+
+                                return word + ' ';
+
+                        }
+                    }
+
+                ]);
+
+
+                $('#addcontext').textcomplete([
+                    { // html
+                        mentions: contextNames,
+                        match: /\b(\w{2,})$/,
+                        search: function (term, callback) {
+                            callback($.map(this.mentions, function (mention) {
+                                return mention.indexOf(term) === 0 ? mention : null;
+                            }));
+                        },
+                        index: 1,
+                        replace: function (mention) {
+                            window.open("?addcontext=" + mention, "_self");
+                            return '@' + mention + '';
+                        }
+                    }
+                ]);
+
             } 
         }
     }

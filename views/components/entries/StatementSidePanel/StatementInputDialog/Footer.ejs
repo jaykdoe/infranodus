@@ -143,39 +143,36 @@ $('#privacy-link').tooltipster({
 
 // If the user opened a URL with collaborate=xxxxxx then they join the room that's the "url_path/xxxxxx"
 if (collaborate_invite) {
-    collaborate_id = collaborate_invite;
+    collabFactory.setCollabId(collaborate_invite);
 }
 // Otherwise they join a room which is "url_path/randomnumber"
 else {
-    collaborate_id = Math.round((Math.random() * 1000000));
+    collabFactory.setCollabId(Math.round((Math.random() * 1000000)));
 }
 
-collaborate_matrix[collaborate_room] = collaborate_room + collaborate_id;
+collabFactory.setCollabMatrix(collabFactory.getCollabRoom(), collabFactory.getCollabId());
 
-// console.log('room id');
-// console.log(collaborate_matrix[collaborate_room]);
+let collaborate_storage = JSON.parse(localStorage.getItem("collaborate"));    
 
 if (!collaborate_invite) {
     if (collaborate_storage) {
 
-        if (collaborate_storage[collaborate_room]) {
-            if (collaborate_storage[collaborate_room].length > 0) {
-                collaborate_matrix[collaborate_room] = collaborate_storage[collaborate_room];
-                collaborate_id = collaborate_matrix[collaborate_room].split("/").pop();
+        if (collaborate_storage[collabFactory.getCollabRoom()]) {
+            if (collaborate_storage[collabFactory.getCollabRoom()].length > 0) {
+                collabFactory.getCollabMatrixForRoom(collabFactory.getCollabRoom(),collaborate_storage[collabFactory.getCollabRoom()]);
+                collabFactory.setCollabId(collabFactory.getCollabMatrixForRoom(collabFactory.getCollabRoom()).split("/").pop());
             }
         }
     }
 
     // Now in case the original user reloads the page by error, they'll get the new collaborate ID, so we avoid that by storing their data
-    localStorage.setItem("collaborate", JSON.stringify(collaborate_matrix));
+    localStorage.setItem("collaborate", JSON.stringify(collabFactory.getCollabMatrix()));
 }
 
 
-collaborate_message = '<a href="mailto:chat@infranodus.com?subject=Chat%20Now&body=https://' + graph_share_url + '/edit?collaborate=' + collaborate_id + '">Invite us</a> or other people for a real-time constellaversation – just share the link below:<br>';
-
-collaborate_html = '<span><form class="pure-form">' + collaborate_message + '<input type="text" id="collaburl" size="22" maxlength="80" class="pure-input" value="http://' + graph_share_url + '/edit?collaborate=' + collaborate_id + '"></form></span>';
-
-collaborate_content = $(collaborate_html);
+let collaborate_message = '<a href="mailto:chat@infranodus.com?subject=Chat%20Now&body=https://' + graph_share_url + '/edit?collaborate=' + collabFactory.getCollabId() + '">Invite us</a> or other people for a real-time constellaversation – just share the link below:<br>';
+let collaborate_html = '<span><form class="pure-form">' + collaborate_message + '<input type="text" id="collaburl" size="22" maxlength="80" class="pure-input" value="http://' + graph_share_url + '/edit?collaborate=' + collabFactory.getCollabId() + '"></form></span>';
+let collaborate_content = $(collaborate_html);
 
 // For collaboration - Socket.IO chat
 var collaborate_invite = getUrlVars()["collaborate"];

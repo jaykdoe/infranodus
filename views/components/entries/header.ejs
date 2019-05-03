@@ -3,6 +3,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, minimal-ui">
     <title><%= title %></title>
     <script src="/javascripts/jquery.min.js"></script>
+    <%- include('../../components/common/index') %>
     <script>
 
     // Initiate Global User Settings
@@ -36,7 +37,8 @@
         let graphOptions = { 
             minnodesize: 5,
             maxnodesize: 16,
-            deselected_nodes_color: '#ddd'
+            deselected_nodes_color: '#ddd',
+            color_context: '#666'
         }
 
 
@@ -289,7 +291,52 @@
             userFactory.setGraphPalette('<%= vieweduser.palette %>');
             userFactory.setBackground('<%= vieweduser.background %>');
         <% } %>
-    <% } %>          
+    <% } %>   
+    
+    
+    // Settings for the general interface view (used for display/embed)
+    userFactory.setViewOption('hide_always', getUrlVars()["hide_always"]);
+    userFactory.setViewOption('hide_edit', getUrlVars()["hide_edit"]);
+    userFactory.setViewOption('show_text', getUrlVars()["show_text"]);
+    userFactory.setViewOption('show_analytics', getUrlVars()["analytics"]);
+    userFactory.setViewOption('hide_when_small', getUrlVars()["hide_when_small"]);
+    userFactory.setViewOption('urlPath', location.pathname);
+
+    // Important settings for the graph view (used in rendering)
+    if (getUrlVars()["language"]) userFactory.setInLanguage(getUrlVars()["language"]);
+    if (getUrlVars()["palette"]) userFactory.setGraphPalette(getUrlVars()["palette"]);
+    if (getUrlVars()["background"]) userFactory.setBackground(getUrlVars()["background"]);
+    if (getUrlVars()["walkthrough"]) userFactory.setWalkthrough(getUrlVars()["walkthrough"]);
+    if (getUrlVars()["most_influential"] == 'bc' || getUrlVars()["most_influential"] == 'bc2' || getUrlVars()["most_influential"] == 'degree') {
+        userFactory.setMostInfluential(getUrlVars()["most_influential"]);
+    }
+
+    // Important switch that shows whether we're in the "interpretation" mode where we build one graph on top of another
+    if (getUrlVars()["interpret"]) userFactory.setInterpret(getUrlVars()["interpret"]);
+    if (getUrlVars()["abstract"]) userFactory.setGraphOption('abstract',getUrlVars()["abstract"]);
+
+    // Change the theme
+
+    function toggleTheme() {
+        if(document.documentElement.hasAttribute('theme')){
+            document.documentElement.removeAttribute('theme');
+        }
+        else {
+            document.documentElement.setAttribute('theme', 'dark');
+            if (userFactory.getGraphPalette() == 'contrast') {
+                userFactory.setGraphOption(deselected_nodes_color,'#555');
+            }
+            else {
+                userFactory.setGraphOption(deselected_nodes_color,'#444');
+            }
+            userFactory.setGraphOption('default_label_color','#ffffff');
+        }
+    }
+
+    if (userFactory.getBackground() == 'dark') {
+        toggleTheme();
+    }
+
     </script>
     <link rel='stylesheet' href='/stylesheets/jquery.textcomplete.css' />
     <link rel="stylesheet" href="/stylesheets/jquery-ui.min.css">

@@ -22,6 +22,24 @@
         return vars;
     }
 
+
+    function autoComplete(element,nodeNames) {
+                        
+        $(element).autocomplete({
+            source: nodeNames,
+            minLength: 1,
+            delay: 500,
+            messages: {
+                noResults: '',
+                results: function() {}
+            },
+            select: function(event, ui) {
+                var filter = ui.item.value;
+            }
+        });
+        
+    }
+
     function normalize(enteredValue, minEntry, maxEntry, normalizedMin, normalizedMax) {
       var mx;
       if ((enteredValue-minEntry) == 0) { mx = 0 } else {
@@ -161,6 +179,34 @@
 
     function getRandomInt(min, max) {
           return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function shannon(data) {
+
+        // Create a dictionary of character frequencies and iterate over it.
+        function process(s, evaluator) {
+            var h = Object.create(null), k;
+            s.split('').forEach(function(c) {
+                h[c] && h[c]++ || (h[c] = 1); });
+            if (evaluator) for (k in h) evaluator(k, h[k]);
+            return h;
+        };
+
+        // Measure the entropy of a string in bits per symbol.
+
+        // Measure the entropy of a string in total bits.
+        function bits (s) {
+            return entropy(s) * s.length;
+        }
+
+        var sum = 0,len = data.length;
+        process(data, function(k, f) {
+            var p = f/len;
+            sum -= p * Math.log(p) / Math.log(2);
+        });
+
+        return sum;
+
     }
 
 

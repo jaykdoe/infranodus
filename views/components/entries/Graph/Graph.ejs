@@ -158,7 +158,7 @@ function graph() {
         initNodesEdges: function(callback) {
             
             let tot = 0;
-            let color_context = '#666';
+            let color_context = userFactory.getGraphOption('color_context');
             let total_nodes = sigma.instances(0).graph.nodes().length;
             let maxnodesize = 0;
 
@@ -292,11 +292,11 @@ function graph() {
                 id: node.id,
                 label: node.label,
                 originalLabel: node.label,
-                originalColor: color_context,
-                size: maxnodesize - 2,
+                originalColor: userFactory.getGraphOption('color_context'),
+                size: userFactory.getGraphOption('maxnodesize') - 2,
                 x: Math.random(),
                 y: Math.random(),
-                color: color_context
+                color: userFactory.getGraphOption('color_context')
               }); 
           //sigma.instances(0).refresh();
         },
@@ -311,7 +311,7 @@ function graph() {
                 label: '',
                 originalLabel: 'context: ' + context.label,
                 originalColor: '#6689d0',
-                size: maxnodesize + 2,
+                size: userFactory.getGraphOption('maxnodesize') + 2,
                 x: x,
                 y: y,
                 type: 'square',
@@ -1028,6 +1028,21 @@ function sigmaGraph() {
                 }
                 sigma.instances(0).refresh();
             });
+        },
+        downloadPNG: function() {
+
+            var canvaspng = document.querySelector('.sigma-scene');
+            let current_context = userFactory.getCurrentContext();
+
+            document.querySelector('#downloadpng').href = canvaspng.toDataURL();
+            document.querySelector('#downloadpng').download = userFactory.getCurrentUser() + '_' + current_context + '.png';
+
+            document.querySelector('#downloadpng').addEventListener('click', function(ev) {
+                document.querySelector('#downloadpng').href = canvaspng.toDataURL();
+                document.querySelector('#downloadpng').download = userFactory.getCurrentUser() + '_' + current_context + '.png';
+            }, false);
+
+
         }
     }
 }

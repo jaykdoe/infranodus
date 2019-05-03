@@ -32,7 +32,7 @@ sigma.parsers.json(
             graph().initNodesEdges(graph().updateMetrics);           
   
             // Initialize autofill for hashtags and contexts - only after the graph is loaded
-            autofill(graphFactory.getNodeNames(),contextNames);
+            addEntryForm().autofill(graphFactory.getNodeNames(),contextNames);
            
             // Drag nodes function initiated, so we can drag nodes
             graph().dragNodes();
@@ -45,6 +45,9 @@ sigma.parsers.json(
 
             // Select the node's label when we're over it and deselect when we're not
             sigmaGraph().highlightNode();
+
+            // Add a hook to enable PNG download of the graph
+            sigmaGraph().downloadPNG();
            
 
         }

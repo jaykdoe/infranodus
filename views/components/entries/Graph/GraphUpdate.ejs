@@ -232,6 +232,20 @@ socket.on('node click', function(msg){
 });
 
 
+// When we click reset button
+
+socket.on('graph reset', function(msg){
+     
+     graphFactory.initPinnedNodes();
+     graphFactory.updateNotFoundNodes();
+     graphFactory.updateSelectedNodes([]);
+     graphFactory.clearSelectCommunity();
+     analyticsPanel.removeSelections();
+     entries().unfilter();
+      
+ });
+
+
 
 
 </script>
