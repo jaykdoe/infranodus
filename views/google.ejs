@@ -33,10 +33,10 @@
 
             <form action='/import' name='submitform' id="submitform" method='post' enctype="multipart/form-data" class='pure-form pure-form-stacked'>
 
-                <input type='text' size="14" maxlength="50" name='search' id="search" class="pure-input" placeholder='search terms' value="<% if (fornode) { %><%= fornode %><% } %>" /> &nbsp;&nbsp; <input class="pure-button" id="googlesubmit" type='submit' name="btnSubmit" value="Go" class="pure-button pure-button-primary">
+                <input type='text' size="25" maxlength="50" name='search' id="search" class="pure-input" placeholder='search terms' value="<% if (fornode) { %><%= fornode %><% } %>" /> <br><br><input class="pure-button pure-button-primary" type='submit' name="btnSubmit" value="Import">
 
                 <br>&nbsp;<br>
-                Type in your search query, and we will show you which words are the most related to your query, so you can continue your search in a more informed way.
+                Type in your search query and visualize the available results as a graph, so you can see the main topics, how they relate, what's there and what's missing.
 
                 <br>&nbsp;<br>
                 <% include messages %>
