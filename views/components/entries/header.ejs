@@ -40,8 +40,9 @@
                 deselected_nodes_color: '#ddd',
                 color_context: '#666',
                 color_addcontext: '#666666',
+                highlight_addcontext: '#0089e0',
                 forceatlas_options: {worker: false, startingIterations: 100, scalingRatio: 0.1, slowDown: 100, strongGravityMode: true},
-                
+
             }
 
             let contextPublic = false;
@@ -365,6 +366,10 @@
     // Important switch that shows whether we're in the "interpretation" mode where we build one graph on top of another
     if (getUrlVars()["interpret"]) userFactory.setInterpret(getUrlVars()["interpret"]);
     if (getUrlVars()["abstract"]) userFactory.setGraphOption('abstract',getUrlVars()["abstract"]);
+    
+    // How do we treat highlights on the intersecting graphs?
+    if (getUrlVars()["highlight"]) userFactory.setGraphOption('highlight_intersections',getUrlVars()["highlight"]);
+    if (getUrlVars()["missing"]) userFactory.setGraphOption('highlight_missing',getUrlVars()["missing"]);
 
     // Change the theme
 

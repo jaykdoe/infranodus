@@ -11,14 +11,6 @@
   // Is Sigma being dragged?
   var sigma_dragged = 0;
 
-  // Initialize JSON parser for SIGMA visualization
-
-
-  var highlight_addcontext = '#0089e0';
-
-  var highlight = getUrlVars()["highlight"];
-
-  var missing = getUrlVars()["missing"];
 
 
   // These are the nodes clicked in the graph
@@ -569,6 +561,9 @@ function graph() {
 
             let deselected_nodes_color = userFactory.getGraphOption('deselected_nodes_color');
 
+            let highlight = userFactory.getGraphOption('highlight_intersections');
+            let missing = userFactory.getGraphOption('highlight_missing');
+
             sigma.instances(0).graph.nodes().forEach(function(n) {
 
                 // Give original color to the node
@@ -627,12 +622,12 @@ function graph() {
                                 if (highlight) {
 
                                     // Then show the nodes that are in the additional context, but not in the meta yet (DIFF)
-                                    n.originalColor = highlight_addcontext;
+                                    n.originalColor = userFactory.getGraphOption('highlight_addcontext');
                                     
                                     // Unless it is pinned
                                     if (pinnedNodes.indexOf(n.label) == -1) {
                                         if (graphFactory.getSelectedNodes().length == 0){
-                                            n.color = highlight_addcontext;
+                                            n.color = userFactory.getGraphOption('highlight_addcontext');
                                         }
                                     }
                                 }
@@ -649,8 +644,8 @@ function graph() {
                                 if ((graphFactory.existsNodeInContext(addcontext, n.id) == true) && (graphFactory.existsNodeInContext(current_context, n.id) == true)) {
                                     // Highlight is on? Highlight intersection
                                     if (highlight) {
-                                        n.originalColor = highlight_addcontext;
-                                        n.color = highlight_addcontext;
+                                        n.originalColor = userFactory.getGraphOption('highlight_addcontext');
+                                        n.color = userFactory.getGraphOption('highlight_addcontext');
                                     }  
                                 }
                                 else {
@@ -667,11 +662,11 @@ function graph() {
                                 // Let's highlight the missing nodes
 
                                 // If the node is in the addcontext but not in the original context we're comparing it to
-                                if (graphFactory.existsNodeInContext(addcontext, n.id) == true && graphFactory.existsNodeInContext(current_context, n.id) == true) {
+                                if (graphFactory.existsNodeInContext(addcontext, n.id) == true && graphFactory.existsNodeInContext(current_context, n.id) != true) {
                                     // If highlight feature is on, highlight the DIFF nodes
                                     if (highlight) {
-                                        n.originalColor = highlight_addcontext;
-                                        n.color = highlight_addcontext;
+                                        n.originalColor = userFactory.getGraphOption('highlight_addcontext');
+                                        n.color = userFactory.getGraphOption('highlight_addcontext');
                                     }
                                     else {
                                         // otherwise show the nodes that are in in the addcontext but NOT in the original one as GRAY
