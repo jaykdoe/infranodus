@@ -91,7 +91,7 @@ function populateContextMenu (contextNames) {
         }
 
         <% if (!perceivername) { %>
-            addNewContext = '<li id="addNewContext" class="menu-item-divided"><a id="addcontextbutton" href="javascript:" class="whiten"> + add new graph&nbsp;&nbsp;</a>&nbsp;<form action="/post" method="GET" class="pure-form" id="addcontextinput"><input type="text" id="addcontextname" size="10" class="pure-input"><input id="addcontextsubmit" type="submit" value="">&nbsp;&nbsp;</form></li>';
+            addNewContext = '<li id="addNewContext" class="menu-item-divided"><a id="addcontextbutton" href="javascript:" class="whiten"> + add new graph&nbsp;&nbsp;</a>&nbsp;<form action="/post" method="GET" class="pure-form" id="addcontextinput"><input type="text" id="addcontextname" size="8" class="pure-input"><input id="addcontextsubmit" type="submit" value="">&nbsp;&nbsp;</form></li>';
         <% } else { %>
             addNewContext = '<li class="menu-item-divided">&nbsp;<a href="javascript:"></a></li>';
 
