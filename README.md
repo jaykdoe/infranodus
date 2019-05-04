@@ -1,5 +1,7 @@
 ## InfraNodus is a text-to-network visualization tool, based on Neo4J, Node.Js and Sigma.Js.
 
+#### InfraNodus provides the fastest way to create a graph using plain text, #hashtags or @mentions. [Try it online](https://infranodus.com) or install your local version.
+
 #### Keep track of all the connections using this simple tool that converts natural language into graph (English, Russian, French, German are supported, other languages — limited support).
 
 #### Also use InfraNodus as an interface to your Neo4J database to quickly try out some basic graph constructs using an easy input procedure via natural language, voice-to-text and #hashtags
@@ -25,7 +27,7 @@
 
 The basic ideas behind InfraNodus are:
 
-- Graph DB model suitable for large graphs and collaboration.
+- [Graph DB model](https://github.com/deemeetree/graphdbmodel) suitable for large graphs and collaboration.
 - Represent text as a network of interconnected nodes.
 - Works on desktop and mobile.
 - Make it easy to add nodes into a graph through a simple web interface.
@@ -46,12 +48,15 @@ The basic ideas behind InfraNodus are:
 InfraNodus is built on
 
 * [Sigma.Js](http://github.com/jacomyal/sigma.js) for graph visualization;
-* [Neo4J](http://neo4j.org) ver 3.x for graph database storage (TODO: add support for OrientDB and Titanium);
+* [Neo4J](http://neo4j.org) ver 3.x for graph database storage 
+* [Graphology](https://graphology.github.io/) for graph metrics calculations (Modularity)
+* [JSNetworksX](http://jsnetworkx.org/) for graph metrics calculations (BC)
 * Node.Js
 * Express Node.Js library;
 * [Node-Neo4J layer](http://github.com/philippkueng/node-neo4j);
 * [Textexture](http://textexture.com) algorithm for text network visualization;
 * Help from the people on StackOverflow and Neo4J community;
+* Special thanks to [Oleg Yarin](https://github.com/monapasan) for advice;
 
 
 =================
@@ -111,20 +116,22 @@ InfraNodus can also be used on a mobile.
 
 ### GPL License
 
-This open source, free software is available under the GPL license.
-You can make modifications to this code and binaries based on it, but only on the condition that you provide access to those modifications on the same license.
-It is provided as is, with no guarantees and no liabilities.
-You can re-use it as long as you keep this notice inside the code
+This open source, free software is available under the GNU Affero General Public License version 3 (AGPLv3) license.
+You can make modifications to this code and binaries based on it, but only on the condition that you provide access to those modifications under the same license (including remotely  through a computer network).
+It is provided as is, with no guarantees and no liabilities. 
+You can re-use it as long as you keep this notice inside the code.
 
-** You are very welcome to join the project! **
+**You are very welcome to join the project!**
 
-Created by [Nodus Labs](http://www.noduslabs.com), conceptualized via [Polysingularity](http://polysingularity.com), inspired from [ThisIsLike.Com](http://thisislike.com), and [KnowNodes (now Rhizi)](http://rhizi.org) co-developed at [Center for Interdisciplinary Research](http://cri-paris.org).
+Created by Dmitry Paranyushkin of [Nodus Labs](http://www.noduslabs.com), conceptualized via [Polysingularity](http://polysingularity.com), inspired from [ThisIsLike.Com](http://thisislike.com), and [KnowNodes (now Rhizi)](http://rhizi.org) co-developed at [Center for Interdisciplinary Research](http://cri-paris.org).
 
 This project would not be possible without the help from StackOverflow community. Thank you so much!
 
-Written by [Dmitry Paranyushkin](http://github.com/deemeetree) | [Nodus Labs](http://www.noduslabs.com) and hopefully you also!
+Copyright (C) [Dmitry Paranyushkin](http://github.com/deemeetree) | [Nodus Labs](http://www.noduslabs.com) and hopefully you also!
 (http://www.noduslabs.com) | info AT noduslabs DOT com
 
 In some parts the code from the book ["Node.js in Action"](http://www.manning.com/cantelon/) is used (highly recommended, btw!)
 (c) 2014 Manning Publications Co.
-Any source code files provided as a supplement to the book are freely available to the public for download. Reuse of the code is permitted, in whole or in part, including the creation of derivative works, provided that you acknowledge that you are using it and identify the source: title, publisher and year.*
+Any source code files provided as a supplement to the book are freely available to the public for download. Reuse of the code is permitted, in whole or in part, including the creation of derivative works, provided that you acknowledge that you are using it and identify the source: title, publisher and year.
+
+Some parts of this code may come under a different license if specified within.
