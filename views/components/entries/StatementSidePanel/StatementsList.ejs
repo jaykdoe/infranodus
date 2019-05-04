@@ -1,0 +1,14 @@
+
+<div id="entries">
+
+    <div id="explanation"></div>
+
+    <% entries.forEach(function(entry) { %>
+        <%- include('./StatementEntry', {entry}); %>
+    <% }) %>
+
+    <%- include('../../common/messages', {messages:locals.messages, removeMessages: locals.removeMessages}); %>
+
+    <div id="warnings"></div>
+
+</div>

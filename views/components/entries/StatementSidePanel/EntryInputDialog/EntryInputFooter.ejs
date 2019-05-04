@@ -1,0 +1,35 @@
+<% if (!perceivername) { %>
+    <a href="javascript:" id="import-link" class="tooltip" title="import from external sources">
+        <!-- Import icon -->
+        <span></span>
+    </a>
+    <a href="javascript:" id="collaborate-link">
+        <!-- Collaborate icon -->
+        <span></span>
+    </a>
+<% } %>
+
+<% if (contextpublic && context && !perceivername) { %>
+    <a href="javascript:" id="privacy-link" class="is-public">
+        <!-- Share icon -->
+        <span></span>
+    </a>
+<% } else if (!perceivername && context) { %>
+    <a href="javascript:" id="privacy-link">
+        <!-- Share icon -->
+        <span></span>
+    </a>
+<% } %>
+
+<% if ((context) && (!perceivername)) { %>
+    <form action='/post' name='deletecontext' id="deletecontext"
+        method='post' class='pure-form'
+        onsubmit="return confirm('Deleting the context will delete all the statements inside. Are you sure?');">
+        <input type="hidden" name="context" value="<%= context %>">
+        <input type="hidden" id="selectedContexts" name="selectedContexts" value="">
+        <input type="hidden" name="statementid" value="">
+        &nbsp; <br />
+        <input type='submit' id="deletecontextbutton" name="delete" value="delete context">
+    </form>
+<% } %>
+

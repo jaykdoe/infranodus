@@ -1,0 +1,134 @@
+<script>
+
+
+undoButton().onClick(resetGraph);
+
+deleteNodeButton().onClick(deleteNodes);
+
+function undoButton() {
+    return {
+        onClick: function(onClick){
+            $('#undo').on('click', onClick);
+        }
+    }
+}
+
+function deleteNodeButton() {
+    return {
+        onClick: function(onClick){
+            $('#deletenodes').on('click', deleteNodes);
+        }
+    }
+}
+
+function graphTags() {
+    return {
+        // TODO maybe add pinnedNodes, notFoundNodes, stopNodes into the function arguments and perform the logic accordingly
+        update: function() {
+                 
+            // Add a delete button next to those nodes
+            if (graphFactory.existPinnedNodes() == true) {
+                    $('#deletenodes').addClass('deletenodes-on');
+                    $('#undo').addClass('undo-on');
+            }
+            else {
+                    $('#deletenodes').removeClass('deletenodes-on');
+                    $('#undo').removeClass('undo-on'); 
+            }
+           
+            
+            // Show tags that are currently used in search
+            var htmlNodes =  '<ul class="tags">';
+
+            // If no pinned nodes, reset not found nodes
+            if (graphFactory.existPinnedNodes() == false) { graphFactory.updateNotFoundNodes(); }
+
+            // Add not found nodes as tags (gray)
+            for (let x = 0; x < graphFactory.getNotFoundNodes().length; x++) {
+                htmlNodes = htmlNodes + '<li><a class="notfound" href="#">' + graphFactory.getNotFoundNodes()[x] + '</a></li>';
+            }
+
+            // Add pinned nodes as tags (blue)
+            for (let q = 0; q < graphFactory.getPinnedNodes().length; q++) {
+                htmlNodes = htmlNodes + '<li><a href="#">' + graphFactory.getPinnedNodes()[q] + '</a></li>';
+            }
+
+            // Add stopNodes to the list 
+            var stopNodesList = '<ul class="tags">';
+            for (var x = 0; x < graphFactory.getStopNodes().length; x++) {
+                stopNodesList = stopNodesList + '<li><a class="deleted" href="#">' + graphFactory.getStopNodes()[x] + '</a></li>';
+            }
+            stopNodesList = stopNodesList + '</ul>';
+
+            htmlNodes = htmlNodes + '<div class="tagsend"></div></ul>';
+
+            $('#pinnednodeslist').html(htmlNodes);
+
+            $('#stopnodeslist').html(stopNodesList);
+
+            // Add triggers to newly shown Tags elements
+
+            addTagTriggers();
+
+            if (graphFactory.existStopNodes() == true) {
+                if (userFactory.getBackground() == 'dark') {
+                    $('#stopsave').addClass('stopsave-dark');
+                }
+                else {
+                    $('#stopsave').addClass('stopsave-on');
+                }
+            }
+            else {
+                if (userFactory.getBackground() == 'dark') {
+                    $('#stopsave').removeClass('stopsave-dark');
+                }
+                else {
+                    $('#stopsave').removeClass('stopsave-on');
+                }
+            }
+            
+        }
+    }
+}
+
+
+
+function addTagTriggers() {
+
+
+    $(".tags").on('click', function(e) {
+
+        e.preventDefault();
+
+        let remove_node = e.target.innerText;
+
+        // If the clicked node is in the pinnedNodes list, remove it and push it into the notfoundNodes list
+
+        if (graphFactory.checkIfPinned(remove_node) == true) {
+                graphFactory.removeFromPinnedNodes(remove_node);
+        }
+        
+        // Adding a deleted node back into the graph
+
+        if (graphFactory.checkIfStopNode(remove_node) == true) {
+            socket.emit('node add', {addingNodes: remove_node, stoplistNodes: graphFactory.getStopNodes()});
+        }
+
+
+    });
+
+}
+
+
+
+// What happens if we want to pass the list of keywords we selected to the settings
+
+$("#stopsave").on('click', function(e) {
+    e.preventDefault;
+    let deletedNodes = graphFactory.getStopNodes();
+    window.location.href = "/settings?stopwords=" + encodeURIComponent(deletedNodes.join(' ')) + "&returncontext=" + userFactory.getCurrentContext();
+});
+
+
+
+</script>

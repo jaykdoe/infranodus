@@ -1,0 +1,630 @@
+<script>
+
+        // Initiate the statements constructor (entries added into the left side-panel)
+
+        const statementsFactory = (() => {
+          function StatementsFactory() {
+
+              let currentSelections = []; // IDs
+
+              let statementsVisibility = 'VISIBLE';
+
+              // Setting parameters for selecting the entries and associated actions
+
+              this.addToCurrentSelections = function(statement_id) {
+                currentSelections.push(statement_id);
+              }
+              this.getCurrentSelections = function() {
+                return currentSelections;
+              }
+              this.isInCurrentSelections = function(statement_id) {
+                if (currentSelections.indexOf(statement_id) > -1) {
+                  return true;
+                }
+                else {
+                  return false;
+                }
+              }
+              this.removeFromCurrentSelections = function(statement_id) {
+                let index = currentSelections.indexOf(statement_id);
+                currentSelections.splice(index,1);
+              }
+              this.removeCurrentSelections = function() {
+                currentSelections = [];
+              }
+
+              this.toggleStatementsTo = function(mode) {
+                  statementsVisibility = mode;
+                  if(statementsVisibility === "HIDDEN") statements().hide();
+                  if(statementsVisibility === "VISIBLE") statements().show();
+              }
+
+              // Initialize this function on load
+              
+              this.initializeStatements = function() {
+
+                statements().linkHashtags();
+                statements().onClick(statements().select);
+                statements().changeTime();
+
+                // Check if the statements should be hidden
+                if (localStorage.getItem('folded') == 1) {
+                    this.toggleStatementsTo('HIDDEN');
+                }  
+
+              }
+ 
+
+          }
+
+          return new StatementsFactory();
+
+        })();
+
+        // Initialize some functions to statements on load 
+        statementsFactory.initializeStatements();
+           
+        // The different functions that can be performed on the statements
+        
+        function statements() {
+            return {
+                linkHashtags: function() {
+                    // Do we link hashtags in statements?
+                    if (userFactory.getViewOption('link_hashtags')) {
+                            $(".entry").each(function() {
+                                // Retrieve the statement text from the entry, clean from html
+                                let originale = $(this).children('.entry-text').html();
+                                // Replace with hashtags
+                                $(this).children('.entry-text').html(originale.replace(/#(\w+)/g,  " <a href='" + userFactory.getForwardTo() + "$1' class='app-concept-link' target='_blank'>$&</a>"));            
+                            });
+                    }
+                    
+                },
+                fillSpace: function(heightToReduce){
+                    $('#entries').css({height:  $(window).height() - heightToReduce});
+                },
+                changeTime: function() {
+                    $(".entry-date").each(function() {
+                        var convertedTime = timeConverter($(this).text()) ;
+                        $(this).text(convertedTime);
+                    });
+                },
+                scroll: function(speed, scrollTo, type, onEnd) {
+                    if (!speed) speed = 1000; // scroll speed in ms
+                    if (!scrollTo) scrollTo = $('#entries')[0].scrollHeight;
+                    if (!type) type = 'swing'; // can also be 'linear'
+        
+                    $("#entries").animate({ scrollTop: scrollTo }, speed, type, onEnd);            
+        
+                },
+                infiniteScroll: function() {
+                    let speed_scroll = 1000;
+                    let max_scroll = $('#entries')[0].scrollHeight - $('#entries').height();
+                    let current_scroll = ($('#entries').scrollTop());
+                    let scroll_to = max_scroll;
+                    let num_entries =  $('.entry').length;
+              
+                    if (current_scroll == max_scroll) {
+                        $('#entries').scrollTop(0);
+                        current_scroll = $('#entries').scrollTop();
+                    }
+                      
+                    let play_time = Math.round(((max_scroll - current_scroll)/max_scroll) * num_entries * speed_scroll);
+              
+                    statements().scroll(play_time, scroll_to, 'linear', statements().infiniteScroll);
+                },
+                selectScrolledOnGraph: function(scroll_entry, undo_select) {        
+                    // TODO BUG fix scroll on http://localhost:3000/news/english/edit#
+                    if (graphFactory.existPinnedNodes() == false && !undo_select) {
+                      graph().selectEntries(scroll_entry);
+                    }
+                    else {
+                        if (graphFactory.existPinnedNodes() == false) {
+                          graph().removeSelections();
+                        }
+                    }
+                
+                },
+                select: function(e) {
+                    
+                    // What happens when a statement is selected on the graph
+                    if (e) {
+                      e.stopPropagation();
+                    }
+                    
+                    let keepStatementID;
+
+                    if (e && e.currentTarget && e.currentTarget.dataset) {
+                      keepStatementID = e.currentTarget.dataset.uid;
+                    }
+
+                    if (!keepStatementID) {
+                      statementsFactory.removeCurrentSelections();
+                    }
+                    else if (statementsFactory.isInCurrentSelections(keepStatementID) == true) {
+                      statementsFactory.removeFromCurrentSelections(keepStatementID);
+                    }
+                    else {
+                      statementsFactory.addToCurrentSelections(keepStatementID);
+                    }
+                    
+                    let entries_to_select = [];
+                    entries_to_select = statementsFactory.getCurrentSelections();
+
+                    let pinnedNodes = graphFactory.getPinnedNodes();
+
+                    $(".entry").each(function() {
+                        if (entries_to_select.length == 0) {
+                          $(this).css('opacity', '1');  
+                          $('.entry-menu',this).hide();
+                        }
+                        else if (statementsFactory.isInCurrentSelections($(this).attr('data-uid')) == true) {
+                          $(this).css('opacity', '1');  
+                          $('.entry-menu',this).show();
+                        } 
+                        else {
+                          $(this).css('opacity', '0.3');  
+                          $('.entry-menu',this).hide();
+                        }
+                    });
+
+                    if (keepStatementID) {
+                      statements().onEditClick(statements().editDeleteStatement);
+                      statements().onResetClick(statements().select);
+                    }
+
+                  
+                    // Make only those edges visible that belong to the statement selected
+                    if (entries_to_select.length > 0) {
+                      graph().selectEntries(entries_to_select);
+                    }
+                    else {
+                      if (graphFactory.existPinnedNodes() == true) {
+                        graphFactory.initPinnedNodes(pinnedNodes);
+                      }
+                      else {
+                        graph().removeSelections();
+                      }
+                    }
+                },
+                stopAnimation: function() {
+                    $("#entries").stop();
+                },
+                append: function(text, id, name, posted_by, alien, chatbot) {
+                    let added_entry = '';
+                    if (!alien) { 
+                      added_entry = "<div class='entry' style='display: none;' data-uid='" + id + "' data-hashtags='" + name + "'><p class='entry-text'>" + text + "</p><p class='entry-date'>by " + posted_by + " at " + moment().format('hh:mm:ss') + "</p><p class='entry-menu'>&nbsp;&nbsp;&nbsp;<a class='editentry' href='#'>edit</a>&nbsp;&nbsp;&nbsp;<a class='resetentry' href='#'>deselect</a></p><div class='separator'>&nbsp;</div><div id='" + id + "' class='hidden'></div></div>";
+                    }
+                    else {
+                      if (!chatbot) 
+                        added_entry = "<div class='entry alien' style='display: none; margin-left: 50px' data-uid='" + id + "' data-hashtags='" + name + "'><p class='entry-text gray'>" + text + "</p><p class='entry-date gray'>by " + posted_by + " at " + moment().format('hh:mm:ss') + "</p><p class='entry-menu'>&nbsp;&nbsp;&nbsp;<a class='editentry' href='#'>edit</a>&nbsp;&nbsp;&nbsp;<a class='resetentry' href='#'>deselect</a></p><div class='separator'>&nbsp;</div><div id='" + id + "' class='hidden'></div></div>";
+                      else {
+                        added_entry =  "<div class='entry alien' style='display: none; margin-left: 50px' data-uid='" + id + "'><p class='entry-text gray'>" + text + "</p><p class='entry-date gray'>help tip &nbsp;<em></em><a href='javascript:' class='disablehelp'>disable</a></em></p><div class='separator'>&nbsp;</div><div id='" + id + "' class='hidden'></div></div>";
+                      }
+                    }
+                    $(added_entry).appendTo($('#entries')).slideDown("fast");
+                },
+                onClick: function(onClick) {
+                    $('.entry').on('click', onClick);
+                },
+                onEditClick: function(onClick) {
+                    $('.editentry').on('click', onClick);
+                },
+                onDoubleClick: function(onClick) {
+                    $(".entry").on('doubletap', onClick);
+                },
+                onResetClick: function(onClick) {
+                    $(".resetentry").on('click', onClick);
+                },
+                show: function() {
+                        $("#entries").css('z-index','5');
+                        $("#entries").css('visibility','visible');
+                        $('#topnav').fadeIn();
+                        localStorage.setItem('folded', 0);
+                        // TODO move color to another function
+                        $('#statements-link').removeClass('statements-link-on-dark');
+                        $('#statements-link').removeClass('statements-link-on');
+                },
+                hide: function() {
+                        
+                        $("#entries").css('z-index','-2'); 
+                        $("#entries").css('visibility','hidden');
+                        $('#topnav').fadeOut();
+                        localStorage.setItem('folded', 1);
+                        // TODO move color to another function
+                        if (userFactory.getBackground() == 'dark') {
+                            $('#statements-link').addClass('statements-link-on-dark');
+                        }
+                        else {
+                            $('#statements-link').addClass('statements-link-on');
+                        }
+                        
+                },
+                toggleStatements() {  
+                    if (statements().areVisible() == 'VISIBLE') {
+                        statementsFactory.toggleStatementsTo('HIDDEN');
+                    }
+                    else if (statements().areVisible() == 'HIDDEN') {
+                        statementsFactory.toggleStatementsTo('VISIBLE');
+                    }
+                },
+                removeAddContext: function() {
+                       let current_context = userFactory.getCurrentContext();
+                       let addcontext = userFactory.getAddContext();
+                       if (addcontext && userFactory.isInterpretOn() == true) {
+                          $('.entry').hide();
+                          let statementsOfContext = graphFactory.getStatementsOfContext(current_context);
+                              for (var ite in statementsOfContext) {
+                                $('.entry[data-uid="' + statementsOfContext[ite] + '"]').each(function() {
+                                  $(this).show();
+                                });                    
+                            }
+                        }
+                },
+                unfilter: function(that) {
+                    if (that) {
+                        $(that).fadeIn(400);
+                    }
+                    else {
+                        $('.entry').fadeIn(400);
+                    }
+                },
+                filter: function(that) {
+        
+                  if (that) {
+                    $(that).fadeOut(400);
+                  }
+                  else {
+                          
+                    if (graphFactory.existPinnedNodes() == false) {
+                      statements().unfilter();
+                      statements().removeHighlight('.entry');
+                    }
+                    else {
+                      statements().searchPinned(statements().addHighlight);        
+                    }
+        
+                  }
+                },
+                addHighlight: function(that, nodesToHighlight) {
+        
+                  // No nodes sent to highlight? Then highlight the pinned ones
+                  if (!nodesToHighlight) {
+                    let nodesToHighlight = graphFactory.getPinnedNodes();
+                  }
+        
+                  // Have to do this, so we don't add extra spans
+                  $(that).removeHighlight();
+        
+                  for (let i = 0; i < nodesToHighlight.length; i++) {
+                      // TODO instead identify the language setting and use jstemmer for that 
+                      if (nodesToHighlight[i].match(/[а-яА-Я]/)) {
+                        $(that).highlight(window.jstemmer(nodesToHighlight[i]));
+                      }
+                      else {
+                        $(that).highlight(nodesToHighlight[i]);
+                      }
+                  }
+        
+                },
+                removeHighlight: function(that) {
+        
+                      // Remove highlight everywhere
+                      $(that).removeHighlight();
+        
+                },
+                checkVisibility: function() {
+                    if ($("#statements").is(":hidden") || $("#entries").css("visibility") === "hidden") {
+                          return false;
+                    }
+                    else {
+                          return true;
+                    }
+                },
+                searchPinned: function(callback) {
+        
+                   let totalEntriesMatched = 0;
+        
+                   let nodeIDs_reversed = graphFactory.getNodeIDsRev();
+        
+                   let nodesOfStatement = graphFactory.getAllNodesOfStatement();
+        
+                   $(".entry").each(function(){
+        
+                      // What is the current statement ID for the entry?
+                      let currentDiv = $(this).attr('data-uid');
+        
+                      // Retrieve the statement text from the entry, clean from html
+                      let originaltext = $(this).children('.entry-text').html();
+        
+                      // How many entries in total were matched?
+                      let matchedThisEntry = 0;
+        
+                      // How many nodes we found in this entry?
+                      let nodesfound = 0;
+        
+                      // For each node present in this statement:
+                      for (let item in nodesOfStatement[currentDiv]) {
+        
+                        let nmarker = nodesOfStatement[currentDiv][item]; //
+        
+                        // Is this node in pinnedNodes?
+                        if (graphFactory.checkIfPinned(nodeIDs_reversed[nmarker]) == true) {
+                          
+                          nodesfound = nodesfound + 1;
+                          // The number of nodes found in this entry equals the number of pinned nodes?
+                          if (nodesfound == graphFactory.getPinnedNodes().length) {
+        
+                              // Then this entry has the full match
+                              matchedThisEntry = 1;
+        
+                              totalEntriesMatched += 1;
+        
+                          }
+        
+                        }
+        
+                      }
+        
+                      if (matchedThisEntry == 1) {
+                          statements().unfilter(this);
+                          callback(this, graphFactory.getPinnedNodes());
+                      }
+                      else {
+                          statements().filter(this);
+                      }
+        
+                  });
+        
+                  if (totalEntriesMatched == 0) {
+        
+                      // Logic #1:
+                      // If no matches are found, let's find entries that have at least one pinned node and one intersection of the pinned ones
+        
+                      // Let's choose the previous node
+                      let lastNode = graphFactory.getLastPinnedNode();
+        
+                      // Get the neighbor nodes in the graph for the previous node, but not including it
+                      let nnodes = sigma.instances(0).graph.neighbors(graphFactory.getNodeID(lastNode));
+        
+                      let selectedNNodes = [];
+        
+                      // We create an array from the neighbors of that previous node
+                      for (let key in nnodes) {
+                          selectedNNodes.push(nnodes[key].originalLabel);
+                      }
+        
+                      // We then find the inersection between the nodes that were connected to the last selected pinnedNode and the neightbors of the one before that one
+                      let overlapNodes = [];
+                      overlapNodes = _.intersection(selectedNNodes, graphFactory.getSelectedNodes());  
+                      
+                      // Let's now create an object for all the nodes selected on the graph to highlight
+                      let allSelectedNodes = [];
+                      allSelectedNodes = _.union(overlapNodes,graphFactory.getPinnedNodes());
+                      
+                      $(".entry").each(function(){
+                                
+                                let matchedentry = 0;
+                                let currentDiv = $(this).attr('data-uid');
+        
+                                let notFoundNodes = [];
+        
+                                // For each node present in this statement:
+                                for (let item in nodesOfStatement[currentDiv]) {
+                                  let nmarker = nodesOfStatement[currentDiv][item];
+        
+                                  // At least one node in that statement belongs to the intersection?
+                                  if (overlapNodes.indexOf(nodeIDs_reversed[nmarker]) > -1) {
+        
+                                    // Yes? then reiterate through the other nodes in there and see if it either contains at least one of the pinnedNodes or the last node?
+                                    for (var node in nodesOfStatement[currentDiv]) {
+                                      var n2marker = nodesOfStatement[currentDiv][node];
+                                      // Yes? the entry has a match
+                                      if (graphFactory.checkIfPinned(nodeIDs_reversed[n2marker]) == true || lastNode == nodeIDs_reversed[n2marker]) {
+                                          matchedentry = 1;
+                                          totalEntriesMatched += 1;
+                                          notFoundNodes.push(nodeIDs_reversed[nmarker]);
+                                      }
+                                    }
+                                  }
+                                }
+        
+                                if (matchedentry == 1) {
+                                  statements().unfilter(this);
+                                  graphFactory.updateNotFoundNodes(notFoundNodes);
+                                  callback(this, allSelectedNodes);
+                                }
+                                else {
+                                  statements().filter(this);
+                                }
+                                
+                        });
+                        
+                        // We didn't find any matches that would contain the neighbors of any of those nodes and at least one
+        
+                        if (totalEntriesMatched == 0) {
+        
+                              // Logic #2:
+                              // We then select all the pins, their neighborhoods, and show the statements that contain both of those words
+        
+                              $(".entry").each(function(){
+        
+                                  // What is the current statement ID for the entry?
+                                  let currentDiv = $(this).attr('data-uid');
+        
+                                  // Retrieve the statement text from the entry, clean from html
+                                  let originaltext = $(this).children('.entry-text').html();
+        
+                                  // How many entries in total were matched?
+                                  let matchedThisEntry = 0;
+        
+                                  // For each node present in this statement:
+                                  for (let item in nodesOfStatement[currentDiv]) {
+        
+                                    let nmarker = nodesOfStatement[currentDiv][item]; //
+        
+                                    // Is this node in pinnedNodes?
+                                    if (graphFactory.checkIfPinned(nodeIDs_reversed[nmarker]) == true) {
+                                      
+                                          // Then this entry has the full match
+                                          matchedThisEntry = 1;
+                                      
+        
+                                    }
+        
+                                  }
+        
+                                  if (matchedThisEntry == 1) {
+                                      statements().unfilter(this);
+                                      callback(this, graphFactory.getPinnedNodes());
+                                  }
+                                  else {
+                                      statements().filter(this);
+                                  }
+        
+                            });
+        
+                        }
+        
+                  }
+        
+                  
+                },
+                updateExplanation: function(filter_origin, most_inf_nodes_str) {
+                  
+                  let polysingularity_score = graphFactory.getStats('PolysingularityScore');
+        
+                  var explanation_html = 'The excerpts from the text containing the main topics and the most influential terms:';
+        
+                  if (filter_origin == 'insight') {
+                    if (polysingularity_score == 'Dispersed') {
+                      explanation_html = "This discourse's structure is <strong>" + polysingularity_score + "</strong>. <br><br>To increase coherency, you can make connections between different separated clusters of key terms and statements. For example, the ones below:";
+                    }
+                    else if (polysingularity_score == 'Diversified') {
+                      explanation_html = "This discourse's structure is <strong>" + polysingularity_score + "</strong>. It has a balanced representation of several perspectives. <br><br>You can make it more focused if you develop the ideas around the main keywords — <strong>" + most_inf_nodes_str + "</strong> — or by identifying the structural gaps between the less represented clusters and making new connections between them (to focus) or going deeper into them (to diversify even more). Like the ones below:";
+                    }
+                    else if (polysingularity_score == 'Focused') {
+                      explanation_html = "This discourse's structure is <strong>" + polysingularity_score + "</strong>. While it has several perspectives, it is focused on one. <br><br>You can make it more diversified if you identify the structural gaps in the graph and make connections between them — that's where the new ideas may be. For example, these two sets of key terms and statements below:";
+                    }
+                    else if (polysingularity_score == 'Biased') {
+                      explanation_html = "This discourse's structure is <strong>" + polysingularity_score + "</strong>. It's leaning towards and promotes a certain perspective, circulating around the most influential words — <strong>" + most_inf_nodes_str + "</strong>. <br><br>You could further develop and make connections between the different perspectives (indicated with colored topical clusters) into this discourse to make it more diversified. For example, the ones below:";
+                    }
+                    // There is a structural gap and a potential for a new idea between these two sets of key terms and statements below:
+                  }
+        
+                  $('#explanation').show();
+                  $('#explanation').html(explanation_html);
+        
+                },
+                activateInsight: function() {
+                  $('#insight').click();
+                },
+                activateSummary: function() {
+                  $('#summary').click();
+                },
+                showWarning: function(message) {
+                  $("#warnings").append('<p class="warning">' + message + '</p>');
+                  $("#warnings").slideDown('slow');
+                },
+                hideWarning: function(timer) {
+                  if (timer) {
+                    setTimeout(function() {
+                          $("#warnings").slideUp('slow');
+                          $("#warnings").text('');
+                    },parseInt(timer));
+                  }
+                  else {
+                    $("#warnings").slideUp('slow');
+                    $("#warnings").text('');
+                  }
+                },
+                areVisible: function() {
+                    if ($("#entries").css('visibility') == 'hidden') {
+                            return 'HIDDEN'
+                    }
+                    else if ($("#entries").css('visibility') == 'visible') {
+                            return 'VISIBLE'
+                    }
+                },
+                editDeleteStatement: function(e) {
+
+                      e.stopPropagation();
+
+                      console.log(e);
+
+                      addEntryForm().populateEdit($(this).closest('div'));
+
+                      // If no delete button is shown
+                      if (addEntryFormFactory.getStatus() == 'add') {
+
+                          // Add the edit, delete and cancel buttons
+                          addEntryForm().switchToEdit();
+
+                          // Add a hook on the cancel button
+                          addEntryForm().onCancelClick();
+
+                          // Add a hook on the delete button
+                          addEntryForm().onDeleteClick();
+
+                          // Add a hook on the edit button
+                          addEntryForm().onEditClick();
+
+                      }
+
+                      // Repopulate contexts field
+                      addEntryForm().repopulateContexts();
+
+
+                      // Smoothly scroll up
+                      $("html, body").animate({ scrollTop: 0 }, "slow");
+                }
+
+                // add more functions here, but don't forget the comma }, 
+            }
+        }
+      
+        
+
+        // If the dynamic graph function is on, when the user scrolls the statements, she sees the graph unfold
+
+        $("#entries").scroll(function() { //.box is the class of the div
+            
+            if (userFactory.getGraphOption('dynamic_graph') == 1) {
+    
+              let ventries = [];
+              let scroll_signal;
+    
+                $('#entries').children(".entry").each(function(){
+                    let vresult;
+                    vresult = checkInView(this,true);
+                    if (vresult == true) {
+                        if (ventries.indexOf($(this).attr('data-uid')) == -1) {
+                            ventries.push($(this).attr('data-uid'));
+                        }
+                    }
+    
+                  //  result2 += " " +  checkInView($(e),true);
+                });
+    
+                statements().selectScrolledOnGraph(ventries);
+    
+                if (!$(this).is(':animated')) {
+    
+                  let current_scroll = ($(this).scrollTop());
+                  let max_scroll = $(this)[0].scrollHeight - $(this).height();
+    
+                  if (current_scroll == max_scroll && scroll_signal != 'bottom') {
+                    $(this).scrollTop(0);
+                    scroll_signal = 'top';
+                  }
+                  else if (current_scroll == 0 && scroll_signal != 'top') {
+                    $(this).scrollTop($(this)[0].scrollHeight);
+                    scroll_signal = 'bottom';
+                  }
+    
+                }
+            }
+    
+        });
+        
+    </script>

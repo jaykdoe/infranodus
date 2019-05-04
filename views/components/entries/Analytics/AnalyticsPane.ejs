@@ -1,0 +1,83 @@
+<div id="analytics">   
+    <div id="panelControllers">
+        <ul>
+        <button id="analbutton" class="panelControlBtn" data-id="analytics">Graph Data</button> &nbsp;<button id='miningbutton' class='panelControlBtn' data-id='mining_analytics'>LDA Data</button> &nbsp;<button id='requestbutton' class='panelControlBtn' data-id='request_analytics'>Custom Report</button>
+        </ul>
+    </div>
+    <div id='mainanalytics'>
+        <div class='headline'>Main Topical Groups</div> (graph communities):<br>
+        <div id="maintopics">N/A</div><br>
+        <div class='headline'>Most Influential Elements</div> <div id="typeofinf"></div>
+        <div id="mostinfluential">N/A</div><br>
+        <div class='headline'>Insight Question</div> (structural gap):<br>
+        <div id="recommendedquestion">N/A</div><br>
+        <div id="addcontext_stats"></div>
+        <div id='graphstats'>
+            <div class="headline">Stats:</div> total <div id="totalnodescount">0</div> nodes, graph density <div id="graph_density">0</div>, average degree: <div id="average_degree">0</div>
+            <br><div class="headline">Network Structure: <div id="diversity_score">N/A</div>&nbsp;&nbsp;[<a href="https://towardsdatascience.com/measuring-discourse-bias-using-text-network-analysis-9f251be5f6f3" target="_blank" rel="nofollow">?</a>]</div><br>
+            <div id="modularity_score">0</div> modularity, <div id="nodesintoptopic">0</div>% of words in the top topic (total <div id="communities_number">0</div> topics),
+            <div id="num_nodes_component">0</div>% in the main connected component (<div id="top_components_length">0</div> in total), influence dispersal <div id="influence_dispersal">0</div>%
+        </div><br><br>
+        
+        <button id='resetgraph' class='panelControlBtn'>Reset</button> &nbsp; <button id='resetgraph' class='panelControlBtn'>Export Data</button>
+    </div>
+    <div id='mininganalytics'>
+        <div class='headline'>Main Topics</div> (according to Latent Dirichlet Allocation):<br>
+        <div id='topicsLDA'><em>loading...</em></div><br>
+        <div class='headline'>Most Influential Words</div> (main topics and words according to LDA):<br>
+        <div id='termsLDA'><em>loading...</em></div><br>
+            LDA works only for English-language texts at the moment. More support is coming soon, subscribe  @noduslabs to be informed.<br><br>
+         <button id="analbackbutton" class="panelControlBtn" data-id="analytics">Back to Graph Stats</button>
+    </div>
+
+</div>
+
+<a href="javascript:" class="tooltip editorpane" title="graph analytics" id="analyticsbutton"><div id="analyticscaption"></div></a>
+
+<script>
+
+    let customization = ' ';
+
+<% if (locals.user && !locals.vieweduser) { %>
+
+    <% if (locals.user.customization) { %>
+    customization = '<%= user.customization %>';
+    <% } %>
+
+<% }  %>
+    
+
+    $('#analyticscaption').html(customization);
+       
+    // What happens when we click analytics pane
+    $('#analyticsbutton').click(function(){
+        // Process logic and remember settings
+        $('#analytics').toggle('slide', function(){
+        if ($('#analytics').is(":visible")) {
+            localStorage.setItem('analytics', 1);
+            $('#analyticsbutton').addClass('analytics-on');
+            $('#analyticscaption').hide();
+
+        }
+        else {
+            localStorage.setItem('analytics', 0);
+            $('#analyticsbutton').removeClass('analytics-on')
+            $('#analyticscaption').show();
+        }
+        });
+
+    });
+
+    function resetGraphButton() {
+        return {
+            onClick: function(onClick){
+                $('#resetgraph').on('click', onClick);
+            }
+        }
+    }
+            
+
+    $('#analytics').on('swipedown',function(){$('#analyticsbutton').trigger('click');});
+
+
+</script>

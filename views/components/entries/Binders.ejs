@@ -1,0 +1,31 @@
+<script>
+
+    // This launches only when all other stuff from above have loaded
+    $(document).ready(function(){
+
+        
+        // Add hooks on all tooltips
+        $('.tooltip').tooltipster({
+            theme: 'tooltipster-noir',
+            position: 'left',
+            maxWidth: 200,
+            delay: 1000
+        });
+
+        // Did we receive a global setting to hide the editor pane?
+        // Then hide all the elements that have .editorpane class
+        // This is for external view mode 
+
+        if (userFactory.getViewOption('hide_edit')) {
+            $('.editorpane').each(function() {
+                $(this).hide();
+            });
+        }
+
+        // Download PNG (the graph isn't modified)
+
+       
+
+    });
+
+</script>

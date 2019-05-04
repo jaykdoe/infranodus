@@ -1,0 +1,190 @@
+<script>
+
+// What are the URL forwarding parameters for the goNextButton
+
+let go_next_url = getUrlVars()["go_next_url"];
+
+let go_next_site = getUrlVars()["go_next_site"];
+
+let go_next_add = getUrlVars()["go_next_add"];
+
+let go_next_override = getUrlVars()["go_next_override"];
+
+// This identifies through the URL where the user is forwarded when he clicks on the link button on #go_next element
+
+if (go_next_url) {
+    if ((go_next_url.substr(go_next_url.length - 1) == 's' || go_next_url.substr(go_next_url.length - 6) == 'search' || go_next_url.substr(go_next_url.length - 5) == 'query')) {
+        go_next_url = go_next_url + '=';
+    }
+    userFactory.setForwardTo(go_next_url);
+}
+else if (go_next_site == 'soundcloud') {
+    userFactory.setForwardTo('https://soundcloud.com/search?q=');
+}
+else if (go_next_site == 'youtube') {
+    userFactory.setForwardTo('https://www.youtube.com/results?search_query=');
+}
+else if (go_next_site == 'wikipedia') {
+    userFactory.setForwardTo('https://wikipedia.org/wiki/Special:Search?search=');
+}
+else if (go_next_site == 'amazon') {
+    userFactory.setForwardTo('http://www.amazon.com/s/field-keywords=')
+}
+else if (go_next_site == 'twitter') {
+    userFactory.setForwardTo('http://twitter.com/search?q=');
+}
+
+graphButton().onClick(statementsPanel().toggleStatementsPanel);
+goNextButton().onClick(externalNavigation);
+improveLayoutButton().onClick(adjustGraphLayout);
+abstractLayoutButton().onLoad();
+abstractLayoutButton().onClick(abstractGraphLayout);
+tutorialButton().onClick(activateTutorial);
+themeSwitchButton().onClick(toggleTheme);
+zoomInButton().onClick(zoomInGraph);
+zoomOutButton().onClick(zoomOutGraph);
+
+
+function graphButton() {
+    return {
+        onClick: function(onClick){
+            $('#graph-link').on('click', onClick)
+        }
+    }
+}
+
+function goNextButton() {
+    return {
+        onClick: function(onClick) {
+             $('#go_next').on('click', onClick)
+        }
+    }
+}
+
+function improveLayoutButton() {
+    return {
+        onClick: function(onClick) {
+             $('#improve-layout').on('click', onClick)
+        }
+    }
+}
+
+function tutorialButton() {
+    return {
+        onClick: function(onClick) {
+            $('#walkthrough').on('click', onClick)
+        }
+    }
+}
+
+function themeSwitchButton() {
+    return {
+        onClick: function(onClick) {
+            $('#themeswitch').on('click', onClick);
+        }
+    }
+}
+
+function zoomInButton() {
+    return {
+        onClick: function(onClick) {
+            $('#zoom-in').on('click', onClick);
+        }
+    }
+}
+
+function zoomOutButton() {
+    return {
+        onClick: function(onClick) {
+            $('#zoom-out').on('click', onClick);
+        }
+    }
+}
+
+function activateTutorial() {
+    walkthrough = 'default';
+    initializeWalkthrough();
+}
+
+function abstractLayoutButton() {
+    return {
+        onClick: function(onClick) {
+             $('#abstract-layout').on('click', onClick)
+        },
+        onLoad: function() {
+            if (userFactory.getGraphOption('abstract') && userFactory.getGraphOption('abstract') != 'no') {
+                $('#abstract-layout').addClass('abstract-on');  
+            }
+        }
+    }
+}
+
+function adjustGraphLayout() {
+    sigmaGraph().adjustLayout();
+}
+
+function abstractGraphLayout() {
+    sigmaGraph().abstractLayout();
+}
+
+
+function externalNavigation() {
+
+    let pinnedNodes = graphFactory.getPinnedNodes();
+    
+    let searchQuery = pinnedNodes.join("+");
+
+    if (go_next_add) {
+        searchQuery = searchQuery + '+' + go_next_add;
+    }
+
+    if (searchQuery.length > 0 || go_next_add) {
+
+        // TODO: Use navigation function below (modify it first)
+        if (go_next_override) {
+            if (pinnedNodes.length > go_next_override) {
+                window.open('http://google.com/search?q=' + searchQuery,'_blank');
+            }
+        else {
+                window.open(userFactory.getForwardTo() + searchQuery,'_blank');
+            }
+        } else {
+            window.open(userFactory.getForwardTo() + searchQuery,'_blank');
+        }
+    }
+    else {
+        alert("Click this after you select a few nodes to find them on the web.");
+    }
+
+
+}
+
+function zoomInGraph() {
+    let c = sigma.instances(0).camera;
+    sigma.misc.animation.camera(c, {
+        ratio: c.ratio / c.settings('zoomingRatio')
+        }, {
+        duration: 400
+    });
+}
+
+function zoomOutGraph() {
+    let c = sigma.instances(0).camera;   
+    sigma.misc.animation.camera(c, {
+        ratio: c.ratio * c.settings('zoomingRatio')
+    }, {
+        duration: 400
+    });
+}
+
+
+$('#themeswitch').tooltipster({
+            theme: 'tooltipster-noir',
+            position: 'left',
+            maxWidth: 220,
+            interactive: true,
+            content: $('<span>switch theme light / dark (permanent in the <a href="/settings">settings</a>)</span>')
+});
+
+
+</script>

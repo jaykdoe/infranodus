@@ -1,0 +1,125 @@
+<script>
+
+    toggleStatementsButton().onClick(statements().toggleStatements);
+    addContextButton().onClick(addContext);
+    diffContextButton().onClick(diffContext);
+
+    // Are we viewing additional context?
+
+    if (userFactory.getAddContext()) {
+        if (userFactory.getGraphOption('highlight_missing')) {
+            $('#diffcontext-link').addClass('diffcontext-visible');
+        }
+        else {
+            $('#addcontext-link').addClass('addcontext-visible');
+        }
+    }
+    
+
+    function addContext() {
+        if ($(".addcontext-on").is(":visible")) {
+                $('#addcontext-link').removeClass('addcontext-on');
+            }
+        else {
+                $('#addcontext-link').addClass('addcontext-on');
+        }
+
+    }
+
+    function diffContext() {
+        if ($(".diffcontext-on").is(":visible")) {
+                $('#diffcontext-link').removeClass('diffcontext-on');
+            }
+        else {
+                $('#diffcontext-link').addClass('diffcontext-on');
+        }
+
+    }
+
+    function toggleStatementsButton() {
+        return {
+            onClick: function(onClick){
+                $('#statements-link').on('click', onClick)
+            }
+        }
+    }
+
+    function addContextButton() {
+        return {
+            onClick: function(onClick){
+                $('#addcontext-link').on('click', onClick)
+            }
+        }
+    }
+
+    function diffContextButton() {
+        return {
+            onClick: function(onClick){
+                $('#diffcontext-link').on('click', onClick)
+            }
+        }
+    }
+
+
+
+    // Dynamic graph functionality
+
+    if (localStorage.getItem('timer') == 1) {
+          ($("#timer-link").trigger('click'));
+    }
+
+
+    // It basically makes only the nodes / edges of the graph visible that the user is currently seeing in the statements div
+
+
+
+    $("#timer-link").click(function(e) {
+      if (!userFactory.getGraphOption('dynamic_graph') || userFactory.getGraphOption('dynamic_graph') == 0) {
+        //localStorage.setItem('timer',1);
+        userFactory.setGraphOption('dynamic_graph', 1);
+        $('#timer-link').addClass('timer-link-on');
+        $('#entries').scrollTop($('#entries').scrollTop() + 1);
+      }
+      else {
+        userFactory.setGraphOption('dynamic_graph', 0);
+        //localStorage.setItem('timer',0);
+        $('#timer-link').removeClass('timer-link-on');
+        statements().selectScrolledOnGraph('',true);
+        if (userFactory.getGraphOption('dynamic_watch') == 1) {
+          $("#watch-link").trigger('click');
+        }
+
+      }
+
+    });
+
+
+
+    // Dynamically watch the graph unfold
+
+    $("#watch-link").click(function(e) {
+
+        if (!userFactory.getGraphOption('dynamic_watch') || userFactory.getGraphOption('dynamic_watch') == 0) {
+
+            userFactory.setGraphOption('dynamic_watch', 1);
+
+            $('#watch-link').addClass('watch-link-on');
+
+            if (!userFactory.getGraphOption('dynamic_graph') || userFactory.getGraphOption('dynamic_graph') == 0) {
+                $("#timer-link").trigger('click');
+            }
+
+            statements().infiniteScroll();
+
+        }
+
+        else  {
+
+            userFactory.setGraphOption('dynamic_watch', 0);
+            $('#watch-link').removeClass('watch-link-on');
+            statements().stopAnimation();
+
+        }
+    });
+
+</script>

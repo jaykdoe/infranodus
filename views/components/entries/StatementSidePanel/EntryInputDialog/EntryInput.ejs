@@ -1,0 +1,11 @@
+<div id="entryform" class="editorpane">
+    <%- include('./EntryInputHeader',
+        {perceivername, addcontext, context}); %>
+
+    <%- include('./EntryInputFooter',
+        {perceivername, context, contextpublic}); %>
+
+        <!-- the panel to show content -->
+    <%- include('./EntryInputBody',
+        {perceivername, url, urltitle}); %>
+</div>

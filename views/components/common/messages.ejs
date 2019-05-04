@@ -1,0 +1,6 @@
+<% if (messages) { %>
+    <% messages.forEach(function(message) { %>
+        <p class="warning"><%= message.string %></p>
+    <% }) %>
+    <% removeMessages() %>
+<% } %>

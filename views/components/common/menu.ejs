@@ -9,8 +9,8 @@
             <li class="menu-item-small"><a href="/apps">apps/home</a></li>
             <li class="menu-item-small" id="settingspane"><a href="/settings">settings</a></li>
             <br>
-            <li id="addNewContext" class="menu-item-divided"><a id="addcontextbutton" href="javascript:"> + new context&nbsp;&nbsp;</a><form action="/post" method="GET" class="pure-form" id="addcontextinput"><input type="text" id="addcontextname" size="7" class="pure-input"></form></li>
-            <li class="menu-item-divided"><a href="/<%= user.name %>/edit">all contexts</a></li>
+            <li id="addNewContext" class="menu-item-divided"><a id="addcontextbutton" href="javascript:" class="whiten"> + add new graph&nbsp;&nbsp;</a><form action="/post" method="GET" class="pure-form" id="addcontextinput"><input type="text" id="addcontextname" size="8" class="pure-input"><input id="addcontextsubmit" type="submit" value="">&nbsp;&nbsp;</form></li>
+            <li class="menu-item-divided"><a href="/<%= user.name %>/edit" class="whiten">see all graphs</a></li>
             <% if (contextlist.length > 0) { %>
             <% contextlist.forEach(function(contextlabel) { %>
                   <li class="menu-item-divided"><a href="/<%= user.name %>/<%= contextlabel[0] %>/edit"><%= contextlabel[0] %></a></li>

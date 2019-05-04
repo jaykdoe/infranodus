@@ -1,0 +1,305 @@
+<script>
+        
+        // Instance of the add entry panel 
+
+        const addEntryPanelFactory = (() => {   
+            function AddEntryPanelFactory() {
+
+                let currentAddEntryPanelMode = "EDIT";
+
+                this.setMode = function(mode) {
+                    currentAddEntryPanelMode = mode;
+                    addEntryPanel().updateStatementSidePanel();
+                }
+                this.getMode = function() {
+                    return currentAddEntryPanelMode;
+                }
+
+                this.init = function() {
+
+                    // Let's get external params
+                    if (userFactory.getViewType() == 'external' || localStorage.getItem('entrypanel') == 'search') {    
+                        this.setMode("SEARCH");
+                    }
+                    else {
+                        this.setMode(currentAddEntryPanelMode);
+                    }
+
+                    // OnLoad get the right height for the entries elements 
+                    // this depends on the add entry panel height so it's here
+        
+                    let uproll = $('#entryform').height();
+                    
+                    if (userFactory.getViewOption('hide_edit')) {
+                        uproll = 50;
+                    }
+                    
+                    // Extend the statements above the form
+                    statements().fillSpace(uproll + 100);
+                    
+                    // Scroll down all the entries
+                    statements().scroll();
+                    
+                    // Do the same with when the window is resized 
+                    $(window).resize(function() {
+                        statements().fillSpace(uproll + 100);
+                        statements().scroll();
+                    });
+                    
+                    // Make texarea automatically resizeable
+                    $('textarea').autosize();
+                }
+
+            }
+            return new AddEntryPanelFactory();
+        })();
+
+        addEntryPanelFactory.init();
+
+
+        function addEntryPanel() {
+            return {
+                updateStatementSidePanel: function() {
+                    if(addEntryPanelFactory.getMode() === "EDIT") addEntryPanel().switchToEdit()
+                    if(addEntryPanelFactory.getMode() === "SEARCH") addEntryPanel().switchToSearch();
+                },
+                switchToSearch: function() {
+                    addEntryPanel().switchStatementMenu('finds');
+                    sidePanelContent().hide('#edit-panel');
+                    sidePanelContent().show('#search-panel');
+                    searchForm().autofill();
+                    localStorage.setItem('entrypanel', 'search');
+                    addEntryPanel().changeEntriesHeight(200)
+                    addEntryPanel().hideFooter()
+                },
+                switchToEdit: function() {
+                    if (userFactory.getViewType() == 'internal') {
+                        addEntryPanel().switchStatementMenu('adds');
+                        sidePanelContent().hide('#search-panel');
+                        sidePanelContent().show('#edit-panel');
+                        localStorage.setItem('entrypanel', 'edit');
+                        // TODO: get the logic from entries.ejs starting from (topmenuaction == 'adds') {
+                        addEntryPanel().changeEntriesHeight(400)
+                        addEntryPanel().showFooter()    
+                    }
+                },
+                changeEntriesHeight: function(height) {
+                    statements().fillSpace(height);
+                },
+                switchStatementMenu: function(element) {
+                    statementMenu().switch(element);
+                },
+                hideFooter: function(){
+                    deleteContextButton().hide()
+                    privacyLinkButton().hide()
+                    collaborateButton().hide();
+                    importLinkButton().hide();
+                },
+                showFooter: function(){
+                    deleteContextButton().show()
+                    privacyLinkButton().show()
+                    collaborateButton().show();
+                    importLinkButton().show();
+                },
+                changeModeTo: function(mode) {
+                    addEntryPanelFactory.setMode(mode);
+                },
+                sendToImport: function() {
+                    let fornode = $('#statement').val();
+                    let pinnedNodes = graphFactory.getPinnedNodes();
+                    if (pinnedNodes.length > 0) {
+                        fornode = pinnedNodes.join("+");
+                    }
+                    navigation().redirect('/import?context=add_' + userFactory.getCurrentContext() + '&fornode=' + fornode);
+                },
+                changeModeToSearch: function() {
+                    addEntryPanel().changeModeTo('SEARCH')
+                },
+                changeModeToEdit: function() {
+                    addEntryPanel().changeModeTo('EDIT')
+                },
+                changeModeToInterpret: function() {
+                    addEntryPanel().changeModeTo('INTERPRET')
+                },
+                togglePanel: function() {
+                    if (addEntryPanelFactory.getMode() === 'SEARCH') {
+                        addEntryPanelFactory.setMode('EDIT');
+                    }
+                    else if (addEntryPanelFactory.getMode() === 'EDIT') {
+                        addEntryPanelFactory.setMode('SEARCH');
+                    }
+                }
+
+            }
+        }
+        
+
+        
+        findsButton().onClick(addEntryPanel().changeModeToSearch);
+        editButton().onClick(addEntryPanel().changeModeToEdit);
+        interpretButton().onClick(addEntryPanel().changeModeToInterpret);
+        minimizeButton().onClick(addEntryPanel().togglePanel);
+        importLinkButton().onClick(addEntryPanel().sendToImport);
+
+        // This activates the logic for the whole statements panel
+        closeStatementMenuButton().onClick(statementsPanel().toggleStatementsPanel);
+        
+        
+        function sidePanelContent() {
+            return {
+                show: function(element){
+                    $(element).show();
+                },
+                hide: function(element){
+                    $(element).hide();
+                }
+            }
+        }
+        
+      
+        
+        // Here we perform some live updates of the graph on receiving a Socket.IO message
+                
+        socket.on('chat message', function(msg){
+            
+            let selfPosted = userFactory.getSelfPosted();
+        
+            let perceivedby = userFactory.getLoggedInUser();    
+        
+            let posted_by = msg.postedby;
+        
+            let alien = false;
+        
+            let chatbot = false;
+        
+            // if the message is not self-posted and also if the poster of the message is not the same as the guy logged in (in case there's two logins simultaneously)
+            if (!selfPosted && perceivedby != posted_by) {
+        
+                // add the alien class so the posted message looks like it's from elsewhere
+                alien = true;
+        
+                // add another class if this is a help message from the chatbot
+                if (msg.help) {
+                    chatbot = true;
+                }
+        
+                // We will set a user for receiving. If the posting user does not equal the user who's watching the graph, we force-add the statement into theirs (provided they collaborate)
+                var receivedby = userFactory.getWatchedUser();
+        
+                // So the user who posted is not the same who's receiving? then submit the form. If the sender didnt have the mute option
+                // This is only for collaboration - we resubmit, otherwise it's already submitted before
+                if ((receivedby != msg.postedby) && !msg.mute) {
+                    // Populate the form and submit
+                    addEntryForm().populateAndPost(msg.entrytext, addEntryForm().post);
+                }
+            }
+        
+            // So let's add that entry to the #entries div
+            statements().append(msg.entrytext, msg.entryuid, msg.entryname, msg.postedby, alien, chatbot);
+        
+            // Unfocus and reFocus again on the entry field
+            addEntryForm().refocus();
+        
+            // Add some behavior hooks again onto that element
+            // One click will filter the nodes / edges of the statement on the graph
+            // Doubleclick will open the edit pane
+        
+            statements().onClick(statements().select);
+
+            // Scroll to the newly added statement if the dynamic graph option is on
+            if (userFactory.getGraphOption('dynamic_watch') == 1 && userFactory.getGraphOption('dynamic_graph') == 1) {
+              $('#watch-link').trigger('click');
+              setTimeout(function() {
+                statements().scroll();
+              }, 500);
+              setTimeout(function() {
+                $('#watch-link').trigger('click');
+              }, 4000);
+            }
+            else {
+                statements().scroll();
+            }
+        
+            // Add new nodes and edges — these are all the nodes and edges of the graph, not newly added only
+            // TODO IMPROVEMENT maybe we could return only the new ones for efficiency
+            var addednodes = msg.graph.nodes;
+            var addededges = msg.graph.edges;
+        
+            // Add to the stats and then add to the graph (inside graphFactory function)
+            graphFactory.addNewNodes(addednodes, addededges, msg.entryuid);
+        
+            // This is for special cases where the user is on a graph, but they are adding their own stuff to this graph into a new graph, so we only show the entries that he added, not the previous ones
+            statements().removeAddContext();
+        
+            // Play MIDI notes
+            playNodesMIDI().addition(addednodes, addededges);
+        
+        
+        });
+        
+        
+        
+        // This is called when an entry is deleted
+        
+        socket.on('delete message', function(msg){
+        
+            $('[data-uid="' + msg.entryuid + '"]').fadeOut();
+        
+            $("#statement").val('');
+        
+            // We remove the nodesOfStatement[statement] for that statement
+            // When searched for nodes in that statement, nothing will appear 
+            graphFactory.removeNodesFromStatement(msg.entryuid);
+        
+            // Let's set up which nodes we will keep
+            let nodesToKeep = [];
+        
+            // Reiterate through Sigma
+            sigma.instances(0).graph.edges().forEach(function(e) {
+
+                // For each context
+                for (let context in e.context_matrix) {
+                        // For every statement in the context
+                        for (let statement in e.context_matrix[context]) {
+                            
+                            // Do this source and target exist in that statement? 
+                            if (graphFactory.existNodeInStatement(statement, e.source) == true) {
+                                nodesToKeep.push(e.source);
+                            }
+                
+                            if (graphFactory.existNodeInStatement(statement, e.target) == true) {
+                                nodesToKeep.push(e.target);
+                            }
+
+                            // Remove statement from this context also
+                            graphFactory.removeStatementFromContext(context, statement);
+                
+                            // Does this edge belong to that particular statement?
+                            if (statement ==  msg.entryuid) {
+                                let weight_to_deduct = e.context_matrix[context][statement];
+                                delete e.context_matrix[context][statement];
+                                e.weight = e.weight - weight_to_deduct;
+                                if (e.weight == 0) {
+                                    sigma.instances(0).graph.dropEdge(e.id);
+                                }
+                            }
+                        }
+                }
+        
+            });
+        
+            // Let's delete the nodes in the graph that were only in that statement and nowhere else
+            let nodesToDelete = [];
+            sigma.instances(0).graph.nodes().forEach(function(n) {
+                if (nodesToKeep.indexOf(n.id) < 0) {
+                    graphFactory.removeNode(n.originalLabel);
+                    nodesToDelete.push(n.originalLabel);
+                }
+        
+            });
+        
+            graphFactory.deleteGraphNodes(nodesToDelete);
+        
+        });
+        
+    </script>

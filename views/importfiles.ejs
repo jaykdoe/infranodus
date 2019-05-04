@@ -21,11 +21,7 @@
         <span></span>
     </a>
 
-    <% include menu %>
-
-
-
-
+    <%- include('components/common/menu') %>
     <div id='content'>
 
         <div id='welcomemessage'>
@@ -85,7 +81,7 @@
 
 
                 <br>&nbsp;<br>
-                Save in context:
+                Save in graph:
                 <br>
                 <input type='text' name='context' value='<% if (context) { %><%= context %><% } else { %>imported<% } %>'/>
                 <br>

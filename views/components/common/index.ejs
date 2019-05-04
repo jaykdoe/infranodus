@@ -1,0 +1,226 @@
+<script>
+    
+
+    function navigation() {
+        return {
+            redirect: function(href){
+                window.location.href = href;
+            }
+        }
+    }
+
+    function getUrlVars()
+    {
+        var vars = [], hash;
+        var hashes = window.location.href.slice(window.location.href.indexOf('?') + 1).split('&');
+        for(var i = 0; i < hashes.length; i++)
+        {
+            hash = hashes[i].split('=');
+            vars.push(hash[0]);
+            vars[hash[0]] = hash[1];
+        }
+        return vars;
+    }
+
+
+    function autoComplete(element,nodeNames) {
+                        
+        $(element).autocomplete({
+            source: nodeNames,
+            minLength: 1,
+            delay: 500,
+            messages: {
+                noResults: '',
+                results: function() {}
+            },
+            select: function(event, ui) {
+                var filter = ui.item.value;
+            }
+        });
+        
+    }
+
+    function normalize(enteredValue, minEntry, maxEntry, normalizedMin, normalizedMax) {
+      var mx;
+      if ((enteredValue-minEntry) == 0) { mx = 0 } else {
+        mx = (Math.log1p((enteredValue-minEntry))/(Math.log1p(maxEntry-minEntry)));
+      }
+      var preshiftNormalized = mx*(normalizedMax-normalizedMin);
+      var shiftedNormalized = preshiftNormalized + normalizedMin;
+
+      return shiftedNormalized;
+
+    }
+
+    function removeParam(key, sourceURL) {
+        var rtn = sourceURL.split("?")[0],
+            param,
+            params_arr = [],
+            queryString = (sourceURL.indexOf("?") !== -1) ? sourceURL.split("?")[1] : "";
+        if (queryString !== "") {
+            params_arr = queryString.split("&");
+            for (var i = params_arr.length - 1; i >= 0; i -= 1) {
+                param = params_arr[i].split("=")[0];
+                if (param === key) {
+                    params_arr.splice(i, 1);
+                }
+            }
+            rtn = rtn + "?" + params_arr.join("&");
+        }
+        return rtn;
+    }
+
+
+    function checkInView(elem,partial)
+    {
+        var container = $("#entries");
+        var contHeight = container.height();
+        var contTop = container.scrollTop();
+        var contBottom = contTop + contHeight ;
+
+        var elemTop = $(elem).offset().top - container.offset().top;
+        var elemBottom = elemTop + $(elem).height();
+
+        var isTotal = (elemTop >= 0 && elemBottom <=contHeight);
+        var isPart = ((elemTop < 0 && elemBottom > 0 ) || (elemTop > 0 && elemTop <= container.height())) && partial ;
+
+        return  isTotal  || isPart ;
+    }
+
+
+    function toTitleCase(str)
+    {
+        return str.replace(/\w\S*/g, function(txt){return txt.charAt(0).toUpperCase() + txt.substr(1).toLowerCase();});
+    }
+
+    function timeConverter(UNIX_timestamp){
+            var modTimestamp = UNIX_timestamp.substr(0, UNIX_timestamp.length - 4);
+            var time = moment(modTimestamp, 'x').fromNow();
+            return time;
+    }
+
+    function componentToHex(c) {
+        var hex = c.toString(16);
+        return hex.length == 1 ? "0" + hex : hex;
+    }
+
+    function rgbToHex(r, g, b) {
+        return "#" + componentToHex(r) + componentToHex(g) + componentToHex(b);
+    }
+
+    function generatePalette(type, colors, background) {
+            let palette;
+
+            if (type == 'color') {
+                // nice color palette    
+                palette = new DistinctColors({count: colors + 1, lightMin: 60, lightMax: 75, chromaMin: 2, chromaMax: 15});
+            }
+            else if (type == 'mono') {
+                // subdued chromo
+                palette = new DistinctColors({count: colors + 1, lightMin: 40, lightMax: 60, chromaMin: 2, chromaMax: 8});
+            
+            }
+            else if (type == 'contrast') {
+                // subdued chromo
+                if (background == 'dark') {
+                    palette = new DistinctColors({count: colors + 1, lightMin: 75, lightMax: 95, chromaMin: 1, chromaMax: 8});
+                }
+                else {
+                    palette = new DistinctColors({count: colors + 1, lightMin: 40, lightMax: 60, chromaMin: 1, chromaMax: 2});
+                } 
+            }
+            else {
+                // good chromo
+                palette = new DistinctColors({count: colors + 1, lightMin: 70, chromaMin: 60, samples: 800});
+            }
+            return palette;
+    }
+
+    function arrayToHashtagString(array) {
+        
+        let string = '';
+        
+        if (array.constructor !== Array) {
+            string = array;
+        }
+
+        if (array && array.length > 0) {
+            string = array.join(' #');
+            string = '#' + string; 
+        } 
+        else {
+            string = '';
+        }
+
+        return string;
+        
+    }
+
+    function displayAlert(message) {
+        alert(message);
+    }
+
+    function removeEmptyElements(obj) {
+        let newObj = [];
+        let idx = 0;
+        for (var propName in obj) {
+            let prop = obj[propName];
+
+            if (prop !== null
+            && prop !== undefined
+            && JSON.stringify(prop) != "[]" // not empty array
+            && JSON.stringify(prop) !== "{}") { // not empty obj
+            newObj[idx] = prop[0]; // we only need one object, NOTE can be an array if we decide to get more statemetns for each community
+            idx++;
+            }
+        }
+        return newObj;
+    }
+
+    function getSelected() {
+        var t = '';
+        if(window.getSelection) {
+            t = window.getSelection();
+        } else if(document.getSelection) {
+            t = document.getSelection();
+        } else if(document.selection) {
+            t = document.selection.createRange().text;
+        }
+        return t;
+    }
+
+    function getRandomInt(min, max) {
+          return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+
+    function shannon(data) {
+
+        // Create a dictionary of character frequencies and iterate over it.
+        function process(s, evaluator) {
+            var h = Object.create(null), k;
+            s.split('').forEach(function(c) {
+                h[c] && h[c]++ || (h[c] = 1); });
+            if (evaluator) for (k in h) evaluator(k, h[k]);
+            return h;
+        };
+
+        // Measure the entropy of a string in bits per symbol.
+
+        // Measure the entropy of a string in total bits.
+        function bits (s) {
+            return entropy(s) * s.length;
+        }
+
+        var sum = 0,len = data.length;
+        process(data, function(k, f) {
+            var p = f/len;
+            sum -= p * Math.log(p) / Math.log(2);
+        });
+
+        return sum;
+
+    }
+
+
+
+</script>

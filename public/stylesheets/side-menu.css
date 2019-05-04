@@ -1,5 +1,111 @@
 
 
+
+:root {
+    --menu-link-background:  rgba(0,0,0,0.7);
+    --menu-link-hover: #000;
+    --statements-toggle-opacity: 1;
+    --statements-toggle-background-image: url('/images/close.png');
+    --graph-link-background-image:  url('/images/graphnet.png');
+    --graph-link-opacity: 1;
+    --improve-layout-opacity: 1;
+    --improve-layout-background-image: url('/images/location-precise.png')!important;
+    --abstract-layout-opacity: 1;
+    --abstract-layout-background-image: url('/images/diamond.png')!important;
+    --walkthrough-button-opacity: 1;
+    --walkthrough-button-background-image: url('/images/question.png')!important;
+
+    --adjustsettings-button-opacity: 0.8;
+    --adjustsettings-button-background-image: url('/images/settings.png')!important;
+
+    --themeswitch-button-opacity: 0.6;
+    --themeswitch-button-background-image: url('/images/theme.png')!important;
+    
+    --deletecontextbutton-opacity: 1;
+    --deletecontextbutton-background-image: url('/images/trash.png')!important;
+
+    --collaborate-link-opacity: 1;
+    --collaborate-link-background-image: url('/images/group.png')!important;
+
+    --import-link-opacity: 1;
+    --import-link-background-image: url('/images/telescope.png')!important;
+
+    --windowdown-link-opacity: 1;
+    --windowdown-link-background-image: url('/images/closewindow.png')!important;
+
+    --statements-link-opacity: 1;
+    --statements-link-background-image: url('/images/square.png')!important;
+
+    --timer-link-opacity: 1;
+    --timer-link-background-image: url('/images/timer.png')!important;
+
+    --watch-link-opacity: 1;
+    --watch-link-background-image: url('/images/watch.png')!important;
+
+    --microphone-link-opacity: 1;
+    --microphone-link-background-image: url('/images/microphone.png')!important;
+
+    --addcontext-link-opacity: 1;
+    --addcontext-link-background-image: url('/images/intersect.png')!important;
+
+
+    --diffcontext-link-opacity: 0.9;
+    --diffcontext-link-background-image: url('/images/diff.png')!important;
+}
+
+:root[theme='dark'] {
+    --menu-link-background: rgba(250, 250, 250, 0.4);
+    --menu-link-hover: #444;
+    --statements-toggle-opacity: 0.6;
+    --statements-toggle-background-image: url('/images/closewhite.png');
+    --graph-link-background-image:  url('/images/graphnet-white.png');
+    --graph-link-opacity: 0.8;
+    --improve-layout-opacity: 0.6;
+    --improve-layout-background-image: url('/images/location-precise-white.png')!important;
+    --abstract-layout-opacity: 0.6;
+    --abstract-layout-background-image: url('/images/diamond-white.png')!important;
+    --walkthrough-button-opacity: 0.6;
+    --walkthrough-button-background-image: url('/images/question-white.png')!important;
+
+    --adjustsettings-button-opacity: 0.6;
+    --adjustsettings-button-background-image: url('/images/settings-white.png')!important;
+
+    --themeswitch-button-opacity: 0.6;
+    --themeswitch-button-background-image: url('/images/theme-white.png')!important;
+
+    --deletecontextbutton-opacity: 0.6;
+    --deletecontextbutton-background-image: url('/images/trash-white.png')!important;
+
+    --collaborate-link-opacity: 0.6;
+    --collaborate-link-background-image: url('/images/group-white.png')!important;
+
+    --import-link-opacity: 0.6;
+    --import-link-background-image: url('/images/telescope-white.png')!important;
+
+    --windowdown-link-opacity: 0.6;
+    --windowdown-link-background-image: url('/images/closewindow-white.png')!important;
+
+    --statements-link-opacity: 0.8;
+    --statements-link-background-image: url('/images/square-white.png')!important;
+
+    --timer-link-opacity: 0.8;
+    --timer-link-background-image: url('/images/timer-white.png')!important;
+
+    --watch-link-opacity: 0.6;
+    --watch-link-background-image: url('/images/watch-white.png')!important;
+
+    --microphone-link-opacity: 0.6;
+    --microphone-link-background-image: url('/images/microphone-white.png')!important;
+
+    --addcontext-link-opacity: 0.6;
+    --addcontext-link-background-image: url('/images/intersect-white.png')!important;
+
+
+    --diffcontext-link-opacity: 0.6;
+    --diffcontext-link-background-image: url('/images/diff-white.png')!important;
+}
+
+
 .pure-img-responsive {
     max-width: 100%;
     height: auto;
@@ -11,15 +117,15 @@
 }
 #layout.active {
     position: relative;
-    left: 150px;
+    left: 180px;
 }
 #layout.active #menu {
-    left: 150px;
-    width: 150px;
+    left: 180px;
+    width: 180px;
 }
 
 #layout.active .menu-link {
-    left: 150px;
+    left: 180px;
 }
 
 /*
@@ -44,8 +150,8 @@ appears on the left side of the page.
 
 
 #menu {
-    margin-left: -150px; /* "#menu" width */
-    width: 150px;
+    margin-left: -180px; /* "#menu" width */
+    width: 180px;
     position: fixed;
     top: 0;
     left: 0;
@@ -131,8 +237,8 @@ small screens.
     display: block; /* show this only on small screens */
     top: 0;
     left: 0; /* "#menu width" */
-    background: #000;
-    background: rgba(0,0,0,0.7);
+    
+    background: var(--menu-link-background);
     font-size: 8px; /* change this value to increase/decrease button size */
     width: 2em;
     height: auto;
@@ -142,7 +248,7 @@ small screens.
 
     .menu-link:hover,
     .menu-link:focus {
-        background: #000;
+        background: var(--menu-link-hover);
     }
 
     .menu-link span {
@@ -175,6 +281,9 @@ small screens.
 
 
        #topnav  {
+         top: 0;
+         left: 0;
+         padding-left: 50px;
          padding-top: 1px;
          padding-bottom: 15px;
        }
@@ -192,7 +301,7 @@ small screens.
     top: 40px;
 }
 
-#graph-link {
+#statements-toggle {
     position: absolute;
     display: inline; /* show this only on small screens */
     top: 0;
@@ -204,11 +313,14 @@ small screens.
     float: right;
     padding: 3.3em 1.6em;
     z-index: 10;
-    background-image: url('../images/close.png');
-    background-repeat:no-repeat;
+    background-image: var(--statements-toggle-background-image);
+    opacity: var(--statements-toggle-opacity);
+    background-repeat: no-repeat;
     background-position:center;
     pointer-events: auto!important;
 }
+
+
 
 
 #statements-link {
@@ -224,22 +336,18 @@ small screens.
     /* float: right; */
     padding: 5px 5px;
     z-index: 10;
-    background-image: url('../images/square.png');
+    background-image: var(--statements-link-background-image);
+    opacity: var(--statements-link-opacity);
     background-repeat:no-repeat;
     background-position:center;
     pointer-events: auto!important;
-}
-
-.statements-link-dark {
-    opacity: 0.8;
-    background-image: url('../images/square-white.png')!important;
 }
 
 
 #timer-link {
     position: fixed;
     display: inline; /* show this only on small screens */
-    top: 80px;
+    top: 160px;
     left: 0; /* "#menu width" */
     background: none;
     text-align: left;
@@ -249,25 +357,23 @@ small screens.
     /* float: right; */
     padding: 5px 5px;
     z-index: 10;
-    background-image: url('../images/timer.png');
+    background-image: var(--timer-link-background-image);
+    opacity: var(--timer-link-opacity);
     background-repeat:no-repeat;
     background-position:center;
     pointer-events: auto!important;
 }
 
-.timer-link-dark {
-    opacity: 0.8;
-    background-image: url('../images/timer-white.png')!important;
-}
+
 
 .timer-link-on {
-    background-image: url('../images/timer-blue.png')!important;
+    background-image: url('/images/timer-blue.png')!important;
 }
 
 #watch-link {
     position: fixed;
     display: inline; /* show this only on small screens */
-    top: 120px;
+    top: 200px;
     left: 0; /* "#menu width" */
     background: none;
     text-align: left;
@@ -277,44 +383,30 @@ small screens.
     /* float: right; */
     padding: 5px 5px;
     z-index: 10;
-    background-image: url('../images/watch.png');
+    background-image: var(--watch-link-background-image);
+    opacity: var(--watch-link-opacity);
     background-repeat:no-repeat;
     background-position:center;
     pointer-events: auto!important;
 }
 
 
-
-.watch-link-dark {
-      opacity: 0.6;
-      background-image: url('../images/watch-white.png')!important;
-}
-
 .watch-link-on {
     opacity: 0.8;
-    background-image: url('../images/watch-blue.png')!important;
+    background-image: url('/images/watch-blue.png')!important;
 }
 
 .statements-link-on {
-    background-image: url('../images/squareplus.png')!important;
+    background-image: url('/images/squareplus.png')!important;
 }
 
 .statements-link-on-dark {
     opacity: 0.8;
-    background-image: url('../images/squareplus-white.png')!important;
+    background-image: url('/images/squareplus-white.png')!important;
 }
 
-.graph-link-dark {
-      opacity: 0.6;
-      background-image: url('../images/closewhite.png')!important;
-}
 
-#graph-link:hover {
-    background: none;
-    background-image: url('../images/close.png');
-    background-repeat:no-repeat;
-    background-position:center;
-}
+
 
 #windowdown-link {
     position: absolute;
@@ -328,15 +420,13 @@ small screens.
     float: right;
     padding: 3.3em 1.6em;
     z-index: 10;
-    background-image: url('../images/closewindow.png');
+    background-image: var(--windowdown-link-background-image);
+    opacity: var(--windowdown-link-opacity);
     background-repeat:no-repeat;
     background-position:center;
     pointer-events: auto!important;
 }
-.windowdown-link-dark {
-    opacity: 0.6;
-    background-image: url('../images/closewindow-white.png')!important;
-}
+
 
 #deletecontext {
     position: absolute;
@@ -353,7 +443,7 @@ small screens.
 
 
 #deletebutton {
-    background: url('../images/trash.png');
+    background: url('/images/trash.png');
     background-repeat:no-repeat;
     background-position:center;
     border: 0;
@@ -368,10 +458,11 @@ small screens.
 }
 .deletebutton-dark {
 
-    background-image: url('../images/trash-white.png')!important;
+    background-image: url('/images/trash-white.png')!important;
 }
 #deletecontextbutton {
-    background: url('../images/trash.png');
+    background: var(--deletecontextbutton-background-image);
+    opacity: var(--deletecontextbutton-opacity);
     background-repeat:no-repeat;
     background-position:center;
     border: 0;
@@ -382,13 +473,10 @@ small screens.
     line-height: 0px;
     font-size: 0px;
 }
-.deletecontextbutton-dark {
-  opacity: 0.6;
-  background-image: url('../images/trash-white.png')!important;
-}
+
 
 #privacy-link {
-    background: url('../images/share.png');
+    background: url('/images/share.png');
     background-repeat:no-repeat;
     background-position:center;
     border: 0;
@@ -405,7 +493,8 @@ small screens.
 }
 
 #collaborate-link {
-    background: url('../images/group.png');
+    background: var(--collaborate-link-background-image);
+    opacity: var(--collaborate-link-opacity);
     background-repeat:no-repeat;
     background-position:center;
     border: 0;
@@ -420,26 +509,23 @@ small screens.
     padding: 3.3em 1.6em;
     z-index: 10;
 }
-.collaborate-link-dark {
-  opacity: 0.6;
-  background-image: url('../images/group-white.png')!important;
 
-}
 
 .is-public {
-    background: url('../images/share-green.png')!important;
+    background: url('/images/share-green.png')!important;
     background-repeat:no-repeat!important;
     background-position:center!important;
 }
 
 .is-collab {
-    background: url('../images/group-green.png')!important;
+    background: url('/images/group-green.png')!important;
     background-repeat:no-repeat!important;
     background-position:center!important;
 }
 
 #import-link {
-    background: url('../images/telescope.png');
+    background: var(--import-link-background-image);
+    opacity: var(--import-link-opacity);
     background-repeat:no-repeat;
     background-position:center;
     border: 0;
@@ -455,13 +541,9 @@ small screens.
     z-index: 10;
 }
 
-.import-link-dark {
-  opacity: 0.6;
-  background-image: url('../images/telescope-white.png')!important;
 
-}
 
-#chat-link {
+#graph-link {
 
 
     margin-top: 0px;
@@ -475,81 +557,82 @@ small screens.
     height: auto;
     padding: 2.6em 2.6em;
     z-index: 11;
-    background-image: url('../images/chat.png');
+    /* background-image: url('../images/chat.png'); */
+    background-image: var(--graph-link-background-image);
+    opacity: var(--graph-link-opacity);
     background-repeat:no-repeat;
     background-position:center;
 }
 
-.chat-highlight {
+
+
+.graph-highlight {
 
     background: rgba(31,141,214,1)!important;
-    background-image: url('../images/chatwhite.png')!important;
+    background-image: url('/images/chatwhite.png')!important;
     background-repeat:no-repeat!important;
     background-position:center!important;
 
 }
-.chat-dark {
-  background-image: url('../images/chatwhite.png')!important;
-}
 
-.chat-highlight:hover {
+
+.graph-highlight:hover {
 
     background: rgba(0,0,0,0.7)!important;
-    background-image: url('../images/chatwhite.png')!important;
+    background-image: url('/images/chatwhite.png')!important;
     background-repeat:no-repeat!important;
     background-position:center!important;
 
 }
 
-#chat-link:hover {
+#graph-link:hover {
     background: rgba(0,0,0,0.7);
-    background-image: url('../images/chatwhite.png');
+    background-image: url('/images/graphnet-white.png');
     background-repeat:no-repeat;
     background-position:center;
 }
 
 #microphone-link {
     display: none;
-    opacity: 1;
+    opacity: var(--microphone-link-opacity);
     position: fixed;
-    top: 355px;
+    top: 240px;
+    left: 0;
     font-size: 8px; /* change this value to increase/decrease button size */
-    width: 2em;
-    height: 25px;
-    right: 0; /* "#menu width" */
-    font-size: 8px; /* change this value to increase/decrease button size */
-    /* width: 2em;
-     height: auto;*/
-    padding: 0em 2.3em;
+    width: 32px;
+    height: 32px;   
+    font-size: 32px; /* change this value to increase/decrease button size */
+    padding: 5px 5px;
     z-index: 10;
-    background-image: url('../images/microphone.png');
+    background-image: var(--microphone-link-background-image);
     background-repeat:no-repeat;
     background-position:center;
 
 }
 
 #addcontext-link {
+
     position: fixed;
-    top: 205px;
-    font-size: 8px; /* change this value to increase/decrease button size */
-    width: 2em;
-    height: 25px;
-    right: 0; /* "#menu width" */
-    font-size: 8px; /* change this value to increase/decrease button size */
-    /* width: 2em;
-     height: auto;*/
-    padding: 0em 2.3em;
+    top: 80px;
+    left: 0;
+    background: none;
+    text-align: left;
+    font-size: 32px; /* change this value to increase/decrease button size */
+    width: 32px;
+    height: 32px;
+    padding: 5px 5px;
     z-index: 10;
-    opacity: 1;
-    background-image: url('../images/compare.png');
+    opacity: var(--addcontext-link-opacity);
+    background-image: var(--addcontext-link-background-image);
     background-repeat:no-repeat;
     background-position:center;
+    pointer-events: auto!important;
 
 }
 
 .addcontext-on {
     opacity: 1!important;
-    background-image: url('../images/compare-blue.png')!important;
+    background-image: url('/images/intersect-active.png')!important;
     background-repeat:no-repeat!important;
     background-position:center!important;
 }
@@ -557,7 +640,41 @@ small screens.
 
 
 .addcontext-visible {
-    background-image: url('../images/compare-green.png')!important;
+    background-image: url('/images/intersect-on.png')!important;
+
+}
+
+#diffcontext-link {
+
+    position: fixed;
+    top: 120px;
+    left: 0;
+    background: none;
+    text-align: left;
+    font-size: 32px; /* change this value to increase/decrease button size */
+    width: 32px;
+    height: 32px;
+    padding: 5px 5px;
+    z-index: 10;
+    opacity: var(--diffcontext-link-opacity);
+    background-image: var(--diffcontext-link-background-image);
+    background-repeat:no-repeat;
+    background-position:center;
+    pointer-events: auto!important;
+
+}
+
+.diffcontext-on {
+    opacity: 1!important;
+    background-image: url('/images/diff-active.png')!important;
+    background-repeat:no-repeat!important;
+    background-position:center!important;
+}
+
+
+
+.diffcontext-visible {
+    background-image: url('/images/diff-on.png')!important;
 
 }
 
@@ -573,15 +690,12 @@ small screens.
    height: auto;*/
   padding: 0em 2.5em;
   z-index: 11;
-  background-image: url('../images/location-precise.png');
+  opacity: var(--improve-layout-opacity);
+  background-image: var(--improve-layout-background-image);
   background-repeat:no-repeat;
   background-position:center;
 }
 
-.improve-layout-dark {
-    opacity: 0.6;
-    background-image: url('../images/location-precise-white.png')!important;
-}
 
 #abstract-layout {
   position: fixed;
@@ -590,61 +704,87 @@ small screens.
   width: 2em;
   height: 25px;
   right: 0; /* "#menu width" */
-  font-size: 8px; /* change this value to increase/decrease button size */
   /* width: 2em;
    height: auto;*/
   padding: 0em 2.5em;
   z-index: 11;
-  background-image: url('../images/diamond.png');
+  background-image: var(--abstract-layout-background-image);
+  opacity: var(--abstract-layout-opacity);
   background-repeat:no-repeat;
   background-position:center;
 }
 
-.abstract-layout-dark {
-    opacity: 0.6;
-    background-image: url('../images/diamond-white.png')!important;
-}
+
 
 #walkthrough {
-  position: fixed;
-  top: 245px;
-  font-size: 8px; /* change this value to increase/decrease button size */
-  width: 2em;
-  height: 25px;
-  right: 0; /* "#menu width" */
-  font-size: 8px; /* change this value to increase/decrease button size */
-  /* width: 2em;
-   height: auto;*/
-  padding: 0em 2.5em;
-  z-index: 11;
-  background-image: url('../images/question.png');
-  background-repeat:no-repeat;
-  background-position:center;
-}
+    position: fixed;
+    top: 245px;
+    font-size: 8px; /* change this value to increase/decrease button size */
+    width: 2em;
+    height: 25px;
+    right: 0; /* "#menu width" */
+    padding: 0em 2.5em;
+    z-index: 11;
+    background: none;
+    background-image: var(--walkthrough-button-background-image);
+    opacity: var(--walkthrough-button-opacity);
+    background-repeat:no-repeat;
+    background-position:center;
+  }
 
-.walkthrough-dark {
-  opacity: 0.6;
-  background-image: url('../images/question-white.png')!important;
 
-}
+#adjustsettings {
+    position: fixed;
+    top: 285px;
+    font-size: 8px; /* change this value to increase/decrease button size */
+    width: 2em;
+    height: 25px;
+    right: 0; /* "#menu width" */
+    padding: 0em 2.5em;
+    z-index: 11;
+    background: none;
+    background-image: var(--adjustsettings-button-background-image);
+    opacity: var(--adjustsettings-button-opacity);
+    background-repeat:no-repeat;
+    background-position:center;
+  }
+
+  #themeswitch {
+    position: fixed;
+    top: 205px;
+    font-size: 8px; /* change this value to increase/decrease button size */
+    width: 2em;
+    height: 25px;
+    right: 0; /* "#menu width" */
+    padding: 0em 2.5em;
+    z-index: 11;
+    background: none;
+    background-image: var(--themeswitch-button-background-image);
+    opacity: var(--themeswitch-button-opacity);
+    background-repeat:no-repeat;
+    background-position:center;
+  }
+  
+
+
 
 .microphone-on {
     opacity: 1!important;
-    background-image: url('../images/microphone-blue.png')!important;
+    background-image: url('/images/microphone-blue.png')!important;
     background-repeat:no-repeat!important;
     background-position:center!important;
 }
 
 .layout-on {
     opacity: 1!important;
-    background-image: url('../images/location-precise-blue.png')!important;
+    background-image: url('/images/location-precise-blue.png')!important;
     background-repeat:no-repeat!important;
     background-position:center!important;
 }
 
 .abstract-on {
     opacity: 1!important;
-    background-image: url('../images/diamond-blue.png')!important;
+    background-image: url('/images/diamond-blue.png')!important;
     background-repeat:no-repeat!important;
     background-position:center!important;
 }
@@ -653,7 +793,7 @@ small screens.
 #graph-tools {
     position: fixed;
     display: none;
-    top: 280px;
+    top: 320px;
     text-align: right;
     right: -2px; /* "#menu width" */
     height: 80px;
@@ -680,12 +820,34 @@ small screens.
 
 #addcontextinput {
   padding-bottom: 0.5em;
+
 }
 
 #addcontextbutton {
   text-decoration: none;
 }
 
+#addcontextname {
+    float: left;
+}
+
+input#addcontextsubmit {
+        position: relative;
+        margin-top: 5px;
+        margin-left: 10px;
+        background:url('/images/save-white.png') no-repeat;
+        cursor:pointer;
+        border:none;
+        width:23px;
+        height:23px;
+        float: none;
+}
+#addcontextbreak {
+    float: none;
+}
+.whiten {
+    color: #cfcfcf!important;
+}
 
 
 
@@ -705,21 +867,21 @@ Hides the menu at `48em`, but modify this based on your app's needs.
 
 
     #layout {
-        padding-left: 150px; /* left col width "#menu" */
+        padding-left: 180px; /* left col width "#menu" */
         left: 0;
     }
     #menu {
-        left: 150px;
+        left: 180px;
     }
 
     .menu-link {
         position: fixed;
-        left: 150px;
+        left: 180px;
         display: none;
     }
 
     #layout.active .menu-link {
-        left: 150px;
+        left: 180px;
     }
 
 
@@ -748,7 +910,7 @@ Hides the menu at `48em`, but modify this based on your app's needs.
     }
 
 
-    #chat-link {
+    #graph-link {
         margin-top: 0px;
         background: none;
         position: fixed;
@@ -760,19 +922,19 @@ Hides the menu at `48em`, but modify this based on your app's needs.
         height: auto;
         padding: 2.6em 2.6em;
         z-index: 11;
-        background-image: url('../images/graphnet.png');
+        background-image: url('/images/graphnet.png');
         background-repeat:no-repeat;
         background-position:center;
     }
 
-    #chat-link:hover {
+    #graph-link:hover {
         background: rgba(0,0,0,0.1);
-        background-image: url('../images/graphnet.png');
+        background-image: url('/images/graphnet.png');
         background-repeat:no-repeat;
         background-position:center;
     }
 
-    #graph-link {
+    #statements-toggle {
         /* display:none; */
     }
 

@@ -21,7 +21,7 @@
         <span></span>
     </a>
 
-    <% include menu %>
+    <%- include('components/common/menu') %>
 
 
 
@@ -36,7 +36,7 @@
                 <br>&nbsp;<br>
                 <input type='text' size="25" maxlength="50" name='search' id="search" class="pure-input" placeholder='search terms' value="<% if (fornode) { %><%= fornode %><% } %>" /> <br><br><input class="pure-button pure-button-primary" type='submit' name="btnSubmit" value="Import">
 
-                
+
 
                 <br>&nbsp;<br>
                 <% include messages %>
@@ -45,11 +45,11 @@
                 <input id="source" type="radio" name="source" value="googlesearch" checked> Import from Google Search<br>
                 <input id="source" type="radio" name="source" value="googlescholar" disabled> Import from Google Scholar
                  </label>
-                
+
                 <label for="extractfilter" class="pure-checkbox">
                     <input id="extractfilter" type="checkbox" name="excludesearchquery" value="1"> exclude search terms from the graph<br>
                 </label>
-               
+
                 <label for="savegraph" class="pure-input">
                     saving in <input style="display:inline;" id="savegraph" type='text' size="10" maxlength="15" name='context' value='<% if (context) { %><%= context %><% } else { %>google<% } %>'/> context
                 </label>
@@ -109,7 +109,7 @@
                 $(this).find('input[type=submit]').attr('disabled', 'disabled');
                 $('#message').html('We are importing the data, this page will automatically reload. If this does not happen in 30 seconds, please, <a href="/<%= user.name %>/'+$('#savegraph').val()+'/edit">click here</a>.');
 
-            
+
 
         });
 

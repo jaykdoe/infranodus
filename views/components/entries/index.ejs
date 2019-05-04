@@ -1,0 +1,1046 @@
+<script>
+
+/* 
+Contains Socket.IO activation and graphFactory global graph settings.
+globalFactory has to be loaded above all else as it's referenced to from other functions.
+*/
+
+// Initialize Socket.IO for websockets (using them for collabs but also to listen to events within the app)
+const socket = io();
+
+// Collaboration options
+const collabFactory = (() => {
+
+    function CollabFactory() {
+        let collaborate_matrix = {};
+        let collaborate_room = userFactory.getViewOption('urlPath') + '/';
+        let collaborate_invite = '';
+        let collaborate_id = Math.round((Math.random() * 1000000));
+
+        let collaborate_storage = JSON.parse(localStorage.getItem("collaborate"));    
+
+        this.setCollabMatrix = function(room, collab_id) {
+            collaborate_matrix[room] = collab_id;
+        }
+        this.getCollabMatrixForRoom = function(room) {
+            return collaborate_matrix[room];
+        }
+        this.getCollabMatrix = function() {
+            return collaborate_matrix;
+        }
+
+        this.getCollabRoom = function() {
+            return collaborate_room;
+        }
+
+        this.getCollabId = function() {
+            return collaborate_id;
+        }
+        this.setCollabId = function(id) {
+            if (id && id.length > 0) {
+                collaborate_id = id;
+            }
+        }
+        this.existsCollabId = function() {
+            if (collaborate_id && collaborate_id.length > 0) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+        this.setCollabInvite = function(id) {
+            if (id && id.length > 0) {
+                collaborate_id = id;
+                collaborate_invite = id;
+            }
+        }
+        this.existsCollabInvite = function() {
+            if (collaborate_invite && collaborate_invite.length > 0) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+
+        this.existsCollabStorage = function() {
+            if (collaborate_storage && collaborate_storage.length > 0) {
+                return true;
+            }
+            else {
+                return false;
+            }
+        }
+        this.getCollabStorage = function() {
+            return collaborate_storage;
+        }
+
+    }
+
+    return new CollabFactory();
+
+})();
+
+// get a URL if applicable for the collaboration setting
+collabFactory.setCollabInvite(getUrlVars()["collaborate"]);
+
+// set the collab matrix    
+collabFactory.setCollabMatrix(collabFactory.getCollabRoom(), collabFactory.getCollabId());
+        
+// there was no URL for collaboration        
+if (collabFactory.existsCollabInvite() == false) {
+
+    if (collabFactory.existsCollabStorage() == true) {
+
+        if (collabFactory.getCollabStorage()[collabFactory.getCollabRoom()]) {
+            if (collabFactory.getCollabStorage()[collabFactory.getCollabRoom()].length > 0) {
+                collabFactory.getCollabMatrixForRoom(collabFactory.getCollabRoom(),collabFactory.getCollabStorage()[collabFactory.getCollabRoom()]);
+                collabFactory.setCollabId(collabFactory.getCollabMatrixForRoom(collabFactory.getCollabRoom()).split("/").pop());
+            }
+        }
+    }
+
+    // Now in case the original user reloads the page by error, they'll get the new collaborate ID, so we avoid that by storing their data
+    localStorage.setItem("collaborate", JSON.stringify(collabFactory.getCollabMatrix()));
+}
+
+
+// Initiate the collaboration settings
+
+// On connection to server get the id of the current chat "room", which is actually the folder/URL of the current user
+
+socket.on('connect', function(){
+    console.log('socket connected');
+    socket.emit('login', {user: userFactory.getCurrentUser(), context: userFactory.getCurrentContext(), id: collabFactory.getCollabMatrixForRoom(collabFactory.getCollabRoom())});
+});
+
+
+socket.on('startChat', function(data){
+    console.log('chat started');
+    if(data.boolean && data.id == collabFactory.getCollabMatrixForRoom(collabFactory.getCollabRoom())) {
+        console.log('in chat room ' + data.id);
+        var collab_content = $('#collaborate-link').tooltipster('content');
+        $('#collaborate-link').tooltipster('content', 'Collaboration is ON');
+        $('#collaborate-link').addClass('is-collab');
+        $('#collaborate-link').tooltipster('show');
+        setTimeout(function() {
+            $('#collaborate-link').tooltipster('hide');
+            setTimeout(function() {
+                $('#collaborate-link').tooltipster('content', collab_content);
+            }, 1000);
+
+        }, 2000);
+    }
+});
+
+socket.on('leave', function(msg){
+    console.log('partner left');
+    console.log(msg.people);
+    if (msg.people < 2) {
+        $('#collaborate-link').removeClass('is-collab');
+        var collab_content = $('#collaborate-link').tooltipster('content');
+        $('#collaborate-link').tooltipster('content', 'Collaboration is OFF');
+        $('#collaborate-link').tooltipster('show');
+        setTimeout(function() {
+            $('#collaborate-link').tooltipster('hide');
+            setTimeout(function() {
+                $('#collaborate-link').tooltipster('content', collab_content);
+            }, 1000);
+        }, 2000);
+    }
+});
+
+socket.on('tooMany', function(data){
+
+    alert('There are already 2 users working on this context and this is our max so far. If you think it is a mistake, please, check if any of your extra browser tabs are opened.');
+    window.location.href = 'http://' + userFactory.getHostSite() + '/' + 'home' + '/edit';
+
+});
+
+
+// Initiate the graph object
+const graphFactory = (() => {
+
+    // Graph parameters object storage and functions
+    function GraphFactory(){
+                
+                // Variables that contain all the current nodes (for easier search)
+                let nodeNames = [];
+                let nodeIDs = {}; // maps names (key) to IDs (values)
+                let nodeIDs_rev = {}; // maps IDs (key) to names (values)
+            
+                // Variables that contain only the original set
+                let origNodeIDs = {};
+                let origNodeIDs_rev = {};
+        
+                // Variabls that contain the edges
+                let edgesDB = [];
+                let nodesDB = [];
+
+                // What are the unique directed edges we have
+                let uniqueEdges = [];
+
+                // Variable that contains the node's size
+                let nodeSize = {}; // maps ID to the size
+        
+                // These are the nodes that are selected
+                let pinnedNodes = [];
+        
+                // These are the nodes that were selected but not found (so gray pinnedNodes)
+                let notFoundNodes = [];
+        
+                // These are selected nodes for community detection (so that they're not colored)
+                let selectedNodes = [];
+        
+                // These are the nodes that are currently in the stoplist
+                let stopNodes = [];
+        
+                // Create statement-node index for filtering
+                let nodesOfStatement = {};
+
+                // Create a list of nodes for each context
+                let contextNodeID = {};
+
+                // Create statements of context object
+                let statementsOfContext = {}; // key is context, value is statement
+        
+                // Top betweenness centrality nodes
+                let topbc_nodes = [];
+
+                // All communities
+                let all_communities = [];
+
+                let community_of_node = {};
+
+                // Insight clusters
+                let insight_clusters = {};
+
+                // Graph statistics
+                let stats = {};
+
+                // Context nodes in the graph
+                let graphContextNodes = [];
+
+                // Context edges in the graph
+                let graphContextEdges = [];
+
+                // Additional context nodes
+                let addcontextnodes = [];
+
+                // Selected communities
+                let selectCommunities = [];
+
+                this.setStats = function(key, value) {
+                    stats[key] = value;
+                    return true;
+                }
+
+                this.getStats = function(key) {
+                    if (key) {
+                        return stats[key];
+                    }
+                    else {
+                        return false;
+                    }
+                }
+
+                this.getAllStats = function() {  
+                    return stats;
+                }
+
+                this.addGraphContextNode = function(context) {
+                    
+                    if (graphContextNodes.indexOf(context.id) == -1) {
+                        graphContextNodes.push(context.id);
+                        graph().addContextNode(context);
+                    }
+                    
+                }
+
+                this.removeGraphContextNodes = function() {
+                    graphContextNodes = [];
+                    graphContextEdges = [];
+                    graph().removeContextNodes();
+                }
+
+                this.addGraphContextEdge = function(context, node) {
+                    
+                    let edge_id = context.id + '-' + node.id;
+                    let source_id = context.id;
+                    let target_id = node.id;
+
+                    if (graphContextEdges.indexOf(edge_id) == -1) {
+                        graphContextEdges.push(edge_id);
+                        graph().addContextEdge(edge_id, context.id, node.id, '');
+                    }
+                    
+                    
+                }
+
+                this.getGraphContextNodes = function() {
+                    return graphContextNodes;
+                }
+
+                this.getGraphContextEdges = function() {
+                    return graphContextEdges;
+                }
+
+                this.saveAllCommunities = function(coms) {
+                    let new_communities = [];
+                    for (let c in coms) {
+                        new_communities.push(coms[c]);
+                    }
+                    all_communities = new_communities;
+                    
+                }
+                
+                this.getAllCommunities = function(number, top_nodes, setting) {
+
+                    if (!top_nodes && setting) {
+                        top_nodes = 3;
+                    }
+                    if (!number && setting) {
+                        number = 4;                    
+                        if (all_communities.length < 4) {
+                            number = all_communities.length;
+                        }
+                    }
+                    
+                    let proc_communities = [];
+
+                    for (let c in all_communities) {
+                        proc_communities[c] = {id: all_communities[c].id, length: 0, nodes: []};
+                    }
+
+                    if (top_nodes) {
+                        for (let j = 0; j < proc_communities.length; j++) {
+                            proc_communities[j].nodes = all_communities[j].nodes.slice(0, top_nodes);
+                            proc_communities[j].length = top_nodes;
+                        }
+                    }
+                    else {
+                        for (let j = 0; j < proc_communities.length; j++) {
+                            proc_communities[j].nodes = all_communities[j].nodes;
+                            proc_communities[j].length += all_communities[j].nodes.length;
+                        }
+                    }
+                    if (number) {
+                        proc_communities = proc_communities.slice(0,number);
+                        return proc_communities;
+                    }
+                    else {
+                        return proc_communities;
+                    }
+
+                }
+
+                this.saveCommunityOfNode = function(node) {
+                    community_of_node[node.originalLabel] = node.community;
+                }
+
+                this.getCommunityOfNode = function(name) {
+                    return community_of_node[name];
+                }
+
+                this.saveAddContextNodes = function(nodes) {
+                    addcontextnodes = nodes;
+                }
+                this.getAddContextNodes = function() {
+                    return addcontextnodes;
+                }
+        
+                this.addNode = function(name, id, n) {
+                    nodeIDs[name] = id;
+                    nodeIDs_rev[id] = name;
+                    nodeNames.push(name);
+                    if (n) {
+                        nodesDB.push(n);
+                        origNodeIDs[n.originalLabel] = n.id;
+                        origNodeIDs_rev[n.id] = n.originalLabel;
+                    }
+                    return true;
+                }
+                this.existNode = function(name) {
+                    if (nodeIDs[name]) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+                this.addEdge = function(e) {
+                    edgesDB.push(e);
+                    return true;
+                }
+                this.removeNode = function(name) {
+                    let nodeID = nodeIDs[name];
+                    delete nodeIDs[name];
+                    delete nodeIDs_rev[nodeID];
+                    nodeNames.splice(nodeNames.indexOf(name),1);
+                    return true;
+                }
+                this.deleteNodes = function(nodes) {
+                    for (let i in nodes) {
+                        this.addToStopNodes(nodes[i]);
+                        this.removeNode(nodes[i]);
+                        this.removeFromNotFoundNodes(nodes[i]);
+                        this.removeFromSelectedNodes(nodes[i]);
+                    }
+                    // If we are deleting the nodes, we transform all the pinned ones, so they can be removed too
+                    this.initPinnedNodes([]);
+
+                    // this.updateGraphNodes(nodeIDs_rev);
+
+                    // TODO this is a workaround, otherwise sigma doesn't have X parameters on initGraph
+                    if (this.existStopNodes() == true) {
+                        console.log('we are deleting them')
+                        this.deleteGraphNodes(this.getStopNodes());          
+                    }
+
+                    return true;
+                }
+                this.addDeletedNode = function(node) {
+                    this.removeFromStopNodes(node);
+                    this.addNode(node, origNodeIDs[node]);
+                    this.initPinnedNodes(pinnedNodes);
+                    let nodesToAdd = [];
+                    nodesToAdd.push(node);
+                    this.addDeletedGraphNodes(nodesToAdd);
+                    return true;
+        
+                }
+                this.addNewNodes = function(nodes, edges, of_statement) {
+                    
+                    // We will only add nodes that do not exist and only the edges that contain the ID of the statement we just added
+                    
+                    let nodesToAdd = [];
+                    let edgesToAdd = [];
+                    
+                    for (let node in nodes) {
+                        if (this.existNode(nodes[node].label) == false) {
+                            this.addNode(nodes[node].label, nodes[node].id, nodes[node]);
+                            nodesToAdd.push(nodes[node]);
+                        }
+                    }
+                    if (of_statement) {
+                        for (let edge in edges) {
+                            
+                            for (let context in edges[edge].context_matrix)
+                            
+                                for (let statement in edges[edge].context_matrix[context]) {
+                                    if (statement == of_statement) {
+                                        // This is the edge we want to add as it is part of the statement we're adding
+                                        edgesToAdd.push(edges[edge]);
+                                    }
+                                }
+                        }
+                    }
+      
+                    this.addGraphNodesEdges(nodesToAdd, edgesToAdd);
+                    return true;
+                }
+
+                this.setNodeSize = function(n) {
+                    nodeSize[n.id] = n.size;
+                }
+                this.getNodeSize = function(node_id) {
+                    return nodeSize[node_id];
+                }
+
+                this.getNodeIDs = function() {
+                    return nodeIDs;
+                }
+                this.getOrigNodes = function() {
+                    return nodesDB;
+                }
+                this.getOrigNodeIDs = function() {
+                    return origNodeIDs;
+                }
+                this.getOrigNodeID = function(name) {
+                    return origNodeIDs[name];
+                }
+                this.getOrigNodeIDsRev = function() {
+                    return origNodeIDs_rev;
+                }
+                this.getNodeID = function(name) {
+                    return nodeIDs[name];
+                }
+                this.getNodeIDsRev = function() {
+                    return nodeIDs_rev;
+                }
+        
+                this.getNodeNames = function() {
+                    return nodeNames;
+                }
+
+
+                this.getEdges = function() {
+                    return edgesDB;
+                }
+        
+        
+                this.deleteGraphNodes = function(nodesToDelete) {
+                     for (let name in nodesToDelete) {
+                        this.deleteUniqueEdgeWithNode(graphFactory.getOrigNodeID(nodesToDelete[name]));
+                     }
+                     // Update the graph nodes (delete or add)
+                     graph().deleteNodes(nodesToDelete, graph().updateMetrics);
+               
+                 }
+        
+                 this.addDeletedGraphNodes = function(nodesToAdd) {
+                     // Update the graph nodes (delete or add)
+                     graph().addDeletedNodes(nodesToAdd, graph().updateMetrics);
+               
+                 }
+        
+                 this.addGraphNodesEdges = function(nodesToAdd, edgesToAdd) {
+                     
+                     // Adding the new nodes
+                     graph().addNodesEdges(nodesToAdd, edgesToAdd, graph().updateMetrics);
+               
+                 }
+          
+        
+                this.initPinnedNodes = function(nodes) {
+
+                    console.log('pinned nddes init')
+
+                    if (nodes) {
+                        pinnedNodes = nodes;
+                    }
+                    else {
+                        pinnedNodes = [];
+                    }
+                    
+                    // Select the pinned nodes on the graph and the adjacent ones 
+                    filter_graph(pinnedNodes);
+        
+                    // Add tags to the graph
+                    graphTags().update();
+        
+                    // Perform filter statements function on the nodes selected
+                    statements().filter();
+        
+                    // Save to local storage
+                    this.saveSelections();
+        
+                    // Add search terms into the top graph search form
+                    nodeInputField().update(pinnedNodes.concat(notFoundNodes));
+        
+                    // Add search terms into the bottom entry add field
+                    addEntryForm().update(pinnedNodes.concat(notFoundNodes));       
+        
+                    // Change selections in the analytics pane
+                    analyticsPanel.updateSelections(pinnedNodes);
+
+                    if (statementsPanelFactory.getCurrentStatementsView() == 'INSIGHT') {
+                        statements().activateInsight();
+                    }
+                    else if (statementsPanelFactory.getCurrentStatementsView() == 'SUMMARY') {
+                        statements().activateSummary();
+                    }
+                }
+        
+                // TODO write initiatilization for the delete nodes
+        
+                this.checkIfPinned = function(node) {
+                    if (pinnedNodes.indexOf(node) > -1) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+                this.addToPinnedNodes = function(name) {
+                    pinnedNodes.push(name);
+                    this.initPinnedNodes(pinnedNodes);
+                    return true;
+                }
+                this.removeFromPinnedNodes = function(name) {
+                    pinnedNodes.splice(pinnedNodes.indexOf(name),1);
+                    this.initPinnedNodes(pinnedNodes);
+                    return true;
+                }
+                this.getPinnedNodes = function() {
+                    return pinnedNodes;
+                }
+                this.getPinnedNode = function(position) {
+                    return pinnedNodes[position];
+                }
+                this.getLastPinnedNode = function() {
+                    return pinnedNodes[pinnedNodes.length - 1];
+                }
+                this.existPinnedNodes = function() {
+                    if (pinnedNodes && pinnedNodes.length > 0) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+        
+                this.updateNotFoundNodes = function(nodes) {
+                    if (!nodes) {
+                        notFoundNodes = [];
+                    }
+                    else {
+                        notFoundNodes = nodes;
+                        graphTags().update();
+                    }
+                    // Add tags to the graph
+                    return true;
+                }
+                this.addToNotFoundNodes = function(name) {
+                    notFoundNodes.push(name);
+                    return true;
+                }
+                this.removeFromNotFoundNodes = function(name) {
+                    notFoundNodes.splice(notFoundNodes.indexOf(name),1);
+                    return true;
+                }
+                this.getNotFoundNodes = function() {
+                    return notFoundNodes;
+                }
+                this.existNotFoundNodes = function() {
+                    if (notFoundNodes && notFoundNodes.length > 0) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+        
+                this.addToSelectedNodes = function(name) {
+                    selectedNodes.push(name);
+                    return true;
+                }
+                this.removeFromSelectedNodes = function(name) {
+                    selectedNodes.splice(selectedNodes.indexOf(name),1);
+                    return true;
+                }
+                this.getSelectedNodes = function() {
+                    return selectedNodes;
+                }
+                this.updateSelectedNodes = function(nodes) {
+                    selectedNodes = nodes;
+                    return true;
+                }
+                this.checkIfSelected = function(node) {
+                    if (selectedNodes.indexOf(node) > -1) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+        
+                this.addToStopNodes = function(name) {
+                    stopNodes.push(name);
+                    return true;
+                }
+                this.removeFromStopNodes = function(name) {
+                    stopNodes.splice(stopNodes.indexOf(name),1);
+                    return true;
+                }
+                this.getStopNodes = function() {
+                    return stopNodes;
+                }
+                this.checkIfStopNode = function(node) {
+                    if (stopNodes.indexOf(node) > -1) {
+                        return true;
+                    }
+                    else {
+                        if (node) {
+                            return false;
+                        }
+                    }
+                }
+                this.existStopNodes = function() {
+                    if (stopNodes && stopNodes.length > 0) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+        
+                this.addNodeToStatement = function(statement, node) {
+                    if (!nodesOfStatement[statement]) {
+                        nodesOfStatement[statement] = [];
+                    }
+                    nodesOfStatement[statement].push(node);
+                    return true;
+                }
+                this.getNodesOfStatement = function(statement) {
+                    if (statement) {
+                        return nodesOfStatement[statement];
+                    }
+                }
+                this.getAllNodesOfStatement = function() {
+                   
+                    return nodesOfStatement
+                   
+                }
+                this.existNodesOfStatement = function(statement) {
+                    if (nodesOfStatement[statement]) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+                this.existNodeInStatement = function(statement, node) {
+                    if (nodesOfStatement[statement].indexOf(node) >= 0) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                    
+                }
+                this.removeNodesFromStatement = function(statement) {
+                    if (nodesOfStatement[statement]) {
+                        nodesOfStatement[statement] = []
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+
+
+                this.addStatementOfContext = function(context, statement) {
+                    if (!statementsOfContext[context]) {
+                        statementsOfContext[context] = [];
+                    }
+                    if (this.existStatementOfContext(context, statement) == false) {
+                        statementsOfContext[context].push(statement);
+                        return true;
+                    }
+                }
+                this.getStatementsOfContext = function(context) {
+                    if (context) {
+                        return statementsOfContext[context];
+                    }
+                }
+                this.getAllStatementsOfContext = function() {
+                   
+                    return statementsOfContext;
+                   
+                }
+                this.getContextsOfStatement = function(statement) {
+                    let contexts = [];
+                    for (let context in statementsOfContext) {
+                        if (statementsOfContext[context].indexOf(statement) > -1) {
+                            contexts.push(context);
+                        }
+                    }
+                    return contexts;
+                }
+                this.existStatementsOfContext = function(context) {
+                    if (statementsOfContext[context]) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+                this.existStatementOfContext = function(context, statement) {
+                    if (statementsOfContext[context].indexOf(statement) >= 0) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                    
+                }
+                this.removeStatementsFromContext = function(context) {
+                    if (statementsOfContext[context]) {
+                        statementsOfContext[context] = []
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+                this.removeStatementFromContext = function(context, statement) {
+                    if (statementsOfContext[context]) {
+                        let index = statementsOfContext[context].indexOf(statement);
+                        if (index) {
+                            statementsOfContext[context].splice(index,1);
+                            return true;
+                        }
+                        else {
+                            return false;
+                        }              
+                    }
+                    else {
+                        return false;
+                    }
+                }
+        
+                this.saveSelections = function() {
+        
+                    // Save all the selected nodes into the localStorage
+                    if (localStorage.getItem("selections")) {
+                        var localstore = JSON.parse(localStorage.getItem("selections"));
+                    }
+                    else {
+                        var localstore = {};
+                    }
+        
+                    var localstore_cell = {};
+        
+                    localstore_cell.stopnodes = this.getStopNodes();
+                    localstore_cell.pinnednodes = this.getPinnedNodes();
+        
+                    if (this.existStopNodes == false && this.existPinnedNodes == false) {
+                        delete localstore[window.location.href]
+                    }
+                    else {
+                        localstore[window.location.href] = localstore_cell;
+                    }
+        
+                    localStorage.setItem("selections",JSON.stringify(localstore));
+        
+                }
+        
+                this.getSelections = function() {
+        
+                    let selected_keywords = getUrlVars()["keywords"];
+        
+                    if (localStorage.getItem("selections")) {
+        
+                        let saved_selections = JSON.parse(localStorage.getItem("selections"));
+        
+                        // Do we have any saved selections stopNodes or pinnedNodes for this URL?
+                        if (saved_selections[window.location.href]) {
+                            let deletedNodes = saved_selections[window.location.href].stopnodes;
+                            let pinnedNodes = saved_selections[window.location.href].pinnednodes;
+                            
+                            if (deletedNodes.length > 0) {
+                                this.deleteNodes(deletedNodes);
+                            }
+                            if (pinnedNodes.length > 0) {
+                                this.initPinnedNodes(pinnedNodes);
+                            }
+        
+                        }
+                        else if (userFactory.isInterpretOn() == true) {
+                            
+                            // In case we're on the interpret or add context field, we might still want to load the original selections
+                            
+                            for (var url in saved_selections) {
+                                if (url.indexOf('/'+userFactory.getAddContext()+'/') > -1) {
+                                    let deletedNodes = saved_selections[url].stopnodes;
+                                    let pinnedNodes = saved_selections[url].pinnednodes;
+                                    if (deletedNodes.length > 0) {
+                                        this.deleteNodes(deletedNodes);
+                                    }
+                                    else {
+                                        if (pinnedNodes.length > 0) {
+                                            this.initPinnedNodes(pinnedNodes);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        else if (selected_keywords && selected_keywords.length > 0) {
+                            
+                            let pinnedNodes = selected_keywords.split("+");
+        
+        
+                            if (pinnedNodes.length > 0) {
+                                this.initPinnedNodes(pinnedNodes);
+                            }
+        
+        
+                        }
+        
+                    }
+                    // TODO clear that
+                    else if (selected_keywords && selected_keywords.length > 0) {
+                    
+                        let pinnedNodes = selected_keywords.split("+");
+        
+                        if (pinnedNodes.length > 0) {
+                            this.initPinnedNodes(pinnedNodes);
+                        }
+        
+        
+                    }
+                }
+        
+                this.updateTopBCNodes = function(nodes) {
+                        topbc_nodes = nodes;
+                        return true
+                }
+        
+                this.getTopBCNodes = function(number) {
+                    if (number && number > 0) {
+                        return topbc_nodes.slice(0,number)
+                    }
+                    else {
+                        return topbc_nodes;
+                    }
+                }
+
+                this.updateTopDegreeNodes = function(nodes) {
+                      topDegree_nodes = nodes;
+                      return true;
+                }
+
+                this.getTopDegreeNodes = function(number) {
+                    if (number && number > 0) {
+                        return topDegree_nodes.slice(0,number)
+                    }
+                    else {
+                        return topDegree_nodes;
+                    }
+                }
+
+                this.selectCommunity = function(community) {
+                    if (selectCommunities.indexOf(community) > -1) {
+                        selectCommunities.splice(selectCommunities.indexOf(community), 1);
+                    }
+                    else {
+                        selectCommunities.push(community);
+                    }
+                    graph().selectCommunities(selectCommunities);
+                }
+
+                this.clearSelectCommunity = function() {
+                    if (selectCommunities.length > 0) {
+                        selectCommunities = [];
+                        graph().selectCommunities(selectCommunities);
+                    }
+                }
+
+                this.createInsightClusters = function(most_inf_comm_nodes) {
+            
+                    let insight_nodes = {0: [], 1: []};
+
+                    let polysingularity_score = graphFactory.getStats('PolysingularityScore');
+
+                    if (most_inf_comm_nodes.length >= 2) {
+                        if (polysingularity_score == 'Diversified' || polysingularity_score == 'Dispersed') {
+                            insight_nodes[0] = most_inf_comm_nodes[0];
+                            insight_nodes[1] = most_inf_comm_nodes[1];
+                        }
+                        else {            
+                            let first_com = most_inf_comm_nodes[most_inf_comm_nodes.length-1];
+                            let second_com = most_inf_comm_nodes[most_inf_comm_nodes.length-2];
+                            insight_nodes[0] = first_com;
+                            insight_nodes[1] = second_com;                       
+                        }
+                    }
+                    else {
+                        if (most_inf_comm_nodes[0] && most_inf_comm_nodes[0].nodes && most_inf_comm_nodes[0].nodes.length > 1) {
+                            
+                            insight_nodes[0] = {nodes: [], length: 0, id: 0};
+                            insight_nodes[1] = {nodes: [], length: 0, id: 0};
+                            
+                            insight_nodes[0].id = most_inf_comm_nodes[0].id;
+                            insight_nodes[1].id = most_inf_comm_nodes[0].id;
+                            
+                            for (let i = 0; i < most_inf_comm_nodes[0].nodes.length; i++) {
+                                
+                                if (i <= insight_nodes[1].length) {
+                                    insight_nodes[0].nodes.push(most_inf_comm_nodes[0].nodes[i]);
+                                    insight_nodes[0].length += 1;
+                                }
+                                
+                                if ((most_inf_comm_nodes[0].nodes.length - 1 - i) > i) {
+                                    insight_nodes[1].nodes.push(most_inf_comm_nodes[0].nodes[most_inf_comm_nodes[0].nodes.length - 1 - i]);
+                                    insight_nodes[1].length += 1;
+                                }
+                            }
+                        }
+                        else {
+                            insight_nodes[0] = most_inf_comm_nodes[0];
+                            insight_nodes[1] = most_inf_comm_nodes[0];
+                        }
+                    }
+
+                    insight_clusters = insight_nodes;
+                
+                }
+
+                this.getInsightClusters = function() {
+                    return insight_clusters;
+                }
+
+                this.existNodesInContext = function(context) {
+                    if (contextNodeID[context] && contextNodeID[context].length > 0) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+
+                this.existsNodeInContext = function(context, node_id) {
+                    if (contextNodeID[context] && contextNodeID[context].indexOf(node_id) >= 0) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+
+                this.addNodeToContext = function(context, node_id) {
+                    if (!contextNodeID[context]) {
+                        contextNodeID[context] = [];
+                    }
+                    if (contextNodeID[context].indexOf(node_id) == -1) {
+                        contextNodeID[context].push(node_id);
+                    }
+                }
+
+                this.getNodesInContext = function(context) {
+                    return contextNodeID[context];
+                }
+                this.getContextNodeIDs = function() {
+                    return contextNodeID;
+                }
+
+                this.addToUniqueEdges = function(source,target) {
+                    uniqueEdges.push(source + '-' + target);
+                }
+                this.getAllUniqueEdges = function() {
+                    return uniqueEdges;
+                }
+                this.existsUniqueEdge = function(source,target) {
+                    if (uniqueEdges.indexOf(source + '-' + target) > -1) {
+                        return true;
+                    }
+                    else {
+                        return false;
+                    }
+                }
+                this.deleteUniqueEdgeWithNode = function(node_id) {
+                    let toRemove = [];
+                    for (let edge in uniqueEdges) {
+                        if (uniqueEdges[edge].indexOf(node_id) > -1) {
+                            toRemove.push(uniqueEdges[edge]);
+                        }
+                    }
+                    for (let rid in toRemove) {
+                        uniqueEdges.splice(uniqueEdges.indexOf(toRemove[rid]),1);
+                    }
+                }
+
+
+        
+        }
+
+        return new GraphFactory();
+
+})(); 
+
+
+
+</script>

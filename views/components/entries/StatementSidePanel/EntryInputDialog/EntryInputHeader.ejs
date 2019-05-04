@@ -1,0 +1,54 @@
+
+
+<% if (!perceivername) { %>
+    <div class='pure-menu pure-menu-open pure-menu-horizontal' style="background: none;">
+        <ul class="statementInputMenu">
+            <% if (!addcontext) {%>
+                <li>
+                    <a id="finds">find</a>
+                </li>
+                <li class="pure-menu-selected-top">
+                    <a id="adds">edit</a>
+                </li>
+                <li>
+                    <a id="interpret" href="/<%= user.name %>/meta_<%= context %>/edit?addcontext=<%= context %>&interpret=1">interpret</a>
+                </li>
+            <% } else { %>
+
+                <li>
+                    <a id="original" href="/<%= user.name %>/<%= addcontext %>/edit">original</a>
+                </li>
+                <li class="pure-menu-selected-top">
+                    <a id="adds">interpret</a>
+                </li>
+                <li>
+                    <a id="finds" href="/<%= user.name %>/<%= context %>/edit">result</a>
+                </li>
+            <% } %>
+        </ul>
+        <br>&nbsp;<br>
+    </div>
+<% } else {  %>
+    <div class='pure-menu pure-menu-open pure-menu-horizontal' style="background: none;">
+        <ul class="statementInputMenu">
+            <li class="pure-menu-selected-top">
+                <a href="javascript:">find</a>
+            </li>
+            <li>
+                <a href="edit">edit</a>
+            </li>
+            <li>
+                <a href="/import">import</a>
+            </li>
+
+        </ul>
+        <br>&nbsp;<br>
+    </div>
+
+<% }  %>
+
+<!-- TODO: remove absolute position from the tooltips below and render them inside the header div -->
+
+<%- include('../../../common/tooltip', {title:"hide this pane and all text", id:"statements-toggle"}); %>
+<%- include('../../../common/tooltip', {title:"minimize window", id:"windowdown-link"}); %>
+

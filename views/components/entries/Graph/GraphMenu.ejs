@@ -1,0 +1,27 @@
+<a href="javascript:" id="graph-link" class="tooltip" title="show / hide the text">
+    <!-- Chat icon -->
+    <span></span>
+</a>
+<div id="controls">
+<a href="javascript:" class="tooltip" title="choose a few nodes from the graph and click this button to find out more"  id="go_next"></a>
+<a href="javascript:location.reload();" class="tooltip" title="reload the graph" id="reloadbutton"></a>
+<a href="javascript:" class="tooltip" title="improve layout" id="improve-layout"></a>
+<a href="javascript:" class="tooltip" title="abstract visualization" id="abstract-layout"></a>
+<a href="javascript:" class="tooltip" title="show tutorial" id="walkthrough"></a>
+<a href="javascript:" class="tooltip" title="switch theme light/dark" id="themeswitch"></a>
+<a href="/settings" class="tooltip" title="adjust settings" id="adjustsettings"></a>
+
+</div>
+
+<div id="graph-tools">
+<a href="javascript:" class="tooltip" title="zoom in" id="zoom-in"></a><br><a href="javascript:" class="tooltip" title="zoom out" id="zoom-out"></a>
+</div>
+
+
+<% if (!perceivername) { %>
+    <a href="javascript:" id="microphone-link" class="tooltip editorpane" title="voice to text on/off">
+        <!-- Microphone icon -->
+        <span></span>
+    </a>
+    
+<% } %>

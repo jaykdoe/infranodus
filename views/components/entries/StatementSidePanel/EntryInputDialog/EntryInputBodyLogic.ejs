@@ -1,0 +1,661 @@
+<script>
+
+
+    const addEntryFormFactory = (() => {
+        
+        function AddEntryFormFactory() {
+        
+            let entryFormState = 'add';
+
+            // Used to populate entry textfield
+            let current_context_field = [];    
+
+            this.setToEdit = function () {
+                entryFormState = 'edit';
+            }
+            this.setToAdd = function () {
+                entryFormState = 'add';
+            }
+            this.getStatus = function() {
+                return entryFormState;
+            }
+
+            this.setCurrentContexts = function(contexts) {
+                current_context_field = contexts;
+            }
+
+            this.getCurrentContexts = function() {
+                return current_context_field;
+            }
+
+            this.addToCurrentContexts = function(context) {
+                current_context_field.push(context);
+            }
+        }
+
+        return new AddEntryFormFactory();
+
+    })();
+
+
+    
+    searchForm().onSubmit(submitSearchForm);
+
+    searchForm().activate();
+
+    addEntryForm().activate();
+
+    addEntryForm().onSubmit(submitEditForm);
+
+
+    function searchForm() {
+        return {
+            autofill: function() {
+                autoComplete('#search',graphFactory.getNodeNames());  
+            },
+            onSubmit: function(onSubmit) {   
+                $('#searchform').on('submit', onSubmit);
+            },
+            activate: function() {
+                  // Submit the form on enter
+                  $('#search').keypress(function(e){ 
+                         
+                    if(e.which == 13 && !e.shiftKey) {
+                        e.preventDefault();
+                        if (localStorage.getItem('defaultbehavior') == 'add') {
+                            $('#addnode').trigger('click');
+                        }
+                        else {
+                            $('#searchnode').trigger('click');
+                        }
+                    }
+                });
+            }
+        }
+    }
+
+    function addEntryForm() {
+        return {
+            update: function(content) {          
+                if ($('#statement').val().length == 0 || $('#statement').val().charAt(0) == '#') {
+                    $('#statement').val(arrayToHashtagString(content));
+                }
+            },
+            onSubmit: function(onSubmit) {
+                $('#submitform').on('submit', onSubmit);
+            },
+            activate: function() {
+                // Submit the form on enter
+                $('#statement').keypress(function(e){            
+                    if(e.which == 13 && !e.shiftKey) {
+                        e.preventDefault();
+                        $('#submitbutton').trigger('click');
+                    }
+                });
+
+                addEntryForm().repopulateContexts();
+
+          
+            },
+            switchToEdit: function() {
+                $("#submitform").append('<input type="submit" name="edit" value="edit" id="editbutton" class="pure-button"> <input type="submit" style="margin: 0px 8px;" name="delete" value="delete" id="deletebutton" > <input type="submit" name="cancel" value="cancel" id="cancelbutton" class="pure-button">');
+                
+                // Hide all the entry edit options
+                deleteContextButton().hide();
+                privacyLinkButton().hide();
+                collaborateButton().hide();
+                importLinkButton().hide();
+
+                submitButton().hide();
+
+                addEntryFormFactory.setToEdit();
+            },
+            switchToAdd: function() {
+                $("#statement").val('');
+                $('#editbutton').remove();
+                $('#deletebutton').remove();
+                $('#cancelbutton').remove();
+
+                // Show all the entry edit options
+                deleteContextButton().show();
+                privacyLinkButton().show();
+                collaborateButton().show();
+                importLinkButton().show();
+
+                // Show the submit button
+                submitButton().show()
+
+                addEntryFormFactory.setToAdd();
+            },
+            populateEdit: function(e) {
+
+                // Get the statement into the edit box at the top
+                $("#statement").val($('.entry-text', e).text());
+
+                // Retrieve that statement's ID into the hidden field (for edit or delete)
+                $('input[name="statementid"]').val(e.attr('data-uid'));
+
+                // Retrieve the date of the statement
+                $('input[name="timestamp"]').val(e.attr('data-timestamp'));
+
+            },
+            onCancelClick: function(e) {
+                
+                // Add a hook on the Cancel button 
+                $("#cancelbutton").on('click', function(e) {
+
+                    e.preventDefault();
+
+                    // Remove the buttons we added
+                    addEntryForm().switchToAdd();
+
+                    // Scroll the entries
+                    statements().scroll();
+
+                    // Remove the hidden timestamp field
+                    $('input[name="timestamp"]').val('');
+
+                    // Repopulate contexts field
+                    addEntryForm().repopulateContexts();
+                    
+
+                });
+            },
+            onDeleteClick: function() {
+
+                $("#deletebutton").on('click', function(e) {
+
+                    e.preventDefault();
+
+                    // Statement is loading
+                    $('#statement').addClass('loading');
+
+                    // Disable the delete button
+                    $('#deletebutton').attr('disabled', 'disabled');
+
+                    // Nullify the timestamp param
+                    $('input[name="timestamp"]').val('');
+
+                    // Create a submit directive with the delete param
+                    let formSubmit = $("#submitform").serialize() + '&delete=delete';
+
+                    // Submit the form
+                    $.post('/post', formSubmit)
+                        .done(function(res) {
+                            // Receive the server response, no need to emit an event
+                            console.log(res);
+                            if (res.successmsg) {
+                                // Show the updated text
+                                userFactory.updateSelfPosted('true');
+                                $('#statement').removeClass('loading');
+                                $('#deletebutton').removeAttr('disabled');
+                                socket.emit('delete message', {entryuid: res.statementid});
+                                statements().showWarning('The statement was deleted.');
+                                $('#cancelbutton').trigger('click');
+                                statements().select();
+                                statements().hideWarning(2000);
+                            }
+                            else if (res.errormsg) {
+                                alert(res.errormsg);
+                            }
+                            else {
+                                alert('Something went wrong, please, try again...');
+                            }
+                        })
+                        .fail(function(res) {
+                            alert("Server Error: " + res.status + " " + res.statusText);
+                        });
+
+                });
+            },
+            onEditClick: function() {
+
+                $("#editbutton").on('click', function(e) {
+
+                    e.preventDefault();
+
+                    $('#statement').addClass('loading');
+
+                    $('#editbutton').attr('disabled', 'disabled');
+
+                    var statementToHide = $('#statementid').val();
+
+                    $('[data-uid="' + statementToHide + '"]').slideUp();
+
+                    var formSubmit = $("#submitform").serialize() + '&edit=edit';
+
+                    $.post('/post', formSubmit)
+                        .done(function(res) {
+                            // Receive the server response, no need to emit an event
+                            if (res.entryuid) {
+                                // Show the updated text
+                                userFactory.updateSelfPosted('true');
+                                $('#statement').removeClass('loading');
+                                $('#editbutton').removeAttr('disabled');
+                                $('#cancelbutton').trigger('click');
+                                socket.emit('chat message', {entryuid: JSON.parse(res.entryuid).data, entrytext: res.entrytext, graph: res.graph});
+                            }
+                            else if (res.errormsg) {
+                                alert(res.errormsg);
+                            }
+                            else {
+                                alert('Something went wrong, please, try again...');
+                            }
+                        })
+                        .fail(function(res) {
+                            alert("Server Error: " + res.status + " " + res.statusText);
+                        });
+
+                });
+            },
+            repopulateContexts: function() {
+
+                    // Populate contexts list next to statement add
+                    let current_context_field = [];
+
+                    // Are we inside some context already?
+                    if ($("#context").val()) {
+                        current_context_field.push($("#context").val());
+                        $("#addedContexts").val($("#context").val());
+                        populateContexts(current_context_field);
+                    }
+
+                    else {
+
+                        // if not, we're making the 'private' context default
+                        let lastcontexts = [];
+
+                        // Let's get the most recent statement
+                        let laststatement = $(".entry:last").attr('data-uid');
+                        
+                        lastcontexts.push(contextNames[0]);
+
+                        // If it doesn't exist or equals "help" (chatbot) then set to private
+                        if (lastcontexts.length == 0 || lastcontexts[0] == 'help') {
+                            current_context_field = ['private'];
+                            $("#addedContexts").val('private');
+                        }
+                        else {
+                            current_context_field = lastcontexts;
+                            // TODO BUG might be an error here if the last entry belongs to several contexts
+                            $("#addedContexts").val(current_context_field.join());
+                        }
+
+                        populateContexts(current_context_field);
+
+                    
+
+                    }
+
+                    function populateContexts(current_context_field) {
+
+                        // Set global param
+                        addEntryFormFactory.setCurrentContexts(current_context_field);
+
+                        // Let's add into the contexts field
+                        $("#addToContexts").tagHandler({
+                            assignedTags: addEntryFormFactory.getCurrentContexts(),
+                            availableTags: contextNames,
+                            autocomplete: true,
+                            afterAdd: function(tag) {
+                                current_context_field.push(tag);
+                                $("#addedContexts").val(current_context_field.join());
+                                console.log('contexts in hidden field: ' + current_context_field.join());
+                                addEntryFormFactory.setCurrentContexts(current_context_field);
+                            },
+                            afterDelete: function(tag) {
+                                console.log('initiated delete from sigma');
+                                for (var i=current_context_field.length-1; i>=0; i--) {
+                                    if (current_context_field[i] === tag) {
+                                        current_context_field.splice(i, 1);
+                                    }
+                                }
+                                $("#addedContexts").val(current_context_field.join());
+                                console.log('contexts in hidden field: ' + current_context_field.join());
+                                addEntryFormFactory.setCurrentContexts(current_context_field);
+                            }
+                        });
+
+                    }
+
+       
+            },
+            disable: function() {
+                $('#statement').addClass('loading');
+            },
+            enable: function() {
+                $('#statement').removeClass('loading');
+            },
+            clear: function() {
+                $("#statement").val('');
+            },
+            refocus: function() {
+                $('#statement').blur();
+                $('#statement').focus();
+            },
+            populateAndPost: function(text, callback) {
+                let to_submit = $('#submitform').serializeArray();
+                for (let key in to_submit) {
+                    if (to_submit[key].name == 'entry[body]') {
+                        to_submit[key].value = text;
+                    }
+                }
+                callback($.param(to_submit));
+            },
+            post: function(submitData) {
+                if (!submitData) {
+                    submitData = $("#submitform").serialize();
+                }
+                $.post('/post', submitData)
+                    .done(function(res) {
+                        // Get the response from the server (ID of the entry added)
+                        if (res.entryuid) {
+                     
+                            addEntryForm().clear();
+                            addEntryForm().enable();
+                            submitButton().enable();
+
+                            let postedby = userFactory.getLoggedInUser();
+                        
+                            // This below if a few statements were posted
+                            // TODO as we can now get all the s.uid back as an array this could be rewritten so no need for the condition after
+                            if (res.entryuid == 'multiple') {
+                                socket.emit('chat message', {postedby: postedby, entryuid: 'multiplesocket', entrytext: res.entrycontent, graph: res.graph});
+                                if (res.successmsg) {
+                                   statements().showWarning('Please, reload the page after a few seconds to see the graph.');
+                                }
+                                setTimeout(function() {
+                                    location.reload();
+                                },3000);
+                            }
+                            else {
+                                // Only one statement added? Initiate processing that will show it both to the user and the collaborator (if exists)
+                                socket.emit('chat message', {postedby: postedby, entryuid: JSON.parse(res.entryuid).data, entrytext: res.entrytext, graph: res.graph});
+                            }
+
+                        }
+                        else if (res.errormsg) {
+                            addEntryForm().enable();
+                            submitButton().enable();
+                            displayAlert(res.errormsg);
+                        }
+                        else {
+                            displayAlert('Something went wrong, please, try again...');
+                        }
+                    })
+                    .fail(function(res) {
+                        displayAlert("Server Error: " + res.status + " " + res.statusText);
+                    });
+            },
+            populateRecommendation: function(insight_nodes) {
+                  
+                let recommender = 'next idea tip: what is the relation between ';
+              
+
+                let iter = 0;    
+                for (let cluster in insight_nodes) {
+
+                    recommender += '"';
+                    for (var n = 0; n < insight_nodes[cluster].nodes.length; n++) {
+                        
+                        recommender += insight_nodes[cluster].nodes[n].name;
+                        if (n < insight_nodes[cluster].nodes.length - 1) { recommender += ' - '}
+                    
+                    }
+                    
+                    iter += 1;
+                    if (iter < Object.keys(insight_nodes).length) {
+                        recommender += '" and ';
+                    }
+                    
+                    
+                }
+
+                recommender += '"?';
+
+                $("#statement").attr("placeholder", recommender);
+            },
+            autofill: function(nodeNames,contextNames) {
+               
+
+                $('#statement').textcomplete([
+                    { // hashtags-concepts
+                        words: nodeNames,
+                        match: /\B#(\w*)$/,
+                        search: function (term, callback) {
+                            callback($.map(this.words, function (word) {
+                                return word.indexOf(term) === 0 ? word : null;
+                            }));
+                        },
+                        index: 1,
+                        replace: function (word) {
+
+                            return '#' + word + ' ';
+
+                        }
+                    },
+                    { // html
+                        mentions: contextNames,
+                        match: /\B@(\w*)$/,
+                        search: function (term, callback) {
+                            callback($.map(this.mentions, function (mention) {
+                                return mention.indexOf(term) === 0 ? mention : null;
+                            }));
+                        },
+                        index: 1,
+                        replace: function (mention) {
+                            return '@' + mention + ' ';
+                        }
+                    },
+                    { // hashtags-concepts
+                        words: nodeNames,
+                        match: /\b(\w{2,})$/,
+                        search: function (term, callback) {
+                            callback($.map(this.words, function (word) {
+                                return word.indexOf(term) === 0 ? word : null;
+                            }));
+                        },
+                        index: 1,
+                        replace: function (word) {
+
+                                return word + ' ';
+
+                        }
+                    }
+
+                ]);
+
+
+                $('#addcontext').textcomplete([
+                    { // html
+                        mentions: contextNames,
+                        match: /\b(\w{2,})$/,
+                        search: function (term, callback) {
+                            callback($.map(this.mentions, function (mention) {
+                                return mention.indexOf(term) === 0 ? mention : null;
+                            }));
+                        },
+                        index: 1,
+                        replace: function (mention) {
+                            window.open("?addcontext=" + mention, "_self");
+                            return '@' + mention + '';
+                        }
+                    }
+                ]);
+
+            } 
+        }
+    }
+
+
+    function submitSearchForm(e) {
+    
+        e.preventDefault();
+
+        // What are we searching?
+        var searchPhrase = $('#search').val();
+
+        if (searchPhrase.length > 1) {
+
+            // Clean up the search string
+            searchPhrase = searchPhrase.replace(/\s+/g,' ').trim();
+
+            // Separate terms into array
+            var searchArray = searchPhrase.toLowerCase().split(" ");
+
+            var searchPhraseLemmas = [];
+
+
+            for (var j = 0; j < searchArray.length; j++) {
+                // Is the search term cyrillic?
+                var search_cyrillic = searchArray[j].match(/[а-яА-Я]/);
+
+                // SEARCHMOD
+                // var search_lemma = window.jstemmer(searchArray[j]);
+
+                var search_lemma = searchArray[j];
+
+                searchPhraseLemmas.push(search_lemma);
+
+            }
+
+            for (var k = 0; k < searchPhraseLemmas.length; k++) {
+                if (graphFactory.checkIfPinned(searchPhraseLemmas[k]) == false) {
+                    graphFactory.addToPinnedNodes(searchPhraseLemmas[k]);
+                }
+            }
+
+        }
+
+    }
+    
+
+    function submitEditForm() {
+
+        addEntryForm().disable();
+
+        submitButton().disable();
+
+        voiceInputPanel().update();
+
+        // is urlvars mute off? in this case we submit this entry
+        if (!userFactory.getViewOption('mute') || userFactory.getViewOption('mute') == '') {
+            userFactory.updateSelfPosted('true');
+            addEntryForm().post();
+        }
+        // otherwise - make a dummy post - it appears in the list but doesn't get submitted into the graph
+        // This was made before to introduce a chat feature — so the software can "talk" to the user without adding stuff into the graph
+        else {
+            addEntryForm().enable();
+            submitButton().enable();
+            addEntryForm().clear();
+            let postedby = userFactory.getLoggedInUser();
+            socket.emit('chat message', {mute: 1, postedby: postedby, entryuid: '', entrytext: $('#statement').val(), graph: '' });
+        }
+
+        return false;
+        
+    }
+
+    function submitButton() {
+        return {
+            disable: function() {
+                $('#submitbutton').attr('disabled', 'disabled');
+            },
+            enable: function() {
+                $('#submitbutton').removeAttr('disabled');
+            },
+            show: function() {
+                $('#submitbutton').show();
+            },
+            hide: function() {
+                $('#submitbutton').hide();
+            }
+        }
+    }
+
+
+    // Entry edit form conversion to hashtags
+
+    $("#statement").select(function(eventObject) {
+
+        var selectedText = getSelected().toString();
+
+        var statementReplace = $("#statement").val();
+
+        if ((statementReplace.indexOf('@'+selectedText) === -1) && (selectedText !== statementReplace)) {
+
+            var regex = RegExp(selectedText, "g");
+
+            var dasherized = S(selectedText).underscore().chompLeft('_').s;
+
+            // TODO check words for morphology (if found, alert)
+
+            var replacedString = statementReplace.replace(regex,"#" + dasherized).replace(/##/g,'#');
+            $("#statement").val(replacedString);
+        }
+
+    });
+
+
+    // Memorize which interface option the user had on last time
+    if (localStorage.getItem('defaultbehavior') == 'add') {
+        $('#addnode').addClass('addnode-on');
+    }
+    else {
+        $('#searchnode').addClass('searchnode-on');
+    }
+
+
+    // What happens when we add a single node from the short find editor
+
+    $("#addnode").on('click', function(e) {
+
+        e.preventDefault();
+
+        $('#addnode').addClass('addnode-on');
+        $('#searchnode').removeClass('searchnode-on');
+
+        localStorage.setItem('defaultbehavior', 'add');
+
+        $('#statement').val($('#search').val());
+        
+        document.getElementById('submitform').dispatchEvent(new Event('submit'));
+        
+        $('#search').val('');
+        $("#search").focus();
+
+    });
+
+    // What if we search for a node in the graph using the find editor 
+
+    $("#searchnode").on('click', function(e) {
+
+        e.preventDefault();
+
+        $('#addnode').removeClass('addnode-on');
+        $('#searchnode').addClass('searchnode-on');
+
+        localStorage.setItem('defaultbehavior', 'search');
+
+        var searchinput = $('#search').val();
+
+        // TODO implement lemmas search
+        if (searchinput.length > 0) {
+            var searchinarray = searchinput.split(' ');
+            for (var key in searchinarray) {
+                if (searchinarray[key].charAt(0) == '#') { searchinarray[key] = searchinarray[key].slice(1); }
+            }
+            searchinput = searchinarray.join(' ');
+            $('#search').val(searchinput);
+            submitSearchForm(e);
+        }
+        else {
+            alert('Please, enter the node name you want to find...');
+        }
+
+    });
+
+
+
+</script>

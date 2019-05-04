@@ -1,0 +1,62 @@
+<script>
+
+  
+
+// Parse the graph on loading the page
+
+sigma.parsers.json(
+        userFactory.getJsonPath(),
+        {
+            container: 'graph-container',
+            renderer: {
+                container: document.getElementById('graph-container'),
+                type: 'canvas'
+            },
+            settings: {
+                minNodeSize: userFactory.getGraphOption('minnodesize'),
+                maxNodeSize: userFactory.getGraphOption('maxnodesize'),
+                minEdgeSize: 0.5,
+                maxEdgeSize: 2,
+                labelThreshold: userFactory.getGraphOption('in_label_threshold'),
+                defaultLabelColor: userFactory.getGraphOption('default_label_color'),
+                adjustSizes: true,
+                
+            }
+        },
+        function(sigma) {       
+           
+            // Initiate custom shapes for the context nodes
+            CustomShapes.init(sigma);
+
+            // Add the nodes and edges into the graph and then calculate the statistics for each node and edge and launch BC and community detection analytics algorithms
+            graph().initNodesEdges(graph().updateMetrics);           
+  
+            // Initialize autofill for hashtags and contexts - only after the graph is loaded
+            addEntryForm().autofill(graphFactory.getNodeNames(),contextNames);
+           
+            // Drag nodes function initiated, so we can drag nodes
+            graph().dragNodes();
+
+            // Remove the entries that belong to the addcontext parameter (we need a graph for that data, that's why it's here)
+            statements().removeAddContext();
+
+            // Select the neighbor nodes when a node is clicked
+            sigmaGraph().clickNode();
+
+            // Select the node's label when we're over it and deselect when we're not
+            sigmaGraph().highlightNode();
+
+            // Add a hook to enable PNG download of the graph
+            sigmaGraph().downloadPNG();
+           
+
+        }
+);
+
+
+
+
+
+
+
+</script>

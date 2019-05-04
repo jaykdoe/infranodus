@@ -1,0 +1,1010 @@
+<script>
+
+
+// Initiate Cytoscape Library - to calculate top components and betweenness centrality for nodes
+
+var cy = cytoscape({
+    container: undefined,
+    headless: true
+});
+
+
+// Initiate main graph functions
+
+function graph() {
+    return {
+        deleteNodes: function(nodesToDelete, callback){
+           
+            // Delete the nodes from the Sigma graph (the edges will get deleted automatically)
+            sigma.instances(0).graph.nodes().forEach(function(n) {
+                if (nodesToDelete.indexOf(n.originalLabel) >= 0) {
+                    sigma.instances(0).graph.dropNode(n.id);
+                }               
+            });
+            
+            callback();
+
+        },
+        addDeletedNodes: function(nodesToAdd, callback){
+                   
+            let nodeIDs = graphFactory.getNodeIDs();
+            let nodeIDs_rev = graphFactory.getNodeIDsRev();
+            
+            let cyclefinished = 0;
+            let edgeproc;
+
+            let edgesDB = graphFactory.getEdges();
+
+            let stoplistNodes = graphFactory.getStopNodes();
+            
+            // First, let's add nodes into the Sigma graph
+      
+            for (let node in nodesToAdd) {
+              let n = {};
+              n.label = nodesToAdd[node];
+              n.id = graphFactory.getNodeID(nodesToAdd[node]);
+              this.addNode(n);
+            }
+
+            // Now, let's see if this node already had any edges from that graph before
+            
+            for (let addingNodes in nodesToAdd) {
+
+              for (var i = 0; i < edgesDB.length; i++ ) {
+                  if (edgesDB[i].source == nodeIDs[nodesToAdd[addingNodes]] || edgesDB[i].target == nodeIDs[nodesToAdd[addingNodes]]) {
+                      edgeproc = edgesDB[i];
+   
+                      // Do we have any stopwords?
+                      
+                      if (stoplistNodes.length > 0) {
+                          // Do connections only if target/source is not in the remaining stoplistNodes
+                          if (graphFactory.checkIfStopNode(nodeIDs_rev[edgeproc.source]) == false && graphFactory.checkIfStopNode(nodeIDs_rev[edgeproc.target]) == false) {
+                                this.addEdge(edgeproc);
+                          }
+                      }
+                      else {
+                        this.addEdge(edgeproc);
+                      }
+
+                    }
+                }
+                
+            }
+
+            // sigma.instances(0).refresh();
+            
+            // After the nodes and edges are added, call the graphMetrics
+            callback();
+
+        },
+        addNodesEdges: function(nodesToAdd, edgesToAdd, callback) {
+            
+          // these nodes are not yet in the graph, so we're adding them to Sigma  
+          for (let node in nodesToAdd) {
+              this.addNode(nodesToAdd[node]);
+          }
+
+          // these edges (source/target/context) might be in the graph, but statement ID is def new
+          for (let edge in edgesToAdd) {
+
+              let e = edgesToAdd[edge];
+
+              // What if there's already an edge with the same source/target
+
+              this.addEdge(edgesToAdd[edge]);
+
+              this.updateEdgeStats(e);
+
+                  
+          }
+
+          callback();
+
+        },
+        initNodesEdges: function(callback) {
+            
+            let tot = 0;
+            let color_context = userFactory.getGraphOption('color_context');
+            let total_nodes = sigma.instances(0).graph.nodes().length;
+            let maxnodesize = 0;
+
+
+            // Now we get the context IDs from the graph - a little bit of a workaround
+            let suspects = [];
+            let nonsuspects = [];
+
+            let nodeIDs_rev = graphFactory.getNodeIDsRev();
+
+            let edgesList = [];
+
+            sigma.instances(0).graph.edges().forEach(function(e) {
+
+                // If an edge has a context prefix, one of its nodes is a context, but we don't know which yet
+
+                if (e.id.substr(0,7) == 'context') {
+                        if (suspects.indexOf(e.source) < 0) {
+                            suspects.push(e.source);
+                        }
+
+                        if (suspects.indexOf(e.target) < 0) {
+                            suspects.push(e.target);
+                        }
+
+                }
+
+                // If an edge doesn't have prefix context, for sure it has only nodes
+                else {
+                        if (nonsuspects.indexOf(e.source) < 0) {
+                            nonsuspects.push(e.source);
+                        }
+
+                        if (nonsuspects.indexOf(e.target) < 0) {
+                            nonsuspects.push(e.target);
+                        }
+                }
+
+                e.sourcename = nodeIDs_rev[e.source];
+                e.targetname = nodeIDs_rev[e.target];
+
+                // Let's store the edge stats for filtering purposes
+                graph().updateEdgeStats(e);
+
+              });
+
+
+            // Find the difference between two arrays above, so we get contexts only
+            let contextids = _.difference(suspects, nonsuspects);
+
+            let contexts_length = contextids.length;
+
+
+            // Now show those nodes that are contexts bigger and with a special label
+              
+            sigma.instances(0).graph.nodes().forEach(function(nodes) {
+                var nodesize = 0;
+                var angle = Math.PI * 2 * tot / total_nodes;
+                nodes.x = Math.cos(angle);
+                nodes.y = Math.sin(angle);
+                nodes.size = sigma.instances(0).graph.degree(nodes.id);
+                nodesize = nodes.size;
+                if (maxnodesize < nodesize) maxnodesize = nodesize;
+                nodes.color = color_context;
+                
+                // Save for backup
+                nodes.originalColor = color_context;
+                nodes.originalLabel = nodes.label;
+
+                // Creating an index of node labels to IDs for filtering
+                graphFactory.addNode(nodes.label, nodes.id, nodes);
+
+                tot = tot + 1;
+                
+                if (contexts_length > 0) {
+                  if (contextids.indexOf(nodes.id) > -1) {
+                      nodes.size = maxnodesize;
+                      nodes.originalLabel = 'context: ' + nodes.originalLabel;
+                      nodes.label = 'context: ' + nodes.label;
+                  }
+                }
+               
+            });
+
+            // Select previously selected nodes on the graph (from LocalStorage) or passed through parameters
+
+            graphFactory.getSelections();
+
+            // Launch the metrics calculation
+            callback();   
+
+        },
+        updateEdgeStats: function(e) {
+
+              // Make a new index of nodes to statement
+              for (let context in e.context_matrix) {
+
+                     // Make an index of nodes to context
+                    graphFactory.addNodeToContext(context, e.source);
+                    graphFactory.addNodeToContext(context, e.target);
+
+                    // Make an index of nodes to statement
+                    for (let statement in e.context_matrix[context]) {
+                        if (graphFactory.existNodesOfStatement(statement) == true) {
+                            if (graphFactory.existNodeInStatement(statement, e.source) == false)
+                                graphFactory.addNodeToStatement(statement, e.source);
+                            if (graphFactory.existNodeInStatement(statement, e.target) == false)
+                                graphFactory.addNodeToStatement(statement, e.target);
+                        }
+                        else {
+                            graphFactory.addNodeToStatement(statement, e.source);
+                            // avoid duplicates
+                            if (e.source != e.target) {
+                                graphFactory.addNodeToStatement(statement, e.target);
+                            }
+                        }
+                        graphFactory.addStatementOfContext(context, statement);
+                    }             
+                    
+              }        
+
+               // Add to EDGES db
+               graphFactory.addEdge(e);
+
+               // Add to unique directed edges list
+               graphFactory.addToUniqueEdges(e.source, e.target);
+
+        },
+        addNode: function(node) {
+          sigma.instances(0).graph.addNode({
+                id: node.id,
+                label: node.label,
+                originalLabel: node.label,
+                originalColor: userFactory.getGraphOption('color_context'),
+                size: userFactory.getGraphOption('maxnodesize') - 2,
+                x: Math.random(),
+                y: Math.random(),
+                color: userFactory.getGraphOption('color_context')
+              }); 
+          //sigma.instances(0).refresh();
+        },
+        addContextNode: function(context) {
+            
+            
+            let x = Math.random();
+            let y = Math.random();
+        
+          sigma.instances(0).graph.addNode({
+                id: context.id,
+                label: '',
+                originalLabel: 'context: ' + context.label,
+                originalColor: '#6689d0',
+                size: userFactory.getGraphOption('maxnodesize') + 2,
+                x: x,
+                y: y,
+                type: 'square',
+                color: '#6689d0',
+                url: context.url
+            });
+            
+        },
+        removeContextNodes: function() {
+            sigma.instances(0).graph.nodes().forEach(function(n) {
+                if (n.url) {
+                    sigma.instances(0).graph.dropNode(n.id);
+                }
+            });
+            graph().refreshGraph();
+        },
+        addEdge: function(edgeproc) {
+            
+            if (graphFactory.existsUniqueEdge(edgeproc.source,edgeproc.target) == false) { 
+                sigma.instances(0).graph.addEdge({
+                    id: edgeproc.id,
+                    source: edgeproc.source,
+                    target: edgeproc.target,
+                    weight: edgeproc.weight,
+                    size: edgeproc.weight,
+                    context_matrix: edgeproc.context_matrix
+                });
+            }
+            else {
+                sigma.instances(0).graph.edges().forEach(function(e) {
+                    if (e.source == edgeproc.source && e.target == edgeproc.target) {
+                        e.weight = edgeproc.weight;
+                        e.size = edgeproc.weight;
+                        e.context_matrix = edgeproc.context_matrix;
+                    }
+                });
+            }
+            //sigma.instances(0).refresh();
+        },
+        addContextEdge: function(id,source,target,edge_context) {
+
+            sigma.instances(0).graph.addEdge({
+                id: id,
+                source: source,
+                target: target,
+                weight: 6,
+                size: 6,
+                context_matrix: edge_context
+            });
+        },
+        updateNodes: function(nodes, callback){
+
+            sigma.instances(0).graph.nodes().forEach(function(n) {
+                if (!nodes[n.id]) {
+                  sigma.instances(0).graph.dropNode(n.id);
+                }               
+            });
+
+            sigma.instances(0).refresh();
+
+        },
+        updateMetrics: function() {
+            
+            // Cytoscape object renew
+            let cyCollection = cy.elements();
+            cy.remove(cyCollection);            
+            let cyNodes = [];
+
+            // Community detection graph object from Graphology
+            let grgraph = new graphology.Graph({type: 'undirected'});
+
+            let node_data = [];
+
+            sigma.instances(0).graph.nodes().forEach(function(n) {
+                
+                // To avoid context: nodes
+                if (!n.url) {
+
+                     // Add nodes into the Louvain object
+                    node_data.push(n.id);
+
+                    // Add nodes into the Graphology object
+                    grgraph.addNode(n.id);
+
+                    // Add the nodes into a Cytoscape object
+                    cyNodes.push({
+                        group: "nodes",
+                        data: { id: n.id, name: n.originalLabel}
+                    });
+                }
+               
+
+            });
+
+            // jsnetworkx object creation
+            let jsGraphEdges = [];
+            let edge_data = [];
+            let nodeIDs_rev = graphFactory.getNodeIDsRev();
+
+            // Let's record all the unique edges we've got
+            let edgesList = [];
+
+            let totalUnEdgesCount = 0;
+            let totalDiEdgesCount = 0;
+
+            sigma.instances(0).graph.edges().forEach(function(e) {
+                // To only include the nodes which are not :context
+                if (e.context_matrix) {
+                
+                    let unique_edge_id = '';
+
+                    // Let's see if the edge source in alphabetical order is further than its target and change places
+
+                    if (e.source > e.target) {
+                        unique_edge_id = e.target + '-' + e.source;
+                    }
+                    else {
+                        unique_edge_id = e.source + '-' + e.target;
+                    }
+
+
+                    // An edge linking these nodes already exists? Let's add their sizes (Sigma doesn't do this automatically)
+
+                    if (edgesList[unique_edge_id]) {
+                        edgesList[unique_edge_id] += edgesList[unique_edge_id];
+                        e.size = e.weight + edgesList[unique_edge_id];
+                    }
+                    else {
+                        // New edge? Just create the edge weight parameter and assign the size
+                        edgesList[unique_edge_id] = e.weight;
+                        e.size = e.weight;
+                    }
+
+                    cyNodes.push({
+                        group: "edges",
+                        data: { id: unique_edge_id, source: e.source, target: e.target, weight: e.weight }
+                    });
+
+                    // TODO remove that, this is just to check data consistentency
+                    e.sourcename = nodeIDs_rev[e.source];
+                    e.targetname = nodeIDs_rev[e.target];
+
+                    var matche = 0;
+
+                    // Do we already have any edges saved for jsX? Reiterate
+                    for (var i = 0; i < edge_data.length; i++) {
+                        // Found an edge that has the current edge's source/target combination?
+                        // replace && with || for undirected graph
+                        if ((edge_data[i].source == e.source && edge_data[i].target == e.target) || (edge_data[i].target == e.source && edge_data[i].source == e.target)) {
+                            
+                            // Do not add this age as new later
+                            matche = 1;
+
+                            // Add the weights together
+                            edge_data[i].weight += parseInt(e.weight);
+
+                            // Reiterate through each jsX object and if found similar source/target combo, update the weight.
+                            for (var obj in jsGraphEdges) {
+                                if ((jsGraphEdges[obj][0] == e.source && jsGraphEdges[obj][1] == e.target) || (jsGraphEdges[obj][1] == e.source && jsGraphEdges[obj][0] == e.target)) {
+                                    jsGraphEdges[obj][2].weight += parseInt(e.weight); 
+                                }
+                            }
+                        }
+                    }
+
+                    // This is the first time we see this edge
+                    if (matche == 0) {
+
+                        // Add it into the graph
+                        edge_data.push({source: e.source, target: e.target, weight: parseInt(e.weight)});
+
+                        // Add to jsnetworkx
+
+                        let edge_params = {
+                            weight: parseInt(e.weight),
+                            sourcename: e.sourcename,
+                            targetname: e.targetname                     
+                        };
+
+                        let edge_object = [e.source, e.target, edge_params];
+                    
+                        jsGraphEdges.push(edge_object);
+
+                        // The number of unique undirected edges
+                        if (e.source != e.target) {
+                        totalUnEdgesCount = totalUnEdgesCount + 1;
+                        }
+
+                    }
+
+                    // The number of unique directed edges
+                    if (e.source != e.target) {
+                        totalDiEdgesCount = totalDiEdgesCount + 1;
+                    }
+
+                }
+                
+
+            });
+
+            
+            // Save the number of edges into the stats object
+            graphFactory.setStats('edgesUndirected',totalUnEdgesCount);
+            graphFactory.setStats('edgesDirected', totalDiEdgesCount);
+            
+            // Add the edges into the Graphology object
+            for (var i = 0; i < edge_data.length; i++) {
+                grgraph.addEdge(edge_data[i].source, edge_data[i].target, {weight: edge_data[i].weight});
+            }
+
+            // Object for louvain community detection
+            let lougraph = {node_data: node_data, edge_data: edge_data};
+
+            // Add the array to the collection
+            let cyElements = cy.add(cyNodes);
+
+            // Create a new graph and add the new edges
+            var jsG = new jsnx.Graph(); // DiGraph for directed
+
+            // Fix edge weights (the BC algorithm considers a lower weight edge stronger)
+            for (let obj in jsGraphEdges) {
+                jsGraphEdges[obj][2].weight = 1 / jsGraphEdges[obj][2].weight;
+            }
+            // jsG = jsnx.convertToUndirected(jsG);
+            jsG.addEdgesFrom(jsGraphEdges);
+
+            // Launch betweenness centrality detection
+            betweennessCentrality(cyElements, jsG);
+
+            // Launch community detect algorithm
+            communityDetect(lougraph, grgraph, graph().refreshGraph);
+
+        },
+        refreshGraph: function() {
+            sigma.instances(0).refresh();
+            sigmaGraph().adjustLayout(5000);
+            
+        },
+        dragNodes: function () {
+
+            var dragListener = sigma.plugins.dragNodes(sigma.instances(0), sigma.instances(0).renderers[0]);
+           
+            dragListener.bind('startdrag', function(event) {
+
+            });
+
+            dragListener.bind('drag', function(event) {
+
+              userFactory.setSigmaDragged('1');
+
+            });
+
+            dragListener.bind('drop', function(event) {
+
+              // sigma.instances(0).refresh();
+
+              var new_forceatlas_options = userFactory.getGraphOption('forceatlas_options');
+
+              new_forceatlas_options.slowDown = 1000;
+              new_forceatlas_options.startingIterations = 0;
+
+              sigmaGraph().adjustLayout(5000);
+
+            });
+            
+            dragListener.bind('dragend', function(event) {
+
+            });
+
+        },
+        colorNodesCommunities: function(palette) {
+
+            let current_context = userFactory.getCurrentContext();
+            let addcontext = userFactory.getAddContext();
+
+
+            let pinnedNodes = graphFactory.getPinnedNodes();
+
+            let addcontextcount = 0;
+
+            let addcontext_nodes = [];
+
+            let deselected_nodes_color = userFactory.getGraphOption('deselected_nodes_color');
+
+            let highlight = userFactory.getGraphOption('highlight_intersections');
+            let missing = userFactory.getGraphOption('highlight_missing');
+
+            sigma.instances(0).graph.nodes().forEach(function(n) {
+
+                // Give original color to the node
+                n.originalColor = rgbToHex(palette[n.community]._rgb[0],palette[n.community]._rgb[1],palette[n.community]._rgb[2]);
+
+                // This node is not pinned?
+                if (graphFactory.checkIfPinned(n.originalLabel) == false) {
+
+                        // Are there any selected nodes?
+                        if (graphFactory.getSelectedNodes().length > 0) {
+
+                            // Is this node the one that is selected?
+                            if (graphFactory.checkIfSelected(n.originalLabel) == true) {
+                                // Color its visible color
+                                n.color = rgbToHex(palette[n.community]._rgb[0],palette[n.community]._rgb[1],palette[n.community]._rgb[2]);
+                            }
+
+                        }
+                        else {
+                            // The node is not pinned and is not selected, so we also make its visible color the same as the original
+                            n.color = rgbToHex(palette[n.community]._rgb[0],palette[n.community]._rgb[1],palette[n.community]._rgb[2]);
+                        }
+
+                }
+
+                // Color the particular node if it appears in the analytics panel
+                analyticsPanel.colorNode(n, palette);
+                
+
+                // Check if the node is in additional context and if yes, give it a different color
+
+               
+                if (graphFactory.existNodesInContext(addcontext) == true && graphFactory.existNodesInContext(current_context) == true) {
+                    
+                        // Are we on the interpret pane?
+                        if (userFactory.isInterpretOn() == true) {
+                            
+                            // Is the node in the current meta_ context?
+                            if (graphFactory.existsNodeInContext(current_context, n.id) == true) {
+
+                                // If no highlight is chosen, show that the node is in meta_
+                                if (!highlight) {
+                                    n.originalColor = '#90909f';
+
+                                    // Same for display, but only if it's not pinned
+                                    if (pinnedNodes.indexOf(n.label) == -1) {
+                                        if (graphFactory.getSelectedNodes().length == 0) {
+                                            n.color = '#90909f';  
+                                        }
+                                    }
+                                }
+                            }
+                            else {
+                                // The node is not in the meta_ context but we have the highlight setting
+                            
+                                if (highlight) {
+
+                                    // Then show the nodes that are in the additional context, but not in the meta yet (DIFF)
+                                    n.originalColor = userFactory.getGraphOption('highlight_addcontext');
+                                    
+                                    // Unless it is pinned
+                                    if (pinnedNodes.indexOf(n.label) == -1) {
+                                        if (graphFactory.getSelectedNodes().length == 0){
+                                            n.color = userFactory.getGraphOption('highlight_addcontext');
+                                        }
+                                    }
+                                }
+                            }
+
+                        }
+                        else {
+
+                            // We are comparing two contexts and we're not on the interpret (meta_) feature
+
+                            // We do NOT want to highlight the missing nodes, only the intersections
+                            if (!missing) {
+                                // Is the node both in the addcontext and in the current_context?
+                                if ((graphFactory.existsNodeInContext(addcontext, n.id) == true) && (graphFactory.existsNodeInContext(current_context, n.id) == true)) {
+                                    // Highlight is on? Highlight intersection
+                                    if (highlight) {
+                                        n.originalColor = userFactory.getGraphOption('highlight_addcontext');
+                                        n.color = userFactory.getGraphOption('highlight_addcontext');
+                                    }  
+                                }
+                                else {
+                                  
+                                    // Only in one or the other? Unless highlight is ON, color them gray
+                                    if (!highlight) {
+                                        n.originalColor = deselected_nodes_color;
+                                        n.color = deselected_nodes_color;
+                                    }  
+                                    // If highlight is ON, they'll stay their original community color
+                                }
+                            }
+                            else {
+                                // Let's highlight the missing nodes
+
+                                // If the node is in the addcontext but not in the original context we're comparing it to
+                                if (graphFactory.existsNodeInContext(addcontext, n.id) == true && graphFactory.existsNodeInContext(current_context, n.id) != true) {
+                                    // If highlight feature is on, highlight the DIFF nodes
+                                    if (highlight) {
+                                        n.originalColor = userFactory.getGraphOption('highlight_addcontext');
+                                        n.color = userFactory.getGraphOption('highlight_addcontext');
+                                    }
+                                    else {
+                                        // otherwise show the nodes that are in in the addcontext but NOT in the original one as GRAY
+                                        n.originalColor = userFactory.getGraphOption('color_addcontext');
+                                        n.color = userFactory.getGraphOption('color_addcontext');
+                                    }
+
+                                }
+                            }
+                        }
+
+                }
+
+
+
+             });
+
+
+        },
+        selectCommunities: function(commClicked) {
+
+                let pinnedNodes = graphFactory.getPinnedNodes();
+                let selectedNods = graphFactory.getSelectedNodes();
+
+                // No pinned nodes on the graph?
+                if (pinnedNodes.length == 0) {
+         
+                    sigma.instances(0).graph.nodes().forEach(function(n) {
+
+                        // There are no communities selected and no pinned nodes?
+                        if (commClicked.length == 0) {
+                            n.color = n.originalColor;
+                            n.label = n.originalLabel;
+                        }
+                        else if (commClicked.indexOf(n.community.toString()) > -1) {
+                            // The node's community is in the selection? color it
+                            n.color = n.originalColor;
+                            n.label = n.originalLabel; 
+                        }
+                        else {
+                            // The node's community is not in the selection? Hide it
+                            n.color = deselected_nodes_color;
+                            n.label = '';
+                        }
+
+                    });
+
+
+                }
+                else {
+
+                    // We clicked on the community which is in the DB of clicked ones and We have some pinned nodes left
+
+                    sigma.instances(0).graph.nodes().forEach(function(n) {
+
+                         // There are no communities selected and no pinned nodes?
+                        if (commClicked.indexOf(n.community.toString()) > -1) {
+                            // The node's community is in the selection? color it
+                            n.color = n.originalColor;
+                            n.label = n.originalLabel; 
+                        }
+                        else {
+                            // The node's community is not in the selection? Hide it
+                            n.color = deselected_nodes_color;
+                            n.label = '';
+                        }
+
+                        if (graphFactory.checkIfPinned(n.originalLabel) == true) {
+                            n.color = '#0089e0';
+                            n.label = n.originalLabel;
+                        }
+                        if (graphFactory.checkIfSelected(n.originalLabel) == false) {
+                            n.color = n.originalColor;
+                            n.label = n.originalLabel;
+                        }
+
+
+                    });
+
+                    
+                }
+
+                sigma.instances(0).refresh();
+
+            
+        },
+        selectEntries: function(entries_ids) {
+
+            let nodesOfStatement = graphFactory.getAllNodesOfStatement();
+
+            // Only show edges that belong to the entries filtered
+            sigma.instances(0).graph.edges().forEach(function(e) {
+                    let got_match = 0;
+                    for (let context in e.context_matrix) {
+                        for (let statement in e.context_matrix[context]) {
+                            if (entries_ids.includes(statement)) {
+                                got_match += 1;
+                            }
+                        }
+                    }
+                    if (got_match > 0) {
+                            e.color = e.originalColor;
+                        }
+                    else {
+                        e.color = userFactory.getGraphOption('deselected_nodes_color');
+                    }
+
+            });
+
+            // Make only those nodes visible that belong to the statement selected
+            sigma.instances(0).graph.nodes().forEach(function(n) {
+                let got_match = 0;
+                // Is there no contexts at all? Show the node.
+                for (var g = 0; g < entries_ids.length; g++) {
+                    if (nodesOfStatement[entries_ids[g]] && nodesOfStatement[entries_ids[g]].indexOf(n.id) > -1)  {
+                        n.color = n.originalColor;
+                        n.label = n.originalLabel;
+                        got_match += 1;
+                    }
+                    else {
+                        if (got_match == 0) {
+                            n.color = userFactory.getGraphOption('deselected_nodes_color');
+                            n.label = '';
+                        }
+                    }
+                    
+                }
+            });
+
+            // Refresh the view
+            sigma.instances(0).refresh();
+
+        },
+        removeSelections: function() {
+            
+            sigma.instances(0).graph.edges().forEach(function(e) {
+                e.color = e.originalColor;
+            });
+
+            sigma.instances(0).graph.nodes().forEach(function(n) {
+                n.color = n.originalColor;
+                n.label = n.originalLabel;
+            });
+
+            // Refresh the view
+            sigma.instances(0).refresh();
+        }
+        // Add more functions here
+    }
+}
+
+
+// We store our timeout process here
+var timeOutVarSigma = '';
+
+// This activates some Sigma-specific functions
+function sigmaGraph() {
+    return {
+        startLayout: function(timeout, terminator) {
+            if (terminator) {
+                clearTimeout(timeOutVarSigma);
+            }
+            else {
+                timeOutVarSigma = setTimeout(function() {
+                            sigma.instances(0).stopForceAtlas2();
+                            sigma.instances(0).killForceAtlas2();
+                            $('#improve-layout').removeClass('layout-on');
+                            console.log('stopped FA layout')
+                },parseInt(timeout));
+            }
+
+        }, 
+        adjustLayout: function(timeout) {
+
+            if (sigma.instances(0).isForceAtlas2Running()) {
+                    console.log('FA IS RUNNING')
+                    sigmaGraph().startLayout(timeout, 'stop');
+                    sigma.instances(0).stopForceAtlas2();
+                    sigma.instances(0).killForceAtlas2();
+                    $('#improve-layout').removeClass('layout-on');
+                    if (timeout) {
+                            setTimeout(function() {
+                                sigma.instances(0).startForceAtlas2(userFactory.getGraphOption('forceatlas_options'));
+                                $('#improve-layout').addClass('layout-on');
+                                sigmaGraph().startLayout(timeout);
+                            },200);                         
+                    }
+            }
+            else {
+                  // sigma.configForceAtlas2({scalingRatio: 0.1});
+                  sigma.instances(0).startForceAtlas2(userFactory.getGraphOption('forceatlas_options'));
+                  $('#improve-layout').addClass('layout-on');
+                  if (timeout) {
+                    sigmaGraph().startLayout(timeout);
+                  }
+            }
+        },
+        abstractLayout: function() {
+            let params = new Map(location.search.slice(1).split('&').map(kv => kv.split('=')));
+            let href = [location.protocol, '//', location.host, location.pathname].join('') + location.search;
+            let url = new URL(href);
+            // What happens when we want to stop showing node labels and make the graph more Abstract
+             if (!$('#abstract-layout').hasClass('abstract-on')) {
+                if (params.has('abstract')) {
+                    url.searchParams.set('abstract', 'true');
+                }
+                else {
+                    url.searchParams.append('abstract', 'true');
+                }
+                window.location.href = url.toString();
+            }
+            else {
+                if (params.has('abstract')) {
+                    url.searchParams.set('abstract', 'no');
+                }
+                else {
+                    url.searchParams.append('abstract', 'no');
+                }
+                window.location.href = url.toString();
+            }
+
+        },
+        clickNode: function() {
+            
+            // When a node is clicked, we check for each node
+            // if it is a neighbor of the clicked one. If not,
+            // we set its color as grey, and else, it takes its
+            // original color.
+            // We do the same for the edges, and we only keep
+            // edges that have both extremities colored.
+
+            sigma.instances(0).bind('clickNode', function(e) {
+                
+                
+                if (userFactory.isSigmaDragged() == false) {
+                    
+                  var nodeLabel = e.data.node.originalLabel;
+  
+                  // TODO to check that
+                  if (userFactory.isInterpretOn() == true) {
+                    $('.entry').show();
+                  }
+  
+                  // If we click on the context node, just bring us to that context
+                  if (nodeLabel.substr(0,9) == 'context: ') {
+
+                        
+                        // TODO if not pinnedNodes are selected, make a search on this context 
+                        // TODO pin the nodes on this graph
+                        // TODO if pins are on, then proceed as below
+                        // TODO for mobile devices — first show, then the logic above
+
+                        let add_url = '';
+                  
+                        if (nodeLabel.indexOf(', by') == -1) {
+                            add_url += '/edit';
+                        }
+                        let pinnedNodes = graphFactory.getPinnedNodes();
+                        for (let pin in pinnedNodes) {
+                            if (pin == 0) {
+                                add_url += '?keywords=' + pinnedNodes[pin];
+                            }
+                            else {
+                                add_url += "+" + pinnedNodes[pin];
+                            }
+                        }
+                        if (e.data.node.url) {
+                            window.open(e.data.node.url + add_url,"_self");
+                        }
+                        else {
+                            window.open('/' + userFactory.getCurrentUser() + '/' + nodeLabel.substr(9,nodeLabel.length) + add_url,"_self");
+                        }
+                  }
+                  else {
+  
+                      // Is the node pinned?
+                      if (graphFactory.checkIfPinned(nodeLabel) == false) {
+                          // Add to pinned and launch the whole filtering machinery
+                          graphFactory.addToPinnedNodes(nodeLabel);
+                      }
+                      else {   
+                          graphFactory.removeFromPinnedNodes(nodeLabel);                                    
+                      }
+  
+                      // Let's send an event to all the collaborators in the chatroom
+                      socket.emit('node click', {pinnedNodes: graphFactory.getPinnedNodes()});
+                          
+                      // If the window is wide enough to show the menu AND div with statements is not visible
+                      if ($("#statements").is(":hidden") || $("#entries").css("visibility") === "hidden") {
+                        // TODO blink the button
+                        if (!userFactory.getViewOption('tip_shown') && graphFactory.existPinnedNodes()) {
+                            userFactory.setViewOption('tip_shown', 1);
+                            voiceInputPanel().showMessage('open the entries to see the excerpts...', 4000);
+                        }
+                      }
+  
+                  }
+  
+                }
+  
+                // This is just to reset node drag parameter
+                userFactory.setSigmaDragged('0');
+  
+  
+              });
+        },
+        highlightNode: function() {
+
+            // Show the node's label when we're over it
+            sigma.instances(0).bind('overNode', function(e) {
+                  e.data.node.label = e.data.node.originalLabel;
+                  sigma.instances(0).refresh();
+            });
+
+            // Hide node's label when we're out of it
+            sigma.instances(0).bind('outNode', function(e) {
+                
+                if ((e.data.node.color != e.data.node.originalColor && graphFactory.checkIfPinned(e.data.node.originalLabel) == false) || e.data.node.url) {
+                    e.data.node.label = '';
+                }
+                sigma.instances(0).refresh();
+            });
+        },
+        downloadPNG: function() {
+
+            var canvaspng = document.querySelector('.sigma-scene');
+            let current_context = userFactory.getCurrentContext();
+
+            document.querySelector('#downloadpng').href = canvaspng.toDataURL();
+            document.querySelector('#downloadpng').download = userFactory.getCurrentUser() + '_' + current_context + '.png';
+
+            document.querySelector('#downloadpng').addEventListener('click', function(ev) {
+                document.querySelector('#downloadpng').href = canvaspng.toDataURL();
+                document.querySelector('#downloadpng').download = userFactory.getCurrentUser() + '_' + current_context + '.png';
+            }, false);
+
+
+        }
+    }
+}
+
+// Add a method to the graph model that returns an
+// object with every neighbors of a node inside:
+
+sigma.classes.graph.addMethod('neighbors', function(nodeId) {
+    var k,
+            neighbors = {},
+            index = this.allNeighborsIndex[nodeId] || {};
+
+    for (k in index)
+        neighbors[k] = this.nodesIndex[k];
+
+    return neighbors;
+});
+
+
+
+
+
+</script>

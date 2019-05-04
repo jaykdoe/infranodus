@@ -2,15 +2,22 @@
   "name": "InfraNodus",
   "version": "1.0.0",
   "private": true,
+  "main": "src/index.js",
+  "engines": {
+    "node": ">= 8.0.0"
+  },
   "scripts": {
-    "start": "node app.js"
+    "start": "node app.js",
+    "start:watch": "nodemon app.js",
+    "prettier:cfg": "prettier --write",
+    "prettier": "npm run prettier:cfg '{.,{routes,lib}/**}/*.{js, json}' '!./package.json'"
   },
   "dependencies": {
     "@joegesualdo/get-youtube-subtitles-node": "^0.1.0",
     "bcrypt-nodejs": "0.0.3",
     "chargebee": "^2.4.3",
     "cheerio": "^1.0.0-rc.2",
-    "csv-parse": "^4.3.1",
+    "csv-parse": "4.3.1",
     "ejs": "^2.5.7",
     "evernote": "^2.0.5",
     "express": "^3.4.8",
@@ -42,5 +49,9 @@
     "unfluff": "^3.0.0",
     "wink-tokenizer": "^5.1.0",
     "youtube-dl": "^1.12.2"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.10",
+    "prettier": "1.14.3"
   }
 }

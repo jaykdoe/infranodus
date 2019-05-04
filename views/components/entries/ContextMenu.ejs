@@ -1,0 +1,599 @@
+<script src="/javascripts/ui.js"></script>
+<script>
+
+var newcontextname = getUrlVars()["newcontextname"];
+var contextNames = [];
+// What are the concepts present in the graph?
+
+
+   // Get the context names - all the contexts that exist in the graph we just loaded
+      // This IF statement is for the case when the contextlist parameter is not passed on
+      <% if (contextlist.length > 0) { %>
+      <% contextlist.forEach(function(contextlabel) { %>
+        contextNames.push("<%= contextlabel[0] %>");
+      <% }); %>
+      <% } %>
+
+// Put the contexts into the menu
+populateContextMenu(contextNames);
+
+// Populate context menu
+
+function populateContextMenu (contextNames) {
+
+        let current_context = userFactory.getCurrentContext();
+
+        var switch_field = '';
+
+        var context_filters = '';
+
+        var currentContextURL = '';
+
+        var appshome = '';
+
+        var settingspane = '';
+        <% if (perceivername) { %>
+
+            currentContextURL = '<li id="listall" class="menu-item-divided pure-menu-selected"><a href="/<%= perceivername %>" class="whiten">see all graphs</a></li>';
+
+        <% } else { %>
+
+            currentContextURL = '<li id="listall" class="menu-item-divided pure-menu-selected"><a href="/<%= user.name %>/edit" class="whiten">see all graphs</a></li>';
+
+        <% } %>
+
+        var addNewContext = '';
+
+        var auxLinks = '';
+
+        var detectedContext = null;
+
+        // The graph exists already?
+        if (typeof contextNames[0] !== 'undefined' && contextNames[0] !== null) {
+            contextNames.forEach(function(n) {
+                if (n == current_context) {
+                    detectedContext = 1;
+                    // for the menu
+                    <% if (perceivername) { %>
+                        context_filters += '<li class="app-context-link menu-item-divided pure-menu-selected"><a href="/<%= perceivername %>/' + n + '">' + n + '</a></li>';
+                        currentContextURL = '<li id="listall" class="menu-item-divided"><a href="/<%= perceivername %>" class="whiten">see all graphs</a></li>';
+                    <% } else { %>
+                        context_filters += '<li class="app-context-link menu-item-divided pure-menu-selected"><a href="/<%= user.name %>/' + n + '/edit">' + n + '</a></li>';
+                        currentContextURL = '<li id="listall" class="menu-item-divided"><a href="/<%= user.name %>/edit" class="whiten">see all graphs</a></li>';
+                    <% } %>
+                }
+                else {
+                    // for the menu
+                    <% if (perceivername) { %>
+                        context_filters += '<li class="app-context-link menu-item-divided "><a href="/<%= perceivername %>/' + n + '">' + n + '</a></li>';
+                    <% } else { %>
+                        context_filters += '<li class="app-context-link menu-item-divided "><a href="/<%= user.name %>/' + n + '/edit">' + n + '</a></li>';
+
+                    <% } %>
+
+                    // for the statement add
+                }
+            });
+            // TODO this is code repeat from above, optimize
+            if (!detectedContext && current_context) {
+            <% if (perceivername) { %>
+                context_filters = '<li class="app-context-link menu-item-divided pure-menu-selected"><a href="/<%= perceivername %>/' + current_context + '">' + current_context + '</a></li>' + context_filters;
+                currentContextURL = '<li id="listall" class="menu-item-divided"><a href="/<%= perceivername %>" class="whiten">see all graphs</a></li>';
+            <% } else { %>
+                context_filters = '<li class="app-context-link menu-item-divided pure-menu-selected"><a href="/<%= user.name %>/' + current_context + '/edit">' + current_context + '</a></li>' + context_filters;
+                currentContextURL = '<li id="listall" class="menu-item-divided"><a href="/<%= user.name %>/edit" class="whiten">see all graphs</a></li>';
+            <% } %>
+            }
+        }
+        // No graph, so show private
+        else {
+            context_filters += '<li class="app-context-link menu-item-divided"><a href="/<%= perceivername %>/private/edit">private</a></li>';
+        }
+
+        <% if (!perceivername) { %>
+            addNewContext = '<li id="addNewContext" class="menu-item-divided"><a id="addcontextbutton" href="javascript:" class="whiten"> + add new graph&nbsp;&nbsp;</a>&nbsp;<form action="/post" method="GET" class="pure-form" id="addcontextinput"><input type="text" id="addcontextname" size="8" class="pure-input"><input id="addcontextsubmit" type="submit" value="">&nbsp;&nbsp;</form></li>';
+        <% } else { %>
+            addNewContext = '<li class="menu-item-divided">&nbsp;<a href="javascript:"></a></li>';
+
+        <% } %>
+
+
+        // We are viewing the user's public page?
+
+        <% if ((perceivername)) { %>
+
+            // So we know whose statements we see, but is it the same as the user who's viewing them?
+            <% if (perceivername == receivername) { %>
+
+            <% if (context) { %>
+                // switch_field = '<li class="menu-item-small"><a href="/<%= perceivername %>/<%= context %>/edit">go to private view</a></li>';
+            <% } else { %>
+                // switch_field = '<li class="menu-item-small"><a href="/<%= perceivername %>/edit">go to private view</a></li>';
+            <% } %>
+
+            // So we know whose statements we're going to view, but the user is not the same as the one who made them.
+            <% } else { %>
+
+
+
+            <% } %>
+
+        // We are viewing the user's private page
+
+        <% } else {  %>
+
+        <% if (context) { %>
+
+                switch_field = '<li class="menu-item-small">&nbsp;</li><li class="menu-item-small"><a href="/<%= user.name %>/<% context %>">go to public view</a></li>';
+
+            <% } else { %>
+
+                switch_field = '<li class="menu-item-small">&nbsp;</li><li class="menu-item-small"><a href="/<%= user.name %>">go to public view</a></li>';
+
+            <% } %>
+
+
+        <% } %>
+
+
+        <% if (perceivername) { %>
+
+            <% if (perceivername == receivername) { %>
+                settingspane = '<li class="menu-item-small" id="settingspane"><a href="/settings">settings</a></li><br>';
+                appshome = '<li class="menu-item-small"><a href="/apps">apps/home</a></li>';
+                auxLinks = '<br>' +
+                        '<li class="menu-item-small"><a href="/<%= perceivername %>/edit">back to private view</a></li>' +
+                        '<li class="menu-item-small">&nbsp;</li>' +
+                        '<li class="menu-item-divided"><a href="/logout">logout</a></li>' +
+                        '<li class="menu-item-small">&nbsp;</li>' +
+                        '<li class="menu-item-divided"><a href="/import">import</a></li>' +
+                        '<li class="menu-item-divided"><a href="/api/public/nodes/<%= perceivername %>/<%= context %>" target="_blank">export</a></li>' +
+                        '<li class="menu-item-small"><a href="/api/public/nodes/<%= perceivername %>/<%= context %>?gexf=1" target="_blank" download="<%= perceivername %>_<%= context %>.gexf">gexf</a> <a href="/api/public/nodes/<%= perceivername %>/<%= context %>?csv=1" target="_blank" download="<%= perceivername %>_<%= context %>.csv">csv</a> <a href="/api/public/nodes/<%= perceivername %>/<%= context %>?csvdata=1" target="_blank">csv matrix</a>  <a href="/api/public/statements/<%= perceivername %>/<%= context %>?textonly=1" target="_blank">text only</a> <a href="" target="_blank" id="downloadpng">PNG image</a></li>' +
+                        '<li class="menu-item-small">&nbsp;</li>' +
+                        '<li class="menu-item-small"><a href="http://noduslabs.com/infranodus/" target="_blank">about</a></li>' +
+                        '<li class="menu-item-small"><a href="http://noduslabs.com/contact/" target="_blank">contact</a></li>' +
+                        '<li class="menu-item-small"><a href="http://github.com/noduslabs/infranodus" target="_blank">help &amp; github</a></li>';
+
+
+            <% } else if (receivername) { %>
+                settingspane = '<li class="menu-item-small" id="settingspane"><a href="/settings">settings</a></li><br>';
+                appshome = '<li class="menu-item-small"><a href="/apps">apps/home</a></li>';
+                auxLinks = '<br>' +
+                        '<li class="menu-item-small"><a href="/<%= receivername %>/edit">back to <%= receivername %></a></li>' +
+                        '<li class="menu-item-small">&nbsp;</li>' +
+                        '<li class="menu-item-divided"><a href="/">home page</a></li>' +
+                        '<li class="menu-item-small">&nbsp;</li>' +
+                        '<li class="menu-item-divided"><a href="/import">import</a></li>' +
+                        '<li class="menu-item-divided"><a href="/api/user/nodes/<%= context %>" target="_blank">export</a></li>' +
+                        '<li class="menu-item-small"><a href="/api/user/nodes/<%= context %>?gexf=1" target="_blank" download="<%= context %>.gexf">gexf</a> <a href="/api/user/nodes/<%= context %>?csv=1" target="_blank">csv</a> <a href="/api/user/nodes/<%= context %>?csvdata=1" target="_blank">csv matrix</a>  <a href="/api/user/statements/<%= context %>?textonly=1" target="_blank">text only</a> <a href="" target="_blank" id="downloadpng">PNG image</a></li>' +
+                        '<li class="menu-item-small"><a href="http://noduslabs.com/infranodus/" target="_blank">about</a></li>' +
+                        '<li class="menu-item-small"><a href="http://noduslabs.com/contact/" target="_blank">contact</a></li>' +
+                        '<li class="menu-item-small"><a href="http://github.com/noduslabs/infranodus" target="_blank">help &amp; github</a></li>';
+
+
+            <% } else { %>
+            appshome = '<li class="menu-item-small"><a href="/">infranodus.com</a></li>';
+                auxLinks = '<br>' +
+                        '<li class="menu-item-small">&nbsp;</li>' +
+                        '<li class="menu-item-divided"><a href="/login">login</a></li>' +
+                        '<li class="menu-item-divided"><a href="/signup">signup</a></li>' +
+                        '<li class="menu-item-small">&nbsp;</li>' +
+                        '<li class="menu-item-divided"><a href="/api/public/nodes/<%= perceivername %>/<%= context %>" target="_blank">export</a></li>' +
+                        '<li class="menu-item-small"><a href="/api/public/nodes/<%= perceivername %>/<%= context %>?gexf=1" target="_blank" download="<%= context %>.gexf">gexf</a> <a href="/api/public/nodes/<%= perceivername %>/<%= context %>?csv=1" target="_blank">csv</a> <a href="/api/public/nodes/<%= perceivername %>/<%= context %>?csvdata=1" target="_blank">csv matrix</a>  <a href="/api/public/statements/<%= perceivername %>/<%= context %>?textonly=1" target="_blank">text only</a> <a href="" target="_blank" id="downloadpng">PNG image</a></li> ' +
+                        '<li class="menu-item-small">&nbsp;</li>' +
+                        '<li class="menu-item-divided"><a href="/#tutorials" target="_blank">tutorials</a></li>' +
+                        '<li class="menu-item-small">&nbsp;</li>' +
+                        '<li class="menu-item-small"><a href="http://noduslabs.com/infranodus/" target="_blank">about</a></li>' +
+                        '<li class="menu-item-small"><a href="/#features">demo</a></li>' +
+                        '<li class="menu-item-small"><a href="/#usecases">case studies</a></li>' +
+                        '<li class="menu-item-small">&nbsp;</li>' +
+                        '<li class="menu-item-small"><a href="http://noduslabs.com/contact/" target="_blank">contact</a></li>' +
+                        '<li class="menu-item-small"><a href="http://github.com/noduslabs/infranodus" target="_blank">help &amp; github</a></li>';
+
+            <% } %>
+
+        // THis below is a case when the user is logged in, so PERCEIVER does not exist (only RECEIVER) and we just use intternal APIs for exports
+
+        <% } else { %>
+            settingspane = '<li class="menu-item-small" id="settingspane"><a href="/settings">settings</a></li><br>';
+            appshome = '<li class="menu-item-small"><a href="/">infranodus.com</a></li><li class="menu-item-small"><a href="/apps">apps/home</a></li>';
+            auxLinks = '<br>' +
+                    '<li class="menu-item-divided"><a href="/logout">logout</a></li>' +
+                    '<li class="menu-item-small">&nbsp;</li>' +
+                    '<li class="menu-item-divided"><a href="/import">import</a></li>' +
+                    '<li class="menu-item-divided"><a href="/api/user/nodes/<%= context %>" target="_blank">export</a></li>' +
+                    '<li class="menu-item-small"><a href="/api/user/nodes/<%= context %>?gexf=1" target="_blank" download="<%= context %>.gexf">gexf</a> <a href="/api/user/nodes/<%= context %>?csv=1" target="_blank">csv</a> <a href="/api/user/nodes/<%= context %>?csvdata=1" target="_blank">csv matrix</a>  <a href="/api/user/statements/<%= context %>?textonly=1" target="_blank">text only</a> <a href="" target="_blank" id="downloadpng">PNG image</a></li>' +
+                    '<li class="menu-item-small">&nbsp;</li>' +
+                    '<li class="menu-item-small"><a href="/#tutorials" target="_blank">video tutorials</a></li>' +
+                    '<li class="menu-item-small"><a href="http://noduslabs.com/courses/text-network-analysis-for-cognitive-stimulation/" target="_blank">online course</a></li>' +
+                    '<li class="menu-item-small"><a href="http://noduslabs.com/category/tutorials/" target="_blank">case studies</a></li>' +
+                    '<li class="menu-item-small">&nbsp;</li>' +
+                    '<li class="menu-item-small"><a href="http://noduslabs.com/contact/" target="_blank">contact</a></li>' +
+                    '<li class="menu-item-small"><a href="http://github.com/noduslabs/infranodus" target="_blank">help &amp; github</a></li>';
+
+        <% } %>
+
+        document.getElementById('contexts').innerHTML = appshome +
+                                                        settingspane +
+                                                        addNewContext +
+                                                        currentContextURL +
+                                                        context_filters +
+                                                        switch_field +
+                                                        auxLinks;
+
+
+
+        // Select range in textarea function
+
+        $.fn.selectRange = function(start, end) {
+            return this.each(function() {
+                if (this.setSelectionRange) {
+                    this.focus();
+                    this.setSelectionRange(start, end);
+                } else if (this.createTextRange) {
+                    var range = this.createTextRange();
+                    range.collapse(true);
+                    range.moveEnd('character', end);
+                    range.moveStart('character', start);
+                    range.select();
+                }
+            });
+        };
+
+        // When add new context is clicked, add it into textarea and select it
+
+        $("#addNewContext").on('tap', function(e) {
+
+            $("#addcontextinput").css("visibility", "visible");
+            $("#add").css("visibility", "visible");
+            $("#addcontextname").focus();
+
+
+        });
+
+        <% if (!perceivername) { %>
+        $('#addcontextinput').submit(function(e) {
+            e.preventDefault(); // to stop the form from submitting
+            if ($('#addcontextname').val().length > 0) {
+                var contextredirect = $('#addcontextname').val();
+                contextredirect = contextredirect.replace(/[\.,-\/#!$%\^&\*;:{}=\-_`~()]/g,"");
+                contextredirect = contextredirect.replace(/[^\w]/gi, '');
+                window.location.href = "/<%= user.name %>/" + contextredirect + '/edit';
+            }
+
+        });
+        <% } %>
+
+        // Now time to trigger the actions we want to have when user clicks on the contexts
+        addContextTriggers();
+
+
+
+        if (newcontextname) {
+        // $('#menuLink').click();
+        $("#addcontextinput").css("visibility", "visible");
+        $("#addcontextname").focus();
+        $("#addcontextname").val(newcontextname);
+        }
+
+
+}
+
+
+function addContextTriggers() {
+
+    // TODO Add case for clicking viewAll, so it doesn't reload the page, but simply removes all filters
+
+    // Find @Contexts and make them filter statements when clicked
+
+        var contextsToFilter = [];
+
+
+        $(".app-context-link").click(function(e) {
+            e.preventDefault();
+            var that = this;
+            setTimeout(function() {
+                var dblclick = parseInt($(that).data('double'), 10);
+                if (dblclick > 0) {
+                    $(that).data('double', dblclick-1);
+                } else {
+                    if (e.shiftKey || ($(".addcontext-on").is(":visible"))) {
+                      addContextOpen.call(that, e);
+                    }
+                    else if ($(".diffcontext-on").is(":visible")) {
+                      diffContextOpen.call(that, e);
+                    }
+                    else {
+                      singleClick.call(that, e);
+                    }
+                }
+            }, 300);
+        }).dblclick(function(e) {
+                    $(this).data('double', 2);
+                    doubleClick.call(this, e);
+                });
+
+
+        // If double click on the menu, open it
+
+        function singleClick (e) {
+
+            window.location = e.target.href;
+
+        }
+
+        // If shift click on the menu, open comparison with other context
+
+        function addContextOpen (e) {
+
+            window.location = e.target.href + '?addcontext=' + userFactory.getCurrentContext();
+
+        }
+
+                // If shift click on the menu, open comparison with other context
+
+        function diffContextOpen (e) {
+
+            window.location = e.target.href + '?addcontext=' + userFactory.getCurrentContext() + '&highlight=1&missing=1';
+
+        }
+
+        // If double click on a link, open it
+
+        $(".app-url-link").on('click tap', function(e) {
+
+              e.stopPropagation();
+
+        });
+
+
+
+        // If only one click, filter it
+
+        function doubleClick (e) {
+
+                var triggeredFromStatement = null;
+
+                var addFilter = null;
+
+                var removeFilter = null;
+
+                // Extract filter label
+                var filter = $(e.target).text();
+
+                // Remove the first @ in case it's @mentions clicked from the statements
+                if (filter.charAt(0) == '@') {
+                    filter = filter.substr(1);
+                    triggeredFromStatement = 1;
+                }
+
+                // Some tricks to make context switch from statements emulate menu items behavior
+                if (triggeredFromStatement) {
+
+                    // If the context is clicked inside the statement, we're just dealing with that event, not others
+                    e.stopPropagation();
+
+                    $(".menu-item-divided").each(function() {
+                         if (S($(this).html()).stripTags().s == filter) {
+                             if ($(this).hasClass('pure-menu-selected')) {
+                                 $(this).removeClass('pure-menu-selected');
+                                 removeFilter = 1;
+                             }
+                             else {
+                                 $(this).addClass('pure-menu-selected');
+                                 addFilter = 1;
+                             }
+                         }
+
+                    });
+                }
+
+                // Index of that filter in our current contextsToFilter array
+                var filterIndex = contextsToFilter.indexOf(filter);
+
+                // Toggle menu highlights
+                if ($(this).hasClass('pure-menu-selected') || removeFilter) {
+
+
+                    // The context is to be removed
+                    if (!removeFilter) {
+                        $(this).removeClass('pure-menu-selected');
+                    }
+
+                    // Does it exist in the list of contexts to filter?
+                    if (filterIndex > -1) {
+                        contextsToFilter.splice(filterIndex, 1);
+                    }
+
+                     // Create context query for jQuery
+                    var contextstring = '';
+
+                    if (contextsToFilter.length >= 0) {
+                        contextstring += ".entry:contains('@"+contextsToFilter[0]+"')";
+
+                        for (var l=1;l<contextsToFilter.length;++l) {
+                            contextstring += ", .entry:contains('@"+contextsToFilter[l]+"')";
+                        }
+
+                        $('.entry').addClass('hidden');
+                        $(contextstring).removeClass('hidden');
+
+                    }
+                    else {
+                        $('.entry').removeClass('hidden');
+                    }
+
+
+                    if (contextsToFilter.length < 1 && !$('#listall').hasClass('pure-menu-selected') && !(userFactory.getCurrentContext())) {
+                        $('#listall').addClass('pure-menu-selected');
+                    }
+
+                }
+                else {
+                    if (!addFilter) {
+                        $(this).addClass('pure-menu-selected');
+                    }
+
+                    // Add this context to a list of contextToFilter
+                    if (filterIndex < 0) {
+                        contextsToFilter.push(filter);
+                    }
+
+                    // Show only those that have the context
+
+                    var contextstring = '';
+                    if (contextsToFilter.length >= 0) {
+                        contextstring += ".entry:contains('@"+contextsToFilter[0]+"')";
+
+                        for (var l=1;l<contextsToFilter.length;++l) {
+                            contextstring += ", .entry:contains('@"+contextsToFilter[l]+"')";
+                        }
+
+                        $('.entry').addClass('hidden');
+                        $(contextstring).removeClass('hidden');
+
+                    }
+                    else {
+                        $('.entry').removeClass('hidden');
+                    }
+
+
+                    if ($('#listall').hasClass('pure-menu-selected')) {
+                        $('#listall').removeClass('pure-menu-selected');
+                    }
+
+
+                }
+
+                console.log(contextsToFilter);
+
+                // Add contexts into the submission form
+                document.getElementById('selectedContexts').value = contextsToFilter.join(',');
+
+                console.log(document.getElementById('selectedContexts').value);
+
+                // Add some remove @context functionality
+                renderGraph(contextsToFilter);
+
+         }
+
+    }
+
+
+    // This function is launched when an item in side-menu is double-clicked
+    // It filters out the contexts in the graph
+    // TODO it works well with one, but not with the subsequent ones. To fix.
+
+    function renderGraph(contextsToFilter) {
+
+            // Creating the context index
+            var nodesToKeep = [];
+
+            var keepNodes = [];
+
+            var keepEdges = [];
+
+            // First, let's reiterate the graph and make a list of nodes and edges to keep
+
+            if (contextsToFilter.length > 0) {
+
+                sigma.instances(0).graph.edges().forEach(function(e) {
+
+                    // Reiterating through edges, leaving only the nodes that appear in at least one filtered context
+
+                    contextsToFilter.forEach(function(element){
+
+                        if (graphFactory.existsNodeInContext(element,e.source) == true) {
+                            keepNodes.push(e.source);
+                        }
+
+                        if (graphFactory.existsNodeInContext(element,e.target) == true) {
+                            keepNodes.push(e.target);
+                        }
+
+                    });
+
+                    // Keep edges that are in at least one of the filtered contexts
+
+                    if (contextsToFilter.indexOf(e.edge_context) > -1) {
+                        keepEdges.push(e.id);
+                    }
+
+
+                });
+            }
+
+            // Uniqualize to avoid duplicates
+
+            keepNodes = $.unique(keepNodes);
+            keepEdges = $.unique(keepEdges);
+
+
+            // Then let's reiterate the graph edges and only show nodes that belong to the contexts created
+
+            sigma.instances(0).graph.edges().forEach(function(e) {
+
+                if (contextsToFilter.length == 0) {
+                    // Show the edge if there's no contexts at all
+                    e.color = e.originalColor;
+                }
+
+                else if (keepEdges.indexOf(e.id) > -1) {
+                    // The edge is in the list to keep => show it normal color
+                    e.color = e.originalColor;
+
+                    // The source of the edge is in the list to keep, so we will keep it.
+                    if (keepNodes.indexOf(e.source) > -1) {
+                        nodesToKeep.push(e.source);
+                    }
+                    // The target of the edge is in the list to keep, so we will keep it also.
+                    if (keepNodes.indexOf(e.target) > -1) {
+                        nodesToKeep.push(e.target);
+                    }
+                    // PS We only do this check for the nodes that belong to the edges that we keep
+                }
+                else {
+                    // Otherwise (the edge IS in the list for removal), so we color the edge invisible
+                    e.color = userFactory.getGraphOption('deselected_nodes_color');
+                }
+
+
+
+            });
+
+
+
+            // Ensure no duplicates
+            nodesToKeep = $.unique(nodesToKeep);
+
+            // Now that we know which nodes to keep, let's reiterate through them all
+
+            sigma.instances(0).graph.nodes().forEach(function(n) {
+
+                // Is there no contexts at all? Show the node.
+                if (contextsToFilter.length == 0) {
+                    n.color = n.originalColor;
+                    n.label = n.originalLabel;
+                }
+
+                // The node is not in the list to keep? Hide it!
+                else if (nodesToKeep.indexOf(n.id) < 0)  {
+                    n.color = userFactory.getGraphOption('deselected_nodes_color');
+                    n.label = '';
+                }
+
+                // Looks like there is a filtering context function AND the node is in the keep list, so make it show!
+                else {
+                    n.color = n.originalColor;
+                    n.label = n.originalLabel;
+                }
+            });
+
+
+            // Refresh the graph (we do it through instances(0) as we're a bit outside of Sigma now)
+            sigma.instances(0).refresh();
+
+
+            }
+
+</script>

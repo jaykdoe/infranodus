@@ -1,0 +1,147 @@
+<script>
+
+    let top_components = [];
+    
+    // Calculate Betweenness Centrality and Top Component
+
+    let bc_nodes_map = {};
+
+    function betweennessCentrality (eles, jsG) {
+
+            // Define collection for Cytoscape
+            // var collection = cy.elements();
+
+            // Calculate betweenness centrality for all the nodes
+            var jsbc = jsnx.betweennessCentrality(jsG, {normalized: true, weight: 'weight'});
+            var bc_jsx = jsbc._stringValues;
+            
+            let nodeIDs_rev = graphFactory.getNodeIDsRev();
+
+            // BC calculation for Cytoscape
+            // var bc = eles.bc({
+            //     weight: function(edges) {
+            //         return edges.data('weight');
+            //     },
+            //     directed: true
+            // });
+
+            let bcmin = 1;
+            let bcmax = 0;
+
+            let bcmap = {};
+
+            let topbc_nodes = [];
+
+            // If no jsNetworkx object sent, calculate with Cytoscape
+            if (!jsG) {
+                for (var i = 0; i < cy.nodes().length; i++) {
+
+                    var nn = eles.getElementById(cy.nodes()[i].data('id'));
+
+                    var currentbc = bc.betweennessNormalized(nn);
+
+                    bcmap[cy.nodes()[i].data('id')] = currentbc;
+
+                    topbc_nodes.push({key: cy.nodes()[i].data('id'), label: cy.nodes()[i].data('name'), bc: currentbc});
+
+                    if (bcmin > currentbc && currentbc != 0) {
+                    bcmin = currentbc;
+                    }
+                    else {
+                    bcmin = 0.00001
+                    }
+
+                    if (bcmax < currentbc) {
+                    bcmax = currentbc;
+                    }
+
+                }
+            }
+            else {
+                // Calculate BC with jsNetworksX
+
+                for (let key in bc_jsx) {
+                    let currentbc = bc_jsx[key];
+                    topbc_nodes.push({key: key, label: nodeIDs_rev[key], bc: bc_jsx[key]});
+                    bcmap[key] = bc_jsx[key];
+
+                    if (bcmin > currentbc && currentbc != 0) {
+                        bcmin = currentbc;
+                    }
+                    else {
+                        bcmin = 0.00001
+                    }
+
+                    if (bcmax < currentbc) {
+                        bcmax = currentbc;
+                    }
+                }
+           
+            }
+
+            // Get the map of the top BC nodes
+            bc_nodes_map = bcmap;
+
+            // Sort all the top BC nodes descending
+            topbc_nodes = _.sortBy(topbc_nodes, 'bc').reverse();
+
+            graphFactory.updateTopBCNodes(topbc_nodes);
+
+            let nodes_shown = 0
+
+            let bcscore = 0;
+
+            let degree_nodes = [];
+
+            // Assign BC score to each node in the graph
+            sigma.instances(0).graph.nodes().forEach(function(n) {
+
+                let node_degree = sigma.instances(0).graph.degree(n.id);
+
+                // Get the nodes with the highest degree
+                degree_nodes.push({key: n.id, label: n.label, degree: node_degree});
+
+                // Do we range the nodes by betweenness centrality?
+                let most_influential = userFactory.getMostInfluential();
+                
+                if ((most_influential == 'bc' || most_influential == 'bc2') && topbc_nodes[0].bc > 0) {
+                
+                    // Does the BC value for this node = 0 or doesn't exist?
+                    if (bcmap[n.id] == 0 || !bcmap[n.id]) { 
+                        bcscore = bcmin; 
+                    } 
+                    else { 
+                        bcscore = bcmap[n.id] 
+                    }
+                
+                    // Normalize the size of the nodes 
+                    n.size = Math.round(normalize(bcscore, bcmin, bcmax, 5, 35));
+
+                    n.bc = bcmap[n.id];
+                }
+                else {
+                    n.size = node_degree;
+                }
+
+                // Save the node's size to the global parameters - based on degree or BC, depending on the above
+                graphFactory.setNodeSize(n);
+
+            
+            });
+
+            // Sort the degree nodes by 
+            degree_nodes = _.sortBy(degree_nodes,'degree').reverse();
+
+            // Save into the global function
+            graphFactory.updateTopDegreeNodes(degree_nodes);
+        
+            // Save components of the graph
+            top_components = eles.components();
+
+            // Debug console
+            // console.log(_.first(_.sortBy(bcmap,'degree').reverse(),3);
+            // console.log(bcmin);
+            // console.log(bcmax);
+
+    }
+</script>

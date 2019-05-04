@@ -1,0 +1,113 @@
+<script>
+
+
+         // Declare Statements Panel  (statements + entries)
+         
+         const statementsPanelFactory = (() => {
+          function StatementsPanelFactory() {
+
+              let statementsPanelVisibility = "VISIBLE"; 
+
+              let currentStatementsView = 'OVERVIEW';
+                              
+              this.toggleStatementsPanelTo = function() {
+                    statementsPanel().toggleStatementsPanel();
+              }
+
+              this.setStatementsPanelVisibility = function(mode) {
+                  statementsPanelVisibility = mode;
+              }
+              this.getStatementsPanelVisibility = function() {
+                  return statementsPanelVisibility;
+              }
+
+              this.getCurrentStatementsView = function() {
+                  return currentStatementsView;
+              }
+              this.setCurrentStatementsView = function(mode) {
+                   currentStatementsView = mode;
+              }
+
+              // Initialize on load
+              this.initializePanel = function() {
+
+                // Did we receive a global setting to hide the graph?
+                if (((userFactory.getViewOption('hide_always') || userFactory.getViewOption('hide_edit')) && !userFactory.getViewOption('show_text')) || ((userFactory.getViewOption('hide_when_small') && $(window).width() < 600) || (userFactory.getViewOption('graphOnly') == 'graph' || userFactory.getViewOption('graphOnly') == '1'))) {   
+                    // Hide the whole Statements (edit) panel as well
+                    statementsPanel().toggleStatementsPanel();
+                }
+
+                // What about the local storage view graph only?
+                if (localStorage.getItem('graph') == 1) {
+                    statementsPanel().toggleStatementsPanel();
+                }
+
+
+              }
+
+
+          }
+
+          return new StatementsPanelFactory();
+
+        })();
+
+        // Initialize Statements Panel Functions on load 
+
+        statementsPanelFactory.initializePanel();
+
+        // Some functions to be performed on the statements panel (statements + entries)
+        
+        function statementsPanel() {
+            return {
+                toggleStatementsPanel: function() {
+
+                    $("#statements").fadeToggle();
+        
+
+                    // The whole statements panel is hidden as well as the statements themselves
+                    if (statementsPanel().isPanelVisible() == 'VISIBLE') {
+                        localStorage.setItem('graph', 1);
+                        $("#graph-link").toggleClass('graph-highlight','add');
+                        statementsPanelFactory.setStatementsPanelVisibility('HIDDEN');
+                    }
+                    else {
+                        localStorage.setItem('graph', 0);
+                        console.log('SHOWING')
+                        statements().show();
+                        $("#graph-link").toggleClass('graph-highlight','remove');
+                        statementsPanelFactory.setStatementsPanelVisibility('VISIBLE');
+                    }
+
+                    // Are statements and entry edit pane both in the same status?
+                    if (statementsPanel().isPanelVisible() != statements().areVisible()) {
+                        statements().toggleStatements();
+                    }
+                         
+                    if (!localStorage.getItem('analytics')) {
+                
+                        $('#analytics').toggle('slide', function(){
+                
+                            if ($('#analytics').is(":visible")) {
+                                    $('#analyticsbutton').addClass('analytics-on');
+                                    $('#analyticscaption').hide();         
+                            }
+                            else {
+                                    $('#analyticsbutton').removeClass('analytics-on');
+                                    $('#analyticscaption').show();           
+                            }
+                
+                        });
+                    }
+                },
+                isPanelVisible: function() {
+                    return statementsPanelFactory.getStatementsPanelVisibility();
+                }
+            }
+        
+        }
+        
+            
+       
+        
+</script>

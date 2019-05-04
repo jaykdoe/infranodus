@@ -25,7 +25,7 @@
         <span></span>
     </a>
 
-    <% include menu %>
+    <%- include('components/common/menu') %>
 
     <div id="content">
           <div id="welcomemessage" style="background: white;">
@@ -81,13 +81,6 @@
     var jsonpath = '/files/signup.json';
 
 
-
-// The button to hide / show statements
-
-    $("#graph-link").click(function(e) {
-        e.preventDefault();
-        $("#statements").fadeToggle();
-    });
 
 // Add a method to the graph model that returns an
 // object with every neighbors of a node inside:

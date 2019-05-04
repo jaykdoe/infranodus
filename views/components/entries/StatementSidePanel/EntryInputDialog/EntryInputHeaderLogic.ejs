@@ -1,0 +1,60 @@
+<script>
+
+    function findsButton() {
+        return {
+            onClick: function(onClick){
+                $('#finds').on('click', onClick)
+            }
+        }
+    }
+    
+    function editButton() {
+        return {
+            onClick: function(onClick){
+                $('#adds').on('click', onClick)
+            }
+        }
+    }
+    
+    function interpretButton() {
+        return {
+            onClick: function(onClick){
+                $('#interpret').on('click', onClick)
+            }
+        }
+    }
+    
+    function minimizeButton() {
+        return {
+            onClick: function(onClick){
+                $('#windowdown-link').on('click', onClick)
+            }
+        }
+    }
+    
+    function closeStatementMenuButton() {
+        return {
+            onClick: function(onClick){
+                $('#statements-toggle').on('click', onClick)
+            }
+        }
+    }
+    
+    function statementMenu() {
+        return {
+            switch: function(element){
+                $('.statementInputMenu').each(function() {
+                    $("li", this).each(function() {
+                        const currentId = $(this).find('a').attr('id');
+                        const currentText = $(this).find('a').text();
+                        $(this).removeClass('pure-menu-selected-top');
+                        if (currentId == element || currentText == element) {
+                            $(this).addClass('pure-menu-selected-top');
+                        }
+                    });
+                });
+            }
+        }
+    }
+    
+    </script>

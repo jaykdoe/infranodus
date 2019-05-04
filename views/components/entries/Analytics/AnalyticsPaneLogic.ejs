@@ -1,0 +1,380 @@
+<script>
+
+
+analyticsPanel = new AnalyticsPanel();
+
+analyticsPanel.activatePanel();
+
+
+function AnalyticsPanel() {
+
+        let analytics_communities = '';
+        let recommender
+    
+        this.populateCommunities = function(topp_communities) {
+                  
+                let comm_info = "1: ";    
+
+                for (var j = 0; j < topp_communities.length; j++) {
+
+                    for (var n = 0; n < topp_communities[j].nodes.length; n++) {
+                        comm_info += "<a href='#' class='community_node' community='"+topp_communities[j].id+"'>" + topp_communities[j].nodes[n].name + "</a> <div class='inlinesquare "+(topp_communities[j].id)+"'></div> ";
+                    }
+                    comm_info += " <br>" + (j + 2) + ": ";
+                }
+
+                comm_info = comm_info.slice(0, -7);
+                
+                $('#maintopics').html(comm_info);
+
+        }
+
+
+        this.populateInfluential = function(toppbc_nodes) {
+
+            let inf_info = '';
+
+            let most_influential = userFactory.getMostInfluential();
+
+            if ((most_influential == 'bc' || (most_influential == 'bc2') && toppbc_nodes[0].bc > 0)) {
+                $('#typeofinf').text('(highest betweenness, i.e. linking different topics):');
+            }
+            else {
+                $('#typeofinf').text('(highest degree, i.e. most co-occurrences):');
+            }
+
+            for (var ind in toppbc_nodes) {
+                    if (toppbc_nodes[ind].bc > 0) {
+                        inf_info += '<div class="inlinesquare '+toppbc_nodes[ind].key+'"></div> <a href="#" class="top_nodes">' + toppbc_nodes[ind].label + '</a> &nbsp;';
+                    }
+            }
+
+            inf_info = inf_info.slice(0, -7);
+        
+            $('#mostinfluential').html(inf_info);
+
+        }
+
+
+        this.populateRecommendation = function(insight_nodes) {
+                       
+            
+            let recommender = 'What is the relation between <br>';
+            recommender += "<div class='headline'>";
+
+            let iter = 0;    
+            for (let cluster in insight_nodes) {
+                recommender += '"';
+                for (var n = 0; n < insight_nodes[cluster].nodes.length; n++) {
+                    
+                    recommender += "<a href='#' class='community_node' community='"+cluster+"'>" + insight_nodes[cluster].nodes[n].name +'</a>';
+                    if (n < insight_nodes[cluster].nodes.length - 1) { recommender += ' - '}
+                   
+                }
+                
+                iter += 1;
+                if (iter < Object.keys(insight_nodes).length) {
+                    recommender += '"</div> and <br><div class="headline">';
+                }
+                
+                
+            }
+
+            recommender += '"?</div>';
+
+            $('#recommendedquestion').html(recommender);
+
+        }
+
+        this.populateStats = function(totalnodescount, graph_density, average_degree, diversity_score, modularity_score, nodesintoptopic, communities_number, num_nodes_component, top_components_length, influence_dispersal) {
+            
+            $('#totalnodescount').text(totalnodescount);
+            $('#graph_density').text(graph_density);
+            $('#average_degree').text(average_degree);
+            $('#diversity_score').text(diversity_score);
+            $('#modularity_score').text(modularity_score);
+            $('#nodesintoptopic').text(nodesintoptopic);
+            $('#communities_number').text(communities_number);
+            $('#num_nodes_component').text(num_nodes_component);
+            $('#top_components_length').text(top_components_length);
+            $('#influence_dispersal').text(influence_dispersal);
+
+            
+        }
+
+        this.populateAddContextInfo = function(addcontext_nodes, current_context, addcontext, addcontext_ratio) {
+            if (Object.keys(addcontext_nodes).length > 0) {
+
+                let addcontext_text = '';
+
+                if (addcontext_nodes['intersection'].length > 0) {
+                    addcontext_text += '<div class="headline">In both graphs:</div> ';
+                    if (addcontext_nodes['intersection'].length > 4) {
+                        addcontext_nodes['intersection'] = addcontext_nodes['intersection'].slice(0, 4);
+                    }
+                    for (let nnn = 0; nnn < addcontext_nodes['intersection'].length; nnn++) {
+                        addcontext_text += '<a href="#" class="top_nodes">' + addcontext_nodes['intersection'][nnn].label + '</a> - ';
+                    }
+                    addcontext_text = addcontext_text.slice(0, -3);
+                    addcontext_text += ' (' + addcontext_ratio['intersection'] + '% similar)';
+
+                }
+
+                if (addcontext_nodes['difference'].length > 0) {
+                    if (addcontext_text.length > 0) {
+                        addcontext_text += '<br>';
+                    }
+                    addcontext_text += '<div class="headline">In ' + addcontext + ' [2] but not in ' + current_context + ' [1]:</div> ';
+                    if (addcontext_nodes['difference'].length > 4) {
+                        addcontext_nodes['difference'] = addcontext_nodes['difference'].slice(0, 4);
+                    }
+                    for (let nnn = 0; nnn < addcontext_nodes['difference'].length; nnn++) {
+                        addcontext_text += '<a href="#" class="top_nodes">' + addcontext_nodes['difference'][nnn].label + '</a> - ';
+                    }
+                    addcontext_text = addcontext_text.slice(0, -3);
+                    addcontext_text += ' (total ' + addcontext_ratio['difference'] + '%)';
+
+                }
+
+          
+
+                addcontext_text += '<br><br>'
+
+                $("#addcontext_stats").html(addcontext_text);
+
+
+            }
+
+        }
+
+        this.colorTopics = function(palette) {
+          
+            for (pall in palette) {
+                if (document.getElementsByClassName("inlinesquare " + pall)) {
+                    for (var i = 0; i < document.getElementsByClassName("inlinesquare " + pall).length; i++) {
+                        document.getElementsByClassName("inlinesquare " + pall)[i].style.backgroundColor = rgbToHex(palette[pall]._rgb[0],palette[pall]._rgb[1],palette[pall]._rgb[2]);
+                        document.getElementsByClassName("inlinesquare " + pall)[i].setAttribute('community',pall);
+                    }
+                }
+            }
+        }
+
+        this.colorNode = function(n, palette) {
+            if (document.getElementsByClassName("inlinesquare " + n.id)[0] != undefined) {
+                        document.getElementsByClassName("inlinesquare " + n.id)[0].style.backgroundColor = rgbToHex(palette[n.community]._rgb[0],palette[n.community]._rgb[1],palette[n.community]._rgb[2]);
+                        document.getElementsByClassName("inlinesquare " + n.id)[0].setAttribute('community',n.community);
+            }
+        }
+
+        this.activatePanel = function() {
+
+            if (!localStorage.getItem('analytics') || localStorage.getItem('analytics') == 1) {
+
+                $('#analytics').show();
+                $('#analyticsbutton').addClass('analytics-on');
+                $('#analyticscaption').hide();
+
+            }
+
+            else {
+            
+                $('#analyticsbutton').removeClass('analytics-on');
+                $('#analyticscaption').show();
+                $("#miningbutton").css('background','#ededed');
+
+            }
+
+            if ((userFactory.getViewOption('hide_always') || userFactory.getViewOption('hide_edit') || userFactory.getViewOption('hide_when_small')) && !userFactory.getViewOption('show_analytics')) {
+                $('#analytics').hide();
+                $('#analyticsbutton').removeClass('analytics-on');
+                $('#analyticscaption').show();
+            }
+
+            resetGraphButton().onClick(resetGraph);
+
+        }
+
+        this.updateSelections = function(pinnedNodes) {
+           
+            $('.top_nodes').each(function(){
+                if (pinnedNodes.indexOf($(this).text()) > -1) {
+                    $(this).attr('style','color: #0089e0 !important; text-decoration: underline !important;');
+                }
+                else {
+                    $(this).removeAttr('style');
+                }
+            });
+
+            $('.community_node').each(function(){
+                if (pinnedNodes.indexOf($(this).text()) > -1) {
+                    $(this).attr('style','color: #0089e0 !important; text-decoration: underline !important;');
+                }
+                else {
+                    $(this).removeAttr('style');
+                }
+            });
+
+        }
+
+        this.activateTopNodes = function() {
+
+            // What happens when we click on top nodes on the Analytics panel?
+
+            $('.top_nodes').click(function(){
+
+                let nodeLabel = $(this).text();
+
+                if (graphFactory.checkIfPinned(nodeLabel) == false) {
+                    graphFactory.addToPinnedNodes(nodeLabel);
+                }
+                else {
+                    if (graphFactory.checkIfPinned(nodeLabel) == true) {
+                        graphFactory.removeFromPinnedNodes(nodeLabel);
+                    }
+                }
+
+                return false;
+
+            });
+
+
+            // What happens when we click on the community nodes in the analytics panel?
+
+            $('.community_node').click(function(){
+
+                    let nodeLabel = $(this).text();
+
+                    if (graphFactory.checkIfPinned(nodeLabel) == false) {
+                        graphFactory.addToPinnedNodes(nodeLabel);
+                    }
+                    else {
+                        if (graphFactory.checkIfPinned(nodeLabel) == true) {
+                            graphFactory.removeFromPinnedNodes(nodeLabel);
+                        }
+                    }
+            });
+
+
+            // What if we click on the community colored boxes?
+
+            $('.inlinesquare').click(function() {
+
+                let communityClicked = $(this).attr('community').toString();
+
+                graphFactory.selectCommunity(communityClicked);
+
+
+            });
+
+
+        }
+
+        this.removeSelections = function() {
+            
+            $('.community_node').each(function(){
+                $(this).removeAttr('style');
+            });
+
+            console.log('removing');
+
+            $('.top_nodes').each(function(){
+                $(this).removeAttr('style');
+            });
+        
+        
+        }
+
+        this.activateButtons = function(current_user, current_context, louvain_communities, palette) {
+
+            let nodeIDs = graphFactory.getNodeIDs();
+
+            $('.panelControlBtn').on("click", function() {
+
+                // What's the origin of the click?
+                var ID = $(this).attr('data-id');
+
+                if (ID == 'analytics') {
+                  
+                    $("#mininganalytics").fadeOut('fast');
+                    $("#mainanalytics").fadeIn('fast');
+                    $("#analbutton").css('background','#ffffff');
+                    $("#miningbutton").css('background','#ededed');
+                    currentPanel = ID;
+
+                }
+                else if (ID == 'mining_analytics') {
+
+                
+                    $("#mainanalytics").fadeOut('fast');
+                    $("#mininganalytics").fadeIn('fast');
+                    $("#analbutton").css('background','#ededed');
+                    $("#miningbutton").css('background','#ffffff');
+
+                    var html = "n/a";
+
+                    $.getJSON("/api/" + current_user + "/lda/topics/" + current_context, function( data ) {
+                        var items = [];
+                        html = '';
+                        for (var i = 0; i < data.length; i++) {
+
+                            for (var j = 0; j < data[i].length; j++) {
+                                //console.log(nodeIDs[data[i][j].term]);
+                                items.push('<div class="inlinesquare ' + louvain_communities[nodeIDs[data[i][j].term]] + '"></div> <a href="#" class="top_nodes">' + data[i][j].term + '</a> &nbsp;');
+                                if (j == (data[i].length - 1)) {
+                                    items.push('<br>')
+                                }
+                            }
+
+
+                        }
+
+                        $("#topicsLDA").html(items.join(""));
+
+                        $.getJSON("/api/" + current_user + "/lda/terms/" + current_context, function( data ) {
+                            let items = [];
+                            html = '';
+                            for (var i = 0; i < data.length; i++) {
+                                for (var j = 0; j < data[i].length; j++) {
+                                        //console.log(nodeIDs[data[i][j].term]);
+                                        items.push('<div class="inlinesquare ' + louvain_communities[nodeIDs[data[i][j].term]] + '"></div> <a href="#" class="top_nodes">' + data[i][j].term + '</a> &nbsp;');
+                                    if (j == (data[i].length - 1)) {
+                                        items.push('<br>')
+                                    }
+                                }
+                            }
+
+
+                            $("#termsLDA").html(items.join(""));
+
+                            for (pall in palette) {
+                                if (document.getElementsByClassName("inlinesquare " + pall)) {
+                                    for (var i = 0; i < document.getElementsByClassName("inlinesquare " + pall).length; i++) {
+
+                                    document.getElementsByClassName("inlinesquare " + pall)[i].style.backgroundColor=rgbToHex(palette[pall]._rgb[0],palette[pall]._rgb[1],palette[pall]._rgb[2]);
+                                    }
+                                }
+                            }
+                            analyticsPanel.activateTopNodes();
+
+                        });
+
+                    });
+
+                  
+                    currentPanel = ID;
+                }
+
+                else if (ID == 'request_analytics'){
+                    window.open('https://noduslabs.com/services/connections/', '_blank');
+                }
+
+                x
+
+
+            });
+        }
+
+
+}
+
+</script>
