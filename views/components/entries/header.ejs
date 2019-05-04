@@ -47,6 +47,8 @@
 
             let contextPublic = false;
 
+            let sigma_dragged = '0';
+
 
             this.getLoggedInUser = function() {
                 return loggedInUser;
@@ -227,6 +229,18 @@
             }
             this.isContextPublic = function() {
                 return contextPublic;
+            }
+
+            this.setSigmaDragged = function(fact) {
+                sigma_dragged = fact;
+            }
+            this.isSigmaDragged = function() {
+                if (sigma_dragged && sigma_dragged == '1') {
+                    return true;
+                }
+                else {
+                    return false;
+                }
             }
 
         }

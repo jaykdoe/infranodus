@@ -70,7 +70,7 @@ function filter_graph(pins){
 
             
 
-            console.log(toKeep.length + ' nodes selected out of ' + global_totalnodes + ' (' + (toKeep.length/global_totalnodes).toFixed(2)*100 + '%)')
+            console.log(toKeep.length + ' nodes selected out of ' + graphFactory.getStats('TotalNodes') + ' (' + (toKeep.length/graphFactory.getStats('TotalNodes') ).toFixed(2)*100 + '%)')
             
             // Save which nodes are selected on the graph for community detection
 

@@ -1,33 +1,12 @@
 <script>
 
 
-  // Initiate Cytoscape Library - to calculate betweenness centrality for nodes and other stuff
+// Initiate Cytoscape Library - to calculate betweenness centrality for nodes and other stuff
 
-  var cy = cytoscape({
-      container: undefined,
-      headless: true
-  });
- 
-  // Is Sigma being dragged?
-  var sigma_dragged = 0;
-
-
-
-  // These are the nodes clicked in the graph
-
-  var global_totalnodes = 0;
-
-
-  // This variable shows if there was a meaningful interaction with the graph yet
-
-  var graphInteraction = null;
-
-
-  // This may be a deprecated setting
-
-  // Inactivity timeout
-  var inactiveTimeout = null;
-
+var cy = cytoscape({
+    container: undefined,
+    headless: true
+});
 
 
 function graph() {
@@ -525,7 +504,7 @@ function graph() {
 
             dragListener.bind('drag', function(event) {
 
-              sigma_dragged = 1;
+              userFactory.setSigmaDragged('1');
 
             });
 
@@ -907,11 +886,9 @@ function sigmaGraph() {
 
             sigma.instances(0).bind('clickNode', function(e) {
                 
-                if (!sigma_dragged) {
-                  
-                  // A node was clicked, so we assume there was a meaningful graph interaction
-                  graphInteraction = 1;
-  
+                
+                if (userFactory.isSigmaDragged() == false) {
+                    
                   var nodeLabel = e.data.node.originalLabel;
   
                   // TODO to check that
@@ -975,7 +952,7 @@ function sigmaGraph() {
                 }
   
                 // This is just to reset node drag parameter
-                sigma_dragged = 0;
+                userFactory.setSigmaDragged('0');
   
   
               });
