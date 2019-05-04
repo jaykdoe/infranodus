@@ -20,6 +20,31 @@
 [Try it Online](http://infranodus.com) - request invitation code through [Nodus Labs](http://noduslabs.com/infranodus/)
 
 
+
+=================
+
+### The Science and the Method
+
+InfraNodus is a non-commercial [venture fiction](https://noduslabs.com/research/venture-fiction/) project: its objective is to enhance perception and imagination. It can:
+
+* Help you retain and remember information
+* Help you connect disjointed bits and pieces of data
+* Visualize patterns in complex relations
+* Be used for text network analysis
+* Be used to quickly create graphs using text / voice input
+* Perform comparative visual analysis of texts
+* Identify the structure of discourse (dispersed / biased)
+* Reveal the gaps in a network (and, thus, the potential for new ideas/connections)
+* Provide network metrics, identify the main communities and top nodes
+
+The method is mainly based on the approach outlined in Paranyushkin (2011) **[Identifying the Pathways of Meaning Circulation Using Text Network Analysis](https://noduslabs.com/research/pathways-meaning-circulation-text-network-analysis/)**. If you use the tool, you can cite this paper. 
+
+A more precise description of InfraNodus' algorithm is presented in Paranyushkin (2019) **InfraNodus — Generating Insight Using Text Network Analysis** (to be published in the Proceedings for WWWW 19 The Web Conference).
+
+A more easy-to-read article on the tool is published in **[Towards Data Science](https://towardsdatascience.com/measuring-discourse-bias-using-text-network-analysis-9f251be5f6f3)**.
+
+
+
 =================
 
 
@@ -51,6 +76,7 @@ InfraNodus is built on
 * [Neo4J](http://neo4j.org) ver 3.x for graph database storage 
 * [Graphology](https://graphology.github.io/) for graph metrics calculations (Modularity)
 * [JSNetworksX](http://jsnetworkx.org/) for graph metrics calculations (BC)
+* [Cytoscape](https://github.com/cytoscape/cytoscape.js) for some graph metrics
 * Node.Js
 * Express Node.Js library;
 * [Node-Neo4J layer](http://github.com/philippkueng/node-neo4j);
