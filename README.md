@@ -180,7 +180,7 @@ This project would not be possible without the help from StackOverflow community
 Copyright (C) [Dmitry Paranyushkin](http://github.com/deemeetree) | [Nodus Labs](http://www.noduslabs.com) and hopefully you also!
 (http://www.noduslabs.com) | info AT noduslabs DOT com
 
-In some parts the code from the book ["Node.js in Action"](http://www.manning.com/cantelon/) is used (highly recommended, btw!)
+In some parts the code from the book ["Node.js in Action"](http://www.manning.com/cantelon/) is used 
 (c) 2014 Manning Publications Co.
 Any source code files provided as a supplement to the book are freely available to the public for download. Reuse of the code is permitted, in whole or in part, including the creation of derivative works, provided that you acknowledge that you are using it and identify the source: title, publisher and year.
 
