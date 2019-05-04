@@ -77,12 +77,12 @@ InfraNodus is built on
 * [Graphology](https://graphology.github.io/) for graph metrics calculations (Modularity)
 * [JSNetworksX](http://jsnetworkx.org/) for graph metrics calculations (BC)
 * [Cytoscape](https://github.com/cytoscape/cytoscape.js) for some graph metrics
-* Node.Js
+* jQuery for the front-end 
+* Node.Js for the back-end
 * Express Node.Js library;
 * [Node-Neo4J layer](http://github.com/philippkueng/node-neo4j);
 * [Textexture](http://textexture.com) algorithm for text network visualization;
-* Help from the people on StackOverflow and Neo4J community;
-* Special thanks to [Oleg Yarin](https://github.com/monapasan) for his support and to [Mattias Östmar](https://gitlab.com/mattiasostmar) for his energy and inspiration;
+* Open-source code from the people on StackOverflow and Neo4J community;
 
 
 =================
@@ -146,6 +146,19 @@ Together with Mattias Östmar (who did most of the work) we created a port of In
 You can get it in [DiscourseDiversity](https://gitlab.com/mattiasostmar/discoursediversity) repo on GitLab. We're still working on it, but if you like Jupyter notebooks and network analysis, there's some good stuff to find in there!
 
 * [InfraNodus in Python](https://gitlab.com/mattiasostmar/discoursediversity) 
+
+
+=================
+
+
+### Technology
+
+InfraNodus could not be built without the 
+* Help from the people on StackOverflow and Neo4J community;
+
+Also... :) 
+* Special thanks to [Oleg Yarin](https://github.com/monapasan) for his support and to [Mattias Östmar](https://gitlab.com/mattiasostmar) for his energy and inspiration;
+
 
 
 =================
