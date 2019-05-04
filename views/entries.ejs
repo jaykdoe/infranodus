@@ -6,6 +6,9 @@
 <!-- Load dependency scripts -->
 <%- include('dependencies/entries') %>
 
+<!-- MIDI controller logic (yes, it can play sounds) -->
+<%- include('components/entries/MidiController') %>
+
 <!-- Load collaboration and graphFactory modules - before the rest -->
 <%- include('components/entries/index') %>
 
@@ -117,8 +120,7 @@
 <!-- Walkthrough tutorials logic -->
 <%- include('components/entries/Walkthrough') %>
 
-<!-- MIDI controller logic (yes, it can play sounds) -->
-<%- include('components/entries/MidiController') %>
+
 
 <!-- Voice input logic -->
 <%- include('components/entries/VoiceInput/VoiceInputController') %>

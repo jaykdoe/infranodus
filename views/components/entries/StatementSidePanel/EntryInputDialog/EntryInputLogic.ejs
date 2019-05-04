@@ -4,18 +4,50 @@
 
         const addEntryPanelFactory = (() => {   
             function AddEntryPanelFactory() {
+
                 let currentAddEntryPanelMode = "EDIT";
 
                 this.setMode = function(mode) {
                     currentAddEntryPanelMode = mode;
-                    updateStatementSidePanel();
+                    addEntryPanel().updateStatementSidePanel();
                 }
                 this.getMode = function() {
                     return currentAddEntryPanelMode;
                 }
 
                 this.init = function() {
-                    this.setMode(currentAddEntryPanelMode);
+
+                    // Let's get external params
+                    if (userFactory.getViewType() == 'external' || localStorage.getItem('entrypanel') == 'search') {    
+                        this.setMode("SEARCH");
+                    }
+                    else {
+                        this.setMode(currentAddEntryPanelMode);
+                    }
+
+                    // OnLoad get the right height for the entries elements 
+                    // this depends on the add entry panel height so it's here
+        
+                    let uproll = $('#entryform').height();
+                    
+                    if (userFactory.getViewOption('hide_edit')) {
+                        uproll = 50;
+                    }
+                    
+                    // Extend the statements above the form
+                    statements().fillSpace(uproll + 100);
+                    
+                    // Scroll down all the entries
+                    statements().scroll();
+                    
+                    // Do the same with when the window is resized 
+                    $(window).resize(function() {
+                        statements().fillSpace(uproll + 100);
+                        statements().scroll();
+                    });
+                    
+                    // Make texarea automatically resizeable
+                    $('textarea').autosize();
                 }
 
             }
@@ -23,101 +55,94 @@
         })();
 
         addEntryPanelFactory.init();
-        
-        function updateStatementSidePanel() {
-            if(addEntryPanelFactory.getMode() === "EDIT") switchToEdit()
-            if(addEntryPanelFactory.getMode() === "SEARCH") switchToSearch()
-           
-        }
-        
-        function switchToSearch() {
-            switchStatementMenu('finds');
-            sidePanelContent().hide('#edit-panel');
-            sidePanelContent().show('#search-panel');
-            searchForm().autofill();
-            localStorage.setItem('entrypanel', 'search');
-            changeEntriesHeight(200)
-            hideFooter()
-        }
-        
-        function switchToEdit() {
-            if (userFactory.getViewType() == 'internal') {
-                switchStatementMenu('adds');
-                sidePanelContent().hide('#search-panel');
-                sidePanelContent().show('#edit-panel');
-                localStorage.setItem('entrypanel', 'edit');
-                // TODO: get the logic from entries.ejs starting from (topmenuaction == 'adds') {
-                changeEntriesHeight(400)
-                showFooter()    
+
+
+        function addEntryPanel() {
+            return {
+                updateStatementSidePanel: function() {
+                    if(addEntryPanelFactory.getMode() === "EDIT") addEntryPanel().switchToEdit()
+                    if(addEntryPanelFactory.getMode() === "SEARCH") addEntryPanel().switchToSearch();
+                },
+                switchToSearch: function() {
+                    addEntryPanel().switchStatementMenu('finds');
+                    sidePanelContent().hide('#edit-panel');
+                    sidePanelContent().show('#search-panel');
+                    searchForm().autofill();
+                    localStorage.setItem('entrypanel', 'search');
+                    addEntryPanel().changeEntriesHeight(200)
+                    addEntryPanel().hideFooter()
+                },
+                switchToEdit: function() {
+                    if (userFactory.getViewType() == 'internal') {
+                        addEntryPanel().switchStatementMenu('adds');
+                        sidePanelContent().hide('#search-panel');
+                        sidePanelContent().show('#edit-panel');
+                        localStorage.setItem('entrypanel', 'edit');
+                        // TODO: get the logic from entries.ejs starting from (topmenuaction == 'adds') {
+                        addEntryPanel().changeEntriesHeight(400)
+                        addEntryPanel().showFooter()    
+                    }
+                },
+                changeEntriesHeight: function(height) {
+                    statements().fillSpace(height);
+                },
+                switchStatementMenu: function(element) {
+                    statementMenu().switch(element);
+                },
+                hideFooter: function(){
+                    deleteContextButton().hide()
+                    privacyLinkButton().hide()
+                    collaborateButton().hide();
+                    importLinkButton().hide();
+                },
+                showFooter: function(){
+                    deleteContextButton().show()
+                    privacyLinkButton().show()
+                    collaborateButton().show();
+                    importLinkButton().show();
+                },
+                changeModeTo: function(mode) {
+                    addEntryPanelFactory.setMode(mode);
+                },
+                sendToImport: function() {
+                    let fornode = $('#statement').val();
+                    let pinnedNodes = graphFactory.getPinnedNodes();
+                    if (pinnedNodes.length > 0) {
+                        fornode = pinnedNodes.join("+");
+                    }
+                    navigation().redirect('/google?context=google_' + userFactory.getCurrentContext() + '&fornode=' + fornode);
+                },
+                changeModeToSearch: function() {
+                    addEntryPanel().changeModeTo('SEARCH')
+                },
+                changeModeToEdit: function() {
+                    addEntryPanel().changeModeTo('EDIT')
+                },
+                changeModeToInterpret: function() {
+                    addEntryPanel().changeModeTo('INTERPRET')
+                },
+                togglePanel: function() {
+                    if (addEntryPanelFactory.getMode() === 'SEARCH') {
+                        addEntryPanelFactory.setMode('EDIT');
+                    }
+                    else if (addEntryPanelFactory.getMode() === 'EDIT') {
+                        addEntryPanelFactory.setMode('SEARCH');
+                    }
+                }
+
             }
         }
         
-        function switchToInterpret() {
-            // create a new graph
-            // add the current (old) context
-            // add interpretation functionality 
-                // a. remove all visible entries from the "old" context
-                // b. switch the way both graph intersection is colored
-            // open the page with the parameters above
-            navigation().redirect('');
-        }
+
         
-        function changeEntriesHeight(height) {
-            statements().fillSpace(height);
-        }
-        
-        function changeSidePanelHeight(height) {
-            sidePanel().resize(height);
-        }
-        
-        function switchStatementMenu(element) {
-            statementMenu().switch(element);
-        }
-        
-        function hideFooter(){
-            deleteContextButton().hide()
-            privacyLinkButton().hide()
-            collaborateButton().hide();
-            importLinkButton().hide();
-        }
-        
-        function showFooter(){
-            deleteContextButton().show()
-            privacyLinkButton().show()
-            collaborateButton().show();
-            importLinkButton().show();
-        }
-        
-        function changeModeTo(mode) {
-            addEntryPanelFactory.setMode(mode);
-        }
-        
-        function sendToImport() {
-            var fornode = $('#statement').val();
-            if (pinnedNodes.length > 0) {
-                fornode = pinnedNodes.join("+");
-            }
-            navigation().redirect('/import?context=' + userFactory.getCurrentContext() + '&fornode=' + fornode);
-        }
-        
-        function changeModeToSearch() {changeModeTo('SEARCH')}
-        function changeModeToEdit() {changeModeTo('EDIT')}
-        function changeModeToInterpret() {changeModeTo('INTERPRET')}
-        function togglePanel() {
-            if (addEntryPanelFactory.getMode() === 'SEARCH') {
-                addEntryPanelFactory.setMode('EDIT');
-            }
-            else if (addEntryPanelFactory.getMode() === 'EDIT') {
-                addEntryPanelFactory.setMode('SEARCH');
-            }
-        }
-        
-        findsButton().onClick(changeModeToSearch);
-        editButton().onClick(changeModeToEdit);
-        interpretButton().onClick(changeModeToInterpret);
-        minimizeButton().onClick(togglePanel);
-        closeStatementMenuButton().onClick(hideStatements);
-        importLinkButton().onClick(sendToImport);
+        findsButton().onClick(addEntryPanel().changeModeToSearch);
+        editButton().onClick(addEntryPanel().changeModeToEdit);
+        interpretButton().onClick(addEntryPanel().changeModeToInterpret);
+        minimizeButton().onClick(addEntryPanel().togglePanel);
+        importLinkButton().onClick(addEntryPanel().sendToImport);
+
+        // This activates the logic for the whole statements panel
+        closeStatementMenuButton().onClick(statementsPanel().toggleStatementsPanel);
         
         
         function sidePanelContent() {
@@ -131,42 +156,7 @@
             }
         }
         
-        function hideStatements() {
-            statementsPanel().toggleStatementsPanel();
-        }
-        
-        
-        // Select the default view for entrycontrol
-        
-        if (userFactory.getViewType() == 'external' || localStorage.getItem('entrypanel') == 'search') {    
-            addEntryPanelFactory.setMode("SEARCH");
-        }
-        
-        
-        // OnLoad get the right height for the entries elements — this depends on the form so it's here
-        
-        let uproll = $('#entryform').height();
-        
-        if (userFactory.getViewOption('hide_edit')) {
-          uproll = 50;
-        }
-        
-        statements().fillSpace(uproll + 100);
-        
-        // Scroll down all the entries
-        
-        statements().scroll();
-        
-        // Do the same with when the window is resized 
-        
-        $(window).resize(function() {
-            statements().fillSpace(uproll + 100);
-            statements().scroll();
-        });
-        
-        // Make texarea automatically resizeable
-        $('textarea').autosize();
-        
+      
         
         // Here we perform some live updates of the graph on receiving a Socket.IO message
         // We could also move this code and use sigma.instances(0).graph.nodes() to get sigma properties
