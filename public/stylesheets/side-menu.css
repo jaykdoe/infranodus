@@ -14,6 +14,9 @@
     --abstract-layout-background-image: url('../images/diamond.png')!important;
     --walkthrough-button-opacity: 1;
     --walkthrough-button-background-image: url('../images/question.png')!important;
+
+    --adjustsettings-button-opacity: 0.8;
+    --adjustsettings-button-background-image: url('../images/settings.png')!important;
     
     --deletecontextbutton-opacity: 1;
     --deletecontextbutton-background-image: url('../images/trash.png')!important;
@@ -40,7 +43,11 @@
     --microphone-link-background-image: url('../images/microphone.png')!important;
 
     --addcontext-link-opacity: 1;
-    --addcontext-link-background-image: url('../images/compare.png')!important;
+    --addcontext-link-background-image: url('../images/intersect.png')!important;
+
+
+    --diffcontext-link-opacity: 0.9;
+    --diffcontext-link-background-image: url('../images/diff.png')!important;
 }
 
 :root[theme='dark'] {
@@ -56,6 +63,9 @@
     --abstract-layout-background-image: url('../images/diamond-white.png')!important;
     --walkthrough-button-opacity: 0.6;
     --walkthrough-button-background-image: url('../images/question-white.png')!important;
+
+    --adjustsettings-button-opacity: 0.6;
+    --adjustsettings-button-background-image: url('../images/settings-white.png')!important;
 
     --deletecontextbutton-opacity: 0.6;
     --deletecontextbutton-background-image: url('../images/trash-white.png')!important;
@@ -82,7 +92,11 @@
     --microphone-link-background-image: url('../images/microphone-white.png')!important;
 
     --addcontext-link-opacity: 0.6;
-    --addcontext-link-background-image: url('../images/compare-white.png')!important;
+    --addcontext-link-background-image: url('../images/intersect-white.png')!important;
+
+
+    --diffcontext-link-opacity: 0.6;
+    --diffcontext-link-background-image: url('../images/diff-white.png')!important;
 }
 
 
@@ -327,7 +341,7 @@ small screens.
 #timer-link {
     position: fixed;
     display: inline; /* show this only on small screens */
-    top: 120px;
+    top: 160px;
     left: 0; /* "#menu width" */
     background: none;
     text-align: left;
@@ -353,7 +367,7 @@ small screens.
 #watch-link {
     position: fixed;
     display: inline; /* show this only on small screens */
-    top: 160px;
+    top: 200px;
     left: 0; /* "#menu width" */
     background: none;
     text-align: left;
@@ -576,7 +590,7 @@ small screens.
     display: none;
     opacity: var(--microphone-link-opacity);
     position: fixed;
-    top: 200px;
+    top: 240px;
     left: 0;
     font-size: 8px; /* change this value to increase/decrease button size */
     width: 32px;
@@ -612,7 +626,7 @@ small screens.
 
 .addcontext-on {
     opacity: 1!important;
-    background-image: url('../images/compare-blue.png')!important;
+    background-image: url('../images/intersect-active.png')!important;
     background-repeat:no-repeat!important;
     background-position:center!important;
 }
@@ -620,7 +634,41 @@ small screens.
 
 
 .addcontext-visible {
-    background-image: url('../images/compare-green.png')!important;
+    background-image: url('../images/intersect-on.png')!important;
+
+}
+
+#diffcontext-link {
+
+    position: fixed;
+    top: 120px;
+    left: 0;
+    background: none;
+    text-align: left;
+    font-size: 32px; /* change this value to increase/decrease button size */
+    width: 32px;
+    height: 32px;
+    padding: 5px 5px;
+    z-index: 10;
+    opacity: var(--diffcontext-link-opacity);
+    background-image: var(--diffcontext-link-background-image);
+    background-repeat:no-repeat;
+    background-position:center;
+    pointer-events: auto!important;
+
+}
+
+.diffcontext-on {
+    opacity: 1!important;
+    background-image: url('../images/diff-active.png')!important;
+    background-repeat:no-repeat!important;
+    background-position:center!important;
+}
+
+
+
+.diffcontext-visible {
+    background-image: url('../images/diff-on.png')!important;
 
 }
 
@@ -664,7 +712,7 @@ small screens.
 
 #walkthrough {
     position: fixed;
-    top: 280px;
+    top: 205px;
     font-size: 8px; /* change this value to increase/decrease button size */
     width: 2em;
     height: 25px;
@@ -674,6 +722,23 @@ small screens.
     background: none;
     background-image: var(--walkthrough-button-background-image);
     opacity: var(--walkthrough-button-opacity);
+    background-repeat:no-repeat;
+    background-position:center;
+  }
+
+
+#adjustsettings {
+    position: fixed;
+    top: 245px;
+    font-size: 8px; /* change this value to increase/decrease button size */
+    width: 2em;
+    height: 25px;
+    right: 0; /* "#menu width" */
+    padding: 0em 2.5em;
+    z-index: 11;
+    background: none;
+    background-image: var(--adjustsettings-button-background-image);
+    opacity: var(--adjustsettings-button-opacity);
     background-repeat:no-repeat;
     background-position:center;
   }
@@ -706,7 +771,7 @@ small screens.
 #graph-tools {
     position: fixed;
     display: none;
-    top: 203px;
+    top: 280px;
     text-align: right;
     right: -2px; /* "#menu width" */
     height: 80px;
@@ -757,6 +822,9 @@ input#addcontextsubmit {
 }
 #addcontextbreak {
     float: none;
+}
+.whiten {
+    color: #cfcfcf!important;
 }
 
 

@@ -922,13 +922,13 @@ button {
 
 .stopsave-on {
     opacity: 0.5!important;
-    background-image: url('../images/save-to.png');
+    background-image: url('../images/save.png');
     background-repeat:no-repeat;
     background-position:center;
 }
 .stopsave-dark {
     opacity: 0.5!important;
-    background-image: url('../images/save-to-white.png');
+    background-image: url('../images/save-white.png');
     background-repeat:no-repeat;
     background-position:center;
 }
@@ -1031,7 +1031,7 @@ button {
   font-size: 8px; /* change this value to increase/decrease button size */
   width: 23px;
   height: 23px;
-padding: 0em 0em 1em 0em;
+    padding: 0em 0em 1em 0em;
   z-index: 10;
   opacity: var(--zoom-in-opacity);
   background-image: var(--zoom-in-background-image);

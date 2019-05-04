@@ -2,12 +2,19 @@
 
     toggleStatementsButton().onClick(statements().toggleStatements);
     addContextButton().onClick(addContext);
+    diffContextButton().onClick(diffContext);
 
     // Are we viewing additional context?
 
     if (userFactory.getAddContext()) {
-        $('#addcontext-link').addClass('addcontext-visible');
+        if (userFactory.getGraphOption('highlight_missing')) {
+            $('#diffcontext-link').addClass('diffcontext-visible');
+        }
+        else {
+            $('#addcontext-link').addClass('addcontext-visible');
+        }
     }
+    
 
     function addContext() {
         if ($(".addcontext-on").is(":visible")) {
@@ -15,6 +22,16 @@
             }
         else {
                 $('#addcontext-link').addClass('addcontext-on');
+        }
+
+    }
+
+    function diffContext() {
+        if ($(".diffcontext-on").is(":visible")) {
+                $('#diffcontext-link').removeClass('diffcontext-on');
+            }
+        else {
+                $('#diffcontext-link').addClass('diffcontext-on');
         }
 
     }
@@ -31,6 +48,14 @@
         return {
             onClick: function(onClick){
                 $('#addcontext-link').on('click', onClick)
+            }
+        }
+    }
+
+    function diffContextButton() {
+        return {
+            onClick: function(onClick){
+                $('#diffcontext-link').on('click', onClick)
             }
         }
     }
