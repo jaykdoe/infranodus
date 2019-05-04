@@ -151,7 +151,7 @@ You can get it in [DiscourseDiversity](https://gitlab.com/mattiasostmar/discours
 =================
 
 
-### Technology
+### Special Thanks
 
 InfraNodus could not be built without the 
 * Help from the people on StackOverflow and Neo4J community;
