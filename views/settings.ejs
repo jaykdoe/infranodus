@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><%= title %></title>
+    <title><%= title %>: InfraNodus</title>
     <link rel='stylesheet' href='/stylesheets/style.css' />
     <link rel="stylesheet" href="/stylesheets/side-menu.css">
     <link rel='stylesheet' href='/stylesheets/jquery.textcomplete.css' />
@@ -43,7 +43,8 @@
 
                     Text input language and lemmatization<br>
                     <label for="inlanguage" class="pure-input">
-                      We will convert your words to lemmas (taken &#8594; take) based on the dictionary below:
+                      We will convert your words to lemmas (taken &#8594; take) based on the dictionary below. This setting also applies to voice-to-text input. You can also choose to switch auto-detection off and add any words you want.
+                      <br>&nbsp;<br>
                       <select id="inlanguage" name="inlanguage">
                       <option value="auto" <% if (user.inlanguage=='auto' || user.inlanguage == undefined) { %> selected <% } %>>Auto-Detect</option>
                       <option value="zz" <% if (user.inlanguage=='zz') { %> selected <% } %>>Do not detect</option>
@@ -58,7 +59,7 @@
                       <option value="sp" <% if (user.inlanguage=='sp') { %> selected <% } %>>Spanish (Porter Stemmer)</option>
                       <option value="vp" <% if (user.inlanguage=='vp') { %> selected <% } %>>Swedish (Porter Stemmer)</option>
                       </select>
-
+                      <br>To learn more about the text processing algorithm used in InfraNodus and for citations, see our <a href="https://noduslabs.com/research/pathways-meaning-circulation-text-network-analysis/">research paper</a>. 
                     </label>
                     <br>
 
@@ -67,7 +68,8 @@
                     <legend>&nbsp;</legend>
 
                     <legend>Graph Design Settings:</legend>
-
+                    Áou can make your graphs as specific and precise or as abstract and beautiful as you wish. These settings will also be used when showing your public graphs.
+                    <br>&nbsp;<br>
                     Graph color palette
                     <label for="palette" class="pure-input">
                       <select id="palette" name="palette">
@@ -132,6 +134,7 @@
                       <option value="bc2" <% if (user.topnodes=='bc2') { %> selected <% } %>>max BC (also for topics)</option>
                       <option value="degree" <% if (user.topnodes=='degree') { %> selected <% } %>>max degree</option>
                       </select>
+                      We use graph betweenness centrality to identify the most prominent topics as per <a href="https://noduslabs.com/research/pathways-meaning-circulation-text-network-analysis/">this algorithm</a>. It emphasizes the words that connect different topical clusters (context) of a text together. However, you can also choose to use the node degree (the number of connections), which is closer to co-occurrences.
                     </label>
                     <br>
 
@@ -140,7 +143,8 @@
                     <legend>&nbsp;</legend>
 
                     <legend>Text Processing Settings:</legend>
-
+                    By default we use a window of 4 words to connect the words into a graph. However, you can choose to only connect the words that are next to each other. 
+                    <br>
                     Words connect into graph, when they are
                     <label for="wordscan-edit-1" class="pure-radio">
                         <input id="wordscan-edit-1" type="radio" name="fullscan" value="0" <% if (user.fullscan=='0') { %> checked <% } %>>
@@ -175,11 +179,12 @@
                     <legend>&nbsp;</legend>
 
                     <legend>Stopwords Settings:</legend>
-
                     Custom stopwords to add to the default list (<a href="/files/stopwords_en_en.txt">en</a>, <a href="/files/stopwords_de_de.txt">de</a>, <a href="/files/stopwords_fr_fr.txt">fr</a>, <a href="/files/stopwords_es_es.txt">es</a>)
                     (example: "alt, don", to exclude, use a "-", e.g. "-kind, -and")
                     <label for="stopwords" class="pure-input">
                         <textarea id="stopwords" name="stopwords" rows="4" cols="20"><% if (user.stopwords != undefined && user.stopwords.length > 0) { %><%= user.stopwords %><% }%></textarea>
+                        By default InfraNodus uses a list of the custom stopwords (links above) and deletes them from the graph. If you don't want some words to be deleted, simply add them above with a minus sign, separated by comma. 
+                        To add some words, simply list them normally, separated by a comma.
                     </label>
 
                     <br>
@@ -188,7 +193,9 @@
                     <legend>&nbsp;</legend>
 
                     <legend>Graph Editor Settings:</legend>
-
+                    InfraNodus is the fastest way to create a graph using text input. Simply add #nodes as #hashtags (to connect to each other) or @mentions (to connect to all the hashtags).<br>
+                    If you don't want the #hashtags to connect to each other, but only to @mentions, change the setting below:
+                    <br><br>
                     #Hashtags will
                     <label for="morphemes1" class="pure-radio">
                         <input id="morphemes1" type="radio" name="morphemes" value="0" <% if (user.morphemes=='0') { %> checked <% } %>>
@@ -221,15 +228,9 @@
 
                     <legend>&nbsp;</legend>
 
-                    <legend>Customization Settings:</legend>
+                    <legend>Voice-to-Text Input:</legend>
 
-                    Analytics pane name (branding bottom right corner)
-                    <label for="graph-view" class="pure-radio">
-                        <input type="text" id="customization" size="10" maxlength="20" class="pure-input" name="customization" placeholder="" value="<% if (!user.customization) { %>analytics<% } else { %><%=user.customization%><% } %>">
-                    </label>
-
-                    <br>
-                    Submit voice to text input:
+                    How to submit your speech into graph:
                     <label for="voice_continues" class="pure-input" id="voicecontinuescaption">
                         <select id="voice_continues" name="voice_continues">
                           <option value="00" <% if (user.voice_continues != undefined && user.voice_continues=='00' || user.voice_continues == undefined) { %> selected <% } %>>Automatically on speech pause</option>
@@ -237,31 +238,39 @@
                           <option value="visualise" <% if (user.voice_continues != undefined && user.voice_continues=='visualise') { %> selected <% } %>>When you say "visualize"</option>
                           <option value="визуализировать" <% if (user.voice_continues != undefined && user.voice_continues=='визуализировать') { %> selected <% } %>>When you say "визуализировать"</option>
                         </select>
+                        Works with Google Chrome only at the moment. You can choose whether to add your words when you pause (automatically), or when you click Save or say a certain word. Contact us to add more options.
                     </label>
                     <br>
                     <button type='submit' class="pure-button pure-button-primary">Save Settings</button>
 
                     <legend>&nbsp;</legend>
 
-                    <legend>Your Paid Subscription Settings:</legend>
-                    
-                    Manage your paid subscription:<br>
-                    <a href="javascript:void(0)" data-cb-type="portal">
-                        Click Here</a>
-                    <br>
-                    <br>
 
-                    &nbsp;<br>
-                    <legend>MIDI Interface Settings:</legend>
+                    <legend>Customization Settings:</legend>
 
-                    MIDI Interface
-                    <label for="midiactive" class="pure-input">
-                      <select id="midiactive" name="midiactive">
-                      <option value="off" <% if (user.midi == 'off' || user.midi == undefined) { %> selected <% } %>>Inactive</option>
-                      <option value="on" <% if (user.midi != undefined && user.midi.length > 3) { %> selected <% } %>>Active</option>
-                      </select>
+                    Analytics pane name (branding bottom right corner)
+                    <label for="graph-view" class="pure-radio">
+                        <input type="text" id="customization" size="10" maxlength="20" class="pure-input" name="customization" placeholder="" value="<% if (!user.customization) { %>analytics<% } else { %><%=user.customization%><% } %>">
+                        This is a label for the Analytics pane at the bottom right, but you can also use it to brand your InfraNodus however you want. Good for projecting on big screens.
                     </label>
 
+                    <br>
+                    <button type='submit' class="pure-button pure-button-primary">Save Settings</button>
+
+                    <legend>&nbsp;</legend>
+
+                
+                    <legend>MIDI Interface Settings:</legend>
+
+                    Activate MIDI Interface?
+                    <label for="midiactive" class="pure-input">
+                      <select id="midiactive" name="midiactive">
+                      <option value="off" <% if (user.midi == 'off' || user.midi == undefined) { %> selected <% } %>>MIDI Deactivated</option>
+                      <option value="on" <% if (user.midi != undefined && user.midi.length > 3) { %> selected <% } %>>MIDI Activated</option>
+                      </select>
+                      You will be able to send MIDI signals to a music / light device via USB. You might need to map the channels below for it to work correctly.
+                    </label>
+                    <br>
                      <a href="javascript:" id="advancedmidi">+ channel map</a>
 
                     <br>
@@ -358,17 +367,28 @@
                         <br>
 
                     </div>
-                    <br>
-                    <br>
-                    &nbsp;
-                    <legend>Click to Save Your Settings:</legend>
-                    &nbsp;<br>
+                    <br>&nbsp;<br>
+                
 
                     <button type='submit' class="pure-button pure-button-primary">Save Settings</button>
 
 
                     <br>
                     &nbsp;
+                    <legend>&nbsp;</legend>
+
+                    <legend>Manage Your Paid Subscription:</legend>
+                    
+            
+                    Your monthly subscription is the only resource that keeps InfraNodus going and helps me continue contribute to the <a href="http://github.com/noduslabs/infranodus">open-source community</a> in an independent way. Thank you for your continued support! <br><br>We use Chargebee / Stripe to process and manage your monthly payments. If you'd like to change your credit card, update or cancel your subscription, please, click below:<br><br>
+                    <a href="javascript:void(0)" data-cb-type="portal">
+                        Chargebee InfraNodus Subscription Portal</a>
+                    <br><br><em>(please, note, you will need to log in again as it's a different account)</em><br>&nbsp;<br>
+                    If you have any questions about your subscription or have feedback / comments / requests, please, <br>write to me directly at dmitry@noduslabs.com  <br>Tweet or FB on @noduslabs  <br>contact on messengers: +33 6 20 28 44 80.
+                    <br>&nbsp;<br>If you created your account before the 18/10/2018, please, use <a href="https://noduslabs.dpdcart.com/subscriber/login?_ga=2.213150740.1642757009.1556992063-873870762.1556992063">DPD Subscriptions portal</a>. 
+                    <br>
+
+                    &nbsp;<br>
                     <br>
                     &nbsp;
                     <br>

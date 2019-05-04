@@ -5,104 +5,104 @@
     --menu-link-background:  rgba(0,0,0,0.7);
     --menu-link-hover: #000;
     --statements-toggle-opacity: 1;
-    --statements-toggle-background-image: url('../images/close.png');
-    --graph-link-background-image:  url('../images/graphnet.png');
+    --statements-toggle-background-image: url('/images/close.png');
+    --graph-link-background-image:  url('/images/graphnet.png');
     --graph-link-opacity: 1;
     --improve-layout-opacity: 1;
-    --improve-layout-background-image: url('../images/location-precise.png')!important;
+    --improve-layout-background-image: url('/images/location-precise.png')!important;
     --abstract-layout-opacity: 1;
-    --abstract-layout-background-image: url('../images/diamond.png')!important;
+    --abstract-layout-background-image: url('/images/diamond.png')!important;
     --walkthrough-button-opacity: 1;
-    --walkthrough-button-background-image: url('../images/question.png')!important;
+    --walkthrough-button-background-image: url('/images/question.png')!important;
 
     --adjustsettings-button-opacity: 0.8;
-    --adjustsettings-button-background-image: url('../images/settings.png')!important;
+    --adjustsettings-button-background-image: url('/images/settings.png')!important;
 
     --themeswitch-button-opacity: 0.6;
-    --themeswitch-button-background-image: url('../images/theme.png')!important;
+    --themeswitch-button-background-image: url('/images/theme.png')!important;
     
     --deletecontextbutton-opacity: 1;
-    --deletecontextbutton-background-image: url('../images/trash.png')!important;
+    --deletecontextbutton-background-image: url('/images/trash.png')!important;
 
     --collaborate-link-opacity: 1;
-    --collaborate-link-background-image: url('../images/group.png')!important;
+    --collaborate-link-background-image: url('/images/group.png')!important;
 
     --import-link-opacity: 1;
-    --import-link-background-image: url('../images/telescope.png')!important;
+    --import-link-background-image: url('/images/telescope.png')!important;
 
     --windowdown-link-opacity: 1;
-    --windowdown-link-background-image: url('../images/closewindow.png')!important;
+    --windowdown-link-background-image: url('/images/closewindow.png')!important;
 
     --statements-link-opacity: 1;
-    --statements-link-background-image: url('../images/square.png')!important;
+    --statements-link-background-image: url('/images/square.png')!important;
 
     --timer-link-opacity: 1;
-    --timer-link-background-image: url('../images/timer.png')!important;
+    --timer-link-background-image: url('/images/timer.png')!important;
 
     --watch-link-opacity: 1;
-    --watch-link-background-image: url('../images/watch.png')!important;
+    --watch-link-background-image: url('/images/watch.png')!important;
 
     --microphone-link-opacity: 1;
-    --microphone-link-background-image: url('../images/microphone.png')!important;
+    --microphone-link-background-image: url('/images/microphone.png')!important;
 
     --addcontext-link-opacity: 1;
-    --addcontext-link-background-image: url('../images/intersect.png')!important;
+    --addcontext-link-background-image: url('/images/intersect.png')!important;
 
 
     --diffcontext-link-opacity: 0.9;
-    --diffcontext-link-background-image: url('../images/diff.png')!important;
+    --diffcontext-link-background-image: url('/images/diff.png')!important;
 }
 
 :root[theme='dark'] {
     --menu-link-background: rgba(250, 250, 250, 0.4);
     --menu-link-hover: #444;
     --statements-toggle-opacity: 0.6;
-    --statements-toggle-background-image: url('../images/closewhite.png');
-    --graph-link-background-image:  url('../images/graphnet-white.png');
+    --statements-toggle-background-image: url('/images/closewhite.png');
+    --graph-link-background-image:  url('/images/graphnet-white.png');
     --graph-link-opacity: 0.8;
     --improve-layout-opacity: 0.6;
-    --improve-layout-background-image: url('../images/location-precise-white.png')!important;
+    --improve-layout-background-image: url('/images/location-precise-white.png')!important;
     --abstract-layout-opacity: 0.6;
-    --abstract-layout-background-image: url('../images/diamond-white.png')!important;
+    --abstract-layout-background-image: url('/images/diamond-white.png')!important;
     --walkthrough-button-opacity: 0.6;
-    --walkthrough-button-background-image: url('../images/question-white.png')!important;
+    --walkthrough-button-background-image: url('/images/question-white.png')!important;
 
     --adjustsettings-button-opacity: 0.6;
-    --adjustsettings-button-background-image: url('../images/settings-white.png')!important;
+    --adjustsettings-button-background-image: url('/images/settings-white.png')!important;
 
     --themeswitch-button-opacity: 0.6;
-    --themeswitch-button-background-image: url('../images/theme-white.png')!important;
+    --themeswitch-button-background-image: url('/images/theme-white.png')!important;
 
     --deletecontextbutton-opacity: 0.6;
-    --deletecontextbutton-background-image: url('../images/trash-white.png')!important;
+    --deletecontextbutton-background-image: url('/images/trash-white.png')!important;
 
     --collaborate-link-opacity: 0.6;
-    --collaborate-link-background-image: url('../images/group-white.png')!important;
+    --collaborate-link-background-image: url('/images/group-white.png')!important;
 
     --import-link-opacity: 0.6;
-    --import-link-background-image: url('../images/telescope-white.png')!important;
+    --import-link-background-image: url('/images/telescope-white.png')!important;
 
     --windowdown-link-opacity: 0.6;
-    --windowdown-link-background-image: url('../images/closewindow-white.png')!important;
+    --windowdown-link-background-image: url('/images/closewindow-white.png')!important;
 
     --statements-link-opacity: 0.8;
-    --statements-link-background-image: url('../images/square-white.png')!important;
+    --statements-link-background-image: url('/images/square-white.png')!important;
 
     --timer-link-opacity: 0.8;
-    --timer-link-background-image: url('../images/timer-white.png')!important;
+    --timer-link-background-image: url('/images/timer-white.png')!important;
 
     --watch-link-opacity: 0.6;
-    --watch-link-background-image: url('../images/watch-white.png')!important;
+    --watch-link-background-image: url('/images/watch-white.png')!important;
 
     --microphone-link-opacity: 0.6;
-    --microphone-link-background-image: url('../images/microphone-white.png')!important;
+    --microphone-link-background-image: url('/images/microphone-white.png')!important;
 
     --addcontext-link-opacity: 0.6;
-    --addcontext-link-background-image: url('../images/intersect-white.png')!important;
+    --addcontext-link-background-image: url('/images/intersect-white.png')!important;
 
 
     --diffcontext-link-opacity: 0.6;
-    --diffcontext-link-background-image: url('../images/diff-white.png')!important;
+    --diffcontext-link-background-image: url('/images/diff-white.png')!important;
 }
 
 
@@ -367,7 +367,7 @@ small screens.
 
 
 .timer-link-on {
-    background-image: url('../images/timer-blue.png')!important;
+    background-image: url('/images/timer-blue.png')!important;
 }
 
 #watch-link {
@@ -393,16 +393,16 @@ small screens.
 
 .watch-link-on {
     opacity: 0.8;
-    background-image: url('../images/watch-blue.png')!important;
+    background-image: url('/images/watch-blue.png')!important;
 }
 
 .statements-link-on {
-    background-image: url('../images/squareplus.png')!important;
+    background-image: url('/images/squareplus.png')!important;
 }
 
 .statements-link-on-dark {
     opacity: 0.8;
-    background-image: url('../images/squareplus-white.png')!important;
+    background-image: url('/images/squareplus-white.png')!important;
 }
 
 
@@ -443,7 +443,7 @@ small screens.
 
 
 #deletebutton {
-    background: url('../images/trash.png');
+    background: url('/images/trash.png');
     background-repeat:no-repeat;
     background-position:center;
     border: 0;
@@ -458,7 +458,7 @@ small screens.
 }
 .deletebutton-dark {
 
-    background-image: url('../images/trash-white.png')!important;
+    background-image: url('/images/trash-white.png')!important;
 }
 #deletecontextbutton {
     background: var(--deletecontextbutton-background-image);
@@ -476,7 +476,7 @@ small screens.
 
 
 #privacy-link {
-    background: url('../images/share.png');
+    background: url('/images/share.png');
     background-repeat:no-repeat;
     background-position:center;
     border: 0;
@@ -512,13 +512,13 @@ small screens.
 
 
 .is-public {
-    background: url('../images/share-green.png')!important;
+    background: url('/images/share-green.png')!important;
     background-repeat:no-repeat!important;
     background-position:center!important;
 }
 
 .is-collab {
-    background: url('../images/group-green.png')!important;
+    background: url('/images/group-green.png')!important;
     background-repeat:no-repeat!important;
     background-position:center!important;
 }
@@ -569,7 +569,7 @@ small screens.
 .graph-highlight {
 
     background: rgba(31,141,214,1)!important;
-    background-image: url('../images/chatwhite.png')!important;
+    background-image: url('/images/chatwhite.png')!important;
     background-repeat:no-repeat!important;
     background-position:center!important;
 
@@ -579,7 +579,7 @@ small screens.
 .graph-highlight:hover {
 
     background: rgba(0,0,0,0.7)!important;
-    background-image: url('../images/chatwhite.png')!important;
+    background-image: url('/images/chatwhite.png')!important;
     background-repeat:no-repeat!important;
     background-position:center!important;
 
@@ -587,7 +587,7 @@ small screens.
 
 #graph-link:hover {
     background: rgba(0,0,0,0.7);
-    background-image: url('../images/graphnet-white.png');
+    background-image: url('/images/graphnet-white.png');
     background-repeat:no-repeat;
     background-position:center;
 }
@@ -632,7 +632,7 @@ small screens.
 
 .addcontext-on {
     opacity: 1!important;
-    background-image: url('../images/intersect-active.png')!important;
+    background-image: url('/images/intersect-active.png')!important;
     background-repeat:no-repeat!important;
     background-position:center!important;
 }
@@ -640,7 +640,7 @@ small screens.
 
 
 .addcontext-visible {
-    background-image: url('../images/intersect-on.png')!important;
+    background-image: url('/images/intersect-on.png')!important;
 
 }
 
@@ -666,7 +666,7 @@ small screens.
 
 .diffcontext-on {
     opacity: 1!important;
-    background-image: url('../images/diff-active.png')!important;
+    background-image: url('/images/diff-active.png')!important;
     background-repeat:no-repeat!important;
     background-position:center!important;
 }
@@ -674,7 +674,7 @@ small screens.
 
 
 .diffcontext-visible {
-    background-image: url('../images/diff-on.png')!important;
+    background-image: url('/images/diff-on.png')!important;
 
 }
 
@@ -770,21 +770,21 @@ small screens.
 
 .microphone-on {
     opacity: 1!important;
-    background-image: url('../images/microphone-blue.png')!important;
+    background-image: url('/images/microphone-blue.png')!important;
     background-repeat:no-repeat!important;
     background-position:center!important;
 }
 
 .layout-on {
     opacity: 1!important;
-    background-image: url('../images/location-precise-blue.png')!important;
+    background-image: url('/images/location-precise-blue.png')!important;
     background-repeat:no-repeat!important;
     background-position:center!important;
 }
 
 .abstract-on {
     opacity: 1!important;
-    background-image: url('../images/diamond-blue.png')!important;
+    background-image: url('/images/diamond-blue.png')!important;
     background-repeat:no-repeat!important;
     background-position:center!important;
 }
@@ -835,7 +835,7 @@ input#addcontextsubmit {
         position: relative;
         margin-top: 5px;
         margin-left: 10px;
-        background:url('../images/save-white.png') no-repeat;
+        background:url('/images/save-white.png') no-repeat;
         cursor:pointer;
         border:none;
         width:23px;
@@ -922,14 +922,14 @@ Hides the menu at `48em`, but modify this based on your app's needs.
         height: auto;
         padding: 2.6em 2.6em;
         z-index: 11;
-        background-image: url('../images/graphnet.png');
+        background-image: url('/images/graphnet.png');
         background-repeat:no-repeat;
         background-position:center;
     }
 
     #graph-link:hover {
         background: rgba(0,0,0,0.1);
-        background-image: url('../images/graphnet.png');
+        background-image: url('/images/graphnet.png');
         background-repeat:no-repeat;
         background-position:center;
     }
