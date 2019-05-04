@@ -21,6 +21,29 @@ function voiceInputPanel() {
     deactivate: function() {
       $('#livetext').html('');
       $('#livetext').hide();
+    },
+    showMessage: function(message, delay) {
+        let already_visible = $('#livetext').is(':visible');
+        if (message) {
+          if (!already_visible) {
+            $('#livetext').show();
+          }
+          $('#livetext').html('<em>' + message + '</em><span></span>'); 
+          if (!delay || delay > 10000) {
+            delay = 3000;
+          }
+          delay = parseInt(delay);
+          setTimeout(function(){
+            $('#livetext').html('');
+            if (already_visible) {
+              $('#livetext').html('<em>waiting...</em><span></span>');
+            }
+            else {
+              $('#livetext').hide();
+            }
+          }, delay);
+        }
+        
     }
   }
 }
@@ -50,6 +73,7 @@ if ('webkitSpeechRecognition' in window) {
     if (localStorage.getItem('microphone') == 1) {
         $('#microphone-link').toggleClass('microphone-on', 'add');
         activateVoiceInput();
+        voiceInputPanel().activate();
     }
 
     if (speech) {

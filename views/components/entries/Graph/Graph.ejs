@@ -938,8 +938,10 @@ function sigmaGraph() {
                       // If the window is wide enough to show the menu AND div with statements is not visible
                       if ($("#statements").is(":hidden") || $("#entries").css("visibility") === "hidden") {
                         // TODO blink the button
-                        //   $('#livetext').show();
-                        //   $('#livetext').html('<em>open the entries to see the excerpts...</em>' + ' <span></span>');
+                        if (!userFactory.getViewOption('tip_shown') && graphFactory.existPinnedNodes()) {
+                            userFactory.setViewOption('tip_shown', 1);
+                            voiceInputPanel().showMessage('open the entries to see the excerpts...', 4000);
+                        }
                       }
   
                   }

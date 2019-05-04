@@ -384,17 +384,32 @@ exports.submit = function(req, res, next) {
                             if (req.remoteUser) {
                                 res.json({ message: 'Entry added.' })
                             } else if (req.internal) {
-                                //next();
+                                // next();
                                 // console.log("internal req");
 
                                 // This was some import or multiple statements add feature and we just reload the page with results
-                                neo4jdriver.close()
-                                res.redirect(
-                                    res.locals.user.name +
-                                        '/' +
-                                        default_context +
-                                        '/edit'
-                                )
+                                neo4jdriver.close();
+
+                                // This is a bit of a workaround, it shows a newly added graph on top of the previous one highlighting the difference
+                                if (default_context.indexOf('add_') == 0) {
+                                    res.redirect(
+                                        res.locals.user.name +
+                                            '/' +
+                                            default_context.substring(4) +
+                                            '/edit' + 
+                                            '?addcontext=' + 
+                                            default_context + 
+                                            '&missing=1&highlight=1'
+                                    )
+                                }
+                                else {
+                                    res.redirect(
+                                        res.locals.user.name +
+                                            '/' +
+                                            default_context +
+                                            '/edit'
+                                    )
+                                }
                             } else {
                                 // Here we deleted a statement or edited it, or deleted the whole context
                                 if (

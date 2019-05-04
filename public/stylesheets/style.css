@@ -719,11 +719,11 @@ button {
 
 #livetext {
   position: fixed;
-  top: 80px;
+  top: 90px;
   text-align: right;
-  width: 200px;
+  width: 250px;
   height: 15px;
-  right: 132px; /* "#menu width" */
+  right: 60px; /* "#menu width" */
   font-size: 14px; /* change this value to increase/decrease button size */
   line-height: 15px;
   /* width: 2em;
