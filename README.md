@@ -25,7 +25,7 @@
 
 ### The Science and the Method
 
-InfraNodus is a non-commercial [venture fiction](https://noduslabs.com/research/venture-fiction/) project: its objective is to enhance perception and imagination. It can:
+InfraNodus is a non-commercial [venture fiction](https://noduslabs.com/research/venture-fiction/) project. Its main objective is to enhance perception and imagination, although it can also solve concrete problems and offer you an efficient way to retain, process, and make sense of information. It can:
 
 * Help you retain and remember information
 * Help you connect disjointed bits and pieces of data
