@@ -2,8 +2,8 @@
 <div id="edit-panel">
     <form action='/post' name='submitform' id="submitform" method='post' class='pure-form'>
 
-            <textarea columns="40" rows="4" name='entry[body]' id="statement" placeholder='type in some words or #hashtags to see how they connect'><% if (url) { %><%= urltitle %> <%= url %><% } %></textarea>
-            <div id="addToContextsLabel">in context:</div>
+            <textarea columns="40" rows="4" name='entry[body]' id="statement" placeholder='type in some words or #hashtags to see how they connect or copy and paste your notes or text here'><% if (url) { %><%= urltitle %> <%= url %><% } %></textarea>
+            <div id="addToContextsLabel">in graph:</div>
             <ul id="addToContexts"></ul>
             <input type="hidden" id="addedContexts" name="addedContexts">
             <input type="hidden" id="context" name="context" value="<%= context %>">
@@ -18,7 +18,7 @@
 
 <div id="search-panel">
     <form class="pure-form" id="searchform">
-        <input type="text" id="search" size="14" maxlength="50" class="pure-input" placeholder="search...">
+        <input type="text" id="search" size="16" maxlength="50" class="pure-input" placeholder="search this graph">
            
            
         

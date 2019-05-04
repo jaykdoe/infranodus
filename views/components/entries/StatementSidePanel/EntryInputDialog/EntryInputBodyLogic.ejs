@@ -190,9 +190,9 @@
                                 $('#statement').removeClass('loading');
                                 $('#deletebutton').removeAttr('disabled');
                                 socket.emit('delete message', {entryuid: res.statementid});
-                                statements.showWarning('The statement was deleted.');
+                                statements().showWarning('The statement was deleted.');
                                 $('#cancelbutton').trigger('click');
-                                statements.hideWarning(2000);
+                                statements().hideWarning(2000);
                             }
                             else if (res.errormsg) {
                                 alert(res.errormsg);

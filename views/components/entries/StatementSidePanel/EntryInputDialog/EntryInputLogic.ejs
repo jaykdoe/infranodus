@@ -256,28 +256,39 @@
         
             // Reiterate through Sigma
             sigma.instances(0).graph.edges().forEach(function(e) {
-        
-                // If a node appears in at least one statement, we add him in ToKeep list
-                for (let item of e.statement_id) {
+
+                // For each context
+                for (let context in e.context_matrix) {
+                        // For every statement in the context
+                        for (let statement in e.context_matrix[context]) {
+                            
+                            // Do this source and target exist in that statement? 
+                            if (graphFactory.existNodeInStatement(statement, e.source) == true) {
+                                nodesToKeep.push(e.source);
+                            }
                 
-                    if (graphFactory.existNodeInStatement(item, e.source) == true) {
-                        nodesToKeep.push(e.source);
-                    }
-        
-                    if (graphFactory.existNodeInStatement(item, e.target) == true) {
-                        nodesToKeep.push(e.target);
-                    }
-        
-                    graphFactory.removeStatementFromContext(e.edge_context, item);
-        
-                    if (item == msg.entryuid) {
-                        sigma.instances(0).graph.dropEdge(e.id);
-                    }
-                    
+                            if (graphFactory.existNodeInStatement(statement, e.target) == true) {
+                                nodesToKeep.push(e.target);
+                            }
+
+                            // Remove statement from this context also
+                            graphFactory.removeStatementFromContext(context, statement);
+                
+                            // Does this edge belong to that particular statement?
+                            if (statement ==  msg.entryuid) {
+                                let weight_to_deduct = e.context_matrix[context][statement];
+                                delete e.context_matrix[context][statement];
+                                e.weight = e.weight - weight_to_deduct;
+                                if (e.weight == 0) {
+                                    sigma.instances(0).graph.dropEdge(e.id);
+                                }
+                            }
+                        }
                 }
         
             });
         
+            // Let's delete the nodes in the graph that were only in that statement and nowhere else
             let nodesToDelete = [];
             sigma.instances(0).graph.nodes().forEach(function(n) {
                 if (nodesToKeep.indexOf(n.id) < 0) {
