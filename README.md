@@ -15,7 +15,7 @@
 #### Works on mobile and desktop. Voice-to-text (EN, RU, FR, DE) is available.
 
 
-[Watch a Video Demo](https://vimeo.com/89807920) - a 2-minute introduction
+[Watch a Video Demo](https://www.youtube.com/watch?v=0mIT9Ni5SO4) - a 3-minute introduction
 
 [Try it Online](http://infranodus.com) - request invitation code through [Nodus Labs](http://noduslabs.com/infranodus/)
 
