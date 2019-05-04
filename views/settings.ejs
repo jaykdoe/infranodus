@@ -28,15 +28,18 @@
 
 
         <div id="content">
-            <div id="statements">
+            <div id="settingsmain">
 
 
                 <% include messages %>
                 <% console.log(user) %>
                 <form action='/settings' method='post' id="settingsform" class="pure-form pure-form-stacked">
 
-                    <legend>settings for user <i><%= user.name %></i></legend>
+                    <legend>Settings for User: <i><%= user.name %></i></legend>
                     <br>
+
+
+                    <legend>Language Settings:</legend>
 
                     Text input language and lemmatization<br>
                     <label for="inlanguage" class="pure-input">
@@ -59,36 +62,11 @@
                     </label>
                     <br>
 
-                    Words connect into graph, when they are
-                    <label for="wordscan-edit-1" class="pure-radio">
-                        <input id="wordscan-edit-1" type="radio" name="fullscan" value="0" <% if (user.fullscan=='0') { %> checked <% } %>>
-                        next to each other (bigrams)
-                    </label>
+                    <button type='submit' class="pure-button pure-button-primary">Save Settings</button>
 
-                    <label for="wordscan-edit-2" class="pure-radio">
-                        <input id="wordscan-edit-2" type="radio" name="fullscan" value="1" <% if (user.fullscan=='1') { %> checked <% } %>>
-                        near each other (4-grams)
-                    </label>
-                    <br>
+                    <legend>&nbsp;</legend>
 
-                    Graph view shows only
-                    <label for="wordscan-view1" class="pure-radio">
-                        <input id="wordscan-view1" type="radio" name="fullview" value="0" <% if (user.fullview=='0') { %> checked <% } %>>
-                        "next to" connections (bigrams)
-                    </label>
-
-                    <label for="wordscan-view2" class="pure-radio">
-                        <input id="wordscan-view2" type="radio" name="fullview" value="1" <% if (user.fullview=='1') { %> checked <% } %>>
-                        "near" connections (4-grams + bigrams)
-                    </label>
-                    <br>
-
-                    Graph shows only
-                    <label for="graph-view" class="pure-radio">
-                        <input type="text" id="graph-view" size="4" maxlength="4" class="pure-input" name="maxnodes" placeholder="" value="<% if (!user.maxnodes) { %>100<% } else { %><%=user.maxnodes%><% } %>">
-                        max number of nodes
-                    </label>
-                    <br>
+                    <legend>Graph Design Settings:</legend>
 
                     Graph color palette
                     <label for="palette" class="pure-input">
@@ -128,6 +106,25 @@
                     </label>
                     <br>
 
+                    Graph view shows only
+                    <label for="wordscan-view1" class="pure-radio">
+                        <input id="wordscan-view1" type="radio" name="fullview" value="0" <% if (user.fullview=='0') { %> checked <% } %>>
+                        "next to" connections (bigrams)
+                    </label>
+
+                    <label for="wordscan-view2" class="pure-radio">
+                        <input id="wordscan-view2" type="radio" name="fullview" value="1" <% if (user.fullview=='1') { %> checked <% } %>>
+                        "near" connections (4-grams + bigrams)
+                    </label>
+                    <br>
+
+                    Graph shows only
+                    <label for="graph-view" class="pure-radio">
+                        <input type="text" id="graph-view" size="4" maxlength="4" class="pure-input" name="maxnodes" placeholder="" value="<% if (!user.maxnodes) { %>100<% } else { %><%=user.maxnodes%><% } %>">
+                        max number of nodes
+                    </label>
+                    <br>
+
                     Most influential words have
                     <label for="topnodes" class="pure-input">
                       <select id="topnodes" name="topnodes">
@@ -135,6 +132,24 @@
                       <option value="bc2" <% if (user.topnodes=='bc2') { %> selected <% } %>>max BC (also for topics)</option>
                       <option value="degree" <% if (user.topnodes=='degree') { %> selected <% } %>>max degree</option>
                       </select>
+                    </label>
+                    <br>
+
+                    <button type='submit' class="pure-button pure-button-primary">Save Settings</button>
+
+                    <legend>&nbsp;</legend>
+
+                    <legend>Text Processing Settings:</legend>
+
+                    Words connect into graph, when they are
+                    <label for="wordscan-edit-1" class="pure-radio">
+                        <input id="wordscan-edit-1" type="radio" name="fullscan" value="0" <% if (user.fullscan=='0') { %> checked <% } %>>
+                        next to each other (bigrams)
+                    </label>
+
+                    <label for="wordscan-edit-2" class="pure-radio">
+                        <input id="wordscan-edit-2" type="radio" name="fullscan" value="1" <% if (user.fullscan=='1') { %> checked <% } %>>
+                        near each other (4-grams)
                     </label>
                     <br>
 
@@ -155,6 +170,24 @@
                     </label>
 
                     <br>
+                    <button type='submit' class="pure-button pure-button-primary">Save Settings</button>
+
+                    <legend>&nbsp;</legend>
+
+                    <legend>Stopwords Settings:</legend>
+
+                    Custom stopwords to add to the default list (<a href="/files/stopwords_en_en.txt">en</a>, <a href="/files/stopwords_de_de.txt">de</a>, <a href="/files/stopwords_fr_fr.txt">fr</a>, <a href="/files/stopwords_es_es.txt">es</a>)
+                    (example: "alt, don", to exclude, use a "-", e.g. "-kind, -and")
+                    <label for="stopwords" class="pure-input">
+                        <textarea id="stopwords" name="stopwords" rows="4" cols="20"><% if (user.stopwords != undefined && user.stopwords.length > 0) { %><%= user.stopwords %><% }%></textarea>
+                    </label>
+
+                    <br>
+                    <button type='submit' class="pure-button pure-button-primary">Save Settings</button>
+
+                    <legend>&nbsp;</legend>
+
+                    <legend>Graph Editor Settings:</legend>
 
                     #Hashtags will
                     <label for="morphemes1" class="pure-radio">
@@ -184,16 +217,13 @@
                         the @ sign is removed, each #hashtag  or word connected to @mention but not to each other
                     </label>
                     <br>
+                    <button type='submit' class="pure-button pure-button-primary">Save Settings</button>
 
-                    Custom stopwords to add to the default list (<a href="/files/stopwords_en_en.txt">en</a>, <a href="/files/stopwords_de_de.txt">de</a>, <a href="/files/stopwords_fr_fr.txt">fr</a>, <a href="/files/stopwords_es_es.txt">es</a>)
-                    (example: "alt, don", to exclude, use a "-", e.g. "-kind, -and")
-                    <label for="stopwords" class="pure-input">
-                        <textarea id="stopwords" name="stopwords" rows="4" cols="20"><% if (user.stopwords != undefined && user.stopwords.length > 0) { %><%= user.stopwords %><% }%></textarea>
-                    </label>
+                    <legend>&nbsp;</legend>
 
-                    <br>
+                    <legend>Customization Settings:</legend>
 
-                    Analytics pane name (customization)
+                    Analytics pane name (branding bottom right corner)
                     <label for="graph-view" class="pure-radio">
                         <input type="text" id="customization" size="10" maxlength="20" class="pure-input" name="customization" placeholder="" value="<% if (!user.customization) { %>analytics<% } else { %><%=user.customization%><% } %>">
                     </label>
@@ -209,12 +239,20 @@
                         </select>
                     </label>
                     <br>
+                    <button type='submit' class="pure-button pure-button-primary">Save Settings</button>
 
+                    <legend>&nbsp;</legend>
+
+                    <legend>Your Paid Subscription Settings:</legend>
+                    
                     Manage your paid subscription:<br>
                     <a href="javascript:void(0)" data-cb-type="portal">
                         Click Here</a>
                     <br>
                     <br>
+
+                    &nbsp;<br>
+                    <legend>MIDI Interface Settings:</legend>
 
                     MIDI Interface
                     <label for="midiactive" class="pure-input">
@@ -321,10 +359,16 @@
 
                     </div>
                     <br>
+                    <br>
+                    &nbsp;
+                    <legend>Click to Save Your Settings:</legend>
+                    &nbsp;<br>
 
-                    <button type='submit' class="pure-button pure-button-primary">save settings</button>
+                    <button type='submit' class="pure-button pure-button-primary">Save Settings</button>
 
 
+                    <br>
+                    &nbsp;
                     <br>
                     &nbsp;
                     <br>

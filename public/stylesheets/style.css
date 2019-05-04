@@ -1314,6 +1314,23 @@ button {
 /*    pointer-events: none;*/
 }
 
+#settingsmain {
+    position: relative;
+
+    left: 14px;
+    bottom: 0;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0);
+    max-width: 400px;
+    padding-left: 50px;
+    padding-top: 5px;
+    padding-right: 10px;
+    margin-bottom: 20px;
+    z-index: 1;
+    opacity: 0.9;
+/*    pointer-events: none;*/
+}
+
 #maincontent {
     position: relative;
     top: 0;
