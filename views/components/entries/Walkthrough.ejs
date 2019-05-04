@@ -24,6 +24,13 @@
                  orphan: true,
                  placement: "top",
                  title: "Welcome to InfraNodus",
+                 content: "Please, follow this step-by-step tutorial to get the most out of this tool. It will only take you 3 minutes and you will learn how to visualize any text as a network, detect the main topics, the relations between them, learn more about the structure of the discourse, compare them, find the structural gaps (that's where the new ideas are!), and perform your research in a more efficient way.",
+               },
+               {
+                 element: "#entryform",
+                 orphan: true,
+                 placement: "top",
+                 title: "Adding Data...",
                  content: "You can start typing your ideas and notes here. Press Enter or Save to submit. They will be visualized as a graph.",
                  onNext: function (tour) {
                      $('#statement').val('Every word you type is a node in a graph. When the words cooccur together, they are connected.');
@@ -32,30 +39,62 @@
                {
                  element: "#statement",
                  placement: "top",
-                 title: "Add a Statement...",
-                 content: "You can add this statement or edit and add your own. Then press the SAVE button...",
+                 title: "Try to Add this Statement Now...",
+                 content: "You can add this statement or edit and add your own. Then press the SAVE button... <br>(You will be able to delete it later).",
                  onNext: function (tour) {
                      $('#statement').val('');
                  }
                },
                {
-                 element: ".entry:first",
+                 element: ".entry:last",
                  orphan: true,
                  placement: "auto",
                  title: "See the Statements",
-                 content: "You will then see this statement appear here. To edit it, double-click it."
+                 content: "You will then see this statement appear here. To see it in the graph, click on it once. To edit or to delete it, click Edit. You can select a few statements at once. Click Deselect to reset the selection."
+               },
+               {
+                 element: "#entryform",
+                 orphan: true,
+                 placement: "top",
+                 title: "Mindmapping Using #Hashtags and @Mentions",
+                 content: "You can also use #hashtags and @mentions to create nodes and edges in the graph, which makes InfraNodus the fastest mind-mapping software out there. #Hashtags connect to each other, @Mentions connect to everything. For example, see how the following statement will get visualized. You can adjust this behavior in <a href='/settings'>Settings</a>",
+                 onNext: function (tour) {
+                     $('#statement').val('One #hashtag will connect to a #different_hashtag and they both will connect to a @mention. The rest of the text is not visualized then.');
+                 }
+               },
+               {
+                 element: "#statement",
+                 placement: "top",
+                 title: "Try to Add this Statement Now...",
+                 content: "You can add this statement or edit and add your own. Then press the SAVE button... <br>(You will be able to delete it later).",
+                 onNext: function (tour) {
+                     $('#statement').val('');
+                 }
+               },
+               {
+                 element: ".entry:last",
+                 orphan: true,
+                 placement: "auto",
+                 title: "It Appears Here and on the Graph",
+                 content: "You will then see this statement appear here. To see it in the graph, click on it once. To edit or to delete it, click Edit. You can select a few statements at once. Click Deselect to reset the selection."
                },
                {
                  element: "#statement",
                  placement: "top",
                  title: "Delete Statements",
-                 content: "If you double-clicked the statement, it appears here. Then simply click the Delete icon below the statement and it will be removed. You can also Edit and click Edit. Or Cancel."
+                 content: "If you click on any statement and then click Edit, it appears here. Then simply click the Delete icon below the statement and it will be removed. You can also Edit and click Edit. Or Cancel."
+               },
+               {
+                 element: "#deletecontextbutton",
+                 placement: "top",
+                 title: "Delete The Whole Graph",
+                 content: "Careful! If you click this button, you will delete the whole graph with all its contents. It cannot be undone."
                },
                {
                  element: "#import-link",
                  placement: "top",
                  title: "Import Statements",
-                 content: "You can also import any data from a PDF / TXT file, a URL (inc Wikipedia), RSS Feeds, Twitter, Google search results, your notes, etc."
+                 content: "You can also import any data from a PDF / TXT file, a URL (inc Wikipedia), RSS Feeds, Twitter, Google search results, your notes, etc.<br>If you already have a few nodes in this graph, you can select them, and then import relevant search results to a new graph and then compare them to your original one."
                },
                {
                  element: "#menuLink",
@@ -95,18 +134,30 @@
                element: "#globalsearchinput",
                placement: "bottom",
                title: "Global Search",
-               content: "You can use this field to search a term among all your graphs",
+               content: "You can use this field to search a term among all your graphs. Select a few nodes and click the Search button. Your private graphs and others' public ones will appear as the squares here. Click them to open the graphs with your selections.",
                },
                {
-               element: "#addnode",
-               placement: "bottom",
-               title: "Add a Node",
-               content: "You can use this field to quickly add a node in the graph.",
+               element: "#addcontext-link",
+               placement: "right",
+               title: "Compare Different Graphs and Texts",
+               content: "You can compare two different graphs using this feature. Click this button once, then go to the menu and select another graph, click it again and you'll see the intersection graph between the two texts. ",
+               },
+               {
+               element: "#timer-link",
+               placement: "right",
+               title: "Visualize the Dynamic Graph's Evolution",
+               content: "Click this button and then when you scroll through your statements, you'll see them visualized one by one",
+               },
+               {
+               element: "#watch-link",
+               placement: "right",
+               title: "Play Back and Watch",
+               content: "If you don't want to scroll yourself, click this button and the graph will play automatically. It is great for a visualization. You can leave it on while adding the new statements as well.",
                },
                {
                  element: "#microphone-link",
                  orphan: true,
-                 placement: "left",
+                 placement: "right",
                  title: "Voice to Text Input",
                  content: "If you use Chrome browser, you can also turn on Voice to Text input. Great for interviews and when you're lazy to type. English, French, German and Russian."
                },
@@ -152,7 +203,7 @@
                  element: "#biasindex",
                  placement: "top",
                  title: "Bias Level",
-                 content: "This measures the level of bias in graph: if it consists of disjointed islands it's 'dispersed'; if those islands are interconnected, there are several topics within, it's 'diversified'; if most of the nodes are in one topic it's 'focused', if it's tightly interconnected and there are no distinct topical clusters, it's 'biased'. Read more about the methology in our <a href='https://noduslabs.com/research/visualization-text-polysingularity-network-analysis/' target='_blank'>Identifying the Discourse Bias</a> (Paranyushkin 2018) article in Towards Data Science."
+                 content: "This measures the level of diversity in the graph: if it consists of disjointed islands it's 'dispersed'; if those islands are interconnected, there are several topics within, it's 'diversified'; if most of the nodes are in one topic it's 'focused', if it's tightly interconnected and there are no distinct topical clusters, it's 'biased'. Read more about the methology in our <a href='https://towardsdatascience.com/measuring-discourse-bias-using-text-network-analysis-9f251be5f6f3' target='_blank'>Identifying the Discourse Bias</a> (Paranyushkin 2018) article in Towards Data Science."
                },
                {
                  element: "#graph-container",
@@ -399,7 +450,7 @@
                  element: "#biasindex",
                  placement: "top",
                  title: "Bias Level",
-                 content: "This measures the level of bias in graph: if it consists of disjointed islands it's 'dispersed'; if those islands are interconnected, there are several topics within, it's 'diversified'; if most of the nodes are in one topic it's 'focused', if it's tightly interconnected and there are no distinct topical clusters, it's 'biased'. Read more about the methology in our <a href='https://noduslabs.com/research/visualization-text-polysingularity-network-analysis/' target='_blank'>Identifying the Discourse Bias</a> (Paranyushkin 2018) article in Towards Data Science."
+                 content: "This measures the level of diversity in the graph: if it consists of disjointed islands it's 'dispersed'; if those islands are interconnected, there are several topics within, it's 'diversified'; if most of the nodes are in one topic it's 'focused', if it's tightly interconnected and there are no distinct topical clusters, it's 'biased'. Read more about the methology in our <a href='https://towardsdatascience.com/measuring-discourse-bias-using-text-network-analysis-9f251be5f6f3' target='_blank'>Identifying the Discourse Bias</a> (Paranyushkin 2018) article in Towards Data Science."
                },
                {
                  element: "#menuLink",
@@ -524,7 +575,7 @@
                  element: "#biasindex",
                  placement: "top",
                  title: "Bias Level",
-                 content: "This measures the level of bias in graph: if it consists of disjointed islands it's 'dispersed'; if those islands are interconnected, there are several topics within, it's 'diversified'; if most of the nodes are in one topic it's 'focused', if it's tightly interconnected and there are no distinct topical clusters, it's 'biased'. Read more about the methology in our <a href='https://noduslabs.com/research/visualization-text-polysingularity-network-analysis/' target='_blank'>Identifying the Discourse Bias</a> (Paranyushkin 2018) article in Towards Data Science."
+                 content: "This measures the level of diversity in the graph: if it consists of disjointed islands it's 'dispersed'; if those islands are interconnected, there are several topics within, it's 'diversified'; if most of the nodes are in one topic it's 'focused', if it's tightly interconnected and there are no distinct topical clusters, it's 'biased'. Read more about the methology in our <a href='https://towardsdatascience.com/measuring-discourse-bias-using-text-network-analysis-9f251be5f6f3' target='_blank'>Identifying the Discourse Bias</a> (Paranyushkin 2018) article in Towards Data Science."
                },
                {
                element: "#graph-container",
