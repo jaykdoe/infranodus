@@ -1,9 +1,16 @@
 <!DOCTYPE html>
 <html>
+<!-- Load userFactory and all the initial initialization functions -->
 <%- include('components/entries/header') %>
+
+<!-- Load dependency scripts -->
 <%- include('dependencies/entries') %>
+
+<!-- Load collaboration and graphFactory modules - before the rest -->
 <%- include('components/entries/index') %>
+
 <body>
+<!-- JS Statistics that should load before everything else -->
 <% include statsabove %>
 <div id="layout">
     <!-- Menu toggle -->
@@ -13,7 +20,9 @@
     </a>
      <div id="menu">
         <div class="pure-menu pure-menu-open">
-
+        
+        <!-- Parsing all the menus -->
+    
         <% if (locals.user || perceivername) { %>
             <% if (perceivername) { %>
             <a class="pure-menu-heading" href="/<%= perceivername %>"><%= perceivername %></a>
@@ -34,58 +43,90 @@
    </div>
      <div id='content'>
 
-          <%- include('components/entries/StatementMenu'); %>
-                     
-          <%- include('components/entries/StatementSidePanel/StatementsPanel',
+            <!-- Parsing all content -->
+
+            <%- include('components/entries/StatementMenu'); %>
+          
+            <!-- Several components inside — see the file below -->
+            <%- include('components/entries/StatementSidePanel/StatementsPanel',
                 {entries, perceivername, addcontext, context, contextpublic, url, urltitle}); %>
 
-          <%- include('components/entries/Graph/GraphCanvas'); %>
+            <%- include('components/entries/Graph/GraphCanvas'); %>
 
-          <%- include('components/entries/Graph/GraphTags') %>
+            <%- include('components/entries/Graph/GraphTags') %>
 
-          <%- include('components/entries/GlobalSearch') %>
+            <%- include('components/entries/GlobalSearch') %>
 
-          <%- include('components/entries/Graph/GraphMenu') %>
+            <%- include('components/entries/Graph/GraphMenu') %>
 
-          <%- include('components/entries/Analytics/Polysingularity'); %>   
+            <%- include('components/entries/Analytics/Polysingularity'); %>   
 
-          <%- include('components/entries/VoiceInput/VoiceInputLiveText'); %>
+            <%- include('components/entries/VoiceInput/VoiceInputLiveText'); %>
 
-          <%- include('components/entries/Analytics/AnalyticsPane'); %>
+            <%- include('components/entries/Analytics/AnalyticsPane'); %>
 
       </div>
 
 </div>
+<!-- Here we start with all the Javascript -->
 
+<!-- First the logic for statements then for the whole statements panel -->
 <%- include('components/entries/StatementSidePanel/StatementsListLogic'); %> 
 <%- include('components/entries/StatementSidePanel/StatementsPanelLogic'); %>
 
+<!-- Statements menu: overview, insight, essence -->
 <%- include('components/entries/StatementSidePanel/StatementsViewLogic'); %>    
 
+<!-- Logic for entry input form in the statements pane -->
 <%- include('components/entries/StatementSidePanel/EntryInputDialog/EntryInputBodyLogic'); %> 
 <%- include('components/entries/StatementSidePanel/EntryInputDialog/EntryInputHeaderLogic'); %>
 <%- include('components/entries/StatementSidePanel/EntryInputDialog/EntryInputFooterLogic'); %>
 <%- include('components/entries/StatementSidePanel/EntryInputDialog/EntryInputLogic'); %>   
    
+ <!-- Graph statistics functions -->
 <%- include('components/entries/Analytics/GraphRank') %>
 <%- include('components/entries/Analytics/GraphModularity') %>
 
+ <!-- Main graph functions (color, align, process) -->
 <%- include('components/entries/Graph/Graph') %>
+
+<!-- Generate a new graph on load -->
 <%- include('components/entries/Graph/GraphGenerate') %>
+
+<!-- What happens when we click the nodes in the graph -->
 <%- include('components/entries/Graph/GraphUpdate') %>
 
+<!-- Load analytics -->
 <%- include('components/entries/Analytics/AnalyticsPaneLogic') %>
 
+<!-- Logic for manipulating statements (hide, dynamic scroll) -->
 <%- include('components/entries/StatementMenuLogic'); %>
+
+<!-- Load polysingularity index logic -->
 <%- include('components/entries/Analytics/PolysingularityLogic') %>
+
+<!-- Menu at the top right when we select nodes on the graph (pinnedNodes) -->
 <%- include('components/entries/Graph/GraphTagsLogic') %>
+
+<!-- Global search functions (to find other graphs) -->
 <%- include('components/entries/GlobalSearchLogic') %>
+
+<!-- The graph menu (right side): realign, zoom, abstract -->
 <%- include('components/entries/Graph/GraphMenuLogic') %>
+
+<!-- Walkthrough tutorials logic -->
 <%- include('components/entries/Walkthrough') %>
+
+<!-- MIDI controller logic (yes, it can play sounds) -->
 <%- include('components/entries/MidiController') %>
+
+<!-- Voice input logic -->
 <%- include('components/entries/VoiceInput/VoiceInputController') %>
+
+<!-- Things to load after everything else is loaded -->
 <%- include('components/entries/Binders') %>
 
+<!-- JS statistics code that should load in the end -->
 <% include statsbelow %>
 
 </body>
