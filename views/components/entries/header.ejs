@@ -30,7 +30,6 @@
             let in_label_threshold = 8;
             let midi = null;
             let background = null;
-            let default_label_color = '#000000';
             let interpret = null;
 
             let viewOptions = {};
@@ -39,6 +38,7 @@
                 maxnodesize: 16,
                 deselected_nodes_color: '#ddd',
                 color_context: '#666',
+                default_label_color: '#000000',
                 color_addcontext: '#666666',
                 highlight_addcontext: '#0089e0',
                 forceatlas_options: {worker: false, startingIterations: 100, scalingRatio: 0.1, slowDown: 100, strongGravityMode: true},
@@ -242,6 +242,7 @@
                     return false;
                 }
             }
+            
 
         }
 
@@ -323,9 +324,7 @@
         <% if (locals.user.maxnodes) { %>
         userFactory.setMaxNodes('<%= user.maxnodes %>');
         <% } %>        
-        <% if (locals.user.maxnodes) { %>
         userFactory.setBackground('<%= user.background %>');
-        <% } %>
         <% if (locals.user.topnodes) { %>
         userFactory.setMostInfluential('<%= user.topnodes %>');
         <% } %>
@@ -387,20 +386,34 @@
 
     // Change the theme
 
-    function toggleTheme() {
+    function toggleTheme(e) {
+        let was_black = false;
         if(document.documentElement.hasAttribute('theme')){
+            was_black = true;
             document.documentElement.removeAttribute('theme');
+            userFactory.setGraphOption('default_label_color','#000');     
         }
         else {
             document.documentElement.setAttribute('theme', 'dark');
             if (userFactory.getGraphPalette() == 'contrast') {
-                userFactory.setGraphOption(deselected_nodes_color,'#555');
+                userFactory.setGraphOption('deselected_nodes_color','#555');
             }
             else {
-                userFactory.setGraphOption(deselected_nodes_color,'#444');
+                userFactory.setGraphOption('deselected_nodes_color','#444');
             }
             userFactory.setGraphOption('default_label_color','#ffffff');
+            
         }
+        if (e) {
+            if (was_black == true) {
+                sigma.settings.defaultLabelColor = '#000';
+            }
+            else {
+                sigma.settings.defaultLabelColor = '#fff';
+            }
+            sigma.instances(0).refresh();
+        }
+        
     }
 
     if (userFactory.getBackground() == 'dark') {

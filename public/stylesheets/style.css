@@ -61,6 +61,7 @@
     --zoom-out-background-image: url('../images/zoom-out.png')!important;
 
     --deleted-nodes-background-image: url('../images/trash.png');
+    --undo-nodes-background-image: url('../images/undo.png');
 
     --taginput-background: rgba(255, 255, 255, 1)!important;
     --taginput-border: 1px solid rgba(141, 141, 141, 0.2);
@@ -69,6 +70,7 @@
     --taginput-height: 26px;
 
     --globalsearch-background: url('../images/search.png');
+    --globalsearch-opacity: 1;
     --addnode-opacity: 1;
 
     --globalsearchremove-background: url('../images/remove.png');
@@ -109,6 +111,7 @@
     --zoom-out-background-image: url('../images/zoom-out-white.png')!important;
 
     --deleted-nodes-background-image: url('../images/trash-white.png');
+    --undo-nodes-background-image: url('../images/undo-white.png');
 
     --taginput-background: rgba(250, 250, 250, 0.2);
     --taginput-border: none;
@@ -117,6 +120,7 @@
     --taginput-height: 26px;
 
     --globalsearch-background: url('../images/search-white.png');
+    --globalsearch-opacity: 0.8;
     --addnode-opacity: 0.6;
 
     --globalsearchremove-background: url('../images/remove-white.png');
@@ -900,16 +904,11 @@ button {
 
 .undo-on {
     opacity: 1!important;
-    background-image: url('../images/undo.png');
+    background-image: var(--undo-nodes-background-image);
     background-repeat:no-repeat;
     background-position:center;
 }
-.undo-dark {
-    opacity: 1!important;
-    background-image: url('../images/undo-white.png');
-    background-repeat:no-repeat;
-    background-position:center;
-}
+
 
 #stopsave {
     float: right;

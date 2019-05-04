@@ -40,6 +40,7 @@ improveLayoutButton().onClick(adjustGraphLayout);
 abstractLayoutButton().onLoad();
 abstractLayoutButton().onClick(abstractGraphLayout);
 tutorialButton().onClick(activateTutorial);
+themeSwitchButton().onClick(toggleTheme);
 zoomInButton().onClick(zoomInGraph);
 zoomOutButton().onClick(zoomOutGraph);
 
@@ -72,6 +73,14 @@ function tutorialButton() {
     return {
         onClick: function(onClick) {
             $('#walkthrough').on('click', onClick)
+        }
+    }
+}
+
+function themeSwitchButton() {
+    return {
+        onClick: function(onClick) {
+            $('#themeswitch').on('click', onClick);
         }
     }
 }
@@ -167,6 +176,15 @@ function zoomOutGraph() {
         duration: 400
     });
 }
+
+
+$('#themeswitch').tooltipster({
+            theme: 'tooltipster-noir',
+            position: 'left',
+            maxWidth: 220,
+            interactive: true,
+            content: $('<span>switch theme light / dark (permanent in the <a href="/settings">settings</a>)</span>')
+});
 
 
 </script>

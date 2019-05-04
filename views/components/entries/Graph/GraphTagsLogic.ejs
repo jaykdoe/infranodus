@@ -28,14 +28,15 @@ function graphTags() {
                  
             // Add a delete button next to those nodes
             if (graphFactory.existPinnedNodes() == true) {
-                $('#deletenodes').addClass('deletenodes-on');
-                $('#undo').addClass('undo-on');
+                    $('#deletenodes').addClass('deletenodes-on');
+                    $('#undo').addClass('undo-on');
             }
             else {
-                $('#deletenodes').removeClass('deletenodes-on');
-                $('#undo').removeClass('undo-on');
+                    $('#deletenodes').removeClass('deletenodes-on');
+                    $('#undo').removeClass('undo-on'); 
             }
-
+           
+            
             // Show tags that are currently used in search
             var htmlNodes =  '<ul class="tags">';
 
