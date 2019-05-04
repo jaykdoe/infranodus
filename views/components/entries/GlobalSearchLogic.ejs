@@ -55,14 +55,31 @@ function globalSearchForm() {
         var squery = '';
       
         let pinnedNodes = [];
+
+        let search_input = $('#globalsearchinput').val();
     
-        if ($('#globalsearchinput').val().length > 0) {
+        if (search_input.length > 0) {
 
           pinnedNodes = graphFactory.getPinnedNodes();
 
-          // Let's formulate the query
-          for (var i = 0; i < pinnedNodes.length; i++) {
-            squery += pinnedNodes[i] + '+';
+          if (pinnedNodes.length > 0) {
+            // Let's formulate the query
+            for (var i = 0; i < pinnedNodes.length; i++) {
+              squery += pinnedNodes[i] + '+';
+            }
+          }
+          else {
+            let search_array = [];
+            search_array = search_input.toLowerCase().split(' ');
+            let search_array_clean = search_array.filter(function (el) {
+                                        if (el != null && el != undefined && el != '' ) return el;
+                                      });
+            for (let item in search_array_clean) {
+              if (search_array_clean[item].substr(0,1) == '#') search_array_clean[item] = search_array_clean[item].substr(1);
+              squery += search_array_clean[item] + '+';
+            }
+            pinnedNodes = search_array_clean;
+            graphFactory.initPinnedNodes(search_array_clean);
           }
           
         }
@@ -73,6 +90,7 @@ function globalSearchForm() {
         }
 
         squery = squery.slice(0, -1);
+
 
         findContexts(squery, pinnedNodes);
 
@@ -112,9 +130,9 @@ function nodeInputField() {
         
         // Add the selected node into the search panel of the graph
 
-        if ($('#globalsearchinput').val().length == 0 || $('#globalsearchinput').val().charAt(0) == '#') {
+        
             $('#globalsearchinput').val(arrayToHashtagString(content));
-        }
+        
 
     }
   }
@@ -162,6 +180,10 @@ function findContexts(squery, pinnedNodes) {
                 }
 
             }
+        }
+        else {
+          graphFactory.deactivateRemoveResults();
+          voiceInputPanel.showMessage('Nothing found in your graphs. Try to select some nodes on the graph and then search again. Or add more graphs first.', 5000);
         }
 
         graph().refreshGraph();       
