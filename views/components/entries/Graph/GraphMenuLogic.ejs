@@ -120,8 +120,10 @@ function abstractGraphLayout() {
 
 
 function externalNavigation() {
+
+    let pinnedNodes = graphFactory.getPinnedNodes();
     
-    var searchQuery = pinnedNodes.join("+");
+    let searchQuery = pinnedNodes.join("+");
 
     if (go_next_add) {
         searchQuery = searchQuery + '+' + go_next_add;
