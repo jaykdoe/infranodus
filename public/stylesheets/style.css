@@ -1378,6 +1378,7 @@ button {
   position:absolute;
   width: 110px;
   bottom: 0;
+  left: 15px;
   padding-bottom: 10px;
   padding-right: 20px;
   font-size: 13px;
@@ -1427,6 +1428,10 @@ button {
 
     color: #00B7FF;
 
+}
+
+input#googlesubmit {
+    margin-top: 3px;!important
 }
 
 

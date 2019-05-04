@@ -33,7 +33,7 @@
 
             <form action='/import' name='submitform' id="submitform" method='post' enctype="multipart/form-data" class='pure-form pure-form-stacked'>
 
-                <input type='text' size="14" maxlength="50" name='search' id="search" class="pure-input" placeholder='search terms' value="<% if (fornode) { %><%= fornode %><% } %>" /> &nbsp;&nbsp; <input class="pure-button" type='submit' name="btnSubmit" value=">" class="pure-button pure-button-primary">
+                <input type='text' size="14" maxlength="50" name='search' id="search" class="pure-input" placeholder='search terms' value="<% if (fornode) { %><%= fornode %><% } %>" /> &nbsp;&nbsp; <input class="pure-button" id="googlesubmit" type='submit' name="btnSubmit" value="Go" class="pure-button pure-button-primary">
 
                 <br>&nbsp;<br>
                 Type in your search query, and we will show you which words are the most related to your query, so you can continue your search in a more informed way.
@@ -42,7 +42,7 @@
                 <% include messages %>
 
                 <label for="extractfilter" class="pure-checkbox">
-                    <input id="extractfilter" type="checkbox" name="excludesearchquery" value="1" checked> exclude search terms from the graph<br>
+                    <input id="extractfilter" type="checkbox" name="excludesearchquery" value="1"> exclude search terms from the graph<br>
                 </label>
 
                 <label for="savegraph" class="pure-input">
