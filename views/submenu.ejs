@@ -4,7 +4,7 @@
     <% if (addcontext) { %>
     <a href='/api/user/nodes/<%= context %>?addcontext=<%= addcontext %>' target='_blank'>json</a>';
     <% } else { %>
-    <a href='/api/user/nodes/<%= context %>' target='_blank'>json</a> | <a href='/api/user/nodes/<%= context %>?gexf=1' target='_blank'>gexf</a><br>
+    <a href='/api/user/nodes/<%= context %>' target='_blank'>json</a> | <a href='/api/user/nodes/<%= context %>?gexf=1' target='_blank' id="gexflink">gexf</a><br>
     <% }  %>
     <% } %>
     <a href='http://github.com/noduslabs/infranodus' target='_blank'>github</a>

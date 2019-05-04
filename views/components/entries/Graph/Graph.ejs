@@ -984,6 +984,26 @@ function sigmaGraph() {
                 document.querySelector('#downloadpng').download = userFactory.getCurrentUser() + '_' + current_context + '.png';
             }, false);
 
+            document.querySelector('#exportpng').href = canvaspng.toDataURL();
+            document.querySelector('#exportpng').download = userFactory.getCurrentUser() + '_' + current_context + '.png';
+
+            document.querySelector('#exportpng').addEventListener('click', function(ev) {
+                document.querySelector('#exportpng').href = canvaspng.toDataURL();
+                document.querySelector('#exportpng').download = userFactory.getCurrentUser() + '_' + current_context + '.png';
+            }, false);
+
+
+        },
+        downloadGexf: function() {
+
+            let gexf_link = $('#gexflink').attr('href');
+            let gexf_download = $('#gexflink').attr('download');
+
+            document.querySelector('#exportgexf').addEventListener('click', function(ev) {
+                document.querySelector('#exportgexf').href = gexf_link;
+                document.querySelector('#exportgexf').download = gexf_download;
+            }, false);
+
 
         }
     }

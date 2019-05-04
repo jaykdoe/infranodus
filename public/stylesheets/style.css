@@ -176,6 +176,13 @@ textarea:focus {
     opacity: 0.5!important;
 }
 
+.loadingwheel {
+    background-image: url('/images/loadingwheel.gif')!important;
+    background-repeat:no-repeat!important;
+    background-position:center!important;
+    opacity: 1!important;
+}
+
 #search {
     position: relative;
     z-index: 100;
@@ -659,6 +666,16 @@ button {
   padding: 5px 10px;
   border-radius: 3px;
   cursor: pointer;
+}
+
+.abutton {
+        font-size: 12px;
+        background: #ededed;
+        border: 1px solid #ccc;
+        padding: 4px 7px;
+        border-radius: 3px;
+        cursor: pointer;
+      
 }
 
 

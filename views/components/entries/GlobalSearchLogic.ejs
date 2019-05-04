@@ -25,7 +25,15 @@ function GlobalSearch() {
       return defaultSearchQuery;
     }
 
+
     this.activateRemoveResults = function() {
+      $("#globalsearchremove").show();
+      $('#globalsearchremove').addClass('loadingwheel');
+
+    }
+
+    this.loadedRemoveResults = function() {
+      $('#globalsearchremove').removeClass('loadingwheel');
       $("#globalsearchremove").show();
     }
 
@@ -115,6 +123,8 @@ function nodeInputField() {
 function findContexts(squery, pinnedNodes) {
 
     let current_user = userFactory.getCurrentUser();
+
+    globalSearch.activateRemoveResults();
        
     $.getJSON("/api/" + current_user + "/connectedcontexts/?keywords=" + squery + "&user=" + current_user, function( data ) {
                           
@@ -127,77 +137,109 @@ function findContexts(squery, pinnedNodes) {
             sitems.push({name: val.name, id: val.uid, url: furl});
         });
 
-           // Request user's context graphs (texts) which contain either the top nodes or the selected ones
-        $.getJSON("/api/connectedcontexts/?keywords=" + squery, function( data ) {
-                  
-                  var oitems = [];
+        let total_items = sitems.length;
+        let previous_contexts = [];
+        
+        if (total_items > 0) {
+            for (let item in sitems) {
 
-                  $.each( data.slice(0,7), function( key, val ) {
+                let context = {label: sitems[item].name, id: sitems[item].id, url: sitems[item].url};
+
+                graphFactory.addGraphContextNode(context);
+                globalSearch.loadedRemoveResults();
+
+                if (previous_contexts.length > 0) {
+                  for (let prcontext in previous_contexts) {
+                      graphFactory.addGraphContextEdge(context, previous_contexts[prcontext]);
+                  }
+                }
+                
+                previous_contexts.push(context);
+
+                for (let pin in pinnedNodes) {
+                  let node = {id: graphFactory.getNodeID(pinnedNodes[pin])}
+                  graphFactory.addGraphContextEdge(context, node);
+                }
+
+            }
+        }
+
+        graph().refreshGraph();       
+        
+        // TODO temporarily disabled below — search only for own texts
+
+        //    // Request user's context graphs (texts) which contain either the top nodes or the selected ones
+        // $.getJSON("/api/connectedcontexts/?keywords=" + squery, function( data ) {
+                  
+        //           var oitems = [];
+
+        //           $.each( data.slice(0,7), function( key, val ) {
                     
-                    let furl = "/" + val[1] + "/" + val[0].name;
+        //             let furl = "/" + val[1] + "/" + val[0].name;
 
-                    oitems.push({name: val[0].name + ', by ' + val[1], id: val[0].uid, uid: val[1], url: furl});
+        //             oitems.push({name: val[0].name + ', by ' + val[1], id: val[0].uid, uid: val[1], url: furl});
 
-                  });
+        //           });
 
+        //           // TODO BUG this works too slow on the production server
 
-                  let total_items = sitems.length;
-                  let previous_contexts = [];
+        //           // let total_items = sitems.length;
+        //           // let previous_contexts = [];
                   
-                  if (total_items > 0) {
-                      for (let item in sitems) {
+        //           // if (total_items > 0) {
+        //           //     for (let item in sitems) {
 
-                          let context = {label: sitems[item].name, id: sitems[item].id, url: sitems[item].url};
+        //           //         let context = {label: sitems[item].name, id: sitems[item].id, url: sitems[item].url};
 
-                          graphFactory.addGraphContextNode(context);
-                          globalSearch.activateRemoveResults();
+        //           //         graphFactory.addGraphContextNode(context);
+        //           //         globalSearch.activateRemoveResults();
 
-                          if (previous_contexts.length > 0) {
-                            for (let prcontext in previous_contexts) {
-                                graphFactory.addGraphContextEdge(context, previous_contexts[prcontext]);
-                            }
-                          }
+        //           //         if (previous_contexts.length > 0) {
+        //           //           for (let prcontext in previous_contexts) {
+        //           //               graphFactory.addGraphContextEdge(context, previous_contexts[prcontext]);
+        //           //           }
+        //           //         }
                           
-                          previous_contexts.push(context);
+        //           //         previous_contexts.push(context);
 
-                          for (let pin in pinnedNodes) {
-                            let node = {id: graphFactory.getNodeID(pinnedNodes[pin])}
-                            graphFactory.addGraphContextEdge(context, node);
-                          }
+        //           //         for (let pin in pinnedNodes) {
+        //           //           let node = {id: graphFactory.getNodeID(pinnedNodes[pin])}
+        //           //           graphFactory.addGraphContextEdge(context, node);
+        //           //         }
 
-                      }
-                  }
+        //           //     }
+        //           // }
 
-                  let total_oitems = oitems.length;
-                  let previous_ocontexts = [];
+        //           let total_oitems = oitems.length;
+        //           let previous_ocontexts = [];
                   
-                  if (total_oitems > 0) {
-                      for (let item in oitems) {
+        //           if (total_oitems > 0) {
+        //               for (let item in oitems) {
 
-                          let context = {label: oitems[item].name, id: oitems[item].id, uid: oitems[item].uid, url: oitems[item].url};
+        //                   let context = {label: oitems[item].name, id: oitems[item].id, uid: oitems[item].uid, url: oitems[item].url};
 
-                          graphFactory.addGraphContextNode(context)
+        //                   graphFactory.addGraphContextNode(context)
 
-                          if (previous_ocontexts.length > 0) {
-                            for (let prcontext in previous_ocontexts) {
-                                if (context.uid == previous_ocontexts[prcontext].uid) {
-                                  graphFactory.addGraphContextEdge(context, previous_ocontexts[prcontext]);
-                                }
-                            }
-                          }
+        //                   if (previous_ocontexts.length > 0) {
+        //                     for (let prcontext in previous_ocontexts) {
+        //                         if (context.uid == previous_ocontexts[prcontext].uid) {
+        //                           graphFactory.addGraphContextEdge(context, previous_ocontexts[prcontext]);
+        //                         }
+        //                     }
+        //                   }
 
-                          previous_ocontexts.push(context);
+        //                   previous_ocontexts.push(context);
 
-                          for (let pin in pinnedNodes) {
-                            let node = {id: graphFactory.getNodeID(pinnedNodes[pin])}
-                            graphFactory.addGraphContextEdge(context, node);
-                          }
+        //                   for (let pin in pinnedNodes) {
+        //                     let node = {id: graphFactory.getNodeID(pinnedNodes[pin])}
+        //                     graphFactory.addGraphContextEdge(context, node);
+        //                   }
 
-                      }
-                  }
+        //               }
+        //           }
 
-                  graph().refreshGraph();                
-        });
+        //           graph().refreshGraph();                
+        // });
 
   
 
