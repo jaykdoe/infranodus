@@ -733,12 +733,31 @@ small screens.
 
 #addcontextinput {
   padding-bottom: 0.5em;
+
 }
 
 #addcontextbutton {
   text-decoration: none;
 }
 
+#addcontextname {
+    float: left;
+}
+
+input#addcontextsubmit {
+        position: relative;
+        margin-top: 5px;
+        margin-left: 10px;
+        background:url('../images/save-white.png') no-repeat;
+        cursor:pointer;
+        border:none;
+        width:23px;
+        height:23px;
+        float: none;
+}
+#addcontextbreak {
+    float: none;
+}
 
 
 
