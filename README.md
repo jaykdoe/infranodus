@@ -82,7 +82,7 @@ InfraNodus is built on
 * [Node-Neo4J layer](http://github.com/philippkueng/node-neo4j);
 * [Textexture](http://textexture.com) algorithm for text network visualization;
 * Help from the people on StackOverflow and Neo4J community;
-* Special thanks to [Oleg Yarin](https://github.com/monapasan) for advice;
+* Special thanks to [Oleg Yarin](https://github.com/monapasan) for his support and to [Mattias Östmar](https://gitlab.com/mattiasostmar) for his energy and inspiration;
 
 
 =================
@@ -135,6 +135,17 @@ InfraNodus can also be used on a mobile.
 
 ![](/public/images/infranodus-mobile.png "InfraNodus Mobile Interface")
 
+
+
+=================
+
+### Python Port
+
+Together with Mattias Östmar (who did most of the work) we created a port of InfraNodus in Python, focusing on the measure of network diversity structure that it provides. 
+
+You can get it in [DiscourseDiversity](https://gitlab.com/mattiasostmar/discoursediversity) repo on GitLab. We're still working on it, but if you like Jupyter notebooks and network analysis, there's some good stuff to find in there!
+
+* [InfraNodus in Python](https://gitlab.com/mattiasostmar/discoursediversity) 
 
 
 =================
