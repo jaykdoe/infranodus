@@ -1,13 +1,15 @@
 <script>
 
 
-// Initiate Cytoscape Library - to calculate betweenness centrality for nodes and other stuff
+// Initiate Cytoscape Library - to calculate top components and betweenness centrality for nodes
 
 var cy = cytoscape({
     container: undefined,
     headless: true
 });
 
+
+// Initiate main graph functions
 
 function graph() {
     return {
