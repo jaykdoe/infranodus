@@ -128,10 +128,15 @@
                 select: function(e) {
                     
                     // What happens when a statement is selected on the graph
-
-                    e.stopPropagation();
+                    if (e) {
+                      e.stopPropagation();
+                    }
                     
-                    let keepStatementID = e.currentTarget.dataset.uid;
+                    let keepStatementID;
+
+                    if (e && e.currentTarget && e.currentTarget.dataset) {
+                      keepStatementID = e.currentTarget.dataset.uid;
+                    }
 
                     if (!keepStatementID) {
                       statementsFactory.removeCurrentSelections();
@@ -543,7 +548,7 @@
                 },
                 editDeleteStatement: function(e) {
 
-                      e.preventDefault();
+                      e.stopPropagation();
 
                       console.log(e);
 

@@ -192,6 +192,7 @@
                                 socket.emit('delete message', {entryuid: res.statementid});
                                 statements().showWarning('The statement was deleted.');
                                 $('#cancelbutton').trigger('click');
+                                statements().select();
                                 statements().hideWarning(2000);
                             }
                             else if (res.errormsg) {
