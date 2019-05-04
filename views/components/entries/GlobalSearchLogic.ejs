@@ -49,8 +49,9 @@ let globalSearch = new GlobalSearch();
 
 function globalSearchForm() {
   return {
-      submit: function() {
-
+      submit: function(e) {
+        e.preventDefault();
+        e.stopPropagation();
         var squery = '';
       
         let pinnedNodes = [];
@@ -83,7 +84,7 @@ function globalSearchForm() {
 
 $("#globalsearchbutton").on('click', function(e) {
  
-        globalSearchForm().submit();
+        globalSearchForm().submit(e);
 });
 
 $("#globalsearchremove").on('click', function(e) {
@@ -95,8 +96,7 @@ $("#globalsearchremove").on('click', function(e) {
 
 $('#globalsearchform').submit(function(e) {
 
-
-      globalSearchForm().submit();
+      globalSearchForm().submit(e);
 
 });
 
