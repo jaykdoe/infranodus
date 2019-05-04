@@ -159,10 +159,7 @@
       
         
         // Here we perform some live updates of the graph on receiving a Socket.IO message
-        // We could also move this code and use sigma.instances(0).graph.nodes() to get sigma properties
-        
-        // TODO set up chatroom, make better design, think of graph sharing functionality
-        
+                
         socket.on('chat message', function(msg){
             
             let selfPosted = userFactory.getSelfPosted();

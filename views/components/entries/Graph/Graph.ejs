@@ -1,35 +1,18 @@
 <script>
 
 
-  // Do we show abstract graph and no nodes?
-
-
-
-  // Sigma graph layout options
-  var forceatlas_options = {worker: false, startingIterations: 100, scalingRatio: 0.1, slowDown: 100, strongGravityMode: true};
-
-
-
-  // Cytoscape object
-
-  var elesnodes = [];
-
-  // Add Cytoscape Library - to calculate betweenness centrality for nodes and other stuff
+  // Initiate Cytoscape Library - to calculate betweenness centrality for nodes and other stuff
 
   var cy = cytoscape({
       container: undefined,
       headless: true
   });
-
-  var eles;
  
-
+  // Is Sigma being dragged?
   var sigma_dragged = 0;
-
 
   // Initialize JSON parser for SIGMA visualization
 
-  var color_addcontext = '#666666'; // #cccccc
 
   var highlight_addcontext = '#0089e0';
 
@@ -558,7 +541,7 @@ function graph() {
 
               // sigma.instances(0).refresh();
 
-              var new_forceatlas_options = forceatlas_options;
+              var new_forceatlas_options = userFactory.getGraphOption('forceatlas_options');
 
               new_forceatlas_options.slowDown = 1000;
               new_forceatlas_options.startingIterations = 0;
@@ -692,8 +675,8 @@ function graph() {
                                     }
                                     else {
                                         // otherwise show the nodes that are in in the addcontext but NOT in the original one as GRAY
-                                        n.originalColor = color_addcontext;
-                                        n.color = color_addcontext;
+                                        n.originalColor = userFactory.getGraphOption('color_addcontext');
+                                        n.color = userFactory.getGraphOption('color_addcontext');
                                     }
 
                                 }
@@ -841,17 +824,18 @@ function graph() {
 }
 
 
+// We store our timeout process here
+var timeOutVarSigma = '';
 
-var timeOutVar = '';
-
+// This activates some Sigma-specific functions
 function sigmaGraph() {
     return {
         startLayout: function(timeout, terminator) {
             if (terminator) {
-                clearTimeout(timeOutVar);
+                clearTimeout(timeOutVarSigma);
             }
             else {
-                timeOutVar = setTimeout(function() {
+                timeOutVarSigma = setTimeout(function() {
                             sigma.instances(0).stopForceAtlas2();
                             sigma.instances(0).killForceAtlas2();
                             $('#improve-layout').removeClass('layout-on');
@@ -870,7 +854,7 @@ function sigmaGraph() {
                     $('#improve-layout').removeClass('layout-on');
                     if (timeout) {
                             setTimeout(function() {
-                                sigma.instances(0).startForceAtlas2(forceatlas_options);
+                                sigma.instances(0).startForceAtlas2(userFactory.getGraphOption('forceatlas_options'));
                                 $('#improve-layout').addClass('layout-on');
                                 sigmaGraph().startLayout(timeout);
                             },200);                         
@@ -878,7 +862,7 @@ function sigmaGraph() {
             }
             else {
                   // sigma.configForceAtlas2({scalingRatio: 0.1});
-                  sigma.instances(0).startForceAtlas2(forceatlas_options);
+                  sigma.instances(0).startForceAtlas2(userFactory.getGraphOption('forceatlas_options'));
                   $('#improve-layout').addClass('layout-on');
                   if (timeout) {
                     sigmaGraph().startLayout(timeout);
