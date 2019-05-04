@@ -39,7 +39,7 @@ InfraNodus is a non-commercial [venture fiction](https://noduslabs.com/research/
 
 The method is mainly based on the approach outlined in Paranyushkin (2011) **[Identifying the Pathways of Meaning Circulation Using Text Network Analysis](https://noduslabs.com/research/pathways-meaning-circulation-text-network-analysis/)**. If you use the tool, you can cite this paper. 
 
-A more precise description of InfraNodus' algorithm is presented in Paranyushkin (2019) **InfraNodus — Generating Insight Using Text Network Analysis** (to be published in the Proceedings for WWWW 19 The Web Conference).
+A more precise description of InfraNodus' algorithm is presented in Paranyushkin (2019) **InfraNodus — Generating Insight Using Text Network Analysis** (to be published in the Proceedings for the WWW'19 The Web Conference).
 
 A more easy-to-read article on the tool is published in **[Towards Data Science](https://towardsdatascience.com/measuring-discourse-bias-using-text-network-analysis-9f251be5f6f3)**.
 
