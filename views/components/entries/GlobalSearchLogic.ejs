@@ -182,8 +182,8 @@ function findContexts(squery, pinnedNodes) {
             }
         }
         else {
-          graphFactory.deactivateRemoveResults();
-          voiceInputPanel.showMessage('Nothing found in your graphs. Try to select some nodes on the graph and then search again. Or add more graphs first.', 5000);
+          globalSearch.deactivateRemoveResults();
+          voiceInputPanel().showMessage('Nothing found in your graphs. Try to select some nodes on the graph and then search again. Or add more graphs first.', 5000);
         }
 
         graph().refreshGraph();       
