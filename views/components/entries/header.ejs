@@ -273,8 +273,8 @@
         // Are we watching somebody else's graph?
         userFactory.setViewType('external');
         userFactory.setWatchedUser('<%= perceivername %>');
-
         userFactory.setWalkthrough('external');
+
         <% if (showcontexts && maxnodes) { %>
         userFactory.setJsonPath('/api/public/nodes/<%= perceivername %>/<%= context %>?showcontexts=<%= showcontexts %>&maxnodes=<%= maxnodes %>');
         <% } else if (showcontexts) { %>
@@ -287,6 +287,11 @@
         userFactory.setJsonPath('/api/public/nodes/<%= perceivername %>/<%= context %>?maxnodes=<%= vieweduser.maxnodes %>');
         <% } else { %>
         userFactory.setJsonPath('/api/public/nodes/<%= perceivername %>/<%= context %>');
+        <% } %>
+        
+        <% if (addcontext) { %>   
+        userFactory.setJsonPath('/api/public/nodes/<%= perceivername %>/<%= context %>?addcontext=<%= addcontext %>');
+        userFactory.setAddContext('<%= addcontext %>');
         <% } %>
     <% } %>
     <% } else { %>

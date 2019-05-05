@@ -179,11 +179,20 @@ function graph() {
 
                 tot = tot + 1;
                 
+            
+
                 if (contexts_length > 0) {
                   if (contextids.indexOf(nodes.id) > -1) {
-                      nodes.size = maxnodesize;
-                      nodes.originalLabel = 'context: ' + nodes.originalLabel;
-                      nodes.label = 'context: ' + nodes.label;
+                    // let context_url = userFactory.getCurrentUser() + '/' + nodes.originalLabel;
+                    // if (userFactory.isLoggedIn() == true) {
+                    //     context_url += '/edit';
+                    // }
+                    nodes.size = userFactory.getGraphOption('maxnodesize') + 2;
+                    nodes.originalLabel = 'context: ' + nodes.originalLabel;
+                    nodes.label = 'context: ' + nodes.label;
+                    nodes.type = 'square';
+                    nodes.color = '#6689d0';
+                    // nodes.url = userFactory.getCurrentUser() + '/' + nodes.originalLabel;
                   }
                 }
                
