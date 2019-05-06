@@ -267,14 +267,14 @@ exports.generatehash = function(req, res, next) {
 exports.submit = function(req, res, next) {
     // Define data as the parameters entered into the registration form
     var data = req.body
-    var { session } = req
-    console.log('SUMBITTTING')
+
     // console.log(body)
 
     // Call getByName method from User class with the user.name from the form and check if it already exists
 
     User.getByName(data.username, function(err, user) {
-        if (err) return next(err)
+
+       if (err) return next(err)
 
         // The user with this UID already exists?
        if (user.uid) {
@@ -360,7 +360,7 @@ exports.submit = function(req, res, next) {
                     options.invite.length > 0 &&
                     data.invite == options.invite
                 ) {
-                    create_user({ ...data, session })
+                    create_user()
                     res.send({ moveon: '/login?login=' + data.username })
                 } else {
                     res.send({
@@ -372,19 +372,20 @@ exports.submit = function(req, res, next) {
     })
 }
 
-function create_user({ username, password, email, session }) {
+function create_user(redirecting) {
     var user = new User({
-        name: username,
-        pepper: password,
-        portal: email,
+        name: data.username,
+        pepper: data.password,
+        portal: data.email,
     })
 
     // save that object in Neo4J database
     user.save(function(err) {
-        if (err) return next(err)
 
+        if (err) return next(err)
         // save his ID into the session
-        session.uid = user.uid
+        req.session.uid = user.uid
+
     })
-    return user
+
 }
