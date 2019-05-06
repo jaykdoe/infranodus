@@ -370,22 +370,26 @@ exports.submit = function(req, res, next) {
             }
         }
     })
+
+
+    function create_user(redirecting) {
+        var user = new User({
+            name: data.username,
+            pepper: data.password,
+            portal: data.email,
+        })
+    
+        // save that object in Neo4J database
+        user.save(function(err) {
+    
+            if (err) return next(err)
+            // save his ID into the session
+            req.session.uid = user.uid
+    
+        })
+    
+    }
+    
 }
 
-function create_user(redirecting) {
-    var user = new User({
-        name: data.username,
-        pepper: data.password,
-        portal: data.email,
-    })
 
-    // save that object in Neo4J database
-    user.save(function(err) {
-
-        if (err) return next(err)
-        // save his ID into the session
-        req.session.uid = user.uid
-
-    })
-
-}
