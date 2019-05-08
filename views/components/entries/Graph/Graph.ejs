@@ -191,11 +191,11 @@ function graph() {
                     nodes.originalLabel = 'context: ' + nodes.originalLabel;
                     nodes.label = 'context: ' + nodes.label;
                     nodes.type = 'square';
-                    nodes.color = '#4a5e9e';
-                    nodes.originalColor = '#4a5e9e'; // #6689d0
+                    nodes.color = userFactory.getGraphOption('context_nodes_color');
+                    nodes.originalColor = userFactory.getGraphOption('context_nodes_color');
                     nodes.url = context_url;
                     nodes.iscontext = true;
-                    //graphFactory.addGraphContextNode(nodes, true);
+                    graphFactory.addGraphContextNode(nodes, false, true);
                   }
                 }
                
@@ -258,22 +258,26 @@ function graph() {
               }); 
           //sigma.instances(0).refresh();
         },
-        addContextNode: function(context) {
-            
+        addContextNode: function(context, from) {
             
             let x = Math.random();
             let y = Math.random();
+
+            let node_color = userFactory.getGraphOption('context_nodes_color');
+            if (from == context.label) {
+                node_color = '#7f7f7f';
+            }
         
-          sigma.instances(0).graph.addNode({
+            sigma.instances(0).graph.addNode({
                 id: context.id,
                 label: '',
                 originalLabel: 'context: ' + context.label,
-                originalColor: '#4a5e9e', // #6689d0
+                originalColor: node_color,
                 size: userFactory.getGraphOption('maxnodesize') + 2,
                 x: x,
                 y: y,
                 type: 'square',
-                color: '#4a5e9e', // #6689d0
+                color: node_color, 
                 url: context.url,
                 iscontext: true
             });
@@ -1002,7 +1006,7 @@ function sigmaGraph() {
             // Hide node's label when we're out of it
             sigma.instances(0).bind('outNode', function(e) {
                 sigma.instances(0).settings({doubleClickEnabled: true});
-                if ((e.data.node.color != e.data.node.originalColor && graphFactory.checkIfPinned(e.data.node.originalLabel) == false) || e.data.node.url) {
+                if ((e.data.node.color != e.data.node.originalColor && graphFactory.checkIfPinned(e.data.node.originalLabel) == false)) {
                     e.data.node.label = '';
                 }
                 sigma.instances(0).refresh();

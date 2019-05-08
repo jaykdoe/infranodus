@@ -143,6 +143,7 @@ function nodeInputField() {
 function findContexts(squery, pinnedNodes) {
 
     let current_user = userFactory.getCurrentUser();
+    let current_context = userFactory.getCurrentContext();
 
     globalSearch.activateRemoveResults();
        
@@ -165,7 +166,7 @@ function findContexts(squery, pinnedNodes) {
 
                 let context = {label: sitems[item].name, id: sitems[item].id, url: sitems[item].url};
 
-                graphFactory.addGraphContextNode(context);
+                graphFactory.addGraphContextNode(context, current_context);
                 globalSearch.loadedRemoveResults();
 
                 if (previous_contexts.length > 0) {

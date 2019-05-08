@@ -250,12 +250,12 @@ const graphFactory = (() => {
                     return stats;
                 }
 
-                this.addGraphContextNode = function(context, nosigma) {
+                this.addGraphContextNode = function(context, from, nosigma) {
                     
                     if (graphContextNodes.indexOf(context.id) == -1) {
                         graphContextNodes.push(context.id);
                         if (!nosigma) {
-                            graph().addContextNode(context);
+                            graph().addContextNode(context, from);
                         }
                     }
                     
