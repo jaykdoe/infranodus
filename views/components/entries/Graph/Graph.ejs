@@ -172,7 +172,6 @@ function graph() {
                 nodesize = nodes.size;
                 if (maxnodesize < nodesize) maxnodesize = nodesize;
                 nodes.color = color_context;
-                nodes.originalColor = color_context;
                 
                 // Save for backup
                 nodes.originalColor = color_context;
@@ -193,6 +192,7 @@ function graph() {
                     nodes.label = 'context: ' + nodes.label;
                     nodes.type = 'square';
                     nodes.color = '#6689d0';
+                    nodes.originalColor = '#6689d0';
                     nodes.url = context_url;
                     nodes.iscontext = true;
                   }
