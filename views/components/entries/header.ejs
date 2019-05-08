@@ -288,7 +288,7 @@
         <% } else { %>
         userFactory.setJsonPath('/api/public/nodes/<%= perceivername %>/<%= context %>');
         <% } %>
-        
+
         <% if (addcontext) { %>   
         userFactory.setJsonPath('/api/public/nodes/<%= perceivername %>/<%= context %>?addcontext=<%= addcontext %>');
         userFactory.setAddContext('<%= addcontext %>');
@@ -396,7 +396,8 @@
         if(document.documentElement.hasAttribute('theme')){
             was_black = true;
             document.documentElement.removeAttribute('theme');
-            userFactory.setGraphOption('default_label_color','#000');     
+            userFactory.setGraphOption('default_label_color','#000');    
+            localStorage.setItem('background', ''); 
         }
         else {
             document.documentElement.setAttribute('theme', 'dark');
@@ -407,23 +408,26 @@
                 userFactory.setGraphOption('deselected_nodes_color','#444');
             }
             userFactory.setGraphOption('default_label_color','#ffffff');
+            localStorage.setItem('background', 'dark');
             
         }
         if (e) {
             if (was_black == true) {
-                sigma.settings.defaultLabelColor = '#000';
+                sigma.instances(0).settings({defaultLabelColor: '#000'});
             }
             else {
-                sigma.settings.defaultLabelColor = '#fff';
+                sigma.instances(0).settings({defaultLabelColor: '#fff'});
             }
             sigma.instances(0).refresh();
         }
         
     }
 
-    if (userFactory.getBackground() == 'dark') {
+    if (userFactory.getBackground() == 'dark' || (localStorage.getItem('background') && localStorage.getItem('background') != userFactory.getBackground())) {
         toggleTheme();
     }
+
+
 
     </script>
     <link rel='stylesheet' href='/stylesheets/jquery.textcomplete.css' />
