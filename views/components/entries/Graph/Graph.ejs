@@ -901,68 +901,35 @@ function sigmaGraph() {
                 
                 if (userFactory.isSigmaDragged() == false) {
                     
-                  var nodeLabel = e.data.node.originalLabel;
+                    let nodeLabel = e.data.node.originalLabel;
+    
+                    // TODO to check that
+                    if (userFactory.isInterpretOn() == true) {
+                        $('.entry').show();
+                    }
   
-                  // TODO to check that
-                  if (userFactory.isInterpretOn() == true) {
-                    $('.entry').show();
-                  }
-  
-                  // If we click on the context node, just bring us to that context
-                  if (nodeLabel.substr(0,9) == 'context: ') {
+        
+                    // Is the node pinned?
+                    if (graphFactory.checkIfPinned(nodeLabel) == false) {
+                        // Add to pinned and launch the whole filtering machinery
+                        graphFactory.addToPinnedNodes(nodeLabel);
+                    }
+                    else {   
+                        graphFactory.removeFromPinnedNodes(nodeLabel);                                    
+                    }
 
+                    // Let's send an event to all the collaborators in the chatroom
+                    socket.emit('node click', {pinnedNodes: graphFactory.getPinnedNodes()});
                         
-                        // TODO if not pinnedNodes are selected, make a search on this context 
-                        // TODO pin the nodes on this graph
-                        // TODO if pins are on, then proceed as below
-                        // TODO for mobile devices — first show, then the logic above
-
-                        let add_url = '';
-                  
-                        if (nodeLabel.indexOf(', by') == -1 && userFactory.isLoggedIn()) {
-                            add_url += '/edit';
-                        }
-
-                        let pinnedNodes = graphFactory.getPinnedNodes();
-                        for (let pin in pinnedNodes) {
-                            if (pin == 0) {
-                                add_url += '?keywords=' + pinnedNodes[pin];
-                            }
-                            else {
-                                add_url += "+" + pinnedNodes[pin];
-                            }
-                        }
-                        if (e.data.node.url) {
-                            window.open(e.data.node.url + add_url,"_self");
-                        }
-                        else {
-                            window.open('/' + userFactory.getCurrentUser() + '/' + nodeLabel.substr(9,nodeLabel.length) + add_url,"_self");
-                        }
-                  }
-                  else {
-  
-                      // Is the node pinned?
-                      if (graphFactory.checkIfPinned(nodeLabel) == false) {
-                          // Add to pinned and launch the whole filtering machinery
-                          graphFactory.addToPinnedNodes(nodeLabel);
-                      }
-                      else {   
-                          graphFactory.removeFromPinnedNodes(nodeLabel);                                    
-                      }
-  
-                      // Let's send an event to all the collaborators in the chatroom
-                      socket.emit('node click', {pinnedNodes: graphFactory.getPinnedNodes()});
-                          
-                      // If the window is wide enough to show the menu AND div with statements is not visible
-                      if ($("#statements").is(":hidden") || $("#entries").css("visibility") === "hidden") {
-                        // TODO blink the button
+                    // If the window is wide enough to show the menu AND div with statements is not visible
+                    if ($("#statements").is(":hidden") || $("#entries").css("visibility") === "hidden") {
+                    // TODO blink the button
                         if (!userFactory.getViewOption('tip_shown') && graphFactory.existPinnedNodes()) {
                             userFactory.setViewOption('tip_shown', 1);
                             voiceInputPanel().showMessage('open the entries to see the excerpts...', 4000);
                         }
-                      }
-  
-                  }
+                    }
+                  
   
                 }
   
@@ -970,19 +937,66 @@ function sigmaGraph() {
                 userFactory.setSigmaDragged('0');
   
   
-              });
+            });
+
+
+            sigma.instances(0).bind('doubleClickNode', function(e) {
+
+                let nodeLabel = e.data.node.originalLabel;
+
+                if (nodeLabel.substr(0,9) == 'context: ') {
+
+                    // TODO if not pinnedNodes are selected, make a search on this context 
+                    // TODO pin the nodes on this graph
+                    // TODO if pins are on, then proceed as below
+                    // TODO for mobile devices — first show, then the logic above
+
+                    let add_url = '';
+                
+                    if (nodeLabel.indexOf(', by') == -1 && userFactory.isLoggedIn()) {
+                        add_url += '/edit';
+                    }
+
+                    let pinnedNodes = graphFactory.getPinnedNodes();
+                    for (let pin in pinnedNodes) {
+                        if (pin == 0) {
+                            if (pinnedNodes[pin].indexOf('context:') == -1) {
+                                add_url += '?keywords=' + pinnedNodes[pin];
+                            }
+                        }
+                        else {
+                            if (pinnedNodes[pin].indexOf('context:') == -1) {
+                                add_url += "+" + pinnedNodes[pin];
+                            }
+                        }
+                    }
+                    if (e.data.node.url) {
+                        window.open(e.data.node.url + add_url,"_self");
+                    }
+                    else {
+                        window.open('/' + userFactory.getCurrentUser() + '/' + nodeLabel.substr(9,nodeLabel.length) + add_url,"_self");
+                    }
+                }
+                else {
+
+                }
+
+            });
+
+
         },
         highlightNode: function() {
 
             // Show the node's label when we're over it
             sigma.instances(0).bind('overNode', function(e) {
+                  sigma.instances(0).settings({doubleClickEnabled: false});
                   e.data.node.label = e.data.node.originalLabel;
                   sigma.instances(0).refresh();
             });
 
             // Hide node's label when we're out of it
             sigma.instances(0).bind('outNode', function(e) {
-                
+                sigma.instances(0).settings({doubleClickEnabled: true});
                 if ((e.data.node.color != e.data.node.originalColor && graphFactory.checkIfPinned(e.data.node.originalLabel) == false) || e.data.node.url) {
                     e.data.node.label = '';
                 }
