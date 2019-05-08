@@ -191,10 +191,11 @@ function graph() {
                     nodes.originalLabel = 'context: ' + nodes.originalLabel;
                     nodes.label = 'context: ' + nodes.label;
                     nodes.type = 'square';
-                    nodes.color = '#6689d0';
-                    nodes.originalColor = '#6689d0';
+                    nodes.color = '#4a5e9e';
+                    nodes.originalColor = '#4a5e9e'; // #6689d0
                     nodes.url = context_url;
                     nodes.iscontext = true;
+                    //graphFactory.addGraphContextNode(nodes, true);
                   }
                 }
                
@@ -267,12 +268,12 @@ function graph() {
                 id: context.id,
                 label: '',
                 originalLabel: 'context: ' + context.label,
-                originalColor: '#6689d0',
+                originalColor: '#4a5e9e', // #6689d0
                 size: userFactory.getGraphOption('maxnodesize') + 2,
                 x: x,
                 y: y,
                 type: 'square',
-                color: '#6689d0',
+                color: '#4a5e9e', // #6689d0
                 url: context.url,
                 iscontext: true
             });
@@ -978,7 +979,11 @@ function sigmaGraph() {
                     }
                 }
                 else {
-
+                    let dblClickQuery = [nodeLabel];
+                    setTimeout(function() {
+                        graphFactory.initPinnedNodes(dblClickQuery);
+                        globalSearchForm().submit();
+                    },300);        
                 }
 
             });

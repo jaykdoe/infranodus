@@ -50,8 +50,10 @@ let globalSearch = new GlobalSearch();
 function globalSearchForm() {
   return {
       submit: function(e) {
-        e.preventDefault();
-        e.stopPropagation();
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
         var squery = '';
       
         let pinnedNodes = [];
