@@ -123,6 +123,10 @@
                     n.size = node_degree;
                 }
 
+                if (n.iscontext) {
+                    n.size = Math.round(normalize(bcmax, bcmin, bcmax, 5, 35));
+                }
+
                 // Save the node's size to the global parameters - based on degree or BC, depending on the above
                 graphFactory.setNodeSize(n);
 

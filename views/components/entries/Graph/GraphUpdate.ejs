@@ -148,7 +148,7 @@ function filter_graph(pins){
             sigma.instances(0).graph.nodes().forEach(function(n) {
 
                 n.color = n.originalColor;
-                if (!n.url) {
+                if (!n.iscontext) {
                     n.label = n.originalLabel;
                 }
 

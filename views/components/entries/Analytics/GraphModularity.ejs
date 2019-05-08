@@ -68,7 +68,7 @@
                     // We now add the new community integer ID to all the nodes in the Sigma graph
 
                     sigma.instances(0).graph.nodes().forEach(function(n) {
-                        if (!n.url) {
+                        if (!n.iscontext) {
                             n.community = louvain_communities[n.id];
 
                             graphFactory.saveCommunityOfNode(n);

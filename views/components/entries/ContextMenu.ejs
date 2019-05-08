@@ -34,11 +34,11 @@ function populateContextMenu (contextNames) {
         var settingspane = '';
         <% if (perceivername) { %>
 
-            currentContextURL = '<li id="listall" class="menu-item-divided pure-menu-selected"><a href="/<%= perceivername %>" class="whiten">see all graphs</a></li>';
+            currentContextURL = '<li id="listall" class="menu-item-divided pure-menu-selected"><a href="/<%= perceivername %>?showcontexts=1" class="whiten">see all graphs</a></li>';
 
         <% } else { %>
 
-            currentContextURL = '<li id="listall" class="menu-item-divided pure-menu-selected"><a href="/<%= user.name %>/edit" class="whiten">see all graphs</a></li>';
+            currentContextURL = '<li id="listall" class="menu-item-divided pure-menu-selected"><a href="/<%= user.name %>/edit?showcontexts=1" class="whiten">see all graphs</a></li>';
 
         <% } %>
 
@@ -56,10 +56,10 @@ function populateContextMenu (contextNames) {
                     // for the menu
                     <% if (perceivername) { %>
                         context_filters += '<li class="app-context-link menu-item-divided pure-menu-selected"><a href="/<%= perceivername %>/' + n + '">' + n + '</a></li>';
-                        currentContextURL = '<li id="listall" class="menu-item-divided"><a href="/<%= perceivername %>" class="whiten">see all graphs</a></li>';
+                        currentContextURL = '<li id="listall" class="menu-item-divided"><a href="/<%= perceivername %>?showcontexts=1" class="whiten">see all graphs</a></li>';
                     <% } else { %>
                         context_filters += '<li class="app-context-link menu-item-divided pure-menu-selected"><a href="/<%= user.name %>/' + n + '/edit">' + n + '</a></li>';
-                        currentContextURL = '<li id="listall" class="menu-item-divided"><a href="/<%= user.name %>/edit" class="whiten">see all graphs</a></li>';
+                        currentContextURL = '<li id="listall" class="menu-item-divided"><a href="/<%= user.name %>/edit?showcontexts=1" class="whiten">see all graphs</a></li>';
                     <% } %>
                 }
                 else {
@@ -78,10 +78,10 @@ function populateContextMenu (contextNames) {
             if (!detectedContext && current_context) {
             <% if (perceivername) { %>
                 context_filters = '<li class="app-context-link menu-item-divided pure-menu-selected"><a href="/<%= perceivername %>/' + current_context + '">' + current_context + '</a></li>' + context_filters;
-                currentContextURL = '<li id="listall" class="menu-item-divided"><a href="/<%= perceivername %>" class="whiten">see all graphs</a></li>';
+                currentContextURL = '<li id="listall" class="menu-item-divided"><a href="/<%= perceivername %>?showcontexts=1" class="whiten">see all graphs</a></li>';
             <% } else { %>
                 context_filters = '<li class="app-context-link menu-item-divided pure-menu-selected"><a href="/<%= user.name %>/' + current_context + '/edit">' + current_context + '</a></li>' + context_filters;
-                currentContextURL = '<li id="listall" class="menu-item-divided"><a href="/<%= user.name %>/edit" class="whiten">see all graphs</a></li>';
+                currentContextURL = '<li id="listall" class="menu-item-divided"><a href="/<%= user.name %>/edit?showcontexts=1" class="whiten">see all graphs</a></li>';
             <% } %>
             }
         }

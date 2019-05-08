@@ -130,6 +130,9 @@ function graph() {
                             suspects.push(e.target);
                         }
 
+                        // As this is a context node, set the context_matrix to none, so we don't process it in updateMetrics
+                        e.context_matrix = '';
+
                 }
 
                 // If an edge doesn't have prefix context, for sure it has only nodes
@@ -183,16 +186,14 @@ function graph() {
 
                 if (contexts_length > 0) {
                   if (contextids.indexOf(nodes.id) > -1) {
-                    // let context_url = userFactory.getCurrentUser() + '/' + nodes.originalLabel;
-                    // if (userFactory.isLoggedIn() == true) {
-                    //     context_url += '/edit';
-                    // }
+                    let context_url = '/' + userFactory.getCurrentUser() + '/' + nodes.originalLabel;
                     nodes.size = userFactory.getGraphOption('maxnodesize') + 2;
                     nodes.originalLabel = 'context: ' + nodes.originalLabel;
                     nodes.label = 'context: ' + nodes.label;
                     nodes.type = 'square';
                     nodes.color = '#6689d0';
-                    // nodes.url = userFactory.getCurrentUser() + '/' + nodes.originalLabel;
+                    nodes.url = context_url;
+                    nodes.iscontext = true;
                   }
                 }
                
@@ -271,13 +272,14 @@ function graph() {
                 y: y,
                 type: 'square',
                 color: '#6689d0',
-                url: context.url
+                url: context.url,
+                iscontext: true
             });
             
         },
         removeContextNodes: function() {
             sigma.instances(0).graph.nodes().forEach(function(n) {
-                if (n.url) {
+                if (n.iscontext) {
                     sigma.instances(0).graph.dropNode(n.id);
                 }
             });
@@ -343,7 +345,7 @@ function graph() {
             sigma.instances(0).graph.nodes().forEach(function(n) {
                 
                 // To avoid context: nodes
-                if (!n.url) {
+                if (!n.iscontext) {
 
                      // Add nodes into the Louvain object
                     node_data.push(n.id);
@@ -463,6 +465,9 @@ function graph() {
                     }
 
                 }
+                else {
+                    e.size = 6;
+                }
                 
 
             });
@@ -556,120 +561,122 @@ function graph() {
 
             sigma.instances(0).graph.nodes().forEach(function(n) {
 
-                // Give original color to the node
-                n.originalColor = rgbToHex(palette[n.community]._rgb[0],palette[n.community]._rgb[1],palette[n.community]._rgb[2]);
+                if (!n.iscontext) {
 
-                // This node is not pinned?
-                if (graphFactory.checkIfPinned(n.originalLabel) == false) {
+                    // Give original color to the node
+                    n.originalColor = rgbToHex(palette[n.community]._rgb[0],palette[n.community]._rgb[1],palette[n.community]._rgb[2]);
 
-                        // Are there any selected nodes?
-                        if (graphFactory.getSelectedNodes().length > 0) {
+                    // This node is not pinned?
+                    if (graphFactory.checkIfPinned(n.originalLabel) == false) {
 
-                            // Is this node the one that is selected?
-                            if (graphFactory.checkIfSelected(n.originalLabel) == true) {
-                                // Color its visible color
+                            // Are there any selected nodes?
+                            if (graphFactory.getSelectedNodes().length > 0) {
+
+                                // Is this node the one that is selected?
+                                if (graphFactory.checkIfSelected(n.originalLabel) == true) {
+                                    // Color its visible color
+                                    n.color = rgbToHex(palette[n.community]._rgb[0],palette[n.community]._rgb[1],palette[n.community]._rgb[2]);
+                                }
+
+                            }
+                            else {
+                                // The node is not pinned and is not selected, so we also make its visible color the same as the original
                                 n.color = rgbToHex(palette[n.community]._rgb[0],palette[n.community]._rgb[1],palette[n.community]._rgb[2]);
                             }
 
-                        }
-                        else {
-                            // The node is not pinned and is not selected, so we also make its visible color the same as the original
-                            n.color = rgbToHex(palette[n.community]._rgb[0],palette[n.community]._rgb[1],palette[n.community]._rgb[2]);
-                        }
+                    }
 
-                }
-
-                // Color the particular node if it appears in the analytics panel
-                analyticsPanel.colorNode(n, palette);
-                
-
-                // Check if the node is in additional context and if yes, give it a different color
-
-               
-                if (graphFactory.existNodesInContext(addcontext) == true && graphFactory.existNodesInContext(current_context) == true) {
+                    // Color the particular node if it appears in the analytics panel
+                    analyticsPanel.colorNode(n, palette);
                     
-                        // Are we on the interpret pane?
-                        if (userFactory.isInterpretOn() == true) {
-                            
-                            // Is the node in the current meta_ context?
-                            if (graphFactory.existsNodeInContext(current_context, n.id) == true) {
 
-                                // If no highlight is chosen, show that the node is in meta_
-                                if (!highlight) {
-                                    n.originalColor = '#90909f';
+                    // Check if the node is in additional context and if yes, give it a different color
 
-                                    // Same for display, but only if it's not pinned
-                                    if (pinnedNodes.indexOf(n.label) == -1) {
-                                        if (graphFactory.getSelectedNodes().length == 0) {
-                                            n.color = '#90909f';  
+                
+                    if (graphFactory.existNodesInContext(addcontext) == true && graphFactory.existNodesInContext(current_context) == true) {
+                        
+                            // Are we on the interpret pane?
+                            if (userFactory.isInterpretOn() == true) {
+                                
+                                // Is the node in the current meta_ context?
+                                if (graphFactory.existsNodeInContext(current_context, n.id) == true) {
+
+                                    // If no highlight is chosen, show that the node is in meta_
+                                    if (!highlight) {
+                                        n.originalColor = '#90909f';
+
+                                        // Same for display, but only if it's not pinned
+                                        if (pinnedNodes.indexOf(n.label) == -1) {
+                                            if (graphFactory.getSelectedNodes().length == 0) {
+                                                n.color = '#90909f';  
+                                            }
                                         }
                                     }
-                                }
-                            }
-                            else {
-                                // The node is not in the meta_ context but we have the highlight setting
-                            
-                                if (highlight) {
-
-                                    // Then show the nodes that are in the additional context, but not in the meta yet (DIFF)
-                                    n.originalColor = userFactory.getGraphOption('highlight_addcontext');
-                                    
-                                    // Unless it is pinned
-                                    if (pinnedNodes.indexOf(n.label) == -1) {
-                                        if (graphFactory.getSelectedNodes().length == 0){
-                                            n.color = userFactory.getGraphOption('highlight_addcontext');
-                                        }
-                                    }
-                                }
-                            }
-
-                        }
-                        else {
-
-                            // We are comparing two contexts and we're not on the interpret (meta_) feature
-
-                            // We do NOT want to highlight the missing nodes, only the intersections
-                            if (!missing) {
-                                // Is the node both in the addcontext and in the current_context?
-                                if ((graphFactory.existsNodeInContext(addcontext, n.id) == true) && (graphFactory.existsNodeInContext(current_context, n.id) == true)) {
-                                    // Highlight is on? Highlight intersection
-                                    if (highlight) {
-                                        n.originalColor = userFactory.getGraphOption('highlight_addcontext');
-                                        n.color = userFactory.getGraphOption('highlight_addcontext');
-                                    }  
                                 }
                                 else {
-                                  
-                                    // Only in one or the other? Unless highlight is ON, color them gray
-                                    if (!highlight) {
-                                        n.originalColor = deselected_nodes_color;
-                                        n.color = deselected_nodes_color;
-                                    }  
-                                    // If highlight is ON, they'll stay their original community color
+                                    // The node is not in the meta_ context but we have the highlight setting
+                                
+                                    if (highlight) {
+
+                                        // Then show the nodes that are in the additional context, but not in the meta yet (DIFF)
+                                        n.originalColor = userFactory.getGraphOption('highlight_addcontext');
+                                        
+                                        // Unless it is pinned
+                                        if (pinnedNodes.indexOf(n.label) == -1) {
+                                            if (graphFactory.getSelectedNodes().length == 0){
+                                                n.color = userFactory.getGraphOption('highlight_addcontext');
+                                            }
+                                        }
+                                    }
                                 }
+
                             }
                             else {
-                                // Let's highlight the missing nodes
 
-                                // If the node is in the addcontext but not in the original context we're comparing it to
-                                if (graphFactory.existsNodeInContext(addcontext, n.id) == true && graphFactory.existsNodeInContext(current_context, n.id) != true) {
-                                    // If highlight feature is on, highlight the DIFF nodes
-                                    if (highlight) {
-                                        n.originalColor = userFactory.getGraphOption('highlight_addcontext');
-                                        n.color = userFactory.getGraphOption('highlight_addcontext');
+                                // We are comparing two contexts and we're not on the interpret (meta_) feature
+
+                                // We do NOT want to highlight the missing nodes, only the intersections
+                                if (!missing) {
+                                    // Is the node both in the addcontext and in the current_context?
+                                    if ((graphFactory.existsNodeInContext(addcontext, n.id) == true) && (graphFactory.existsNodeInContext(current_context, n.id) == true)) {
+                                        // Highlight is on? Highlight intersection
+                                        if (highlight) {
+                                            n.originalColor = userFactory.getGraphOption('highlight_addcontext');
+                                            n.color = userFactory.getGraphOption('highlight_addcontext');
+                                        }  
                                     }
                                     else {
-                                        // otherwise show the nodes that are in in the addcontext but NOT in the original one as GRAY
-                                        n.originalColor = userFactory.getGraphOption('color_addcontext');
-                                        n.color = userFactory.getGraphOption('color_addcontext');
+                                    
+                                        // Only in one or the other? Unless highlight is ON, color them gray
+                                        if (!highlight) {
+                                            n.originalColor = deselected_nodes_color;
+                                            n.color = deselected_nodes_color;
+                                        }  
+                                        // If highlight is ON, they'll stay their original community color
                                     }
+                                }
+                                else {
+                                    // Let's highlight the missing nodes
 
+                                    // If the node is in the addcontext but not in the original context we're comparing it to
+                                    if (graphFactory.existsNodeInContext(addcontext, n.id) == true && graphFactory.existsNodeInContext(current_context, n.id) != true) {
+                                        // If highlight feature is on, highlight the DIFF nodes
+                                        if (highlight) {
+                                            n.originalColor = userFactory.getGraphOption('highlight_addcontext');
+                                            n.color = userFactory.getGraphOption('highlight_addcontext');
+                                        }
+                                        else {
+                                            // otherwise show the nodes that are in in the addcontext but NOT in the original one as GRAY
+                                            n.originalColor = userFactory.getGraphOption('color_addcontext');
+                                            n.color = userFactory.getGraphOption('color_addcontext');
+                                        }
+
+                                    }
                                 }
                             }
-                        }
 
+                    }
                 }
-
 
 
              });
@@ -911,9 +918,10 @@ function sigmaGraph() {
 
                         let add_url = '';
                   
-                        if (nodeLabel.indexOf(', by') == -1) {
+                        if (nodeLabel.indexOf(', by') == -1 && userFactory.isLoggedIn()) {
                             add_url += '/edit';
                         }
+
                         let pinnedNodes = graphFactory.getPinnedNodes();
                         for (let pin in pinnedNodes) {
                             if (pin == 0) {

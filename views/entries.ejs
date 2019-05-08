@@ -85,6 +85,8 @@
 <%- include('components/entries/StatementSidePanel/EntryInputDialog/EntryInputHeaderLogic'); %>
 <%- include('components/entries/StatementSidePanel/EntryInputDialog/EntryInputFooterLogic'); %>
 <%- include('components/entries/StatementSidePanel/EntryInputDialog/EntryInputLogic'); %>   
+
+
    
  <!-- Graph statistics functions -->
 <%- include('components/entries/Analytics/GraphRank') %>
@@ -93,14 +95,14 @@
  <!-- Main graph functions (color, align, process) -->
 <%- include('components/entries/Graph/Graph') %>
 
-<!-- Generate a new graph on load -->
-<%- include('components/entries/Graph/GraphGenerate') %>
-
 <!-- What happens when we click the nodes in the graph -->
 <%- include('components/entries/Graph/GraphUpdate') %>
 
 <!-- Load analytics -->
 <%- include('components/entries/Analytics/AnalyticsPaneLogic') %>
+
+<!-- Generate a new graph on load -->
+<%- include('components/entries/Graph/GraphGenerate') %>
 
 <!-- Logic for manipulating statements (hide, dynamic scroll) -->
 <%- include('components/entries/StatementMenuLogic'); %>
