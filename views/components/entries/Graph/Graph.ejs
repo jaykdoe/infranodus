@@ -693,6 +693,7 @@ function graph() {
 
                 let pinnedNodes = graphFactory.getPinnedNodes();
                 let selectedNods = graphFactory.getSelectedNodes();
+                let deselected_nodes_color = userFactory.getGraphOption('deselected_nodes_color');
 
                 // No pinned nodes on the graph?
                 if (pinnedNodes.length == 0) {
