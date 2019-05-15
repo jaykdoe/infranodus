@@ -23,9 +23,10 @@
         });
     
         $("#insight").click(function(e) {
-          
+            
             e.preventDefault();
-    
+
+      
             let insight_nodes = [];
         
             let insight_clusters = graphFactory.getInsightClusters();
@@ -45,6 +46,7 @@
             // Top community terms
     
             statementsPanelFactory.setCurrentStatementsView('INSIGHT');
+            
     
     
         });
@@ -315,7 +317,7 @@
                       // Make only those edges visible that belong to the statement selected
         
                       if (graphFactory.existPinnedNodes() == false) {
-                          if (filter_origin == 'insight') {
+                          if (filter_origin == 'insight') {                          
                              for (let i in top_community_words) {
                                let communityClicked = top_community_words[i]['id'].toString();
                                graphFactory.selectCommunity(communityClicked);

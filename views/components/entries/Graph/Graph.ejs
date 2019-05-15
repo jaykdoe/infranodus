@@ -705,7 +705,7 @@ function graph() {
                             n.color = n.originalColor;
                             n.label = n.originalLabel;
                         }
-                        else if (commClicked.indexOf(n.community.toString()) > -1) {
+                        else if (n.community && commClicked.indexOf(n.community.toString()) > -1) {
                             // The node's community is in the selection? color it
                             n.color = n.originalColor;
                             n.label = n.originalLabel; 
