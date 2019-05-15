@@ -132,18 +132,6 @@
                     // Populate Analytics Panel with community information
                     analyticsPanel.populateCommunities(topN_communities);
 
-                    // Create insight clusters from the community nodes
-                    graphFactory.createInsightClusters(topN_communities);
-
-                    // Populate Analytics Panel with insight recommendation
-
-                    let insightClusters = graphFactory.getInsightClusters();
-
-                    analyticsPanel.populateRecommendation(insightClusters);
-
-                    // Populate entries field
-                    addEntryForm().populateRecommendation(insightClusters);
-
                     // Get the top BC nodes
                     // TODO implement Jenks-Breaks to calculate the optimal number of nodes shown
                     let topInfluenceNodes = graphFactory.getTopBCNodes(4);
@@ -356,6 +344,18 @@
 
                     graphFactory.setStats('PolysingularityScore', diversity_score);
 
+
+                    // Create insight clusters from the community nodes
+                    graphFactory.createInsightClusters(topN_communities);
+
+                    // Populate Analytics Panel with insight recommendation
+
+                    let insightClusters = graphFactory.getInsightClusters();
+
+                    analyticsPanel.populateRecommendation(insightClusters);
+
+                    // Populate entries field
+                    addEntryForm().populateRecommendation(insightClusters);
                     
 
                     // How influential nodes are dispersed among the communities

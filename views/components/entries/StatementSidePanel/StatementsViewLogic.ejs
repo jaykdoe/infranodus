@@ -315,8 +315,15 @@
                       // Make only those edges visible that belong to the statement selected
         
                       if (graphFactory.existPinnedNodes() == false) {
-        
-                          graph().selectEntries(entries_ids);
+                          if (filter_origin == 'insight') {
+                             for (let i in top_community_words) {
+                               let communityClicked = top_community_words[i]['id'].toString();
+                               graphFactory.selectCommunity(communityClicked);
+                             }
+                          }
+                          else {
+                            graph().selectEntries(entries_ids);
+                          }
                         
                       }
         
