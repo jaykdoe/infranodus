@@ -43,6 +43,7 @@ tutorialButton().onClick(activateTutorial);
 themeSwitchButton().onClick(toggleTheme);
 zoomInButton().onClick(zoomInGraph);
 zoomOutButton().onClick(zoomOutGraph);
+adjustSettingsButton().onClick(adjustSettings);
 
 
 function graphButton() {
@@ -81,6 +82,14 @@ function themeSwitchButton() {
     return {
         onClick: function(onClick) {
             $('#themeswitch').on('click', onClick);
+        }
+    }
+}
+
+function adjustSettingsButton() {
+    return {
+        onClick: function(onClick) {
+            $('#adjustsettings').on('click', onClick);
         }
     }
 }
@@ -125,6 +134,26 @@ function adjustGraphLayout() {
 
 function abstractGraphLayout() {
     sigmaGraph().abstractLayout();
+}
+
+function adjustSettings() {
+      
+        // Process logic and remember settings
+        $('#graphsettings').toggle('slide', function(){
+        // if ($('#graphsettings').is(":visible")) {
+        //     localStorage.setItem('graph', 1);
+        //     $('#analyticsbutton').addClass('analytics-on');
+        //     $('#analyticscaption').hide();
+
+        // }
+        // else {
+        //     localStorage.setItem('analytics', 0);
+        //     $('#analyticsbutton').removeClass('analytics-on')
+        //     $('#analyticscaption').show();
+        // }
+        });
+
+   
 }
 
 

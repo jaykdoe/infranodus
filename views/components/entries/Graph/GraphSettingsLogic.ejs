@@ -1,0 +1,80 @@
+<script>
+
+let filterPanel = new FilterPanel();
+
+function FilterPanel() {
+        
+        let filter = '';
+
+        // Logic when the filter panel is updated
+        this.updatePanel = function(graph,filter) {
+                        
+            // get max degree
+            var maxDegree = 0,
+                categories = {};
+            
+            categories = graphFactory.getContextNodeIDs();
+            
+            // read nodes
+            graph.nodes().forEach(function(n) {
+                maxDegree = Math.max(maxDegree, graph.degree(n.id));    
+            })
+
+            // min degree
+            document.getElementById('min-degree').max = maxDegree;
+            document.getElementById('max-degree-value').textContent = maxDegree;
+            
+            // node category
+            let nodecategoryElt = document.getElementById('node-category');
+            Object.keys(categories).forEach(function(c) {
+                let optionElt = document.createElement("option");
+                optionElt.text = c;
+                nodecategoryElt.add(optionElt);
+            });
+
+            // reset button
+            $('#filterreset').on("click", function(e) {
+                document.getElementById('min-degree').value = 0;
+                document.getElementById('min-degree-val').textContent = '0';
+                document.getElementById('node-category').selectedIndex = 0;
+                filter.undo().apply();
+                $('#dump').textContent = '';
+                $('#dump').hide();
+            });
+            
+
+        }
+
+        this.applyMinDegreeFilter = function(e) {
+            let v = e.target.value;
+            document.getElementById('min-degree-val').textContent = v;
+            filter
+            .undo('min-degree')
+            .nodesBy(function(n) {
+                return this.degree(n.id) >= v;
+            }, 'min-degree')
+            .apply();
+        }
+
+        this.applyCategoryFilter = function(e) {
+            let c = e.target[e.target.selectedIndex].value;
+            filter
+            .undo('node-category')
+            .nodesBy(function(n) {
+                return !c.length || graphFactory.existsNodeInContext(c, n.id)                
+            }, 'node-category')
+            .apply();
+        }
+
+        // Activate the main panel and the event listeners
+        this.activatePanel = function() {
+            filter = new sigma.plugins.filter(sigma.instances(0));
+            this.updatePanel(sigma.instances(0).graph, filter);
+            $('#min-degree').on("input", this.applyMinDegreeFilter);  // for Chrome and FF
+            $('#min-degree').on("change", this.applyMinDegreeFilter); // for IE10+, that sucks
+            $('#node-category').on("change", this.applyCategoryFilter);
+        }
+        
+}
+
+</script>

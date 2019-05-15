@@ -598,7 +598,7 @@ a:hover.app-more-link {
     font-size: 15px;
     line-height: 20px;
     text-align: left;
-    right: 15px;
+    right: 50px;
     width: 320px;
     clear: both;
     border-radius: 12px;
@@ -737,6 +737,54 @@ button {
 #resetgraph {
     background: #ededed;
 }
+
+
+
+#graphsettings {
+    font: 15px 'IstokWeb-Regular',sans-serif;
+    position: fixed;
+    top: 285px;
+    font-size: 15px;
+    line-height: 20px;
+    text-align: left;
+    right: 50px;
+    width: 250px;
+    clear: both;
+    border-radius: 12px;
+    padding: 0px 10px 10px 10px;
+    margin-right: 0px;
+    z-index: 12;
+    background-color: var(--analytics-pane-background);
+    /* box-shadow: 0px 1px 1px 2px #f3f4f6; */
+    word-wrap: break-word;
+    display:none;
+    box-shadow: 0 5px 40px rgba(0,0,0,.16)!important;
+    -webkit-box-shadow: 0 5px 40px rgba(0,0,0,.16)!important;
+}
+
+#filtergraph {
+    padding: 10px;
+    /* display: inline-block; */
+    clear: both;
+}
+
+
+#graphsettings a {
+    color: inherit!important;
+    text-decoration: none!important;
+}
+
+#graphsettings a:hover {
+    color: #0089E0!important;
+    text-decoration: underline!important;
+}
+
+#filtersettings {
+    background: #ffffff;
+}
+
+
+
 
 #livetext {
   position: fixed;

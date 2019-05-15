@@ -62,6 +62,8 @@
 
             <%- include('components/entries/Graph/GraphMenu') %>
 
+            <%- include('components/entries/Graph/GraphSettings') %>
+
             <%- include('components/entries/Analytics/Polysingularity'); %>   
 
             <%- include('components/entries/VoiceInput/VoiceInputLiveText'); %>
@@ -100,6 +102,9 @@
 
 <!-- Load analytics -->
 <%- include('components/entries/Analytics/AnalyticsPaneLogic') %>
+
+<!-- Load graph settings logic -->
+<%- include('components/entries/Graph/GraphSettingsLogic') %>
 
 <!-- Generate a new graph on load -->
 <%- include('components/entries/Graph/GraphGenerate') %>
