@@ -47,6 +47,11 @@ function GlobalSearch() {
 let globalSearch = new GlobalSearch();
 
 
+if (userFactory.getViewOption('showcontexts')) {
+  globalSearch.loadedRemoveResults();
+}
+
+
 function globalSearchForm() {
   return {
       submit: function(e) {

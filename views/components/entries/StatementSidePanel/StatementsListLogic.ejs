@@ -328,6 +328,8 @@
                    let nodeIDs_reversed = graphFactory.getNodeIDsRev();
         
                    let nodesOfStatement = graphFactory.getAllNodesOfStatement();
+
+                   let pinnedContexts = graphFactory.getPinnedContexts();
         
                    $(".entry").each(function(){
         
@@ -364,6 +366,16 @@
         
                         }
         
+                      }
+
+                      // Let's also check if there's a context pinned whether this statement is in this context
+                      if (pinnedContexts.length > 0) {
+                          for (let c in pinnedContexts) {
+                             if (graphFactory.getContextsOfStatement(currentDiv).indexOf(pinnedContexts[c]) != -1) {
+                                matchedThisEntry = 1;
+                                totalEntriesMatched += 1;
+                             }
+                          } 
                       }
         
                       if (matchedThisEntry == 1) {

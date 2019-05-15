@@ -187,6 +187,9 @@ const graphFactory = (() => {
         
                 // These are the nodes that are selected
                 let pinnedNodes = [];
+
+                // These are the contexts that are pinned
+                let pinnedContexts = [];
         
                 // These are the nodes that were selected but not found (so gray pinnedNodes)
                 let notFoundNodes = [];
@@ -508,13 +511,21 @@ const graphFactory = (() => {
         
                 this.initPinnedNodes = function(nodes) {
 
-                    console.log('pinned nddes init')
+                    console.log('pinned nodes init')
 
                     if (nodes) {
                         pinnedNodes = nodes;
+                        pinnedContexts = [];
+                        // TODO find a better way to deal with the context nodes
+                        for (let n in nodes) {
+                            if (nodes[n].indexOf('context:') != -1) {
+                                pinnedContexts.push(nodes[n].substr(9));
+                            }
+                        }
                     }
                     else {
                         pinnedNodes = [];
+                        pinnedContexts = [];
                     }
                     
                     // Select the pinned nodes on the graph and the adjacent ones 
@@ -582,6 +593,9 @@ const graphFactory = (() => {
                     else {
                         return false;
                     }
+                }
+                this.getPinnedContexts = function() {
+                    return pinnedContexts;
                 }
         
                 this.updateNotFoundNodes = function(nodes) {

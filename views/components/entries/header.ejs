@@ -278,8 +278,10 @@
 
         <% if (showcontexts && maxnodes) { %>
         userFactory.setJsonPath('/api/public/nodes/<%= perceivername %>/<%= context %>?showcontexts=<%= showcontexts %>&maxnodes=<%= maxnodes %>');
+        userFactory.setViewOption('showcontexts', true);
         <% } else if (showcontexts) { %>
         userFactory.setJsonPath('/api/public/nodes/<%= perceivername %>/<%= context %>?showcontexts=<%= showcontexts %>');
+        userFactory.setViewOption('showcontexts', true);
         <% } else if (maxnodes) { %>
         userFactory.setJsonPath('/api/public/nodes/<%= perceivername %>/<%= context %>?maxnodes=<%= maxnodes %>');
         <% } else  { %>
@@ -306,6 +308,7 @@
         userFactory.setAddContext('<%= addcontext %>');
         <% } else if (showcontexts) { %>
         userFactory.setJsonPath('/api/user/nodes/<%= context %>?showcontexts=<%= showcontexts %>');
+        userFactory.setViewOption('showcontexts', true);
         <% } else if (maxnodes) { %>
         userFactory.setJsonPath('/api/user/nodes/<%= context %>?maxnodes=<%= maxnodes %>');
         userFactory.setMaxNodes('<%= maxnodes %>');
