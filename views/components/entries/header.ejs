@@ -287,11 +287,20 @@
         <% } else  { %>
         <% if (locals.vieweduser && vieweduser.maxnodes) { %>
         userFactory.setMaxNodes('<%= vieweduser.maxnodes %>');
-        userFactory.setJsonPath('/api/public/nodes/<%= perceivername %>/<%= context %>?maxnodes=<%= vieweduser.maxnodes %>');
+        <% if (context) { %>
+            userFactory.setJsonPath('/api/public/nodes/<%= perceivername %>/<%= context %>?maxnodes=<%= vieweduser.maxnodes %>');
         <% } else { %>
-        userFactory.setJsonPath('/api/public/nodes/<%= perceivername %>/<%= context %>');
+            userFactory.setJsonPath('/api/public/nodes/<%= perceivername %>/?showcontexts=1&maxnodes=<%= vieweduser.maxnodes %>');
+            userFactory.setViewOption('showcontexts', true);
         <% } %>
-
+        <% } else { %>
+        <% if (context) { %>    
+        userFactory.setJsonPath('/api/public/nodes/<%= perceivername %>/<%= context %>');
+        <% } else { %>
+        userFactory.setJsonPath('/api/public/nodes/<%= perceivername %>/?showcontexts=1');
+        userFactory.setViewOption('showcontexts', true);
+        <% } %>   
+        <% } %>
         <% if (addcontext) { %>   
         userFactory.setJsonPath('/api/public/nodes/<%= perceivername %>/<%= context %>?addcontext=<%= addcontext %>');
         userFactory.setAddContext('<%= addcontext %>');
