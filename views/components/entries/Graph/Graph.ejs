@@ -695,6 +695,7 @@ function graph() {
                 let selectedNods = graphFactory.getSelectedNodes();
                 let deselected_nodes_color = userFactory.getGraphOption('deselected_nodes_color');
 
+           
                 // No pinned nodes on the graph?
                 if (pinnedNodes.length == 0) {
          
@@ -705,7 +706,7 @@ function graph() {
                             n.color = n.originalColor;
                             n.label = n.originalLabel;
                         }
-                        else if (n.community && commClicked.indexOf(n.community.toString()) > -1) {
+                        else if (n.community >= 0 && commClicked.indexOf(n.community.toString()) > -1) {
                             // The node's community is in the selection? color it
                             n.color = n.originalColor;
                             n.label = n.originalLabel; 
@@ -957,17 +958,34 @@ function sigmaGraph() {
                     // TODO if pins are on, then proceed as below
                     // TODO for mobile devices — first show, then the logic above
 
+                    let edit_url = '';
+
                     let add_url = '';
+
+                    let addcontext_url = '';
                 
                     if (nodeLabel.indexOf(', by') == -1 && userFactory.isLoggedIn()) {
-                        add_url += '/edit';
+                        edit_url += '/edit';
+                    }
+
+                    // Check if additional contexts are selected
+                    if ($(".addcontext-on").is(":visible")) {
+                        addcontext_url += '?addcontext=' + userFactory.getCurrentContext();
+                    }
+                    else if ($(".diffcontext-on").is(":visible")) {
+                        addcontext_url += '?addcontext=' + userFactory.getCurrentContext() + '&highlight=1&missing=1';
                     }
 
                     let pinnedNodes = graphFactory.getPinnedNodes();
                     for (let pin in pinnedNodes) {
                         if (pin == 0) {
                             if (pinnedNodes[pin].indexOf('context:') == -1) {
-                                add_url += '?keywords=' + pinnedNodes[pin];
+                                if (addcontext_url.length == 0) {
+                                    add_url += '?keywords=' + pinnedNodes[pin];
+                                } 
+                                else {
+                                    add_url += '&keywords=' + pinnedNodes[pin];
+                                }
                             }
                         }
                         else {
@@ -976,11 +994,13 @@ function sigmaGraph() {
                             }
                         }
                     }
+                 
+                  
                     if (e.data.node.url) {
-                        window.open(e.data.node.url + add_url,"_self");
+                        window.open(e.data.node.url + edit_url + addcontext_url + add_url,"_self");
                     }
                     else {
-                        window.open('/' + userFactory.getCurrentUser() + '/' + nodeLabel.substr(9,nodeLabel.length) + add_url,"_self");
+                        window.open('/' + userFactory.getCurrentUser() + '/' + nodeLabel.substr(9,nodeLabel.length) + edit_url + addcontext_url + add_url,"_self");
                     }
                 }
                 else {
