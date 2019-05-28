@@ -51,6 +51,9 @@
 
     --diffcontext-link-opacity: 0.9;
     --diffcontext-link-background-image: url('/images/diff.png')!important;
+
+    --privacy-link-share-image: url('/images/share.png');
+    --privacy-link-share-opacity: 0.9;
 }
 
 :root[theme='dark'] {
@@ -103,6 +106,9 @@
 
     --diffcontext-link-opacity: 0.6;
     --diffcontext-link-background-image: url('/images/diff-white.png')!important;
+
+    --privacy-link-share-image: url('/images/share-white.png');
+    --privacy-link-share-opacity: 0.6;
 }
 
 
@@ -324,7 +330,7 @@ small screens.
 
 
 #statements-link {
-    position: fixed;
+    position: absolute;
     display: inline; /* show this only on small screens */
     top: 40px;
     left: 0; /* "#menu width" */
@@ -345,7 +351,7 @@ small screens.
 
 
 #timer-link {
-    position: fixed;
+    position: absolute;
     display: inline; /* show this only on small screens */
     top: 160px;
     left: 0; /* "#menu width" */
@@ -371,7 +377,7 @@ small screens.
 }
 
 #watch-link {
-    position: fixed;
+    position: absolute;
     display: inline; /* show this only on small screens */
     top: 200px;
     left: 0; /* "#menu width" */
@@ -476,20 +482,23 @@ small screens.
 
 
 #privacy-link {
-    background: url('/images/share.png');
-    background-repeat:no-repeat;
-    background-position:center;
-    border: 0;
     position: absolute;
     display: inline; /* show this only on small screens */
-    bottom: 10px;
-    right: 70px; /* "#menu width" */
-    font-size: 8px; /* change this value to increase/decrease button size */
-    width: 2em;
-    height: auto;
-    float: right;
-    padding: 3.3em 1.6em;
+    top: 240px;
+    left: 0; /* "#menu width" */
+    background: none;
+    text-align: left;
+    font-size: 32px; /* change this value to increase/decrease button size */
+    width: 32px;
+    height: 32px;
+    /* float: right; */
+    padding: 5px 5px;
     z-index: 10;
+    background-image: var(--privacy-link-share-image);
+    opacity: var(--privacy-link-share-opacity);
+    background-repeat:no-repeat;
+    background-position:center;
+    pointer-events: auto!important;
 }
 
 #collaborate-link {
@@ -595,8 +604,8 @@ small screens.
 #microphone-link {
     display: none;
     opacity: var(--microphone-link-opacity);
-    position: fixed;
-    top: 240px;
+    position: absolute;
+    top: 320px;
     left: 0;
     font-size: 8px; /* change this value to increase/decrease button size */
     width: 32px;
@@ -610,9 +619,14 @@ small screens.
 
 }
 
+#statementmenu {
+    position: fixed;
+    top: 0px;
+}
+
 #addcontext-link {
 
-    position: fixed;
+    position: absolute;
     top: 80px;
     left: 0;
     background: none;
@@ -646,7 +660,7 @@ small screens.
 
 #diffcontext-link {
 
-    position: fixed;
+    position: absolute;
     top: 120px;
     left: 0;
     background: none;

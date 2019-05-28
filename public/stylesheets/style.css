@@ -566,8 +566,8 @@ a:hover.app-more-link {
 #entries {
     position: relative;
     top: 0;
-    left: 0;
-    padding-left: 50px;
+    left: 50px;
+    padding-left: 0px;
     padding-top: 0px;
     height: 100%;
     z-index: 5;

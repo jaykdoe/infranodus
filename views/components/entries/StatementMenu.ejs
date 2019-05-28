@@ -1,3 +1,8 @@
+<div id='statementmenu'>
+
+<a href="javascript:" class="tooltip" title="hide the text pane" id="statements-link">
+    <span></span>
+</a> 
 <a href="javascript:" id="addcontext-link" class="tooltip editorpane" title="see the similarities with another graph (intersections): click this and then choose another graph in the menu.">
         <!-- Addcontext icon -->
         <span></span>
@@ -8,10 +13,6 @@
         <span></span>
 </a>
 
-<a href="javascript:" class="tooltip" title="hide the text pane" id="statements-link">
-    <span></span>
-</a> 
-
 <a href="javascript:" class="tooltip" title="make graph dynamic: as you scroll the text entries you'll see them highlighted" id="timer-link">
     <span></span>
 </a> 
@@ -19,5 +20,27 @@
 <a href="javascript:" class="tooltip" title="play dynamic graph: infranodus will scroll the text entries and highlight them on the graph" id="watch-link">
     <span></span>
 </a> 
+
+<% if (contextpublic && context && !perceivername) { %>
+    <a href="javascript:" id="privacy-link" class="is-public">
+        <!-- Share icon -->
+        <span></span>
+    </a>
+<% } else if (!perceivername && context) { %>
+    <a href="javascript:" id="privacy-link">
+        <!-- Share icon -->
+        <span></span>
+    </a>
+<% } %>
+
+<% if (!perceivername) { %>
+    <a href="javascript:" id="microphone-link" class="tooltip editorpane" title="voice to text on/off">
+        <!-- Microphone icon -->
+        <span></span>
+    </a>
+    
+<% } %>
+
+</div>
 
 

@@ -122,4 +122,100 @@
         }
     });
 
+
+    // Function to construct a graph share URL
+
+    const graphShareConstructor = (() => {
+
+        function GraphShareConstructor() {
+            
+            let site_user_url = userFactory.getHostSite() + '/' + userFactory.getCurrentUser();
+
+
+            if (userFactory.getCurrentContext()) {
+                site_user_url += "/" + userFactory.getCurrentContext();
+            }
+
+            let graph_share_url = site_user_url + '?';
+
+            if (userFactory.getBackground()) {
+                graph_share_url += 'background=' + userFactory.getBackground() + '&';
+            }
+
+            if (userFactory.getGraphOption('abstract') == 'true') {
+                graph_share_url += '&abstract=true&hide_always=1&';
+            }
+
+            if (userFactory.getMostInfluential()) {
+                graph_share_url += '&most_influential=' + userFactory.getMostInfluential() + '&';
+            }
+
+            if (userFactory.getMaxNodes()) {
+                graph_share_url += '&maxnodes=' + userFactory.getMaxNodes() + '&';
+            }
+
+            let privacy_iframe = "<iframe width='100%' height='500' style='height: 500px' src='https://" + graph_share_url + "hide_always=1&link_hashtags=1&background=" + userFactory.getBackground() + "&maxnodes=" + userFactory.getMaxNodes() + "' frameborder='0' allowfullscreen></iframe>";
+
+            this.generateShareLink = function () {
+                let privacyform = '';
+                if (userFactory.isContextPublic() == true) {
+                    privacyform = $('<span><form action="/context" name="privacycontext" method="post" class="pure-form"><input type="hidden" name="context" value="<%= context %>">This context can be viewed on:<br><input type="text" id="embedurl" size="25" maxlength="80" class="pure-input" value="https://' + graph_share_url + '"><br><br>Embed code for websites:<br><input type="text" id="embedcode" size="25" maxlength="100" class="pure-input" value="' + privacy_iframe + '"><br><br><input type="submit" id="privacybutton" name="privacy" value="make private"></form></span>');
+                }
+                else if (userFactory.isLoggedIn() == true && userFactory.isInContext() == true) {
+                    privacyform = $('<span><form action="/context" name="privacycontext" method="post" class="pure-form"><input type="hidden" name="context" value="<%= context %>">This context is currently private and cannot be seen by the public.<br><br><input type="submit" id="privacybutton" name="privacy" value="make public"></form></span>');
+                }
+                return privacyform;
+            }
+
+            let collaborate_message = '<a href="mailto:chat@infranodus.com?subject=Chat%20Now&body=https://' + site_user_url + '/edit?collaborate=' + collabFactory.getCollabId() + '">Invite us</a> or other people for a real-time constellaversation – just share the link below:<br>';
+            let collaborate_html = '<span><form class="pure-form">' + collaborate_message + '<input type="text" id="collaburl" size="22" maxlength="80" class="pure-input" value="http://' + site_user_url + '/edit?collaborate=' + collabFactory.getCollabId() + '"></form></span>';
+            let collaborate_content = $(collaborate_html);
+
+            this.generateCollabLink = function () {
+                return collaborate_content;
+            }
+            
+        }
+
+        return new GraphShareConstructor();
+
+    })();
+
+
+    // Tooltipster for the graph share button
+
+    $('#privacy-link').tooltipster({
+        theme: 'tooltipster-noir',
+        position: 'right',
+        maxWidth: 220,
+        interactive: true,
+        content: graphShareConstructor.generateShareLink(),
+        functionReady: function() {
+            $('#embedurl').focus(function(event) {
+                setTimeout(function() {$('#embedurl').select();}, 0);
+            });
+            $('#embedcode').focus(function(event) {
+                setTimeout(function() {$('#embedcode').select();}, 0);
+            });
+        }
+    });
+
+
+    // For collaboration - Socket.IO chat
+
+    $('#collaborate-link').tooltipster({
+        theme: 'tooltipster-noir',
+        position: 'top-right',
+        maxWidth: 220,
+        interactive: true,
+        content: graphShareConstructor.generateCollabLink(),
+        functionReady: function() {
+            $('#collaburl').focus(function(event) {
+                this.setSelectionRange(0, 9999);
+            });
+        }
+    });
+
+
+
 </script>

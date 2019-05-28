@@ -9,17 +9,6 @@
     </a>
 <% } %>
 
-<% if (contextpublic && context && !perceivername) { %>
-    <a href="javascript:" id="privacy-link" class="is-public">
-        <!-- Share icon -->
-        <span></span>
-    </a>
-<% } else if (!perceivername && context) { %>
-    <a href="javascript:" id="privacy-link">
-        <!-- Share icon -->
-        <span></span>
-    </a>
-<% } %>
 
 <% if ((context) && (!perceivername)) { %>
     <form action='/post' name='deletecontext' id="deletecontext"
