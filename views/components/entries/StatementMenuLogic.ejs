@@ -167,7 +167,7 @@
                 return privacyform;
             }
 
-            let collaborate_message = '<a href="mailto:chat@infranodus.com?subject=Chat%20Now&body=https://' + site_user_url + '/edit?collaborate=' + collabFactory.getCollabId() + '">Invite us</a> or other people for a real-time constellaversation – just share the link below:<br>';
+            let collaborate_message = 'Collaborate with somebody else on the graph, just send them the link below:<br>';
             let collaborate_html = '<span><form class="pure-form">' + collaborate_message + '<input type="text" id="collaburl" size="22" maxlength="80" class="pure-input" value="http://' + site_user_url + '/edit?collaborate=' + collabFactory.getCollabId() + '"></form></span>';
             let collaborate_content = $(collaborate_html);
 

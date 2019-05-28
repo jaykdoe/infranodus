@@ -24,7 +24,7 @@
     --deletecontextbutton-opacity: 1;
     --deletecontextbutton-background-image: url('/images/trash.png')!important;
 
-    --collaborate-link-opacity: 1;
+    --collaborate-link-opacity: 0.8;
     --collaborate-link-background-image: url('/images/group.png')!important;
 
     --import-link-opacity: 1;
@@ -502,21 +502,24 @@ small screens.
 }
 
 #collaborate-link {
+
+    position: absolute;
+    display: inline; /* show this only on small screens */
+    top: 280px;
+    left: 0; /* "#menu width" */
+    background: none;
+    text-align: left;
+    font-size: 32px; /* change this value to increase/decrease button size */
+    width: 32px;
+    height: 32px;
+    /* float: right; */
+    padding: 5px 5px;
+    z-index: 10;
     background: var(--collaborate-link-background-image);
     opacity: var(--collaborate-link-opacity);
     background-repeat:no-repeat;
     background-position:center;
-    border: 0;
-    position: absolute;
-    display: inline; /* show this only on small screens */
-    bottom: 10px;
-    right: 35px; /* "#menu width" */
-    font-size: 8px; /* change this value to increase/decrease button size */
-    width: 2em;
-    height: auto;
-    float: right;
-    padding: 3.3em 1.6em;
-    z-index: 10;
+    pointer-events: auto!important;
 }
 
 

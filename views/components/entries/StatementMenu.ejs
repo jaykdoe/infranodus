@@ -34,6 +34,17 @@
 <% } %>
 
 <% if (!perceivername) { %>
+    <a href="javascript:" id="import-link" class="tooltip" title="import from external sources">
+        <!-- Import icon -->
+        <span></span>
+    </a>
+    <a href="javascript:" id="collaborate-link">
+        <!-- Collaborate icon -->
+        <span></span>
+    </a>
+<% } %>
+
+<% if (!perceivername) { %>
     <a href="javascript:" id="microphone-link" class="tooltip editorpane" title="voice to text on/off">
         <!-- Microphone icon -->
         <span></span>

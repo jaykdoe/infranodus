@@ -1,15 +1,3 @@
-<% if (!perceivername) { %>
-    <a href="javascript:" id="import-link" class="tooltip" title="import from external sources">
-        <!-- Import icon -->
-        <span></span>
-    </a>
-    <a href="javascript:" id="collaborate-link">
-        <!-- Collaborate icon -->
-        <span></span>
-    </a>
-<% } %>
-
-
 <% if ((context) && (!perceivername)) { %>
     <form action='/post' name='deletecontext' id="deletecontext"
         method='post' class='pure-form'
