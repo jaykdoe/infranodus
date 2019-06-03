@@ -24,7 +24,7 @@
     --deletecontextbutton-opacity: 1;
     --deletecontextbutton-background-image: url('/images/trash.png')!important;
 
-    --collaborate-link-opacity: 0.8;
+    --collaborate-link-opacity: 0.7;
     --collaborate-link-background-image: url('/images/group.png')!important;
 
     --import-link-opacity: 1;
@@ -437,14 +437,7 @@ small screens.
 #deletecontext {
     position: absolute;
     display: inline; /* show this only on small screens */
-    bottom: 0;
-    right: 105px; /* "#menu width" */
-    font-size: 8px; /* change this value to increase/decrease button size */
-    width: 2em;
-    height: auto;
-    float: right;
-    padding: 3.3em 1.6em;
-    z-index: 9;
+ 
 }
 
 
@@ -466,15 +459,26 @@ small screens.
 
     background-image: url('/images/trash-white.png')!important;
 }
+
 #deletecontextbutton {
-    background: var(--deletecontextbutton-background-image);
+    position: absolute;
+    display: inline; /* show this only on small screens */
+    top: 330px;
+    left: 5px; /* "#menu width" */
+    text-align: left;
+    font-size: 32px; /* change this value to increase/decrease button size */
+    width: 32px;
+    height: 32px;
+    border: 0;
+    /* float: right; */
+    padding: 5px 5px;
+    z-index: 10;
+    background: none;
+    background-image: var(--deletecontextbutton-background-image);
     opacity: var(--deletecontextbutton-opacity);
     background-repeat:no-repeat;
     background-position:center;
-    border: 0;
-    display: block;
-    height: 23px;
-    width: 23px;
+    pointer-events: auto!important;
     text-indent:-9999px;
     line-height: 0px;
     font-size: 0px;
@@ -486,9 +490,8 @@ small screens.
     display: inline; /* show this only on small screens */
     top: 240px;
     left: 0; /* "#menu width" */
-    background: none;
     text-align: left;
-    font-size: 32px; /* change this value to increase/decrease button size */
+    font-size: 32px; /*   this value to increase/decrease button size */
     width: 32px;
     height: 32px;
     /* float: right; */
@@ -608,7 +611,7 @@ small screens.
     display: none;
     opacity: var(--microphone-link-opacity);
     position: absolute;
-    top: 320px;
+    top: 370px;
     left: 0;
     font-size: 8px; /* change this value to increase/decrease button size */
     width: 32px;

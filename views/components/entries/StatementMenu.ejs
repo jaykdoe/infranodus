@@ -21,7 +21,7 @@
     <span></span>
 </a> 
 
-<% if (contextpublic && context && !perceivername) { %>
+<% if (contextpublic && context) { %>
     <a href="javascript:" id="privacy-link" class="is-public">
         <!-- Share icon -->
         <span></span>
@@ -42,6 +42,18 @@
         <!-- Collaborate icon -->
         <span></span>
     </a>
+<% } %>
+
+<% if ((context) && (!perceivername)) { %>
+    <form action='/post' name='deletecontext' id="deletecontext"
+        method='post' class='pure-form'
+        onsubmit="return confirm('Deleting the context will delete all the statements inside. Are you sure?');">
+        <input type="hidden" name="context" value="<%= context %>">
+        <input type="hidden" id="selectedContexts" name="selectedContexts" value="">
+        <input type="hidden" name="statementid" value="">
+        &nbsp; <br />
+        <input type='submit' id="deletecontextbutton" name="delete" value="delete context">
+    </form>
 <% } %>
 
 <% if (!perceivername) { %>
