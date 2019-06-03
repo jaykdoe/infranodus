@@ -46,14 +46,14 @@ var extractor = require('unfluff')
 
 var fs = require('fs')
 
-var google = require('google')
-
 const feedparser = require('feedparser-promised')
 
 var options = require('../options')
 
 var max_length = options.settings.max_text_length
 var max_total_length = options.settings.max_total_text_length
+
+const https = require('https');
 
 // This is for PDF reader
 global.navigator = {
@@ -2662,11 +2662,11 @@ exports.submit = function(req, res, next) {
             }
         })
     } else if (service == 'googlesearch') {
-        google.lang = 'us'
-        google.tld = 'us'
+        // google.lang = 'us'
+        // google.tld = 'us'
 
-        google.resultsPerPage = limit
-        var nextCounter = 0
+        // google.resultsPerPage = limit
+        // var nextCounter = 0
 
         var statements = []
 
@@ -2676,6 +2676,9 @@ exports.submit = function(req, res, next) {
         addToContexts.push(default_context)
 
         var excludesearchquery = req.body.excludesearchquery
+
+        var excludetitles = req.body.excludetitles
+
 
         validate.getContextID(user_id, addToContexts, function(result, err) {
             if (err) {
@@ -2699,99 +2702,101 @@ exports.submit = function(req, res, next) {
                     multiple: 1,
                 }
 
-                // TODO to get also page titles
+                
+                let google_request_link = config.google.URL_search + config.google.API_key ;
 
-                google(searchString, function(err, resp) {
-                    if (err) {
-                        console.log(err)
-                        res.error(JSON.stringify(err))
-                        res.redirect('back')
-                    }
+                https.get(google_request_link, (resp) => {
 
-                    for (var i = 0; i < resp.links.length; ++i) {
-                        if (
-                            resp.links[i].description &&
-                            resp.links[i].description != 'null' &&
-                            resp.links[i].description != undefined
-                        ) {
-                            var searchtext = ''
+                    let receiveddata = '';
 
-                            // We don't show titles because otherwise there's overload of search terms in the graph
-                            // searchtext = resp.links[i].title;
+                    // A chunk of data has been received.
+                    resp.on('data', (chunk) => {
+                        receiveddata += chunk;
+                    });
 
-                            searchtext += resp.links[i].description
-                            searchtext += ' ' + resp.links[i].href
-                            searchtext = searchtext.replace(
-                                /(0?[1-9]|[12][0-9]|3[01])\s{1}(Jan|Feb|Mar|Apr|May|Jun|Jul|Apr|Sep|Oct|Nov|Dec)\s{1}\d{4}/g,
-                                ''
-                            )
+                    // The whole response has been received. Print out the result.
+                    resp.on('end', () => {
+                        let googlejson = JSON.parse(receiveddata);
+                        let searchresults = googlejson.items;
 
-                            if (excludesearchquery) {
-                                var searchterms = searchString.split(' ')
+                        for (let i = 0; i < searchresults.length;  ++i) { 
+                            if (
+                                searchresults[i].snippet &&
+                                searchresults[i].snippet != 'null' &&
+                                searchresults[i].snippet != undefined
+                            ) {
+    
+                                let searchtext = ''
+    
+                                if (excludetitles) {
+                                    searchtext += searchresults[i].title + ' ';
+                                }
+                                searchtext += searchresults[i].snippet
+                                searchtext += ' ' + searchresults[i].link
 
-                                for (var k = 0; k < searchterms.length; k++) {
-                                    // Remove the search term from the Google results
-                                    // TODO maybe there's a way of keeping them in the text and removing the nodes
-                                    var searchPattern = new RegExp(
-                                        '(' + searchterms[k] + ')',
-                                        'ig'
+                                // Old Google import code that replaces the dates
+                                // searchtext = searchtext.replace(
+                                //     /(0?[1-9]|[12][0-9]|3[01])\s{1}(Jan|Feb|Mar|Apr|May|Jun|Jul|Apr|Sep|Oct|Nov|Dec)\s{1}\d{4}/g,
+                                //     ''
+                                // )
+    
+                                // Add the search result as an entry to process
+                                req.body.entry.body[i] = searchtext
+
+                            }
+                        }
+
+                        // Do we need to exclude the search query from the graph? Let's make a temporary list of stopwords for it
+
+                        if (excludesearchquery) {
+
+                            let searchterms = searchString.toLowerCase().split(' ')
+
+                            let searchlemmas = [];
+
+                            for (let k = 0; k < searchterms.length; k++) {
+                             
+                                // Now we find lemmas, so we deal with plural cases and also with Russian word endings and suffixes
+                                // TODO this whole thing should be moved outside of this function and Russian lemmas should be added to stopwords not deleted from text
+
+                                if (
+                                    /[а-яА-ЯЁё]/.test(searchterms[k]) ==
+                                    true
+                                ) {
+                                    var lemmaterm = lemmerRus.lemmatize(
+                                        searchterms[k]
+                                    ) 
+                                }
+
+                                // English?
+                                else {
+                                    var lemmaterm = lemmerEng.lemmatize(
+                                        searchterms[k]
                                     )
-                                    searchtext = searchtext.replace(
-                                        searchPattern,
-                                        ' '
-                                    )
-
-                                    // Now we find lemmas, so we deal with plural cases and also with Russian word endings and suffixes
-                                    // TODO this whole thing should be moved outside of this function and Russian lemmas should be added to stopwords not deleted from text
-
-                                    if (
-                                        /[а-яА-ЯЁё]/.test(searchterms[k]) ==
-                                        true
-                                    ) {
-                                        var lemmaterm = lemmerRus.lemmatize(
-                                            searchterms[k]
-                                        )
-                                        if (lemmaterm[0] != undefined) {
-                                            searchPattern = new RegExp(
-                                                '(' +
-                                                    lemmaterm[0].toLowerCase() +
-                                                    ')',
-                                                'ig'
-                                            )
-                                            searchtext = searchtext.replace(
-                                                searchPattern,
-                                                ' '
-                                            )
-                                        }
-                                    }
-
-                                    // English?
-                                    else {
-                                        var lemmaterm = lemmerEng.lemmatize(
-                                            searchterms[k]
-                                        )
-                                        if (lemmaterm[0] != undefined) {
-                                            searchPattern = new RegExp(
-                                                '(' +
-                                                    lemmaterm[0].toLowerCase() +
-                                                    ')',
-                                                'ig'
-                                            )
-                                            searchtext = searchtext.replace(
-                                                searchPattern,
-                                                ' '
-                                            )
-                                        }
-                                    }
+                                  
+                                }
+                                
+                                // Now push the lemma into the list
+                                if (lemmaterm[0] != undefined) {
+                                    searchlemmas.push(lemmaterm[0].toLowerCase())
                                 }
                             }
-
-                            req.body.entry.body[i] = searchtext
                         }
-                    }
 
-                    entries.submit(req, res)
-                })
+                        // Submit the entries
+
+                        entries.submit(req, res);
+
+                    });
+
+            
+
+                }).on("error", (err) => {
+                    console.log("Error: " + err.message);
+                    res.error(JSON.stringify(err.message));
+                    res.redirect('back')
+                });
+
             }
         })
     }

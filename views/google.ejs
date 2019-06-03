@@ -32,7 +32,7 @@
 
 
             <form action='/import' name='submitform' id="submitform" method='post' enctype="multipart/form-data" class='pure-form pure-form-stacked'>
-                Type in your search query and visualize the available results as a graph, so you can see the main topics, how they relate, what's there and what's missing.
+                Type in your search query and visualize the available Google search results as a graph, so you can see the main topics, how they relate, what's there and what's missing.
                 <br>&nbsp;<br>
                 <input type='text' size="25" maxlength="50" name='search' id="search" class="pure-input" placeholder='search terms' value="<% if (fornode) { %><%= fornode %><% } %>" /> <br><br><input class="pure-button pure-button-primary" type='submit' name="btnSubmit" value="Import">
 
@@ -48,6 +48,7 @@
 
                 <label for="extractfilter" class="pure-checkbox">
                     <input id="extractfilter" type="checkbox" name="excludesearchquery" value="1"> exclude search terms from the graph<br>
+                    <input id="extractfilter" type="checkbox" name="excludetitles" value="1"> exclude page titles<br>
                 </label>
 
                 <label for="savegraph" class="pure-input">
