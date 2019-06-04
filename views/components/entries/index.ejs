@@ -814,10 +814,10 @@ const graphFactory = (() => {
                     localstore_cell.pinnednodes = this.getPinnedNodes();
         
                     if (this.existStopNodes == false && this.existPinnedNodes == false) {
-                        delete localstore[window.location.href]
+                        delete localstore[location.host + location.pathname]
                     }
                     else {
-                        localstore[window.location.href] = localstore_cell;
+                        localstore[location.host + location.pathname] = localstore_cell;
                     }
         
                     localStorage.setItem("selections",JSON.stringify(localstore));
@@ -827,15 +827,17 @@ const graphFactory = (() => {
                 this.getSelections = function() {
         
                     let selected_keywords = getUrlVars()["keywords"];
-        
+
+                    let selected_stopwords = getUrlVars()["stopwords"];
+
                     if (localStorage.getItem("selections")) {
         
                         let saved_selections = JSON.parse(localStorage.getItem("selections"));
         
                         // Do we have any saved selections stopNodes or pinnedNodes for this URL?
-                        if (saved_selections[window.location.href]) {
-                            let deletedNodes = saved_selections[window.location.href].stopnodes;
-                            let pinnedNodes = saved_selections[window.location.href].pinnednodes;
+                        if (saved_selections[location.host + location.pathname]) {
+                            let deletedNodes = saved_selections[location.host + location.pathname].stopnodes;
+                            let pinnedNodes = saved_selections[location.host + location.pathname].pinnednodes;
                             
                             if (deletedNodes.length > 0) {
                                 this.deleteNodes(deletedNodes);
@@ -875,7 +877,11 @@ const graphFactory = (() => {
         
         
                         }
-        
+                        else if (selected_stopwords && selected_stopwords.length > 0) {
+                            let nodesToDelete = selected_stopwords.toLowerCase().split('+');
+                            this.deleteNodes(nodesToDelete);
+                        }
+            
                     }
                     // TODO clear that
                     else if (selected_keywords && selected_keywords.length > 0) {
@@ -887,6 +893,10 @@ const graphFactory = (() => {
                         }
         
         
+                    }
+                    else if (selected_stopwords && selected_stopwords.length > 0) {
+                        let nodesToDelete = selected_stopwords.toLowerCase().split('+');
+                        this.deleteNodes(nodesToDelete);
                     }
                 }
         

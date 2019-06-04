@@ -136,6 +136,8 @@ exports.submit = function(req, res, next) {
     // Pass on the context IDs from the DB
     var contextids = req.contextids
 
+    
+
     // Some parameter settings
     var max_length = options.settings.max_text_length
     var max_total_length = options.settings.max_total_text_length
@@ -402,6 +404,15 @@ exports.submit = function(req, res, next) {
                                             '&missing=1&highlight=1'
                                     )
                                 }
+                                else if (req.excludestopwords) {
+                                    res.redirect(
+                                        res.locals.user.name +
+                                            '/' +
+                                            default_context +
+                                            '/edit?stopwords=' + 
+                                            req.excludestopwords.join('+')
+                                    )
+                                }    
                                 else {
                                     res.redirect(
                                         res.locals.user.name +
@@ -426,7 +437,10 @@ exports.submit = function(req, res, next) {
                                         res.redirect(
                                             '/' + res.locals.user.name + '/edit'
                                         )
-                                    } else {
+                                    }
+                                  
+                                
+                                    else {
                                         res.redirect(
                                             res.locals.user.name +
                                                 '/' +

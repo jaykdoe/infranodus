@@ -2703,7 +2703,7 @@ exports.submit = function(req, res, next) {
                 }
 
                 
-                let google_request_link = config.google.URL_search + config.google.API_key ;
+                let google_request_link = config.google.URL_search + config.google.API_key + '&q=' + searchString.toLowerCase();
 
                 https.get(google_request_link, (resp) => {
 
@@ -2786,6 +2786,48 @@ exports.submit = function(req, res, next) {
                                                             googlejson = JSON.parse(receiveddata);
                         
                                                             req.body.entry.body = req.body.entry.body.concat(addGoogleEntry(googlejson, excludetitles));
+
+
+                                                             // Do we need to exclude the search query from the graph? Let's make a temporary list of stopwords for it
+
+                                                            if (excludesearchquery) {
+
+                                                                let searchterms = searchString.toLowerCase().split(' ')
+
+                                                                let searchlemmas = [];
+
+                                                                for (let k = 0; k < searchterms.length; k++) {
+                                                                
+                                                                    // Now we find lemmas, so we deal with plural cases and also with Russian word endings and suffixes
+                                                                    // TODO this whole thing should be moved outside of this function and Russian lemmas should be added to stopwords not deleted from text
+
+                                                                    if (
+                                                                        /[а-яА-ЯЁё]/.test(searchterms[k]) ==
+                                                                        true
+                                                                    ) {
+                                                                        var lemmaterm = lemmerRus.lemmatize(
+                                                                            searchterms[k]
+                                                                        ) 
+                                                                    }
+
+                                                                    // English?
+                                                                    else {
+                                                                        var lemmaterm = lemmerEng.lemmatize(
+                                                                            searchterms[k]
+                                                                        )
+                                                                    
+                                                                    }
+                                                                    
+                                                                    // Now push the lemma into the list
+                                                                    if (lemmaterm[0] != undefined) {
+                                                                        searchlemmas.push(lemmaterm[0].toLowerCase())
+                                                                    }
+                                                                }
+
+                                                                req.excludestopwords = searchlemmas; 
+                                                            }
+
+                                                            // Submit entries (routes/entries.js)
                         
                                                             entries.submit(req, res);
 
@@ -2794,56 +2836,30 @@ exports.submit = function(req, res, next) {
                                                     });
                                                     
                                                 }
+                                                else {
+                                                    entries.submit(req, res);
+
+                                                }
             
             
                                             });
                                         });
 
                                     }
+                                    else {
+                                        entries.submit(req, res);
+                                    }
 
 
                                 });
                             });
                         }
-
-                        // Do we need to exclude the search query from the graph? Let's make a temporary list of stopwords for it
-
-                        if (excludesearchquery) {
-
-                            let searchterms = searchString.toLowerCase().split(' ')
-
-                            let searchlemmas = [];
-
-                            for (let k = 0; k < searchterms.length; k++) {
-                             
-                                // Now we find lemmas, so we deal with plural cases and also with Russian word endings and suffixes
-                                // TODO this whole thing should be moved outside of this function and Russian lemmas should be added to stopwords not deleted from text
-
-                                if (
-                                    /[а-яА-ЯЁё]/.test(searchterms[k]) ==
-                                    true
-                                ) {
-                                    var lemmaterm = lemmerRus.lemmatize(
-                                        searchterms[k]
-                                    ) 
-                                }
-
-                                // English?
-                                else {
-                                    var lemmaterm = lemmerEng.lemmatize(
-                                        searchterms[k]
-                                    )
-                                  
-                                }
-                                
-                                // Now push the lemma into the list
-                                if (lemmaterm[0] != undefined) {
-                                    searchlemmas.push(lemmaterm[0].toLowerCase())
-                                }
-                            }
+                        else {
+                            entries.submit(req, res);
                         }
 
-                        // Submit the entries
+                       
+
 
 
                     });
@@ -2870,30 +2886,32 @@ exports.submit = function(req, res, next) {
 
             let searchresults = googlejson.items;
 
-            for (let i = 0; i < searchresults.length;  ++i) { 
-                if (
-                    searchresults[i].snippet &&
-                    searchresults[i].snippet != 'null' &&
-                    searchresults[i].snippet != undefined
-                ) {
+            if (searchresults) {
+                for (let i = 0; i < searchresults.length;  ++i) { 
+                    if (
+                        searchresults[i].snippet &&
+                        searchresults[i].snippet != 'null' &&
+                        searchresults[i].snippet != undefined
+                    ) {
 
-                    let searchtext = ''
+                        let searchtext = ''
 
-                    if (!excludetitles) {
-                        searchtext += searchresults[i].title + ' ';
+                        if (!excludetitles) {
+                            searchtext += searchresults[i].title + ' ';
+                        }
+                        searchtext += searchresults[i].snippet
+                        searchtext += ' ' + searchresults[i].link
+
+                        // Old Google import code that replaces the dates
+                        // searchtext = searchtext.replace(
+                        //     /(0?[1-9]|[12][0-9]|3[01])\s{1}(Jan|Feb|Mar|Apr|May|Jun|Jul|Apr|Sep|Oct|Nov|Dec)\s{1}\d{4}/g,
+                        //     ''
+                        // )
+
+                        // Add the search result as an entry to process
+                        entryobject[i] = searchtext;
+
                     }
-                    searchtext += searchresults[i].snippet
-                    searchtext += ' ' + searchresults[i].link
-
-                    // Old Google import code that replaces the dates
-                    // searchtext = searchtext.replace(
-                    //     /(0?[1-9]|[12][0-9]|3[01])\s{1}(Jan|Feb|Mar|Apr|May|Jun|Jul|Apr|Sep|Oct|Nov|Dec)\s{1}\d{4}/g,
-                    //     ''
-                    // )
-
-                    // Add the search result as an entry to process
-                    entryobject[i] = searchtext;
-
                 }
             }
 
