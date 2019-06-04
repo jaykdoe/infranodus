@@ -2707,7 +2707,7 @@ exports.submit = function(req, res, next) {
 
                 https.get(google_request_link, (resp) => {
 
-                    let receiveddata = '';
+                    var receiveddata = '';
 
                     // A chunk of data has been received.
                     resp.on('data', (chunk) => {
@@ -2716,34 +2716,94 @@ exports.submit = function(req, res, next) {
 
                     // The whole response has been received. Print out the result.
                     resp.on('end', () => {
+
                         let googlejson = JSON.parse(receiveddata);
-                        let searchresults = googlejson.items;
 
-                        for (let i = 0; i < searchresults.length;  ++i) { 
-                            if (
-                                searchresults[i].snippet &&
-                                searchresults[i].snippet != 'null' &&
-                                searchresults[i].snippet != undefined
-                            ) {
-    
-                                let searchtext = ''
-    
-                                if (excludetitles) {
-                                    searchtext += searchresults[i].title + ' ';
-                                }
-                                searchtext += searchresults[i].snippet
-                                searchtext += ' ' + searchresults[i].link
+                        req.body.entry.body = addGoogleEntry(googlejson, excludetitles);
+                        
+                        let currentmarker = 0;
 
-                                // Old Google import code that replaces the dates
-                                // searchtext = searchtext.replace(
-                                //     /(0?[1-9]|[12][0-9]|3[01])\s{1}(Jan|Feb|Mar|Apr|May|Jun|Jul|Apr|Sep|Oct|Nov|Dec)\s{1}\d{4}/g,
-                                //     ''
-                                // )
-    
-                                // Add the search result as an entry to process
-                                req.body.entry.body[i] = searchtext
+                        // How much total results we get?
+                        let tot_search_results = googlejson.queries.request[0].totalResults;
+                        
+                        currentmarker = tot_search_results - 10;
 
-                            }
+                        let startmarker = 0;
+
+                        if (currentmarker > 0) {
+                            startmarker = 10;
+                            https.get(google_request_link + '&start=' + startmarker, (resp) => {
+
+                                receiveddata = '';
+                                // A chunk of data has been received.
+                                resp.on('data', (chunk) => {
+                                    receiveddata += chunk;
+                                });
+            
+                                // The whole response has been received. Print out the result.
+                                resp.on('end', () => {
+                                    
+                                    googlejson = JSON.parse(receiveddata);
+
+                                    req.body.entry.body = req.body.entry.body.concat(addGoogleEntry(googlejson, excludetitles));
+
+                                    currentmarker = tot_search_results - 20;
+
+                                    if (currentmarker > 0) {
+                                        startmarker = 20;
+
+                                        https.get(google_request_link + '&start=' + startmarker, (resp) => {
+
+                                            receiveddata = '';
+                                            // A chunk of data has been received.
+                                            resp.on('data', (chunk) => {
+                                                receiveddata += chunk;
+                                            });
+                        
+                                            // The whole response has been received. Print out the result.
+                                            resp.on('end', () => {
+                                                
+                                                googlejson = JSON.parse(receiveddata);
+            
+                                                req.body.entry.body = req.body.entry.body.concat(addGoogleEntry(googlejson, excludetitles));
+            
+                                                currentmarker = tot_search_results - 30;
+            
+                                                if (currentmarker > 0) {
+                                                    startmarker = 30;
+
+                                                    https.get(google_request_link + '&start=' + startmarker, (resp) => {
+
+                                                        receiveddata = '';
+                                                        // A chunk of data has been received.
+                                                        resp.on('data', (chunk) => {
+                                                            receiveddata += chunk;
+                                                        });
+                                    
+                                                        // The whole response has been received. Print out the result.
+                                                        resp.on('end', () => {
+                                                            
+                                                            googlejson = JSON.parse(receiveddata);
+                        
+                                                            req.body.entry.body = req.body.entry.body.concat(addGoogleEntry(googlejson, excludetitles));
+                        
+                                                            entries.submit(req, res);
+
+                        
+                                                        });
+                                                    });
+                                                    
+                                                }
+            
+            
+                                            });
+                                        });
+
+                                    }
+
+
+                                });
+                            });
                         }
 
                         // Do we need to exclude the search query from the graph? Let's make a temporary list of stopwords for it
@@ -2785,7 +2845,6 @@ exports.submit = function(req, res, next) {
 
                         // Submit the entries
 
-                        entries.submit(req, res);
 
                     });
 
@@ -2799,6 +2858,47 @@ exports.submit = function(req, res, next) {
 
             }
         })
+    }
+
+
+    function addGoogleEntry(googlejson, excludetitles) {
+
+        console.log('googlejson')
+            console.log(googlejson)
+
+            let entryobject = [];
+
+            let searchresults = googlejson.items;
+
+            for (let i = 0; i < searchresults.length;  ++i) { 
+                if (
+                    searchresults[i].snippet &&
+                    searchresults[i].snippet != 'null' &&
+                    searchresults[i].snippet != undefined
+                ) {
+
+                    let searchtext = ''
+
+                    if (!excludetitles) {
+                        searchtext += searchresults[i].title + ' ';
+                    }
+                    searchtext += searchresults[i].snippet
+                    searchtext += ' ' + searchresults[i].link
+
+                    // Old Google import code that replaces the dates
+                    // searchtext = searchtext.replace(
+                    //     /(0?[1-9]|[12][0-9]|3[01])\s{1}(Jan|Feb|Mar|Apr|May|Jun|Jul|Apr|Sep|Oct|Nov|Dec)\s{1}\d{4}/g,
+                    //     ''
+                    // )
+
+                    // Add the search result as an entry to process
+                    entryobject[i] = searchtext;
+
+                }
+            }
+
+            return entryobject;
+
     }
 
     function saveHighlight(highlight, contexts) {
