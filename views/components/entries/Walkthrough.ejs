@@ -8,13 +8,19 @@
                e.preventDefault();
                userFactory.setWalkthrough('default');
                initializeWalkthrough(userFactory.getWalkthrough());
-          });
+        });
+
+        $("#analytics_help").click(function(e) {
+               e.preventDefault();
+               userFactory.setWalkthrough('analytics_help');
+               initializeWalkthrough(userFactory.getWalkthrough());
+        });
 
         // Begin walkthrough tour module for tutorial Help
         
          function initializeWalkthrough (walkthrough) {
 
-          if (walkthrough == 'default' || walkthrough == 'newcontext' || walkthrough == 'analytics' || walkthrough == "tldr" || walkthrough == "force") {           
+          if (walkthrough == 'default' || walkthrough == 'newcontext' || walkthrough == 'analytics_help' || walkthrough == "tldr" || walkthrough == "force") {           
            // Instance the tour
              var tour = new Tour({
                storage: false,
@@ -401,100 +407,69 @@
 
              // Another walkthrough option passed through the URL
 
-             if (walkthrough == 'analytics') {
+             if (walkthrough == 'analytics_help') {
              //  console.log(tour._options.steps);
                tour._options.steps = [
-                 {
-                 element: "#entryform",
-                 placement: "right",
-                 title: "Text Analytics",
-                 content: "If you would like to analyze a text, please, copy and paste it here or <a href='/import'>import a file</a>.",
-               },
-               {
-               element: "#graph-container",
-               placement: "bottom",
-               title: "Navigate the Graph",
-               content: "You will then see a graph representation of this text. The most prominent topics will be shown as bigger nodes in the graph, those words, which are used in the same context will be closer to each other.",
-               },
-               {
-               element: "#graph-container",
-               placement: "left",
-               title: "Discover New Ideas",
-               content: "The gaps in the graph will show you where you could do more research or what questions to ask.",
-               },
-               {
-                 element: "#analyticsbutton",
-                 placement: "left",
-                 title: "Text / Graph Analytics",
-                 content: "Here you can see the main topics identified in the graph and the main keywords / nodes and click them to get more insights about the graph. You can also discover what questions to ask to make your discourse more connected.",
-               },
                {
                  element: "#analytics",
-                 placement: "auto",
+                 placement: "top",
                  title: "How to Analyze the Graph",
-                 content: "The top topics are identified according to Louvain community detection algorithm (Blondes et al 2008). It detects the words that co-occur more often together than others and puts them into the same community (designated with a specific color)."
+                 content: "This walkthrough will help you understand the different measures used when analyzing the graph. <br><br>You can also refer to and cite our paper: Paranyushkin, D (2019). <strong>InfraNodus: Generating Insight Using Text Network Analysis</strong>, Proceedings of WWW ’19 The World Wide Web Conference, Pages 3584-3589, San Francisco, CA, USA — May 13 – 17, 2019. Available as an HTML Version in <a href='https://dl.acm.org/citation.cfm?id=3314123' target='_blank' rel='nofollow'>ACM Library</a> or as a <a href='http://bit.ly/wwwinfranodus'>Free PDF Download</a>" 
+                },
+                {
+                 element: "#analytics",
+                 placement: "top",
+                 title: "Graph Visualization",
+                 content: "On the graph, every node is a word and every co-occurrence is a connection between them. The nodes that tend to appear more often together are shown closer on the graph. This way you get the next generation tag cloud: emphasizing not only the most relevant words, but also showing which context they appear in." 
+                },
+               {
+                 element: "#maintopics",
+                 placement: "left",
+                 title: "Main Topical Groups",
+                 content: "The top topics are identified according to Louvain community detection algorithm (<a href='https://iopscience.iop.org/article/10.1088/1742-5468/2008/10/P10008/meta' rel='nofollow' target='_blank'>Blondel et al 2008</a>). It detects the words that co-occur more often together than others and puts them into the same community (designated with a distinct color each). We range them either according to the degree or the number of connections that each node has (default measure — correlates with the node's frequency) or betweenness centrality (see <a href='/settings'>settings</a>)."
                },
                {
-                 element: "#analytics",
-                 placement: "auto",
+                 element: "#mostinfluential",
+                 placement: "left",
                  title: "Most Influential Words",
-                 content: "The most influential words are the words in the graph that have the highest betweenness centrality — they appear most often on the shortest path between any two randomly chosen words. It means they serve as the 'crossroads' of meaning, often linking different contexts together. This is not the same as the most frequently used words, rather these words connect the different topics in this discourse. (it is also possible to use degree as the most influential words setting)"
+                 content: "The most influential words are the words in the graph that have the highest <a href='https://www.eecs.wsu.edu/~assefaw/CptS580-06/papers/brandes01centrality.pdf' rel='nofollow' target='_blank'>betweenness centrality</a> (by defaut) — they appear most often on the shortest path between any two randomly chosen words. It means they serve as the 'crossroads' of meaning, often linking the different contexts or topical clusters together. This is not the same as the most frequently used words, rather these words connect the different topics in this discourse. (it is also possible to use degree as the most influential words if you change the <a href='/settings'>settings</a>)"
                },
                {
                  element: "#graphstats",
-                 placement: "top",
-                 title: "Graph Stats",
-                 content: "We use our own measure of <a href='https://noduslabs.com/research/visualization-text-polysingularity-network-analysis/' target='_blank'>discourse polysingularity</a> (Paranyushkin 2012, 2018) to score the discourse visualized based on the structure of the graph. <br><b>'Sparse'</b> — indicates a fragmented discourse (e.g. poetry, the beginning of a research, etc.) <br><b>'Diversified'</b> — indicates a discourse with a high level of plurality.<br><b>'Focused'</b> — prioritizes one or two topics. <br><b>'Biased'</b> — an agenda or mobilizing action present (e.g. advertising, ideology, manifesto)."
-               },
-               {
-                 element: "#biasindex",
-                 placement: "top",
-                 title: "Bias Level",
-                 content: "This measures the level of diversity in the graph: if it consists of disjointed islands it's 'dispersed'; if those islands are interconnected, there are several topics within, it's 'diversified'; if most of the nodes are in one topic it's 'focused', if it's tightly interconnected and there are no distinct topical clusters, it's 'biased'. Read more about the methology in our <a href='https://towardsdatascience.com/measuring-discourse-bias-using-text-network-analysis-9f251be5f6f3' target='_blank'>Identifying the Discourse Bias</a> (Paranyushkin 2018) article in Towards Data Science."
-               },
-               {
-                 element: "#menuLink",
-                 title: "Context Menu",
-                 content: "You will be able to later find your text here.",
-                 onShow: function (tour) {
-                     $('#menuLink').click();
-                 }
-               },
-               {
-                 element: "#summary",
-                 placement: "bottom",
-                 title: "Essence / Summary",
-                 content: "Click here to filter the most essential statements from the discourse. These will be the ones that contain the key terms (the main topical clusters) of the discourse as identified in the Analytics pane.",
-                 onShow: function (tour) {
-                     $('#summary').click();
-                     if ($('#analytics').is(":visible")) {
-                     }
-                     else {
-                       $('#analyticsbutton').click();
-                     }
-                 }
-               },
-               {
-                 element: "#insight",
-                 placement: "bottom",
-                 title: "Insight",
-                 content: "Click here to generate new ideas: we will show you the two topical clusters and the associated statements, which could be linked together to get a new insight into the discourse or to develop it further (depending on its structure).",
-                 onShow: function (tour) {
-                     $('#insight').click();
-                 }
-               },
-               {
-                 element: "#walkthrough",
                  placement: "left",
-                 title: "Detailed Tutorial",
-                 content: "If, at any point, you want to see a more detailed Tutorial, click here.",
-                 onShow: function (tour) {
-                     if ($('#analytics').is(":visible")) {
-                        $('#analyticsbutton').click();
-                     }
-                     $('#overview').click();
-                 }
-               }
+                 title: "Graph Statistics",
+                 content: "Here you can see some statistics about the graph. The total number of nodes displayed (can be changed in <a href='/settings'>settings</a>), the relation of total edges to nodes (the higher this number, the more densely connected the graph is), the average degree (how many nodes every node is connected to)."
+               },
+               {
+                 element: "#diversity_score",
+                 placement: "left",
+                 title: "Diversity Score",
+                 content: "We use <a href='http://bit.ly/wwwinfranodus'>Paranyushkin 2019</a> to score the level of diversity in the network based on the structure of the graph. <br><b>'Disperse'</b> — indicates a fragmented network, there are distinct communities but they are not connected (e.g. poetry, the beginning of a research, a nascent social network etc.) <br><b>'Diversified'</b> — indicates a network with a high level of plurality — there are distinct communities that are related on the global level and that can both propagate and retain information.<br><b>'Focused'</b> — prioritizes one or two communities or topics (e.g. news articles are often 'focused'). <br><b>'Biased'</b> — the network is highly homogeneous — an agenda or mobilizing action may be present (e.g. advertising, ideology, manifesto)."
+               },
+               {
+                 element: "#diversity_score",
+                 placement: "left",
+                 title: "Diversity Score",
+                 content: "The modularity measure that's higher than 0.4 indicates a highly pronounced community structure in the graph. <br><br>The number of nodes in the top topic indicates whether the influence is distributed evenly in the graph or if it's concentrated in one topic. Influence Dispersal shows how evenly the most influential nodes are distributed among the main communities in the graph. The low score means that most influential nodes are concentrated in one community."
+               },
+               {
+                 element: "#recommendedquestion",
+                 placement: "left",
+                 title: "Insight",
+                 content: "This measure identifies the structural gap in the graph: the part of the network between the two or several distinct communities that are not connected. Structural gaps are known to play an important role in social networks, where they indicate the areas of high potential. Answering the question that links the two disjointed parts of the graph together may lead to the new ideas and 'eureka' moments.",
+               },
+               {
+                 element: "#miningbutton",
+                 placement: "left",
+                 title: "Latent Dirichlet Allocation",
+                 content: "You can also compare the results obtained using network analysis to the popular topic detection method LDA - Latent Dirichlet Allocation. Both methods can compliment each other."
+               },
+               {
+                 element: "#analytics",
+                 placement: "left",
+                 title: "More Information",
+                 content: "For more information, please, refer to and cite our paper: Paranyushkin, D (2019). <strong>InfraNodus: Generating Insight Using Text Network Analysis</strong>, Proceedings of WWW ’19 The World Wide Web Conference, Pages 3584-3589, San Francisco, CA, USA — May 13 – 17, 2019. Available as an HTML Version in <a href='https://dl.acm.org/citation.cfm?id=3314123' target='_blank' rel='nofollow'>ACM Library</a> or as a <a href='http://bit.ly/wwwinfranodus'>Free PDF Download</a>.<br><br>Also, feel free to <a href='http://noduslabs.com/contact/'>contact us</a> if you have specific questions about the graph measures used." 
+                },
                ]
              }
 
