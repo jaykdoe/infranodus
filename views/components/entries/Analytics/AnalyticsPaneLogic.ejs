@@ -369,7 +369,9 @@ function AnalyticsPanel() {
                     currentPanel = ID;
                 }
 
-                else if (ID == 'stats_analytics'){             
+                else if (ID == 'stats_analytics'){   
+                    
+                    // Switch the panels and buttons
                     $("#mainanalytics").fadeOut('fast');
                     $("#mininganalytics").fadeOut('fast');
                     $("#statsanalytics").fadeIn('fast');
@@ -382,13 +384,33 @@ function AnalyticsPanel() {
                     let nodes_header = ["node", "degree", "frequency", "beweenness", "topic"];
                     let nodes_list = [];
                     let sigma_nodes = sigma.instances(0).graph.nodes();
+
+                    // Create the data object
                     for (let n in sigma_nodes) {
                         nodes_list[n] = {"node": sigma_nodes[n].originalLabel, "degree": sigma_nodes[n].degree, "frequency": sigma_nodes[n].degree, "betweenness": (sigma_nodes[n].bc).toFixed(6), "topic": sigma_nodes[n].community};
                     }
 
+                    // Generate table head and the table data
                     generateTableHead(table, nodes_header);
                     generateTable(table, nodes_list, "numeric");
+
+                    // Add click events on each node name
                     analyticsPanel.activateTopNodes();
+
+                    // Table sorting function
+
+                    const getCellValue = (tr, idx) => tr.children[idx].innerText || tr.children[idx].textContent;
+
+                    const comparer = (idx, asc) => (a, b) => ((v1, v2) => 
+                        v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2)
+                        )(getCellValue(asc ? b : a, idx), getCellValue(asc ? a : b, idx));
+
+                    document.querySelectorAll('th').forEach(th => th.addEventListener('click', (() => {
+                        const table = th.closest('table');
+                        Array.from(table.querySelectorAll('tr:nth-child(n+2)'))
+                            .sort(comparer(Array.from(th.parentNode.children).indexOf(th), this.asc = !this.asc))
+                            .forEach(tr => table.appendChild(tr) );
+                    })));
 
                 }
 

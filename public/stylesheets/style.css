@@ -694,6 +694,7 @@ a:hover.app-more-link {
     background-color: #aaa;
     color: #fff;
     white-space: nowrap;
+    cursor: pointer;
     
   }
   
