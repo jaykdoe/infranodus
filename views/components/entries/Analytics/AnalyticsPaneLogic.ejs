@@ -386,9 +386,20 @@ function AnalyticsPanel() {
                     let nodes_list = [];
                     let sigma_nodes = sigma.instances(0).graph.nodes();
 
+                    let all_keywords = [];
+
+                    $(".entry").each(function(){
+                       let entry_hashtags = $(this).attr('data-hashtags').split(' ');
+                       for (tag in entry_hashtags) {
+                            entry_hashtags[tag] = entry_hashtags[tag].substr(1);
+                            all_keywords.push(entry_hashtags[tag]);
+                       }
+                    });
+
                     // Create the data object
                     for (let n in sigma_nodes) {
-                        nodes_list[n] = {"node": sigma_nodes[n].originalLabel, "degree": sigma_nodes[n].degree, "frequency": sigma_nodes[n].degree, "betweenness": (sigma_nodes[n].bc).toFixed(6), "topic": sigma_nodes[n].community};
+                        let node_label = sigma_nodes[n].originalLabel;
+                        nodes_list[n] = {"node": node_label, "degree": sigma_nodes[n].degree, "frequency": all_keywords.filter(x => x === node_label).length, "betweenness": (sigma_nodes[n].bc).toFixed(6), "topic": sigma_nodes[n].community};
                     }
 
                     // Generate table head and the table data
