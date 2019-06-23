@@ -101,6 +101,9 @@
                 // Get the nodes with the highest degree
                 degree_nodes.push({key: n.id, label: n.label, degree: node_degree});
 
+                // Assign node degree
+                n.degree = node_degree;
+
                 // Do we range the nodes by betweenness centrality?
                 let most_influential = userFactory.getMostInfluential();
                 

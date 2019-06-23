@@ -659,6 +659,55 @@ a:hover.app-more-link {
 
 }
 
+#statsanalytics {
+    display: none;
+    padding: 10px;
+    clear: both;
+}
+
+.table-wrapper {
+    overflow: auto;
+      max-width: 100%;
+      max-height: 400px;
+      background:
+          linear-gradient(to right, white 30%, rgba(255,255,255,0)),
+          linear-gradient(to right, rgba(255,255,255,0), white 70%) 0 100%,
+          radial-gradient(farthest-side at 0% 50%, rgba(0,0,0,.2), rgba(0,0,0,0)),
+          radial-gradient(farthest-side at 100% 50%, rgba(0,0,0,.2), rgba(0,0,0,0)) 0 100%;
+      background-repeat: no-repeat;
+      background-color: rgba(255, 255, 255, 1);
+      background-size: 40px 100%, 40px 100%, 14px 100%, 14px 100%;
+    background-position: 0 0, 100%, 0 0, 100%;
+      background-attachment: local, local, scroll, scroll;
+  }
+  
+  table {
+    border-collapse: collapse;
+
+  }
+
+  tr {
+    border-bottom: 1px solid #aaa;
+  }
+  
+  th {
+    background-color: #aaa;
+    color: #fff;
+    white-space: nowrap;
+    
+  }
+  
+  th,
+  td {
+    font-size: 13px;
+    text-align: left;
+    padding: 0.3em 0.4em;
+  }
+  
+  .numeric {
+    text-align: right;
+  }
+
 button {
   font-size: 12px;
   background: #ededed;

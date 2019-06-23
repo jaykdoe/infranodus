@@ -296,9 +296,11 @@ function AnalyticsPanel() {
                 if (ID == 'analytics') {
                   
                     $("#mininganalytics").fadeOut('fast');
+                    $("#statsanalytics").fadeOut('fast');
                     $("#mainanalytics").fadeIn('fast');
                     $("#analbutton").css('background','#ffffff');
                     $("#miningbutton").css('background','#ededed');
+                    $("#statsbutton").css('background','#ededed');
                     currentPanel = ID;
 
                 }
@@ -306,9 +308,12 @@ function AnalyticsPanel() {
 
                 
                     $("#mainanalytics").fadeOut('fast');
+                    $("#statsanalytics").fadeOut('fast');
                     $("#mininganalytics").fadeIn('fast');
                     $("#analbutton").css('background','#ededed');
                     $("#miningbutton").css('background','#ffffff');
+                    $("#statsbutton").css('background','#ededed');
+
 
                     var html = "n/a";
 
@@ -362,6 +367,29 @@ function AnalyticsPanel() {
 
                   
                     currentPanel = ID;
+                }
+
+                else if (ID == 'stats_analytics'){             
+                    $("#mainanalytics").fadeOut('fast');
+                    $("#mininganalytics").fadeOut('fast');
+                    $("#statsanalytics").fadeIn('fast');
+                    $("#analbutton").css('background','#ededed');
+                    $("#miningbutton").css('background','#ededed');
+                    $("#statsbutton").css('background','#ffffff');
+
+                    let table = document.querySelector("table");
+                    
+                    let nodes_header = ["node", "degree", "frequency", "beweenness", "topic"];
+                    let nodes_list = [];
+                    let sigma_nodes = sigma.instances(0).graph.nodes();
+                    for (let n in sigma_nodes) {
+                        nodes_list[n] = {"node": sigma_nodes[n].originalLabel, "degree": sigma_nodes[n].degree, "frequency": sigma_nodes[n].degree, "betweenness": (sigma_nodes[n].bc).toFixed(6), "topic": sigma_nodes[n].community};
+                    }
+
+                    generateTableHead(table, nodes_header);
+                    generateTable(table, nodes_list, "numeric");
+                    analyticsPanel.activateTopNodes();
+
                 }
 
                 // else if (ID == 'analytics_help'){
