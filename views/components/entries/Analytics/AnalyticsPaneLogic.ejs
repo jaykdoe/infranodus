@@ -290,7 +290,7 @@ function AnalyticsPanel() {
 
             let table = document.querySelector("table");
                     
-            let nodes_header = ["node", "degree", "frequency", "beweenness", "topic"];
+            let nodes_header = ["node", "degree", "frequency", "beweenness", "topic", "conductivity", "locality", "diversivity"];
             let nodes_list = [];
             let sigma_nodes = sigma.instances(0).graph.nodes();
 
@@ -307,7 +307,8 @@ function AnalyticsPanel() {
             // Create the data object
             for (let n in sigma_nodes) {
                     let node_label = sigma_nodes[n].originalLabel;
-                    nodes_list[n] = {"node": node_label, "degree": sigma_nodes[n].degree, "frequency": all_keywords.filter(x => x === node_label).length, "betweenness": (sigma_nodes[n].bc ? (sigma_nodes[n].bc).toFixed(6) : 0), "topic": sigma_nodes[n].community};
+                    let node_frequency = all_keywords.filter(x => x === node_label).length;
+                    nodes_list[n] = {"node": node_label, "degree": sigma_nodes[n].degree, "frequency": node_frequency, "betweenness": (sigma_nodes[n].bc ? (sigma_nodes[n].bc).toFixed(6) : 0), "topic": sigma_nodes[n].community, "conductivity": (sigma_nodes[n].bc * 10000 / sigma_nodes[n].degree).toFixed(1), "locality": (!isFinite((sigma_nodes[n].degree/sigma_nodes[n].bc)) ? 0 : (sigma_nodes[n].degree * sigma_nodes[n].degree/(sigma_nodes[n].bc * 10000)).toFixed(0)), "diversivity": (sigma_nodes[n].bc * 10000 / node_frequency).toFixed(1)};
             }
 
             // Generate table head and the table data
