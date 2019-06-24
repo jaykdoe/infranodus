@@ -510,6 +510,9 @@ function graph() {
             // Launch community detect algorithm
             communityDetect(lougraph, grgraph, graph().refreshGraph);
 
+            // Recalculate statistics if necessary
+            analyticsPanel.populateStatsTable();
+
         },
         refreshGraph: function() {
             sigma.instances(0).refresh();

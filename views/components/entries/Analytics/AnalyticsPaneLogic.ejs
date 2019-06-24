@@ -284,6 +284,56 @@ function AnalyticsPanel() {
         
         }
 
+        this.populateStatsTable = function() {
+
+            document.getElementById("stats_table").innerHTML = "";
+
+            let table = document.querySelector("table");
+                    
+            let nodes_header = ["node", "degree", "frequency", "beweenness", "topic"];
+            let nodes_list = [];
+            let sigma_nodes = sigma.instances(0).graph.nodes();
+
+            let all_keywords = [];
+
+            $(".entry").each(function(){
+                let entry_hashtags = $(this).attr('data-hashtags').split(' ');
+                for (tag in entry_hashtags) {
+                    entry_hashtags[tag] = entry_hashtags[tag].substr(1);
+                    all_keywords.push(entry_hashtags[tag]);
+                }
+            });
+
+            // Create the data object
+            for (let n in sigma_nodes) {
+                    let node_label = sigma_nodes[n].originalLabel;
+                    nodes_list[n] = {"node": node_label, "degree": sigma_nodes[n].degree, "frequency": all_keywords.filter(x => x === node_label).length, "betweenness": (sigma_nodes[n].bc ? (sigma_nodes[n].bc).toFixed(6) : 0), "topic": sigma_nodes[n].community};
+            }
+
+            // Generate table head and the table data
+            generateTableHead(table, nodes_header);
+            generateTable(table, nodes_list, "numeric");
+
+            // Add click events on each node name
+            analyticsPanel.activateTopNodes();
+
+            // Table sorting function
+
+            const getCellValue = (tr, idx) => tr.children[idx].innerText || tr.children[idx].textContent;
+
+            const comparer = (idx, asc) => (a, b) => ((v1, v2) => 
+                v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2)
+                )(getCellValue(asc ? b : a, idx), getCellValue(asc ? a : b, idx));
+
+            document.querySelectorAll('th').forEach(th => th.addEventListener('click', (() => {
+                const table = th.closest('table');
+                Array.from(table.querySelectorAll('tr:nth-child(n+2)'))
+                    .sort(comparer(Array.from(th.parentNode.children).indexOf(th), this.asc = !this.asc))
+                    .forEach(tr => table.appendChild(tr) );
+            })));
+
+        }
+
         this.activateButtons = function(current_user, current_context, louvain_communities, palette) {
 
             let nodeIDs = graphFactory.getNodeIDs();
@@ -378,55 +428,15 @@ function AnalyticsPanel() {
                     $("#analbutton").css('background','#ededed');
                     $("#miningbutton").css('background','#ededed');
                     $("#statsbutton").css('background','#ffffff');
-                    document.getElementById("stats_table").innerHTML = "";
+                 
 
                     // Attach Download actions on the CSV and Excel buttons
                     sigmaGraph().downloadCSV();
                     sigmaGraph().downloadExcel();
 
-                    let table = document.querySelector("table");
-                    
-                    let nodes_header = ["node", "degree", "frequency", "beweenness", "topic"];
-                    let nodes_list = [];
-                    let sigma_nodes = sigma.instances(0).graph.nodes();
+                    // Populate statistics table
+                    analyticsPanel.populateStatsTable();
 
-                    let all_keywords = [];
-
-                    $(".entry").each(function(){
-                       let entry_hashtags = $(this).attr('data-hashtags').split(' ');
-                       for (tag in entry_hashtags) {
-                            entry_hashtags[tag] = entry_hashtags[tag].substr(1);
-                            all_keywords.push(entry_hashtags[tag]);
-                       }
-                    });
-
-                    // Create the data object
-                    for (let n in sigma_nodes) {
-                        let node_label = sigma_nodes[n].originalLabel;
-                        nodes_list[n] = {"node": node_label, "degree": sigma_nodes[n].degree, "frequency": all_keywords.filter(x => x === node_label).length, "betweenness": (sigma_nodes[n].bc).toFixed(6), "topic": sigma_nodes[n].community};
-                    }
-
-                    // Generate table head and the table data
-                    generateTableHead(table, nodes_header);
-                    generateTable(table, nodes_list, "numeric");
-
-                    // Add click events on each node name
-                    analyticsPanel.activateTopNodes();
-
-                    // Table sorting function
-
-                    const getCellValue = (tr, idx) => tr.children[idx].innerText || tr.children[idx].textContent;
-
-                    const comparer = (idx, asc) => (a, b) => ((v1, v2) => 
-                        v1 !== '' && v2 !== '' && !isNaN(v1) && !isNaN(v2) ? v1 - v2 : v1.toString().localeCompare(v2)
-                        )(getCellValue(asc ? b : a, idx), getCellValue(asc ? a : b, idx));
-
-                    document.querySelectorAll('th').forEach(th => th.addEventListener('click', (() => {
-                        const table = th.closest('table');
-                        Array.from(table.querySelectorAll('tr:nth-child(n+2)'))
-                            .sort(comparer(Array.from(th.parentNode.children).indexOf(th), this.asc = !this.asc))
-                            .forEach(tr => table.appendChild(tr) );
-                    })));
 
                 }
 
