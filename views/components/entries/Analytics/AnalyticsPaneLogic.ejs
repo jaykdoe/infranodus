@@ -380,6 +380,10 @@ function AnalyticsPanel() {
                     $("#statsbutton").css('background','#ffffff');
                     document.getElementById("stats_table").innerHTML = "";
 
+                    // Attach Download actions on the CSV and Excel buttons
+                    sigmaGraph().downloadCSV();
+                    sigmaGraph().downloadExcel();
+
                     let table = document.querySelector("table");
                     
                     let nodes_header = ["node", "degree", "frequency", "beweenness", "topic"];

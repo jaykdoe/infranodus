@@ -1067,6 +1067,26 @@ function sigmaGraph() {
             }, false);
 
 
+        },
+        downloadCSV: function() {
+
+            let filename = userFactory.getCurrentUser() + "_" + userFactory.getCurrentContext() + "_data.csv";
+
+            document.querySelector('#csv_exportdata').addEventListener('click', function(ev) {
+                document.querySelector('#csv_exportdata').download = filename;
+                return ExcellentExport.csv(this, 'stats_table');
+            }, false);
+
+        },
+        downloadExcel: function() {
+
+        let filename = userFactory.getCurrentUser() + "_" + userFactory.getCurrentContext() + "_data.xls";
+
+        document.querySelector('#excel_exportdata').addEventListener('click', function(ev) {
+            document.querySelector('#excel_exportdata').download = filename;
+            return ExcellentExport.excel(this, 'stats_table', 'GraphNodes');
+        }, false);
+
         }
     }
 }
