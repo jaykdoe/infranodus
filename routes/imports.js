@@ -46,6 +46,8 @@ var extractor = require('unfluff')
 
 var fs = require('fs')
 
+var gexf = require('gexf');
+
 const feedparser = require('feedparser-promised')
 
 var options = require('../options')
@@ -1455,6 +1457,8 @@ exports.submit = function(req, res, next) {
             })
         }
     } else if (service == 'file') {
+
+        console.log('filetype')
         console.log(req.files)
 
         console.log(req.files.uploadedFile.type)
@@ -1482,7 +1486,8 @@ exports.submit = function(req, res, next) {
             req.files.uploadedFile.size < max_total_length &&
             (filetype == 'text/html' ||
                 filetype == 'text/plain' ||
-                filetype == 'application/pdf' ||
+                filetype == 'application/pdf' ||  
+                filetype == 'application/octet-stream' ||                
                 filetype == 'text/csv')
         ) {
             // Import parameters
@@ -1694,6 +1699,47 @@ exports.submit = function(req, res, next) {
                                 filetype
                             )
                         })
+                } else if (filetype == 'application/octet-stream') {
+                    if (req.files.uploadedFile.name.indexOf('.gexf') >= 0) {
+                        let gexf_graph = gexf.parse(filecontents);
+                        let gexf_edges = gexf_graph.edges;
+                        let gexf_nodes = gexf_graph.nodes;
+                        let gexf_statements = [];
+                        for (let i = 0; i < gexf_edges.length; i++) {
+                            for (let j = 0; j < gexf_nodes.length; j++) {
+                                if (gexf_nodes[j].id == gexf_edges[i].source) {
+                                    if (!gexf_statements[i]) gexf_statements[i] = ' ';
+                                    gexf_statements[i] += ' #' + gexf_nodes[j].label;
+                                }
+                                if (gexf_nodes[j].id == gexf_edges[i].target) {
+                                    if (!gexf_statements[i]) gexf_statements[i] = ' ';
+                                    gexf_statements[i] += ' #' + gexf_nodes[j].label;
+                                } 
+                            } 
+                            if (gexf_edges[i].weight > 1) {
+                                for (let k = 0; k < gexf_edges[i].weight; k++) {
+                                    gexf_statements[i] += '\n\n ' + gexf_statements[i]; 
+                                }
+                            }                           
+                        }
+                     
+                        //console.log(gexf_statements);
+
+                    
+                        var currentcontext = processContext(importContext)
+
+                        parsedata[currentcontext] = [];
+
+                        parsedata[currentcontext].push(gexf_statements.join('\n\n'));
+                        
+                        processFile(
+                            titlefield,
+                            processfield,
+                            filecontents,
+                            parsedata,
+                            filetype
+                        )
+                    }
                 } else if (filetype == 'text/html') {
                     // Load DIVs in the file contents
                     var $ = cheerio.load(filecontents)
@@ -1786,6 +1832,7 @@ exports.submit = function(req, res, next) {
                                     filetype == 'text/plain' ||
                                     filetype == 'application/pdf' ||
                                     filetype == 'text/csv' ||
+                                    filetype == 'application/octet-stream' ||
                                     filetype == 'text/html'
                                 ) {
                                     callback(null, contexts)
@@ -1929,7 +1976,51 @@ exports.submit = function(req, res, next) {
                                             res.redirect('back')
                                         }
                                     }
-                                } else if (filetype == 'text/csv') {
+                                }  else if (filetype == 'application/octet-stream') {
+                                    for (var graphname in parsedata) {
+                                        if (parsedata[graphname].length > 0) {
+
+                                            var addingstatements = ''
+
+                                            // Check the corresponding context ID for the book name
+                                            var addingcontexts = []
+
+                                            for (
+                                                var j = 0;
+                                                j < contexts.length;
+                                                j++
+                                            ) {
+                                                if (contexts[j].name == graphname) {
+                                                    addingcontexts.push(
+                                                        contexts[j]
+                                                    )
+                                                }
+                                            }
+
+                                            // Put together all statements from that context into one graph
+                                            for (var st in parsedata[graphname]) {
+                                                if (
+                                                    parsedata[graphname][st]
+                                                        .length > 0
+                                                ) {
+                                                    addingstatements +=
+                                                        parsedata[graphname][st] +
+                                                        '\n\n'
+                                                }
+                                            }
+
+                                            if (addingstatements.length > 0) {
+                                                saveFileAtOnce(
+                                                    addingstatements,
+                                                    addingcontexts
+                                                )
+                                                something_added += 1
+                                            }
+                                        
+                                        }
+                                    }
+                                }
+                                else if (filetype == 'text/csv') {
                                     for (var graph in parsedata) {
                                         if (parsedata[graph].length > 0) {
                                             var addingstatements = ''
