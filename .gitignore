@@ -9,3 +9,4 @@ lib/sandbox
 node_modules
 npm-debug.log*
 
+views/statsheader.ejs
