@@ -75,6 +75,8 @@
 
     --globalsearchremove-background: url('/images/remove.png');
     --addnode-opacity: 1;
+
+    --scroll-color: #888;
 }
 :root[theme='dark'] {
     --body-text-color: #aaaab5;
@@ -125,6 +127,8 @@
 
     --globalsearchremove-background: url('/images/remove-white.png');
     --addnode-opacity: 0.6;
+
+    --scroll-color: #333;
 }
 
 
@@ -549,7 +553,7 @@ a:hover.app-more-link {
 }
 /* optional: show position indicator in red */
 ::-webkit-scrollbar-thumb {
-    background: #444444;
+    background: var(--scroll-color);
 }
 
 
@@ -600,6 +604,9 @@ a:hover.app-more-link {
     text-align: left;
     right: 50px;
     width: 320px;
+    max-height: 85%;
+    overflow: auto;
+    -webkit-overflow-scrolling: touch;
     clear: both;
     border-radius: 12px;
     padding: 0px 10px 10px 10px;

@@ -1709,11 +1709,11 @@ exports.submit = function(req, res, next) {
                             for (let j = 0; j < gexf_nodes.length; j++) {
                                 if (gexf_nodes[j].id == gexf_edges[i].source) {
                                     if (!gexf_statements[i]) gexf_statements[i] = ' ';
-                                    gexf_statements[i] += ' #' + gexf_nodes[j].label;
+                                    gexf_statements[i] += ' #' + S(gexf_nodes[j].label.toLowerCase()).underscore();
                                 }
                                 if (gexf_nodes[j].id == gexf_edges[i].target) {
                                     if (!gexf_statements[i]) gexf_statements[i] = ' ';
-                                    gexf_statements[i] += ' #' + gexf_nodes[j].label;
+                                    gexf_statements[i] += ' #' + S(gexf_nodes[j].label.toLowerCase()).underscore();
                                 } 
                             } 
                             if (gexf_edges[i].weight > 1) {
