@@ -27,6 +27,7 @@
 
 InfraNodus is a non-commercial [venture fiction](https://noduslabs.com/research/venture-fiction/) project. Its main objective is to enhance perception and imagination, although it can also solve concrete problems and offer you an efficient way to retain, process, and make sense of information. It can:
 
+* Help researchers make sense of textual data
 * Help you retain and remember information
 * Help you connect disjointed bits and pieces of data
 * Visualize patterns in complex relations
@@ -37,9 +38,9 @@ InfraNodus is a non-commercial [venture fiction](https://noduslabs.com/research/
 * Reveal the gaps in a network (and, thus, the potential for new ideas/connections)
 * Provide network metrics, identify the main communities and top nodes
 
-The method is mainly based on the approach outlined in Paranyushkin (2011) **[Identifying the Pathways of Meaning Circulation Using Text Network Analysis](https://noduslabs.com/research/pathways-meaning-circulation-text-network-analysis/)**. If you use the tool, you can cite this paper. 
+The method is mainly based on the approach outlined in Paranyushkin (2011) **[Identifying the Pathways of Meaning Circulation Using Text Network Analysis](https://noduslabs.com/research/pathways-meaning-circulation-text-network-analysis/)**. 
 
-A more precise description of InfraNodus' algorithm is presented in Paranyushkin (2019) **InfraNodus — Generating Insight Using Text Network Analysis** (to be published in the Proceedings for the WWW'19 The Web Conference).
+A more precise description of InfraNodus' algorithm is presented in Paranyushkin (2019) **[InfraNodus — Generating Insight Using Text Network Analysis](http://bit.ly/infragitpdf)** (published in the [Proceedings for the WWW'19 The Web Conference](http://bit.ly/infragitacm)). If you use the tool, you can cite this paper. 
 
 A more easy-to-read article on the tool is published in **[Towards Data Science](https://towardsdatascience.com/measuring-discourse-bias-using-text-network-analysis-9f251be5f6f3)**.
 
