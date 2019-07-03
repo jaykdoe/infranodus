@@ -207,6 +207,12 @@ p{
     z-index: 70;
     padding: 0;
     margin:0;
+    -ms-overflow-style: none;  
+    scrollbar-width: none; 
+}
+
+#content-box::-webkit-scrollbar { 
+    display: none;  
 }
 
 
