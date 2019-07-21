@@ -106,6 +106,7 @@
                     if (pinnedNodes.length > 0) {
                         fornode = pinnedNodes.join("+");
                     }
+                    fornode = fornode.replace(/_/gi, "+");
                     navigation().redirect('/google?context=add_' + userFactory.getCurrentContext() + '&fornode=' + fornode);
                 },
                 changeModeToSearch: function() {

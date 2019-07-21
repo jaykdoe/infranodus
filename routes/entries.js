@@ -393,6 +393,7 @@ exports.submit = function(req, res, next) {
                                 neo4jdriver.close();
 
                                 // This is a bit of a workaround, it shows a newly added graph on top of the previous one highlighting the difference
+                                // Happens in case of Google search for example
                                 if (default_context.indexOf('add_') == 0) {
                                     res.redirect(
                                         res.locals.user.name +
@@ -401,7 +402,7 @@ exports.submit = function(req, res, next) {
                                             '/edit' + 
                                             '?addcontext=' + 
                                             default_context + 
-                                            '&missing=1&highlight=1'
+                                            '&highlight=0'
                                     )
                                 }
                                 else if (req.excludestopwords) {
