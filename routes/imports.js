@@ -2873,9 +2873,6 @@ exports.submit = function(req, res, next) {
                                     
                                                         // The whole response has been received. Print out the result.
                                                         resp.on('end', () => {
-
-                                                            console.log('receiveddata');
-                                                            console.log(receiveddata);
                                                             
                                                             googlejson = JSON.parse(receiveddata);
                         
@@ -2949,7 +2946,14 @@ exports.submit = function(req, res, next) {
                             });
                         }
                         else {
-                            entries.submit(req, res);
+                            if (tot_search_results > 0) {
+                                entries.submit(req, res);
+                            }
+                            else {
+                                console.log("Error: No Google search results found");
+                                res.error(JSON.stringify("Google provided zero search results for this query. Try to make it a bit more general."));
+                                res.redirect('back')
+                            }
                         }
 
                        
