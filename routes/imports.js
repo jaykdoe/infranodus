@@ -2873,6 +2873,9 @@ exports.submit = function(req, res, next) {
                                     
                                                         // The whole response has been received. Print out the result.
                                                         resp.on('end', () => {
+
+                                                            console.log('receiveddata');
+                                                            console.log(receiveddata);
                                                             
                                                             googlejson = JSON.parse(receiveddata);
                         

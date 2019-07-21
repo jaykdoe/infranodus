@@ -1393,6 +1393,12 @@ button {
   color: var(--addnode-input-color);
 }
 
+#importpane {
+    position: absolute;
+    display: inline; /* show this only on small screens */
+    bottom: 22px;
+    left: 140px;
+}
 
 
 #switcher-selector {

@@ -106,7 +106,7 @@
                     if (pinnedNodes.length > 0) {
                         fornode = pinnedNodes.join("+");
                     }
-                    navigation().redirect('/import?context=add_' + userFactory.getCurrentContext() + '&fornode=' + fornode);
+                    navigation().redirect('/google?context=add_' + userFactory.getCurrentContext() + '&fornode=' + fornode);
                 },
                 changeModeToSearch: function() {
                     addEntryPanel().changeModeTo('SEARCH')

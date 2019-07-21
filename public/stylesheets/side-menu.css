@@ -54,6 +54,10 @@
 
     --privacy-link-share-image: url('/images/share.png');
     --privacy-link-share-opacity: 0.9;
+
+
+    --google-import-opacity: 1;
+    --google-import-background-image: url('/images/import-google.png')!important;
 }
 
 :root[theme='dark'] {
@@ -109,6 +113,9 @@
 
     --privacy-link-share-image: url('/images/share-white.png');
     --privacy-link-share-opacity: 0.6;
+
+    --google-import-opacity: 1;
+    --google-import-background-image: url('/images/import-google-white.png')!important;
 }
 
 
@@ -412,6 +419,23 @@ small screens.
 }
 
 
+#google-import {
+        position: relative;
+        display: inline; /* show this only on small screens */
+        left: 0; /* "#menu width" */
+        background: none;
+        text-align: left;
+        font-size: 32px; /* change this value to increase/decrease button size */
+        width: 32px;
+        height: 32px;
+        float: right;
+        z-index: 10;
+        background-image: var(--google-import-background-image);
+        opacity: var(--google-import-link-opacity);
+        background-repeat:no-repeat;
+        background-position:center;
+        pointer-events: auto!important;  
+}
 
 
 #windowdown-link {
