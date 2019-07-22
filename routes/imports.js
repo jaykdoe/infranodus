@@ -330,7 +330,7 @@ exports.submit = function(req, res, next) {
     if (
         req.body.context &&
         req.body.context.length > 2 &&
-        req.body.context.length < 20
+        req.body.context.length < 30
     ) {
         importContext = validate
             .sanitize(req.body.context)
