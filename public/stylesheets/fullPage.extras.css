@@ -118,6 +118,9 @@ p{
         text-align: center;
 
     }
+    .squeezedinv {
+        display: none!important;
+    }
 
 }
 
