@@ -111,6 +111,14 @@ p{
 
     }
 
+    
+    .squeezed {
+        max-width: 80%!important;
+        display: inline-block;
+        text-align: center;
+
+    }
+
 }
 
 .videoclick {
@@ -129,6 +137,12 @@ p{
     font-size: 0.9em!important;
 }
 
+.squeezed {
+    max-width: 50%;
+    display: inline-block;
+    text-align: center;
+
+}
 
 
 
