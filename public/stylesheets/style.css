@@ -77,6 +77,10 @@
     --addnode-opacity: 1;
 
     --scroll-color: #888;
+
+    --expla-background: rgba(250, 250, 250, 0.9); 
+    --expla-color: #444;
+
 }
 :root[theme='dark'] {
     --body-text-color: #aaaab5;
@@ -129,6 +133,11 @@
     --addnode-opacity: 0.6;
 
     --scroll-color: #333;
+
+    --expla-background: rgba(30, 30, 30, 0.9); 
+    --expla-color: #aaa;
+
+
 }
 
 
@@ -255,6 +264,15 @@ textarea:focus {
 }
 
 #explanation {
+  float: left;
+  margin-bottom:25px;
+  padding: 10px 10px;
+  min-width: 160px;
+  min-height: 10px;
+  margin-left: 2px;
+  background-color: var(--expla-background);
+  border-radius: 5px;
+  box-shadow: var(--entry-box-shadow);  
   position: relative;
   width: 80%;
   padding-left: 13px;
@@ -262,8 +280,13 @@ textarea:focus {
   font: 14px 'IstokWeb-Regular',sans-serif;
   font-style: italic;
   padding-bottom: 15px;
-  color: #666;
+  color: var(--expla-color);
   display: none;
+}
+
+.explintro {
+    position: relative;
+    font-style: normal!important;
 }
 
 .entry-date {

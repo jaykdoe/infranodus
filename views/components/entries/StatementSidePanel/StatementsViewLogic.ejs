@@ -9,7 +9,7 @@
             // // Top community nodes
             // console.log(topp_communities);
     
-            filter_statements_summary(graphFactory.getTopBCNodes(4), graphFactory.getAllCommunities(null, null, 'auto'));
+            filter_statements_summary(graphFactory.getTopBCNodes(4), graphFactory.getAllCommunities(null, null, 'auto'), 'summary');
     
             $('#topnav_items').each(function() {
                 $("li", this).each(function(i) {
@@ -259,7 +259,7 @@
         
                       // Update explanation above the entries
                       
-                      statements().updateExplanation(filter_origin, most_inf_nodes_str);
+                      statements().updateExplanation(filter_origin, most_inf_nodes_str, top_community_words);
                       
                       // Hide everything
         

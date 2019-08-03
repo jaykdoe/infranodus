@@ -502,11 +502,21 @@
         
                   
                 },
-                updateExplanation: function(filter_origin, most_inf_nodes_str) {
+                updateExplanation: function(filter_origin, most_inf_nodes_str, top_community_words) {
                   
                   let polysingularity_score = graphFactory.getStats('PolysingularityScore');
+
+                  let top_com_nodes_str = '';
+                  for (var l = 0; l < top_community_words.length; l++) {
+                    top_com_nodes_str += (l + 1) + " ";
+                    for (var k = 0; k <  top_community_words[l]['nodes'].length; k++) {
+                      top_com_nodes_str += top_community_words[l]['nodes'][k].name + " ";
+                    }
+                    top_com_nodes_str += "<br>";
+                  }
         
-                  var explanation_html = 'The excerpts from the text containing the main topics and the most influential terms:';
+                  var explanation_html = '';
+                  
         
                   if (filter_origin == 'insight') {
                     if (polysingularity_score == 'Dispersed') {
@@ -522,6 +532,11 @@
                       explanation_html = "This discourse's structure is <strong>" + polysingularity_score + "</strong>. It's leaning towards and promotes a certain perspective, circulating around the most influential words — <strong>" + most_inf_nodes_str + "</strong>. <br><br>You could further develop and make connections between the different perspectives (indicated with colored topical clusters) into this discourse to make it more diversified. For example, the ones below:";
                     }
                     // There is a structural gap and a potential for a new idea between these two sets of key terms and statements below:
+                  }
+                  else if (filter_origin == 'summary') {
+                      explanation_html = "<div class='explintro'><span class='headline'>The main topics are:<br></span>" + top_com_nodes_str + "<br>";
+                      explanation_html += "<span class='headline'>Influential terms:<br> </span>" + most_inf_nodes_str + "</div>";
+                      explanation_html += '<br><br>Explore the main topics and terms outlined above or see them in the excerpts from this text below.';
                   }
         
                   $('#explanation').show();
