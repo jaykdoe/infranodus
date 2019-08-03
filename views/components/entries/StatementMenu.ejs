@@ -1,6 +1,6 @@
 <div id='statementmenu'>
 
-<a href="javascript:" class="tooltip" title="hide the text pane" id="statements-link">
+<a href="javascript:" class="tooltip researchpane" title="hide the text pane" id="statements-link">
     <span></span>
 </a> 
 <a href="javascript:" id="addcontext-link" class="tooltip editorpane" title="see the similarities with another graph (intersections): click this and then choose another graph in the menu.">
@@ -13,32 +13,32 @@
         <span></span>
 </a>
 
-<a href="javascript:" class="tooltip" title="make graph dynamic: as you scroll the text entries you'll see them highlighted" id="timer-link">
+<a href="javascript:" class="tooltip researchpane" title="make graph dynamic: as you scroll the text entries you'll see them highlighted" id="timer-link">
     <span></span>
 </a> 
 
-<a href="javascript:" class="tooltip" title="play dynamic graph: infranodus will scroll the text entries and highlight them on the graph" id="watch-link">
+<a href="javascript:" class="tooltip researchpane" title="play dynamic graph: infranodus will scroll the text entries and highlight them on the graph" id="watch-link">
     <span></span>
 </a> 
 
 <% if (contextpublic && context) { %>
-    <a href="javascript:" id="privacy-link" class="is-public">
+    <a href="javascript:" id="privacy-link" class="is-public researchpane">
         <!-- Share icon -->
         <span></span>
     </a>
 <% } else if (!perceivername && context) { %>
-    <a href="javascript:" id="privacy-link">
+    <a href="javascript:" id="privacy-link" class="researchpane">
         <!-- Share icon -->
         <span></span>
     </a>
 <% } %>
 
 <% if (!perceivername) { %>
-    <a href="javascript:" id="import-link" class="tooltip" title="import from external sources">
+    <a href="javascript:" id="import-link" class="researchpane" class="tooltip" title="import from external sources">
         <!-- Import icon -->
         <span></span>
     </a>
-    <a href="javascript:" id="collaborate-link">
+    <a href="javascript:" id="collaborate-link" class="researchpane">
         <!-- Collaborate icon -->
         <span></span>
     </a>
