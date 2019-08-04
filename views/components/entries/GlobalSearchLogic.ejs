@@ -108,8 +108,12 @@ function globalSearchForm() {
 // What happens when we search for a node in the graph?
 
 $("#globalsearchbutton").on('click', function(e) {
- 
+  if ($('#globalsearchinput').is(":visible")) {
         globalSearchForm().submit(e);
+  }
+  else {
+    $('#globalsearchinput').show();
+  }
 });
 
 $("#globalsearchremove").on('click', function(e) {

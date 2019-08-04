@@ -21,6 +21,21 @@
             statementsPanelFactory.setCurrentStatementsView('SUMMARY');
     
         });
+
+
+        $("#graphonly").click(function(e) {
+            e.preventDefault();
+    
+         
+            $('#topnav_items').each(function() {
+                $("li", this).each(function(i) {
+                    $(this).removeClass('pure-menu-selected-top');
+                });
+            });
+            this.className = 'pure-menu-selected-top';
+            
+            statements().hide();
+        });
     
         $("#insight").click(function(e) {
             
@@ -72,7 +87,9 @@
             
             $('.summary').remove();
             $('#explanation').hide();
-    
+            
+            statements().show();
+            
             statementsPanelFactory.setCurrentStatementsView('OVERVIEW');
         });
     

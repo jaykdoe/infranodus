@@ -219,17 +219,22 @@
                 show: function() {
                         $("#entries").css('z-index','5');
                         $("#entries").css('visibility','visible');
-                        $('#topnav').fadeIn();
+                        // $('#topnav').fadeIn();
                         localStorage.setItem('folded', 0);
                         // TODO move color to another function
                         $('#statements-link').removeClass('statements-link-on-dark');
                         $('#statements-link').removeClass('statements-link-on');
+                        // Top menu for statements selecta
+                        if ($('#graphonly').hasClass('pure-menu-selected-top')) {
+                          $('#overview').removeClass('pure-menu-selected-top');
+                          $('#graphonly').addClass('pure-menu-selected-top');
+                        }             
                 },
                 hide: function() {
                         
                         $("#entries").css('z-index','-2'); 
                         $("#entries").css('visibility','hidden');
-                        $('#topnav').fadeOut();
+                        // $('#topnav').fadeOut();
                         localStorage.setItem('folded', 1);
                         // TODO move color to another function
                         if (userFactory.getBackground() == 'dark') {
@@ -237,6 +242,11 @@
                         }
                         else {
                             $('#statements-link').addClass('statements-link-on');
+                        }
+                        // Top menu for statements selecta
+                        if ($('#overview').hasClass('pure-menu-selected-top')) {
+                          $('#overview').removeClass('pure-menu-selected-top');
+                          $('#graphonly').addClass('pure-menu-selected-top');
                         }
                         
                 },

@@ -1027,6 +1027,10 @@ Hides the menu at `48em`, but modify this based on your app's needs.
 
     }
 
+    #globalsearchinput { 
+        display: none;
+    }
+
 
 
 
@@ -1035,9 +1039,8 @@ Hides the menu at `48em`, but modify this based on your app's needs.
 
 @media (max-width: 600px) {
 
-  #topnav  {
-    padding-top: 45px;
-    padding-bottom: 15px;
-  }
+  #globalsearchinput { 
+    display: none;
+}
 
 }

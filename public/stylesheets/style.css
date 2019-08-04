@@ -36,7 +36,7 @@
     --entry-text-color: #000;
     --analytics-pane-background: rgba(250, 250, 250, 0.9);
     --entry-form-background: rgba(250, 250, 250, 0.9);
-    --addnode-input-background: rgba(255, 255, 255, 0.5);
+    --addnode-input-background: rgba(255, 255, 255, 0.9);
     --addnode-input-border: 1px solid rgba(141, 141, 141, 0.2);
     --addnode-input-shadow: inset 0 0 3px rgba(141, 141, 141, 0.2);
     --addnode-input-color: #333;
