@@ -78,7 +78,7 @@
 
     --scroll-color: #888;
 
-    --expla-background: rgba(250, 250, 250, 0.9); 
+    --expla-background: rgba(250, 250, 250, 0.6); 
     --expla-color: #444;
 
 }
@@ -134,7 +134,7 @@
 
     --scroll-color: #333;
 
-    --expla-background: rgba(30, 30, 30, 0.9); 
+    --expla-background: rgba(30, 30, 30, 0.7); 
     --expla-color: #aaa;
 
 
@@ -265,27 +265,30 @@ textarea:focus {
 
 #explanation {
   float: none;
-  margin-bottom:25px;
-  padding: 10px 10px;
-  min-width: 160px;
-  min-height: 10px;
-  margin-left: 2px;
-  background-color: var(--expla-background);
-  border-radius: 5px;
-  box-shadow: var(--entry-box-shadow);  
   position: relative;
+  max-width: 320px;
+  display: none;
   top: 0;
   left: 50px;
-  z-index: 5;
-  max-width: 280px;
-  font: 14px 'IstokWeb-Regular',sans-serif;
-  font-style: italic;
-  padding-bottom: 15px;
-  color: var(--expla-color);
-  display: none;
+  
 }
 
 .explintro {
+    margin-bottom:25px;
+    padding: 10px 10px;
+    min-width: 160px;
+    min-height: 10px;
+    margin-left: 2px;
+    background-color: var(--expla-background);
+    border-radius: 5px;
+    box-shadow: var(--entry-box-shadow);  
+    top: 0;
+    z-index: 6;
+    max-width: 280px;
+    font: 14px 'IstokWeb-Regular',sans-serif;
+    font-style: italic;
+    padding-bottom: 15px;
+    color: var(--expla-color);
     position: relative;
     font-style: normal!important;
 }

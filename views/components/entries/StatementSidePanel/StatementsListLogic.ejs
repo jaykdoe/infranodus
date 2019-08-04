@@ -515,12 +515,13 @@
                 updateExplanation: function(filter_origin, most_inf_nodes_str, top_community_words) {
                   
                   let polysingularity_score = graphFactory.getStats('PolysingularityScore');
+                  
 
                   let top_com_nodes_str = '';
                   for (var l = 0; l < top_community_words.length; l++) {
                     top_com_nodes_str += (l + 1) + " ";
                     for (var k = 0; k <  top_community_words[l]['nodes'].length; k++) {
-                      top_com_nodes_str += top_community_words[l]['nodes'][k].name + " ";
+                      top_com_nodes_str += "<a href='#' class='community_node' community='"+top_community_words[l].id+"'>" + top_community_words[l]['nodes'][k].name + "</a>  ";
                     }
                     top_com_nodes_str += "<br>";
                   }
@@ -544,15 +545,19 @@
                     // There is a structural gap and a potential for a new idea between these two sets of key terms and statements below:
                   }
                   else if (filter_origin == 'summary') {
-                      explanation_html = "<div class='explintro'><span class='headline'>The main topics are:<br></span>" + top_com_nodes_str + "<br>";
-                      explanation_html += "<span class='headline'>Influential terms:<br> </span>" + most_inf_nodes_str + "</div>";
-                      explanation_html += '<br><br>Explore the main topics and terms outlined above or see them in the excerpts from this text below.';
+                      explanation_html += "<div class='explintro'><span class='headline'>Influential terms:<br> </span>" + most_inf_nodes_str + "</div>";  
+                      explanation_html += "<div class='explintro'><span class='headline'>The main topics are:<br></span>" + top_com_nodes_str + "</div>";
+                      explanation_html += "<div class='explintro'>Explore the main topics and terms outlined above or see them in the <a href='javascript:' id='unhideentries'>excerpts from this text</a> below.</div>";
                   }
         
-                  $('#explanation').css('display', 'inline-block');
+                  $('#explanation').css('display', 'block');
                   $('#explanation').html(explanation_html);
 
                   statements().hide();
+
+                  $('#unhideentries').click(function() {
+                    statements().toggleStatements();
+                  });
         
                 },
                 activateInsight: function() {
