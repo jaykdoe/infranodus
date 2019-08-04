@@ -549,8 +549,10 @@
                       explanation_html += '<br><br>Explore the main topics and terms outlined above or see them in the excerpts from this text below.';
                   }
         
-                  $('#explanation').show();
+                  $('#explanation').css('display', 'inline-block');
                   $('#explanation').html(explanation_html);
+
+                  statements().hide();
         
                 },
                 activateInsight: function() {

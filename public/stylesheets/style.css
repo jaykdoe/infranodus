@@ -264,7 +264,7 @@ textarea:focus {
 }
 
 #explanation {
-  float: left;
+  float: none;
   margin-bottom:25px;
   padding: 10px 10px;
   min-width: 160px;
@@ -274,9 +274,10 @@ textarea:focus {
   border-radius: 5px;
   box-shadow: var(--entry-box-shadow);  
   position: relative;
-  width: 80%;
-  padding-left: 13px;
-  padding-top:-5px;
+  top: 0;
+  left: 50px;
+  z-index: 5;
+  max-width: 280px;
   font: 14px 'IstokWeb-Regular',sans-serif;
   font-style: italic;
   padding-bottom: 15px;
