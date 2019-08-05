@@ -776,6 +776,11 @@ button {
   cursor: pointer;
 }
 
+button:hover {
+    background: #e0e0e0;
+
+  }
+
 .abutton {
         font-size: 12px;
         background: #ededed;
@@ -783,7 +788,12 @@ button {
         padding: 4px 7px;
         border-radius: 3px;
         cursor: pointer;
-      
+        text-decoration: none;
+}
+.abutton:hover {
+    
+    background: #e0e0e0;
+    
 }
 
 
@@ -1788,6 +1798,7 @@ Forms Core
     margin: 0; /* 2 */
     vertical-align: baseline; /* 3 */
     *vertical-align: middle; /* 3 */
+    border: 1px solid #ccc; /* Green */
 }
 
 /*

@@ -421,20 +421,29 @@ small screens.
 
 #google-import {
         position: relative;
-        display: inline; /* show this only on small screens */
         left: 0; /* "#menu width" */
-        background: none;
-        text-align: left;
-        font-size: 32px; /* change this value to increase/decrease button size */
-        width: 32px;
+        text-align: center;
+        padding-top: 6px;
+        padding-bottom: 6px;
+        padding-left: 10px;
+        padding-right: 10px;
+        background-color: #f5f5f5;
+        top: -4px;
+        color: #666;
+        font: 15px 'IstokWeb-Regular',sans-serif;
+        /* width: 32px;
         height: 32px;
-        float: right;
+        float: right; */
         z-index: 10;
-        background-image: var(--google-import-background-image);
-        opacity: var(--google-import-link-opacity);
-        background-repeat:no-repeat;
-        background-position:center;
-        pointer-events: auto!important;  
+        /* background-image: var(--google-import-background-image);
+        opacity: var(--google-import-link-opacity); */
+        /* background-repeat:no-repeat;
+        background-position:center; */
+        /* pointer-events: auto!important;   */
+}
+
+#google-import:hover {
+    background-color: #efefef;
 }
 
 
