@@ -273,6 +273,24 @@ textarea:focus {
   
 }
 
+#expsummary {
+    display: none;    
+}
+
+#expinsight {
+    display: none;
+}
+
+#expsummary a {
+    color: inherit;
+    text-decoration: none;
+}
+
+#expsummary a:hover {
+    color: #0089E0!important;
+    text-decoration: underline!important;
+}
+
 .explintro {
     margin-bottom:25px;
     padding: 10px 10px;
@@ -292,6 +310,12 @@ textarea:focus {
     position: relative;
     font-style: normal!important;
 }
+
+.underlinelink {
+    color: #0089E0!important;
+    text-decoration: underline!important;
+}
+
 
 .entry-date {
     float: left;

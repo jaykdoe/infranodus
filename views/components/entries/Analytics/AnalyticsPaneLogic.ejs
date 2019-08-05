@@ -25,7 +25,11 @@ function AnalyticsPanel() {
 
                 comm_info = comm_info.slice(0, -7);
                 
+                // Analytics pane update
                 $('#maintopics').html(comm_info);
+
+                // Summary and insight pane update
+                $('.topinftopics').html(comm_info);
 
         }
 
@@ -51,7 +55,11 @@ function AnalyticsPanel() {
 
             inf_info = inf_info.slice(0, -7);
         
+            // Update analytics panel
             $('#mostinfluential').html(inf_info);
+
+            // Update the summary and insight panels
+            $('.topinfnodes').html(inf_info);
 
         }
 
@@ -159,10 +167,12 @@ function AnalyticsPanel() {
             }
         }
 
-        this.colorNode = function(n, palette) {
+        this.colorNode = function(n, palette) {       
             if (document.getElementsByClassName("inlinesquare " + n.id)[0] != undefined) {
-                        document.getElementsByClassName("inlinesquare " + n.id)[0].style.backgroundColor = rgbToHex(palette[n.community]._rgb[0],palette[n.community]._rgb[1],palette[n.community]._rgb[2]);
-                        document.getElementsByClassName("inlinesquare " + n.id)[0].setAttribute('community',n.community);
+                for (var i = 0; i < document.getElementsByClassName("inlinesquare " + n.id).length; i++) {
+                        document.getElementsByClassName("inlinesquare " + n.id)[i].style.backgroundColor = rgbToHex(palette[n.community]._rgb[0],palette[n.community]._rgb[1],palette[n.community]._rgb[2]);
+                        document.getElementsByClassName("inlinesquare " + n.id)[i].setAttribute('community',n.community);
+                }
             }
         }
 

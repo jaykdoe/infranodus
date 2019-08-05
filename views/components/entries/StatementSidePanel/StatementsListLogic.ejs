@@ -528,8 +528,10 @@
         
                   var explanation_html = '';
                   
-        
+                  $('#explanation').css('display', 'block');
+
                   if (filter_origin == 'insight') {
+                    $('#expinsight').show();
                     if (polysingularity_score == 'Dispersed') {
                       explanation_html = "This discourse's structure is <strong>" + polysingularity_score + "</strong>. <br><br>To increase coherency, you can make connections between different separated clusters of key terms and statements. For example, the ones below:";
                     }
@@ -542,17 +544,13 @@
                     else if (polysingularity_score == 'Biased') {
                       explanation_html = "This discourse's structure is <strong>" + polysingularity_score + "</strong>. It's leaning towards and promotes a certain perspective, circulating around the most influential words — <strong>" + most_inf_nodes_str + "</strong>. <br><br>You could further develop and make connections between the different perspectives (indicated with colored topical clusters) into this discourse to make it more diversified. For example, the ones below:";
                     }
+                    $('#insightadvice').html(explanation_html);
                     // There is a structural gap and a potential for a new idea between these two sets of key terms and statements below:
                   }
                   else if (filter_origin == 'summary') {
-                      explanation_html += "<div class='explintro'><span class='headline'>Influential terms:<br> </span>" + most_inf_nodes_str + "</div>";  
-                      explanation_html += "<div class='explintro'><span class='headline'>The main topics are:<br></span>" + top_com_nodes_str + "</div>";
-                      explanation_html += "<div class='explintro'>Explore the main topics and terms outlined above or see them in the <a href='javascript:' id='unhideentries'>excerpts from this text</a> below.</div>";
+                    $('#expsummary').show();
                   }
         
-                  $('#explanation').css('display', 'block');
-                  $('#explanation').html(explanation_html);
-
                   statements().hide();
 
                   $('#unhideentries').click(function() {
