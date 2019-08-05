@@ -209,7 +209,10 @@
               else {
         
                 // Get the statements with the top BC words only
-                find_statement(top_words,0);
+                if (top_words.length > 0) {
+               
+                  find_statement(top_words,0);
+                }
               }
         
               function find_statement(key_terms, sweetch) {
@@ -219,14 +222,18 @@
                   // Find the first entry that contains ALL the key_terms
         
                   $(".entry").each(function(){
-        
+
+                    
+
                     // We did not find any statements with top BC nodes yet OR we did not find any statements of coms 
                     if ((found_statements.length < 1 && sweetch == 0) || (sweetch > 0 && com_statements[sweetch].length < 1)) {
         
                       let currentDiv = $(this).attr('data-uid');
         
-        
+                      
                       let originaltext = $(this).children('.entry-text').html();
+
+
                       let statement_hashtags = $(this).attr('data-hashtags');
                       let currentTimecode = $(this).attr('data-timestamp');
         
@@ -269,7 +276,9 @@
                     }
         
                   });
-        
+
+
+          
                   // We are searching for top nodes only and we found at least 1 statement, which has them all 
         
                   if ((sweetch == 0 && found_statements.length > 0)) {
@@ -431,7 +440,9 @@
                     // All the top nodes cannot be found for Top Influence Nodes or for Top Comm, so we cut the list and search again
                     if (sweetch == 0) {
                       top_words = top_words.slice(0, -1);
-                      find_statement(top_words,0)
+                      if (top_words.length > 0) {
+                        find_statement(top_words,0);
+                      }
                     }
                     else if (sweetch > 0) {
                         let reduced_query = key_terms.slice(0,-1);

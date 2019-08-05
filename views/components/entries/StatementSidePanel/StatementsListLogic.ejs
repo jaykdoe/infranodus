@@ -536,16 +536,16 @@
                   if (filter_origin == 'insight') {
                  
                     if (polysingularity_score == 'Dispersed') {
-                      explanation_html = "This discourse's structure is <span class='headline'>" + polysingularity_score + "</span>. <br><br>To <span class='headline'>increase coherency</span>, you can ask a research question that would help you develop the topics below and the connection between them:";
+                      explanation_html = "This discourse's structure is <span class='headline'>" + polysingularity_score + "</span>. <br><br>To <span class='headline'>increase coherency</span>, you can ask a research question that would help you develop the topics below and the connections between them:";
                     }
                     else if (polysingularity_score == 'Diversified') {
-                      explanation_html = "This discourse's structure is <span class='headline'>" + polysingularity_score + "</span>. It has a balanced representation of several perspectives. <br><br>You can make it more focused if you develop the ideas around the main keywords — <span class='headline'>" + most_inf_nodes_str + "</span> — or by identifying the structural gaps between the less represented clusters and making new connections between them (to focus) or going deeper into them (to diversify even more). Like the ones below:";
+                      explanation_html = "This discourse's structure is <span class='headline'>" + polysingularity_score + "</span>. It has a <span class='headline'>balanced representation of several perspectives</span>. <br><br>You can make it <span class='headline'>more focused</span> if you develop the ideas around the main keywords — <span class='headline'>" + most_inf_nodes_str + "</span> — or by identifying the <span class='headline'>structural gap</span> between the less represented topics below and <span class='headline'>developing the themes</span> they represent:";
                     }
                     else if (polysingularity_score == 'Focused') {
-                      explanation_html = "This discourse's structure is <span class='headline'>" + polysingularity_score + "</span>. While it has several perspectives, it is focused on one. <br><br>You can make it more diversified if you identify the structural gaps in the graph and make connections between them — that's where the new ideas may be. For example, these two sets of key terms and statements below:";
+                      explanation_html = "This discourse's structure is <span class='headline'>" + polysingularity_score + "</span>. While it has several perspectives, it is focused on one. <br><br>You can make it <span class='headline'>more diversified</span> if you identify the structural gaps in the graph and <span class='headline'>make connections</span> between them — that's where the new ideas may be. For example, between these two topics below:";
                     }
                     else if (polysingularity_score == 'Biased') {
-                      explanation_html = "This discourse's structure is <span class='headline'>" + polysingularity_score + "</span>. It's leaning towards and promotes a certain perspective, circulating around the most influential words — <span class='headline'>" + most_inf_nodes_str + "</span>. <br><br>You could further develop and make connections between the different perspectives (indicated with colored topical clusters) into this discourse to make it more diversified. For example, the ones below:";
+                      explanation_html = "This discourse's structure is <span class='headline'>" + polysingularity_score + "</span>. It's leaning towards and promotes a certain perspective, circulating around the most influential words — <span class='headline'>" + most_inf_nodes_str + "</span>. <br><br>You could <span class='headline'>develop the less represented topics</span> as the ones listed below:";
                     }
                     $('#insightadvice').html(explanation_html);
                     // There is a structural gap and a potential for a new idea between these two sets of key terms and statements below:

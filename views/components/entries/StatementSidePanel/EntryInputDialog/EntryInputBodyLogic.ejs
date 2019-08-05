@@ -229,7 +229,7 @@
                                 $('#statement').removeClass('loading');
                                 $('#editbutton').removeAttr('disabled');
                                 $('#cancelbutton').trigger('click');
-                                socket.emit('chat message', {entryuid: JSON.parse(res.entryuid).data, entrytext: res.entrytext, graph: res.graph});
+                                socket.emit('chat message', {entryuid: JSON.parse(res.entryuid).data, entryname: res.entryname, entrytext: res.entrytext, graph: res.graph});
                             }
                             else if (res.errormsg) {
                                 alert(res.errormsg);
@@ -366,7 +366,7 @@
                             }
                             else {
                                 // Only one statement added? Initiate processing that will show it both to the user and the collaborator (if exists)
-                                socket.emit('chat message', {postedby: postedby, entryuid: JSON.parse(res.entryuid).data, entrytext: res.entrytext, graph: res.graph});
+                                socket.emit('chat message', {postedby: postedby, entryuid: JSON.parse(res.entryuid).data, entrytext: res.entrytext, entryname: res.entryname, graph: res.graph});
                             }
 
                         }

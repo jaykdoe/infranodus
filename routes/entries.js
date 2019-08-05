@@ -274,6 +274,8 @@ exports.submit = function(req, res, next) {
                         var statementName = ''
                         var newtimestamp = timestamp + s * 2
                         var st_uid = uuid.v1()
+
+                                           
                         if (hashtags) {
                             if (hashtags.length >= maxhash) {
                                 error =
@@ -481,6 +483,7 @@ exports.submit = function(req, res, next) {
                                                         splitStatements[0],
                                                     graph: graph,
                                                 })
+                                                
                                             }
                                         )
                                     }

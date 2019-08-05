@@ -144,15 +144,6 @@
                     // Send the default search setting to the Global Search
                     // TODO take into account the polysingularity index
                     globalSearch.populateGlobalSearch(topInfluenceNodes);
-
-                    // Generate a nice fixed patterns for the communities
-                    let palette = generatePalette(userFactory.getGraphPalette(), max_community_number, userFactory.getBackground());
-
-                    // Color the topic boxes in the Analytics panel
-                    analyticsPanel.colorTopics(palette);    
-
-                    // Color the nodes in the graph
-                    graph().colorNodesCommunities(palette);
                     
                     // Set the number of nodes in the first and second communities
                     graphFactory.setStats('FirstComNodes',all_communities[0].length);
@@ -236,10 +227,6 @@
                     }
 
 
-
-                    // Color the nodes in the graph to communities colors
-                    // TODO this function also counts addcontext nodes, should be taken out
-                    graph().colorNodesCommunities(palette);
 
 
                     // Number of nodes in the top topic
@@ -355,7 +342,19 @@
 
                     // Populate entries field
                     addEntryForm().populateRecommendation(insightClusters);
-        
+
+                    // Populate the insight cluster
+                    statementsView().populateRecommendation(insightClusters);
+
+                    // Generate a nice fixed patterns for the communities
+                    let palette = generatePalette(userFactory.getGraphPalette(), max_community_number, userFactory.getBackground());
+
+                    // Color the topic boxes in the Analytics panel
+                    analyticsPanel.colorTopics(palette);    
+
+                    // Color the nodes in the graph to communities colors
+                    // TODO this function also counts addcontext nodes, should be taken out
+                    graph().colorNodesCommunities(palette);
 
                     // How influential nodes are dispersed among the communities
                     let influence_dispersal = ((bc_entropy/2).toFixed(1)*100).toFixed(0);
