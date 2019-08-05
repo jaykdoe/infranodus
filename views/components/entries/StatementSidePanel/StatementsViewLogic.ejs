@@ -1,7 +1,7 @@
 <script>    
     
         $("#summary").click(function(e) {
-          
+
             e.preventDefault();
 
             let curview = statementsPanelFactory.getCurrentStatementsView();
@@ -12,7 +12,7 @@
             // // Top community nodes
             // console.log(topp_communities);
     
-            if (curview != 'SUMMARY') {
+            
 
               filter_statements_summary(graphFactory.getTopBCNodes(4), graphFactory.getAllCommunities(null, null, 'auto'), 'summary');
       
@@ -25,7 +25,16 @@
               
               statementsPanelFactory.setCurrentStatementsView('SUMMARY');
 
-            }
+              $('#explanation').css('display', 'block');
+
+              $('#expinsight').hide();
+              $('#expsummary').show();
+
+              statements().hide();
+
+             
+
+            
     
         });
 
@@ -40,34 +49,55 @@
                 });
             });
             this.className = 'pure-menu-selected-top';
+
+            $('#explanation').css('display', 'none');
+
+
+            $('#expinsight').hide();
+            $('#expsummary').hide();
             
             statements().hide();
+
+           
         });
     
         $("#insight").click(function(e) {
             
             e.preventDefault();
 
+            let curview = statementsPanelFactory.getCurrentStatementsView();
+
       
-            let insight_nodes = [];
-        
-            let insight_clusters = graphFactory.getInsightClusters();
+              let insight_nodes = [];
+          
+              let insight_clusters = graphFactory.getInsightClusters();
+              
+              for (let el in insight_clusters) {
+                insight_nodes.push(insight_clusters[el]);
+              }
+      
+              filter_statements_summary(graphFactory.getTopBCNodes(4), insight_nodes, 'insight');
+      
+              $('#topnav_items').each(function() {
+                  $("li", this).each(function(i) {
+                      $(this).removeClass('pure-menu-selected-top');
+                  });
+              });
+              this.className = 'pure-menu-selected-top';
+              // Top community terms
+      
+              statementsPanelFactory.setCurrentStatementsView('INSIGHT');
+
+              $('#explanation').css('display', 'block');
+
+              $('#expinsight').show();
+              $('#expsummary').hide();
+
+              statements().hide();
+
+          
+
             
-            for (let el in insight_clusters) {
-              insight_nodes.push(insight_clusters[el]);
-            }
-    
-            filter_statements_summary(graphFactory.getTopBCNodes(4), insight_nodes, 'insight');
-    
-            $('#topnav_items').each(function() {
-                $("li", this).each(function(i) {
-                    $(this).removeClass('pure-menu-selected-top');
-                });
-            });
-            this.className = 'pure-menu-selected-top';
-            // Top community terms
-    
-            statementsPanelFactory.setCurrentStatementsView('INSIGHT');
             
     
     
@@ -93,7 +123,10 @@
             }
             
             $('.summary').remove();
-            $('#explanation').hide();
+            $('#explanation').css('display', 'none');
+
+            $('#expinsight').hide();
+            $('#expsummary').hide();
             
             statements().show();
             
@@ -101,6 +134,42 @@
         });
     
     
+        // Functions to generate the various comments and hints above the statements
+
+        function statementsView() {
+          return {
+              populateRecommendation: function(insight_nodes) {      
+
+                let recommender = '';
+                recommender += "<span class='headline'>What is the relation between:<br></span>";
+
+                let iter = 0;    
+                for (let cluster in insight_nodes) {
+                    recommender += '';
+                    for (var n = 0; n < insight_nodes[cluster].nodes.length; n++) {
+                        
+                        recommender += "<div class='inlinesquare "+(insight_nodes[cluster].id)+"'></div> <a href='#' class='community_node' community='"+cluster+"'>" + insight_nodes[cluster].nodes[n].name +'</a>';
+                        if (n < insight_nodes[cluster].nodes.length - 1) { recommender += ' - '}
+                      
+                    }
+                    
+                    iter += 1;
+                    if (iter < Object.keys(insight_nodes).length) {
+                        recommender += '<br> and <br>';
+                    }
+                    
+                    
+                }
+
+
+                recommender += '';
+
+                $('#insightclusters').html(recommender);
+
+              }
+             
+          }
+        }
 
         // This function is launched when the user clicks Essence / Overview / Insight 
         // It filters out the statements that contain top words / top community words                

@@ -50,7 +50,12 @@
                 // Check if the statements should be hidden
                 if (localStorage.getItem('folded') == 1) {
                     this.toggleStatementsTo('HIDDEN');
-                }  
+                } 
+
+                // Add an event on the hiding params
+                $('.unhidelink').click(function() {
+                  statements().toggleStatements();
+                });
 
               }
  
@@ -527,35 +532,25 @@
                   }
         
                   var explanation_html = '';
-                  
-                  $('#explanation').css('display', 'block');
-
+                
                   if (filter_origin == 'insight') {
-                    $('#expinsight').show();
+                 
                     if (polysingularity_score == 'Dispersed') {
-                      explanation_html = "This discourse's structure is <strong>" + polysingularity_score + "</strong>. <br><br>To increase coherency, you can make connections between different separated clusters of key terms and statements. For example, the ones below:";
+                      explanation_html = "This discourse's structure is <span class='headline'>" + polysingularity_score + "</span>. <br><br>To <span class='headline'>increase coherency</span>, you can ask a research question that would help you develop the topics below and the connection between them:";
                     }
                     else if (polysingularity_score == 'Diversified') {
-                      explanation_html = "This discourse's structure is <strong>" + polysingularity_score + "</strong>. It has a balanced representation of several perspectives. <br><br>You can make it more focused if you develop the ideas around the main keywords — <strong>" + most_inf_nodes_str + "</strong> — or by identifying the structural gaps between the less represented clusters and making new connections between them (to focus) or going deeper into them (to diversify even more). Like the ones below:";
+                      explanation_html = "This discourse's structure is <span class='headline'>" + polysingularity_score + "</span>. It has a balanced representation of several perspectives. <br><br>You can make it more focused if you develop the ideas around the main keywords — <span class='headline'>" + most_inf_nodes_str + "</span> — or by identifying the structural gaps between the less represented clusters and making new connections between them (to focus) or going deeper into them (to diversify even more). Like the ones below:";
                     }
                     else if (polysingularity_score == 'Focused') {
-                      explanation_html = "This discourse's structure is <strong>" + polysingularity_score + "</strong>. While it has several perspectives, it is focused on one. <br><br>You can make it more diversified if you identify the structural gaps in the graph and make connections between them — that's where the new ideas may be. For example, these two sets of key terms and statements below:";
+                      explanation_html = "This discourse's structure is <span class='headline'>" + polysingularity_score + "</span>. While it has several perspectives, it is focused on one. <br><br>You can make it more diversified if you identify the structural gaps in the graph and make connections between them — that's where the new ideas may be. For example, these two sets of key terms and statements below:";
                     }
                     else if (polysingularity_score == 'Biased') {
-                      explanation_html = "This discourse's structure is <strong>" + polysingularity_score + "</strong>. It's leaning towards and promotes a certain perspective, circulating around the most influential words — <strong>" + most_inf_nodes_str + "</strong>. <br><br>You could further develop and make connections between the different perspectives (indicated with colored topical clusters) into this discourse to make it more diversified. For example, the ones below:";
+                      explanation_html = "This discourse's structure is <span class='headline'>" + polysingularity_score + "</span>. It's leaning towards and promotes a certain perspective, circulating around the most influential words — <span class='headline'>" + most_inf_nodes_str + "</span>. <br><br>You could further develop and make connections between the different perspectives (indicated with colored topical clusters) into this discourse to make it more diversified. For example, the ones below:";
                     }
                     $('#insightadvice').html(explanation_html);
                     // There is a structural gap and a potential for a new idea between these two sets of key terms and statements below:
                   }
-                  else if (filter_origin == 'summary') {
-                    $('#expsummary').show();
-                  }
-        
-                  statements().hide();
-
-                  $('#unhideentries').click(function() {
-                    statements().toggleStatements();
-                  });
+               
         
                 },
                 activateInsight: function() {

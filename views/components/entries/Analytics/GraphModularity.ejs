@@ -348,15 +348,14 @@
                     // Create insight clusters from the community nodes
                     graphFactory.createInsightClusters(topN_communities);
 
-                    // Populate Analytics Panel with insight recommendation
-
                     let insightClusters = graphFactory.getInsightClusters();
 
+                    // Populate Analytics Panel with insight recommendation
                     analyticsPanel.populateRecommendation(insightClusters);
 
                     // Populate entries field
                     addEntryForm().populateRecommendation(insightClusters);
-                    
+        
 
                     // How influential nodes are dispersed among the communities
                     let influence_dispersal = ((bc_entropy/2).toFixed(1)*100).toFixed(0);

@@ -31,6 +31,12 @@ function AnalyticsPanel() {
                 // Summary and insight pane update
                 $('.topinftopics').html(comm_info);
 
+                // Insight panel recommendation update
+
+                let insightClusters = graphFactory.getInsightClusters();
+
+                statementsView().populateRecommendation(insightClusters);
+
         }
 
 
