@@ -322,24 +322,34 @@
              ]});
 
              // New context tutorial? Do not show it if it's been shown before
-             if (walkthrough == 'newcontext' || walkthrough == 'tldr') {
-               tour._options.storage = window.localStorage;
-             }
+            //  if (walkthrough == 'newcontext' || walkthrough == 'tldr') {
+            //    tour._options.storage = window.localStorage;
+            //  }
 
              if (walkthrough == 'tldr') {
              //  console.log(tour._options.steps);
                tour._options.steps = [
+               {
+               element: "#graph-container",
+               placement: "top",
+               title: "Welcome to InfraNodus",
+               content: "Text network visualization can be used ot make sense of a text or to gain a new perspective on it. It shows you how the most relevant terms, how they are connected, and what are the gaps between them. To proceed with this tutorial, please, click the Next button...",
+               backdrop: true, 
+               onShow: function (tour) {
+                   $('#analytics').hide();
+               }
+               },
                  {
                  element: "#entryform",
                  placement: "right",
-                 title: "Visualizing a Long Text",
-                 content: "If you would like to visualize a long text, copy and paste it here and click Save. You will probably need to wait for about 20-60 seconds. If nothign happens, you can try to reload the page after. We currently can handle about 150K max.",
+                 title: "Adding a Text",
+                 content: "You can start typing here or simply copy and paste your notes or any text that you have. You can also use one of our <a href='/import'>import</a> functions.",
                },
                {
                element: "#graph-container",
                placement: "bottom",
                title: "Navigate the Graph",
-               content: "You will then see a graph representation of this text. The most prominent topics will be shown as bigger nodes in the graph, those words, which are used in the same context will be closer to each other.",
+               content: "You will then see a graph representation of this text. The most prominent terms will be shown as bigger nodes in the graph, those words, which are used in the same context will be closer to each other and have the same color.",
                },
                {
                element: "#graph-container",
@@ -354,26 +364,20 @@
                content: "The gaps in the graph will show you where you could do more research or what questions to ask.",
                },
                {
-               element: "#graph-container",
-               placement: "left",
-               title: "Discover New Ideas",
-               content: "The gaps in the graph will show you where you could do more research or what questions to ask.",
-               },
-               {
-                 element: "#menuLink",
-                 title: "Context Menu",
-                 content: "You will be able to later find your text here.",
+                 element: "#summary",
+                 placement: "right",
+                 title: "Essence / Summary",
+                 content: "Click here to see the most essential terms and topics from this text. You can use it to check which ideas your text relays and also click these words to learn more about the context they appear.",
                  onShow: function (tour) {
-                     $('#menuLink').click();
+                     $('#summary').click();
                  }
                },
                {
-                 element: "#summary",
-                 placement: "bottom",
-                 title: "Essence / Summary",
-                 content: "Click here to filter the most essential statements from the discourse. These will be the ones that contain the key terms (the main topical clusters) of the discourse as identified in the Analytics pane.",
+                 element: "#analytics",
+                 placement: "left",
+                 title: "Analytics",
+                 content: "You can also see more information about these words in the Analytics panel.",
                  onShow: function (tour) {
-                     $('#summary').click();
                      if ($('#analytics').is(":visible")) {
                      }
                      else {
@@ -382,12 +386,39 @@
                  }
                },
                {
+                 element: "#statsbutton",
+                 placement: "left",
+                 title: "Statistics",
+                 content: "If you click on the Stats button you'll see much more stats and you can find the words that are important for discourse's conductivity and diversity.",
+                 onShow: function (tour) {
+                    $('#statsbutton').click();
+                 }
+               },
+               {
+                 element: "#biasindex",
+                 placement: "top",
+                 title: "Network Structure Diversity",
+                 content: "This measure shows how diverse or homogeneous the structure of your discourse is. The more diverse it is, the more different distinct topics it represents. The more homogeneous the network is, the more focused the discourse is on one particular topic.",
+                 
+               },
+               {
                  element: "#insight",
                  placement: "bottom",
                  title: "Insight",
                  content: "Click here to generate new ideas: we will show you the two topical clusters and the associated statements, which could be linked together to get a new insight into the discourse or to develop it further (depending on its structure).",
                  onShow: function (tour) {
+                      if ($('#analytics').is(":visible")) {
+                        $('#analyticsbutton').click();
+                      }        
                      $('#insight').click();
+                 }
+               },
+               {
+                 element: "#menuLink",
+                 title: "Context Menu",
+                 content: "You will be able to later find your text listed here, among other texts.",
+                 onShow: function (tour) {
+                     $('#menuLink').click();
                  }
                },
                {
@@ -396,6 +427,7 @@
                  title: "Detailed Tutorial",
                  content: "If, at any point, you want to see a more detailed Tutorial, click here.",
                  onShow: function (tour) {
+                  $('#menuLink').click();
                      if ($('#analytics').is(":visible")) {
                         $('#analyticsbutton').click();
                      }

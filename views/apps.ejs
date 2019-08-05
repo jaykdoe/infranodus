@@ -35,9 +35,10 @@
 
         <div id='maincontent'>
           <!-- TODO: add Apps to the menu -->
-          <a href="/<%= user.name %>/edit" id="notes"><div class="appbox"><div class="appbox_image"><img src='../images/app-notes.png'></div><div class="appbox_text">Add your notes and research ideas to see how they all connect</div></div></a>
-          <a href="/<%= user.name %>/edit" id="tldr"><div class="appbox"><div class="appbox_image"><img src='../images/app-newtext.png'></div><div class="appbox_text">Visualize any text as a graph to discover the patterns within</div></div></a>
-          <a href="/<%= user.name %>/edit" id="analytica"><div class="appbox"><div class="appbox_image"><img src='../images/app-textanalytics.png'></div><div class="appbox_text">Text network analytics: topic modeling and discourse bias</div></div></a>
+          <a href="/<%= user.name %>/edit" id="analytica"><div class="appbox"><div class="appbox_image"><img src='../images/app-textanalytics.png'></div><div class="appbox_text">Add a new text: visualizion, analysis, and topic modeling.</div></div></a>
+          <a href="/<%= user.name %>/edit" id="explore"><div class="appbox"><div class="appbox_image"><img src='../images/app-explore.png'></div><div class="appbox_text">Explore any domain of knowledge or a new topic.</div></div></a>          
+          <!-- <a href="/<%= user.name %>/edit" id="notes"><div class="appbox"><div class="appbox_image"><img src='../images/app-notes.png'></div><div class="appbox_text">Add your notes and research ideas to see how they all connect</div></div></a>
+          <a href="/<%= user.name %>/edit" id="tldr"><div class="appbox"><div class="appbox_image"><img src='../images/app-newtext.png'></div><div class="appbox_text">Visualize any text as a graph to discover the patterns within</div></div></a> -->
           <a href="javascript:" onclick="$('#menuLink').click();" ><div class="appbox"><div class="appbox_image"><img src='../images/app-alltext.png'></div><div class="appbox_text">List your existing context graphs or see how they all connect</div></div></a>
           <a href="/importrss"><div class="appbox"><div class="appbox_image"><img src='../images/app-rss.png'></div><div class="appbox_text">Visualize news or any RSS feed to discover the main topics</div></div></a>
           <a href="/import/youtube"><div class="appbox"><div class="appbox_image"><img src='../images/app-youtube.png'></div><div class="appbox_text">Visualize YouTube video captions to understand what it's about</div></div></a>
@@ -131,15 +132,15 @@
 
       var newcontextlong = new Date().toISOString().slice(2,16).replace(/-/g,"").replace(/:/g,"");
       var newcontextshort = new Date().toISOString().slice(2,10).replace(/-/g,"");
+      var newcontextshortsec = new Date().toISOString().slice(2,10).replace(/-/g,"").replace(/:/g,"")
 
       document.getElementById("twitter").href += newcontextshort;
       document.getElementById("google").href += newcontextshort;
       // document.getElementById("newlist").href = "/<%= user.name %>/" + newcontextlong + "/edit?walkthrough=newcontext&newcontextname=" + newcontextlong;
+      document.getElementById("analytica").href = "/<%= user.name %>/" + newcontextlong + "/edit?walkthrough=tldr";      
+      document.getElementById("explore").href = "/<%= user.name %>/" + newcontextlong + "/edit?walkthrough=explore";      
       document.getElementById("speech").href = "/<%= user.name %>/" + newcontextlong + "/edit?speech=1&walkthrough=mic";
-      document.getElementById("tldr").href = "/<%= user.name %>/tldr" + new Date().toISOString().slice(2,10).replace(/-/g,"").replace(/:/g,"") + "/edit?walkthrough=tldr";
-      document.getElementById("notes").href = "/<%= user.name %>/notes" + newcontextlong + "/edit?walkthrough=newcontext";
-      document.getElementById("analytica").href = "/<%= user.name %>/" + newcontextlong + "/edit?walkthrough=analytics";
-
+      
       document.getElementById("start").href = "/<%= user.name %>/" + newcontextlong + "/edit?walkthrough=default";
       document.getElementById("tuto").href = "/<%= user.name %>/" + newcontextlong + "/edit?walkthrough=default";
 
