@@ -1035,12 +1035,21 @@ Hides the menu at `48em`, but modify this based on your app's needs.
 
 
 
+
+
+
+
 }
 
 @media (max-width: 600px) {
 
-  #globalsearchinput { 
-    display: none;
-}
+    #globalsearchinput { 
+        display: none;
+    }
+
+    #topnav {
+        font: 11px 'IstokWeb-Bold',sans-serif;
+    }
+  
 
 }
