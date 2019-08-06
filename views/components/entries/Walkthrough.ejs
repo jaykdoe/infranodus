@@ -16,11 +16,14 @@
                initializeWalkthrough(userFactory.getWalkthrough());
         });
 
+
+    
+
         // Begin walkthrough tour module for tutorial Help
         
          function initializeWalkthrough (walkthrough) {
 
-          if (walkthrough == 'default' || walkthrough == 'newcontext' || walkthrough == 'analytics_help' || walkthrough == "tldr" || walkthrough == "force" || walkthrough == "explore") {           
+          if (walkthrough == 'default' || walkthrough == 'newcontext' || walkthrough == 'analytics_help' || walkthrough == "tldr" || walkthrough == "insight" || walkthrough == "force" || walkthrough == "explore") {           
            // Instance the tour
              var tour = new Tour({
                storage: false,
@@ -322,7 +325,7 @@
              ]});
 
             //  New context tutorial? Do not show it if it's been shown before
-             if ((walkthrough == 'newcontext' || walkthrough == 'tldr' || walkthrough == 'explore') && (userFactory.getViewOption('forced_walkthrough') != '1')) {
+             if ((walkthrough == 'newcontext' || walkthrough =='insight' || walkthrough == 'tldr' || walkthrough == 'explore') && (userFactory.getViewOption('forced_walkthrough') != '1')) {
                tour._options.storage = window.localStorage;
              }
 
@@ -367,7 +370,7 @@
                  element: "#summary",
                  placement: "right",
                  title: "Essence / Summary",
-                 content: "Click here to see the most essential terms and topics from this text. You can use it to check which ideas your text relays and also click these words to learn more about the context they appear.",
+                 content: "Click here to see the most essential terms and topics from this text. You can use it to check which ideas your text relays and also click these words to learn more about the context they appear in.",
                  onShow: function (tour) {
                      $('#summary').click();
                  }
@@ -548,6 +551,123 @@
                         $('#analyticsbutton').click();
                      }
                      $('#overview').click();
+                 }
+               }
+               ]
+             }
+
+             // Walkthrough option for generating insight
+
+              if (walkthrough == 'insight') {
+              //  console.log(tour._options.steps);
+               tour._options.steps = [
+               {
+               element: "#entryform",
+               placement: "top",
+               title: "Welcome to InfraNodus Insight Generation",
+               content: "Using this tool you can generate insight, new ideas, and your own personal eureka moments. We will now lead you through this process.",
+               backdrop: true, 
+               onShow: function (tour) {
+                   $('#analytics').hide();
+               }
+               },
+                 {
+                 element: "#entryform",
+                 placement: "top",
+                 title: "Getting Your Data",
+                 backdrop: true, 
+                 content: "In order to start, you will need to add a text that you already wrote before here. It can be: <ul><li>An abstract of your paper</li><li>A collection of your notes</li><li>A text that you wrote</li><li>Some ideas in free form</li></ul>If you don't have anything, you can just write a few statements that describe the area of your current interest.",
+               },
+                 {
+                 element: "#entryform",
+                 placement: "top",
+                 title: "Adding a Text",
+                 backdrop: true, 
+                 content: "Please, write something or copy and paste the existing text into this field and tap the 'SAVE' button. <br> <br> We highly recommend that you take your time and add something here, because it will make this tutorial clearer for you.<br><br><a href='javascript:' class='abutton' id='addsample'>Add a Sample Text Now</a> ",
+                onShown: function(tour) {
+                  $('#addsample').click(function(e) {
+                        console.log('clickhappened')
+                        e.preventDefault();
+                        let sampletext = "In this paper we present a web-based open source tool and a method for generating insight from any text or discourse using text network analysis. The tool (InfraNodus) can be used by researchers and writers to organize and to better understand their notes, to measure the level of bias in discourse, and to identify the parts of the discourse where there is a potential for insight and new ideas. The method is based on text network analysis algorithm, which represents any text as a network and identifies the most influential words in a discourse based on the terms' co-occurrence. Graph community detection algorithm is then applied in order to identify the different topical clusters, which represent the main topics in the text as well as the relations between them. The community structure is used in conjunction with other measures to identify the level of bias or cognitive diversity of the discourse. Finally, the structural gaps in the graph can indicate the parts of the discourse where the connections are lacking, therefore highlighting the areas where there’s a potential for new ideas. The tool can be used as stand-alone software by end users as well as implemented via an API into other tools. Another interesting application is in the field of recommendation systems: structural gaps could indicate potentially interesting non-trivial connections to any connected datasets.";
+                        $('#statement').val(sampletext);
+                  });
+                },
+                 onNext: function (tour) {
+                     if ($('#statement').val().length > 0) {
+                       $('#submitbutton').click();
+                     }
+                 }
+               },
+               {
+               element: "#graph-container",
+               placement: "top",
+               title: "Text Network Visualization",
+               content: "Once your text is processed, it will be visualized as a graph.<br><br>The <strong>colors</strong> indicate the words that belong to the same topic and are more often used in the same context. <br><br>The <strong>node size</strong> indicates the importance of the words (based on how connected they are to the whole discourse).<br><br>Science: <a href='http://bit.ly/wwwinfranodus'>PDF whitepaper</a>",
+               },
+               {
+               element: "#graph-container",
+               placement: "left",
+               title: "Analyze the Graph",
+               content: "Already by looking at this graph you can have a good overview of your ideas and the relations between them.<br><br>But what we're interested in are the gaps!",
+               },
+               {
+                 element: "#insight",
+                 placement: "bottom",
+                 title: "Insight",
+                 backdrop: true, 
+                 content: "This is the insight panel. <br><br>Our algorithm will <strong>analyze the structure of your text network graph</strong> and show you the <strong>two topical clusters</strong> which could be <strong>linked together</strong> to generate insight and develop the text further.",
+                 onShow: function (tour) {
+                      if ($('#analytics').is(":visible")) {
+                        $('#analyticsbutton').click();
+                      }        
+                     $('#insight').click();
+                 }
+               },
+               {
+                 element: "#insightclusters",
+                 placement: "right",
+                 title: "Structural Gaps",
+                 backdrop: true, 
+                 content: "This approach is based on identifying <strong>the structural gaps</strong> in the discourse: something you've mentioned but didn't yet connect. <br><br>All you need to do then is to <strong>ask yourself a question</strong> that would link these two clusters together. <div id='recommenderwalkthrough'></div>",
+                 onShown: function(tour) {
+                   $('#recommenderwalkthrough').html('<br>For example: ' + $('#recommendedquestion').text());
+                 }
+               },
+               {
+                 element: "#entryform",
+                 placement: "top",
+                 title: "Adding More Text",
+                 content: "You can add the answer to this question (or some new ideas) here, in order to improve the structure of your discourse and to generate a new recommendation.<div id='recommenderwalkthrough'></div>",
+                 onShown: function(tour) {
+                   $('#recommenderwalkthrough').html('<br>For example, <strong>type in the answer to this question</strong>: ' + $('#recommendedquestion').text());
+                 }
+               },
+               {
+                 element: "#graph-container",
+                 placement: "top",
+                 title: "Structural Gaps",
+                 content: "You can, of course, see these same <strong>structural gaps</strong> shown on the graph (that's how we identify them) — a visual aid to help you generate new ideas.<br><br><strong>Every time you see a gap, ask yourself what idea could bridge it.</strong> This might be your next creation!<br><br>If you're interested in the science behind this approach, check out our article <a href='https://towardsdatascience.com/measuring-discourse-bias-using-text-network-analysis-9f251be5f6f3' target='_blank'>Identifying the Discourse Bias</a> (Paranyushkin 2018) article in Towards Data Science.",
+                 
+               },
+            
+               {
+                 element: "#summary",
+                 placement: "right",
+                 title: "Essence / Summary",
+                 content: "Click here to see the most essential terms and topics from this text. <br><br>You can use it to check which ideas your text relays and also click these words to learn more about the context they appear in.",
+                 onShow: function (tour) {
+                     $('#summary').click();
+                 }
+               },
+     
+               {
+                 element: "#walkthrough",
+                 placement: "left",
+                 title: "Detailed Tutorial",
+                 content: "If, at any point, you want to see a more detailed Tutorial, click here.",
+                 onShow: function (tour) {
+                  $('#menuLink').click();
+                  $('#insight').click();
                  }
                }
                ]
