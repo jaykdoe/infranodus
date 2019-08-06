@@ -1457,7 +1457,7 @@ button:hover {
 #importpane {
     position: absolute;
     display: inline; /* show this only on small screens */
-    bottom: 22px;
+    bottom: 25px;
     left: 140px;
 }
 

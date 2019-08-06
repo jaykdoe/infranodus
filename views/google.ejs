@@ -8,6 +8,8 @@
     <link rel="stylesheet" href="/stylesheets/side-menu.css">
     <link rel="stylesheet" href="/stylesheets/jquery-ui.min.css">
     <link rel='stylesheet' href='/stylesheets/style.css' />
+    <%- include('components/common/index') %>
+
 
     <% include statsheader %>
 
@@ -59,6 +61,7 @@
                 <input type="hidden" name="settings" value="morphemes">
                 <input type="hidden" id="hide_always" name="hide_always" value="1">
                 <input type="hidden" id="go_next_add" name="go_next_add" value="">
+                <input type="hidden" id="walknext" name="walknext" value="">
                 <input type="hidden" id="selectedContexts" name="selectedContexts" value="">
                 <input type="hidden" name="statementid" value="">
 
@@ -100,7 +103,9 @@
 <script>
     ;(function(){
 
-
+        if (getUrlVars()["walkthrough"]) {
+            $("#walknext").val(getUrlVars()["walkthrough"]);
+        }
 
 
         $('form#submitform').submit(function(event){

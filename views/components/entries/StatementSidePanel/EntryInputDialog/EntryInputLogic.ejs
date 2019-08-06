@@ -107,7 +107,10 @@
                         fornode = pinnedNodes.join("+");
                     }
                     fornode = fornode.replace(/_/gi, "+");
-                    navigation().redirect('/google?context=add_' + userFactory.getCurrentContext() + '&fornode=' + fornode);
+                    let redirecturl = '/google?context=add_' + userFactory.getCurrentContext() + '&fornode=' + fornode;
+                    let walktype = userFactory.getWalkthrough();
+                    if (walktype) redirecturl += '&walkthrough=' + walktype;
+                    navigation().redirect(redirecturl);
                 },
                 changeModeToSearch: function() {
                     addEntryPanel().changeModeTo('SEARCH')

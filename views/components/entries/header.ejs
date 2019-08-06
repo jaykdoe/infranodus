@@ -391,6 +391,7 @@
         }
     }
     if (getUrlVars()["walkthrough"]) userFactory.setWalkthrough(getUrlVars()["walkthrough"]);
+    if (getUrlVars()["forced_walkthrough"]) userFactory.setViewOption('forced_walkthrough', '1');
     if (getUrlVars()["most_influential"] == 'bc' || getUrlVars()["most_influential"] == 'bc2' || getUrlVars()["most_influential"] == 'degree') {
         userFactory.setMostInfluential(getUrlVars()["most_influential"]);
     }

@@ -353,6 +353,11 @@ exports.submit = function(req, res, next) {
         append_url = append_url + '&go_next_add=' + req.body.go_next_add
     }
 
+    var walknext = '';
+    if (req.body.walknext) {
+        walknext = req.body.walknext;
+    }
+
     // We extract only hashtags or hashtags and morphemes
     // TODO reset res.locals after that parameter change
 
@@ -2791,6 +2796,7 @@ exports.submit = function(req, res, next) {
                     contextids: contexts,
                     internal: 1,
                     multiple: 1,
+                    walkthrough: walknext
                 }
 
                 

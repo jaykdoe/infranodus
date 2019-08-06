@@ -397,15 +397,19 @@ exports.submit = function(req, res, next) {
                                 // This is a bit of a workaround, it shows a newly added graph on top of the previous one highlighting the difference
                                 // Happens in case of Google search for example
                                 if (default_context.indexOf('add_') == 0) {
-                                    res.redirect(
-                                        res.locals.user.name +
-                                            '/' +
-                                            default_context.substring(4) +
-                                            '/edit' + 
-                                            '?addcontext=' + 
-                                            default_context + 
-                                            '&highlight=0'
-                                    )
+                                    let redirect_url = res.locals.user.name +
+                                                        '/' +
+                                                        default_context.substring(4) +
+                                                        '/edit' + 
+                                                        '?addcontext=' + 
+                                                        default_context + 
+                                                        '&highlight=0';
+
+                                    if (req.walkthrough) {
+                                        redirect_url += '&walkthrough=' + req.walkthrough;
+                                    }
+
+                                    res.redirect(redirect_url);
                                 }
                                 else if (req.excludestopwords) {
                                     res.redirect(

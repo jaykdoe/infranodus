@@ -20,7 +20,7 @@
         
          function initializeWalkthrough (walkthrough) {
 
-          if (walkthrough == 'default' || walkthrough == 'newcontext' || walkthrough == 'analytics_help' || walkthrough == "tldr" || walkthrough == "force") {           
+          if (walkthrough == 'default' || walkthrough == 'newcontext' || walkthrough == 'analytics_help' || walkthrough == "tldr" || walkthrough == "force" || walkthrough == "explore") {           
            // Instance the tour
              var tour = new Tour({
                storage: false,
@@ -321,10 +321,10 @@
 
              ]});
 
-             // New context tutorial? Do not show it if it's been shown before
-            //  if (walkthrough == 'newcontext' || walkthrough == 'tldr') {
-            //    tour._options.storage = window.localStorage;
-            //  }
+            //  New context tutorial? Do not show it if it's been shown before
+             if ((walkthrough == 'newcontext' || walkthrough == 'tldr' || walkthrough == 'explore') && (userFactory.getViewOption('forced_walkthrough') != '1')) {
+               tour._options.storage = window.localStorage;
+             }
 
              if (walkthrough == 'tldr') {
              //  console.log(tour._options.steps);
@@ -350,6 +350,122 @@
                placement: "bottom",
                title: "Navigate the Graph",
                content: "You will then see a graph representation of this text. The most prominent terms will be shown as bigger nodes in the graph, those words, which are used in the same context will be closer to each other and have the same color.",
+               },
+               {
+               element: "#graph-container",
+               placement: "top",
+               title: "Search through Text",
+               content: "You can then click on the nodes in the graph to find the parts of the text that you find interesting.",
+               },
+               {
+               element: "#graph-container",
+               placement: "left",
+               title: "Discover New Ideas",
+               content: "The gaps in the graph will show you where you could do more research or what questions to ask.",
+               },
+               {
+                 element: "#summary",
+                 placement: "right",
+                 title: "Essence / Summary",
+                 content: "Click here to see the most essential terms and topics from this text. You can use it to check which ideas your text relays and also click these words to learn more about the context they appear.",
+                 onShow: function (tour) {
+                     $('#summary').click();
+                 }
+               },
+               {
+                 element: "#analytics",
+                 placement: "left",
+                 title: "Analytics",
+                 content: "You can also see more information about these words in the Analytics panel.",
+                 onShow: function (tour) {
+                     if ($('#analytics').is(":visible")) {
+                     }
+                     else {
+                       $('#analyticsbutton').click();
+                     }
+                 }
+               },
+               {
+                 element: "#statsbutton",
+                 placement: "left",
+                 title: "Statistics",
+                 content: "If you click on the Stats button you'll see much more stats and you can find the words that are important for discourse's conductivity and diversity.",
+                 onShow: function (tour) {
+                    $('#statsbutton').click();
+                 }
+               },
+               {
+                 element: "#biasindex",
+                 placement: "top",
+                 title: "Network Structure Diversity",
+                 content: "This measure shows how diverse or homogeneous the structure of your discourse is. The more diverse it is, the more different distinct topics it represents. The more homogeneous the network is, the more focused the discourse is on one particular topic.",
+                 
+               },
+               {
+                 element: "#insight",
+                 placement: "bottom",
+                 title: "Insight",
+                 content: "Click here to generate new ideas: we will show you the two topical clusters and the associated statements, which could be linked together to get a new insight into the discourse or to develop it further (depending on its structure).",
+                 onShow: function (tour) {
+                      if ($('#analytics').is(":visible")) {
+                        $('#analyticsbutton').click();
+                      }        
+                     $('#insight').click();
+                 }
+               },
+               {
+                 element: "#menuLink",
+                 title: "Context Menu",
+                 content: "You will be able to later find your text listed here, among other texts.",
+                 onShow: function (tour) {
+                     $('#menuLink').click();
+                 }
+               },
+               {
+                 element: "#walkthrough",
+                 placement: "left",
+                 title: "Detailed Tutorial",
+                 content: "If, at any point, you want to see a more detailed Tutorial, click here.",
+                 onShow: function (tour) {
+                  $('#menuLink').click();
+                     if ($('#analytics').is(":visible")) {
+                        $('#analyticsbutton').click();
+                     }
+                     $('#overview').click();
+                 }
+               }
+               ]
+             }
+
+             // Walkthrough options for exploration
+
+             if (walkthrough == 'explore') {
+             //  console.log(tour._options.steps);
+               tour._options.steps = [
+               {
+               element: "#entryform",
+               placement: "top",
+               title: "Welcome to InfraNodus",
+               content: "In this short tutorial you will find out how to learn more about a certain domain of knowledge or a certain topic using InfraNodus. ",
+               backdrop: true, 
+               onShow: function (tour) {
+                   $('#analytics').hide();
+                   $('#submitbutton').css('visibility', 'hidden');
+               }
+               },
+                 {
+                 element: "#entryform",
+                 placement: "top",
+                 title: "Defining a Topic",
+                 backdrop: true, 
+                 content: "Type in here any topic or a list of keywords you're interested in, for example, 'network analysis'",
+               },
+               {
+               element: "#google-import",
+               placement: "top",
+               title: "Exploring the Map",
+               backdrop: true, 
+               content: "Then click 'import from google'. InfraNodus will take you to another page to confirm the settings and will then visualize the first 40 Google search results for this topic as a network graph. It will show you the context around the search terms you're looking for and how they connect.",
                },
                {
                element: "#graph-container",

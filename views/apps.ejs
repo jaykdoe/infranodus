@@ -137,8 +137,8 @@
       document.getElementById("twitter").href += newcontextshort;
       document.getElementById("google").href += newcontextshort;
       // document.getElementById("newlist").href = "/<%= user.name %>/" + newcontextlong + "/edit?walkthrough=newcontext&newcontextname=" + newcontextlong;
-      document.getElementById("analytica").href = "/<%= user.name %>/" + newcontextlong + "/edit?walkthrough=tldr";      
-      document.getElementById("explore").href = "/<%= user.name %>/" + newcontextlong + "/edit?walkthrough=explore";      
+      document.getElementById("analytica").href = "/<%= user.name %>/" + newcontextlong + "/edit?walkthrough=tldr&forced_walkthrough=1";      
+      document.getElementById("explore").href = "/<%= user.name %>/" + newcontextlong + "/edit?walkthrough=explore&forced_walkthrough=1";      
       document.getElementById("speech").href = "/<%= user.name %>/" + newcontextlong + "/edit?speech=1&walkthrough=mic";
       
       document.getElementById("start").href = "/<%= user.name %>/" + newcontextlong + "/edit?walkthrough=default";
