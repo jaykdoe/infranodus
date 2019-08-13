@@ -44,8 +44,7 @@
           <a href="/<%= user.name %>/edit" id="insight"><div class="appbox"><div class="appbox_image"><img src='../images/app-insight.png'></div><div class="appbox_text">Generate new ideas, find the gaps in your knowledge</div></div></a>          
           <!-- <a href="/<%= user.name %>/edit" id="notes"><div class="appbox"><div class="appbox_image"><img src='../images/app-notes.png'></div><div class="appbox_text">Add your notes and research ideas to see how they all connect</div></div></a>
           <a href="/<%= user.name %>/edit" id="tldr"><div class="appbox"><div class="appbox_image"><img src='../images/app-newtext.png'></div><div class="appbox_text">Visualize any text as a graph to discover the patterns within</div></div></a> -->
-          <a href="javascript:" onclick="$('#menuLink').click();" ><div class="appbox"><div class="appbox_image"><img src='../images/app-alltext.png'></div><div class="appbox_text">List your existing context graphs or see how they all connect</div></div></a>
-          <!-- <a href="/<%= user.name %>/edit"  id="seo"><div class="appbox"><div class="appbox_image"><img src='../images/app-seo.png'></div><div class="appbox_text">Search engine optimization: find the keyword gaps.</div></div></a> -->
+          <a href="/<%= user.name %>/edit"  id="seo"><div class="appbox"><div class="appbox_image"><img src='../images/app-seo.png'></div><div class="appbox_text">Search engine optimization: find the keyword gaps.</div></div></a>
           <a href="/import/evernote"><div class="appbox"><div class="appbox_image"><img src='../images/app-evernote.png'></div><div class="appbox_text">Import Evernote notes and see how they all connect</div></div></a>
           <a href="/twitter?fornode=dataviz&context=twitter" id="twitter"><div class="appbox"><div class="appbox_image"><img src='../images/app-twitter.png'></div><div class="appbox_text">Discover the main topics in a Twitter hashtag or username feed</div></div></a>
           <a href="/google?fornode=text+visualization&context=google" id="google"><div class="appbox"><div class="appbox_image"><img src='../images/app-google.png'></div><div class="appbox_text">SEO analysis: discover patterns in Google search results</div></div></a>
@@ -146,7 +145,7 @@
       document.getElementById("analytica").href = "/<%= user.name %>/" + newcontextlong + "/edit?walkthrough=tldr&forced_walkthrough=1";      
       document.getElementById("explore").href = "/<%= user.name %>/" + newcontextlong + "/edit?walkthrough=explore&forced_walkthrough=1";      
       document.getElementById("insight").href = "/<%= user.name %>/" + newcontextlong + "/edit?walkthrough=insight&forced_walkthrough=1";      
-      // document.getElementById("seo").href = "/<%= user.name %>/" + newcontextlong + "/edit?walkthrough=seo&forced_walkthrough=1";      
+      document.getElementById("seo").href = "/<%= user.name %>/" + newcontextlong + "/edit?walkthrough=seo&forced_walkthrough=1";      
       document.getElementById("speech").href = "/<%= user.name %>/" + newcontextlong + "/edit?speech=1&walkthrough=mic";
       
       document.getElementById("start").href = "/<%= user.name %>/" + newcontextlong + "/edit?walkthrough=default";

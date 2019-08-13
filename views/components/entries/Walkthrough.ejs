@@ -23,7 +23,7 @@
         
          function initializeWalkthrough (walkthrough) {
 
-          if (walkthrough == 'default' || walkthrough == 'newcontext' || walkthrough == 'analytics_help' || walkthrough == "tldr" || walkthrough == "insight" || walkthrough == "force" || walkthrough == "explore") {           
+          if (walkthrough == 'default' || walkthrough == 'newcontext' || walkthrough == 'analytics_help' || walkthrough == "tldr" || walkthrough == "insight" || walkthrough == "force" || walkthrough == "seo" || walkthrough == "explore") {           
            // Instance the tour
              var tour = new Tour({
                storage: window.localStorage,
@@ -332,6 +332,19 @@
                   window.localStorage.removeItem('explore_current_step');
                   window.localStorage.removeItem('explore_end');
                }
+               else if (walkthrough == 'seo') {
+                  window.localStorage.removeItem('seo_current_step');
+                  window.localStorage.removeItem('seo_end');
+               }
+               else if (walkthrough == 'insight') {
+                  window.localStorage.removeItem('insight_current_step');
+                  window.localStorage.removeItem('insight_end');
+               }
+               else if (walkthrough == 'tldr') {
+                  window.localStorage.removeItem('tldr_current_step');
+                  window.localStorage.removeItem('tldr_end');
+               }
+             
              }
 
              if (walkthrough == 'tldr') {
@@ -625,6 +638,154 @@
                      $('#overview').click();
                  }
                }
+               ]
+             }
+
+
+            // Walkthrough options for exploration
+
+            if (walkthrough == 'seo') {
+             //  console.log(tour._options.steps);
+               tour._options.name = 'seo';
+               tour._options.steps = [
+               {
+               title: "Search Engine Optimization with InfraNodus",
+               content: "You can use InfraNodus to identify the content you need to create <strong>to fill in the gap</strong> between <strong>what people search for</strong> and <strong>what they actually find</strong> on Google. <br><br>We've tried this approach many times and it works consistently by pushing your content at the top of the search results pages, even for more generic requests.",
+               orphan: true, 
+               backdrop: true, 
+               onShow: function (tour) {
+                   $('#analytics').hide();
+                   $('#google-import').css('visibility', 'hidden');
+               }
+               },
+               {
+               element: "#entryform",
+               placement: "right",
+               title: "Find What People Search For",
+               content: "First, let's find out <strong>what people search for</strong> when they type in the query you're interested in.<br><br>In order to do that, define a search query (e.g. 'network visualization') and use Google Keywords Planner to get the related search query suggestions:<br><br><strong>Step 1:</strong> Open <a href='https://ads.google.com/aw/keywordplanner/home' target='_blank'>Google Keyword Planner Tool</a> in a new window and click <strong>'Discover new keywords'</strong>.<br><br><strong>Step 2:</strong> Now enter your search query in that field and see the suggestions that Google proposes.<br><br><strong>Step 3:</strong> Click <strong>Download keyword ideas</strong>, get the CSV file, then open it in Excel or Google Docs, <br><br><strong>Step 4:</strong> Copy and paste the column with the keywords here. <br><br><a href='javascript:' class='abutton' id='addsample'>Add Sample Keywords Now</a> ",
+               onShown: function(tour) {
+                  $('#addsample').click(function(e) {
+                        e.preventDefault();
+                        let sampletext = "network visualization\nnetwork graph\nd3 network graph\npython network graph\nnetwork graph visualization";
+                        $('#statement').val(sampletext);
+                  });
+               },
+               },
+               {
+               element: "#submitbutton",
+               placement: "top",
+               title: "Visualize Google's Suggestions",
+               content: "Now click the Save button to overlay Google's suggestions for this search term on top of the existing search results graph.",
+               onShow: function(tour) {
+                insertUrlParam('forced_walkthrough', 0);
+               },
+               onNext: function (tour) {
+                     if ($('#statement').val().length > 0) {
+                       tour._options.storage = window.localStorage;
+                       $('#submitbutton').click();
+                     }
+                     else {
+                       alert('We highly recommend you to copy and paste the keyword suggestions here to better understand this tutorial.')
+                     }
+                 }
+               },
+               {
+               element: "#graph-container",
+               placement: "top",
+               title: "Graph Visualization",
+               content: "You can now see the <strong>most common search patterns</strong> for your specific search query visualized as a graph.<br>The bigger the nodes, the more influential are the words they represent to the topic you've chosen in the previous step. The <strong>words that tend to co-occur together</strong> are closer on the graph and have the same color. ",
+               onShow: function(tour) {
+                $('#google-import').css('visibility', 'visible');
+               }
+               },
+               {
+               element: "#graph-container",
+               placement: "left",
+               title: "Graph Filtering",
+               content: "You might want to remove some of the more obvious influential words from the graph to better see the context they appear in.<br><br>For example: <div id='top_nodes'></div><br><a href='javascript:' class='abutton' id='top_select'>Select the Top Nodes</a><br><br><a href='javascript:' class='abutton' id='top_delete'>Delete the Top Nodes</a><br>&nbsp;",
+               onShown: function(tour) {
+                  let top_nodes = graphFactory.getTopBCNodes(2);
+                  let top_nodes_string = '';
+                  let nodesToDelete = [];
+                  for (let top_node in top_nodes) {
+                      top_nodes_string += '<div class="inlinesquare '+top_nodes[top_node].key+'"></div> <a href="#" class="top_nodes">' + top_nodes[top_node].label + '</a> ';
+                      nodesToDelete.push(top_nodes[top_node].label);
+                  }
+                  $('#top_nodes').html(top_nodes_string);
+                  $('#top_delete').click(function(e) {
+                        e.preventDefault();
+                        graphFactory.deleteNodes(nodesToDelete);
+                  });
+                  $('#top_select').click(function(e) {
+                        e.preventDefault();
+                        for (let pin in  nodesToDelete) {
+                          if (graphFactory.checkIfPinned(nodesToDelete[pin]) == false) {
+                            graphFactory.addToPinnedNodes(nodesToDelete[pin]);
+                          }
+
+                        }        
+                  });
+               }
+               },
+               {
+                 element: "#entryform",
+                 placement: "top",
+                 title: "What People Actually Find",
+                 backdrop: true, 
+                 content: "Now that you know what people search for, it's time to see what they <strong>actually find</strong>.<br><br> In order to do that, let's import Google search results for your search query. <strong>Please, type it in below</strong> or <br><br><a href='javascript:' class='abutton' id='addsample'>Add a Sample Text Now</a> ",
+                 onShown: function(tour) {
+                  $('#addsample').click(function(e) {
+                        e.preventDefault();
+                        let sampletext = "network visualization";
+                        $('#statement').val(sampletext);
+                  });
+                }
+                 
+               },
+               {
+               element: "#google-import",
+               placement: "top",
+               title: "Exploring the Context",
+               backdrop: true, 
+               content: "Then click 'import from google'. InfraNodus will take you to another page to confirm the settings and will then visualize the first 40 Google search results for this topic as a network graph. It will show you the context around the search terms you're looking for and how they connect.",
+               onNext: function (tour) {
+                     if ($('#statement').val().length > 0) {
+                       tour._options.storage = window.localStorage;
+                       $('#google-import').click();
+                     }
+                 }
+               }, 
+               {
+               element: "#graph-container",
+               placement: "left",
+               title: "See the Difference",
+               content: "You will now see highlighted (in blue) the <strongs>search terms, which people are looking for, but that do not exist in Google's search results.</strong> ",
+                onShow: function (tour) {
+                     if ($('#analytics').is(":visible")) {
+                      $('#analyticsbutton').click();
+                     }
+                 },
+                onNext: function (tour) {
+                     if ($('#analytics').is(":visible")) {
+                     }
+                     else {
+                       $('#analyticsbutton').click();
+                     }
+                 }
+               },
+               {
+               element: "#addcontext_stats",
+               placement: "left",
+               title: "Missing Terms",
+               content: "This info pane in the Analytics panel will list the most influential words, which are present in Google's keywords suggestions (what people search for), but that are not present in Google's search results (what they actually find).",
+                
+               },
+               {
+                 orphan: true,
+                 title: "What to do with this information?",
+                 content: "Now that you've identified the words that are <strong>present</strong> in users' requests but are <strong>absent</strong> in Google's search results, you can <strong>create the content that will fulfil in this gap</strong> and, therefore, be promoted by search engines to your readers.",
+               },
+              
                ]
              }
 

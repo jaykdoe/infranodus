@@ -407,6 +407,17 @@ exports.submit = function(req, res, next) {
 
                                     if (req.walkthrough) {
                                         redirect_url += '&walkthrough=' + req.walkthrough;
+                                        // This is for the case where we have Walkthrough SEO defined
+                                        if (req.walkthrough == 'seo') {
+                                            redirect_url = res.locals.user.name +
+                                            '/' +
+                                            default_context +
+                                            '/edit' + 
+                                            '?addcontext=' + 
+                                            default_context.substring(4) + 
+                                            '&highlight=0&missing=1' + 
+                                            '&walkthrough=' + req.walkthrough;
+                                        }
                                     }
 
                                     res.redirect(redirect_url);
