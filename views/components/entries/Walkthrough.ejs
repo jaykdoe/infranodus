@@ -686,9 +686,15 @@
                },
                {
                element: "#entryform",
-               placement: "right",
+               placement: "top",
                title: "Find What People Search For",
-               content: "First, let's find out <strong>what people search for</strong> when they type in the query you're interested in.<br><br>In order to do that, define a search query (e.g. 'network visualization') and use Google Keywords Planner to get the related search query suggestions:<br><br><strong>Step 1:</strong> Open <a href='https://ads.google.com/aw/keywordplanner/home' target='_blank'>Google Keyword Planner Tool</a> in a new window and click <strong>'Discover new keywords'</strong>.<br><br><strong>Step 2:</strong> Now enter your search query in that field and see the suggestions that Google proposes.<br><br><strong>Step 3:</strong> Click <strong>Download keyword ideas</strong>, get the CSV file, then open it in Excel or Google Docs, <br><br><strong>Step 4:</strong> Copy and paste the column with the keywords here. <br><br><a href='javascript:' class='abutton' id='addsample'>Add Sample Keywords Now</a> ",
+               content: "First, let's find out <strong>what people search for</strong> when they type in the query you're interested in.<br><br>In order to do that, define a search query (e.g. 'network visualization') and use Google Keywords Planner to get the related search query suggestions.",
+               },
+               {
+               element: "#entryform",
+               placement: "top",
+               title: "Find What People Search For",
+               content: "<strong>Step 1:</strong> Open <a href='https://ads.google.com/aw/keywordplanner/home' target='_blank'>Google Keyword Planner Tool</a> in a new window and click <strong>'Discover new keywords'</strong>.<br><br><strong>Step 2:</strong> Now enter your search query in that field and see the suggestions that Google proposes.<br><br><strong>Step 3:</strong> Click <strong>Download keyword ideas</strong>, get the CSV file, then open it in Excel or Google Docs, <br><br><strong>Step 4:</strong> Copy and paste the column with the keywords here. <br><br><a href='javascript:' class='abutton' id='addsample'>Add Sample Keywords Now</a> ",
                onShown: function(tour) {
                   $('#addsample').click(function(e) {
                         e.preventDefault();
@@ -729,7 +735,7 @@
                },
                {
                element: "#graph-container",
-               placement: "left",
+               placement: "top",
                title: "Graph Filtering",
                content: "You might want to select or remove some of the more obvious influential words from the graph to better see the context they appear in.<br><br>For example: <div id='top_nodes'></div><br><a href='javascript:' class='abutton' id='top_select'>Select the Top Nodes</a><br><br><a href='javascript:' class='abutton' id='top_delete'>Delete the Top Nodes</a><br>&nbsp;",
                onShown: function(tour) {
