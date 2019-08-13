@@ -26,7 +26,8 @@
           if (walkthrough == 'default' || walkthrough == 'newcontext' || walkthrough == 'analytics_help' || walkthrough == "tldr" || walkthrough == "insight" || walkthrough == "force" || walkthrough == "explore") {           
            // Instance the tour
              var tour = new Tour({
-               storage: false,
+               storage: window.localStorage,
+               name: 'default',
                steps: [
                {
                  element: "#entryform",
@@ -325,12 +326,17 @@
              ]});
 
             //  New context tutorial? Do not show it if it's been shown before
-             if ((walkthrough == 'newcontext' || walkthrough =='insight' || walkthrough == 'tldr' || walkthrough == 'explore') && (userFactory.getViewOption('forced_walkthrough') != '1')) {
-               tour._options.storage = window.localStorage;
+             if (userFactory.getViewOption('forced_walkthrough') == '1') {
+               tour._options.storage = false;
+               if (walkthrough == 'explore') {
+                  window.localStorage.removeItem('explore_current_step');
+                  window.localStorage.removeItem('explore_end');
+               }
              }
 
              if (walkthrough == 'tldr') {
              //  console.log(tour._options.steps);
+               tour._options.name = 'tldr';
                tour._options.steps = [
                {
                element: "#graph-container",
@@ -370,7 +376,7 @@
                  element: "#summary",
                  placement: "right",
                  title: "Essence / Summary",
-                 content: "Click here to see the most essential terms and topics from this text. You can use it to check which ideas your text relays and also click these words to learn more about the context they appear in.",
+                 content: "In the <strong>Summary</strong> tab you will see the most essential terms and topics from this text. You can use it to check which ideas your text relays and also click these words to learn more about the context they appear in.",
                  onShow: function (tour) {
                      $('#summary').click();
                  }
@@ -398,6 +404,13 @@
                  }
                },
                {
+                 element: "#stats_table",
+                 placement: "left",
+                 title: "Statistics Table",
+                 content: "Scroll to the right of this table to see all the statistical parameters and sort out the nodes by their <strong>Conductivity</strong> to see what are the less frequent but more important words to this discourse.",
+                
+               },
+               {
                  element: "#biasindex",
                  placement: "top",
                  title: "Network Structure Diversity",
@@ -408,7 +421,7 @@
                  element: "#insight",
                  placement: "bottom",
                  title: "Insight",
-                 content: "Click here to generate new ideas: we will show you the two topical clusters and the associated statements, which could be linked together to get a new insight into the discourse or to develop it further (depending on its structure).",
+                 content: "You can use the <strong>Insight</strong> tab to generate new ideas: we will show you the two topical clusters and the associated statements, which could be linked together to get a new insight into the discourse or to develop it further (depending on its structure).",
                  onShow: function (tour) {
                       if ($('#analytics').is(":visible")) {
                         $('#analyticsbutton').click();
@@ -444,12 +457,12 @@
 
              if (walkthrough == 'explore') {
              //  console.log(tour._options.steps);
+               tour._options.name = 'explore';
                tour._options.steps = [
                {
-               element: "#entryform",
-               placement: "top",
-               title: "Welcome to InfraNodus",
-               content: "In this short tutorial you will find out how to learn more about a certain domain of knowledge or a certain topic using InfraNodus. ",
+               title: "Welcome to InfraNodus Knowledge Exploration App",
+               content: "This step-by-step tour will guide you through the steps you need to take in order to discover more about a certain domain of knowledge using this tool. Try it out and if you understand how it works, you can always switch this tour off and do it on your own.",
+               orphan: true, 
                backdrop: true, 
                onShow: function (tour) {
                    $('#analytics').hide();
@@ -461,20 +474,72 @@
                  placement: "top",
                  title: "Defining a Topic",
                  backdrop: true, 
-                 content: "Type in here any topic or a list of keywords you're interested in, for example, 'network analysis'",
+                 content: "Type in here any topic or a list of keywords you're interested in, for example, 'network analysis' <br><br><a href='javascript:' class='abutton' id='addsample'>Add a Sample Text Now</a> ",
+                 onShown: function(tour) {
+                  $('#addsample').click(function(e) {
+                        e.preventDefault();
+                        let sampletext = "network visualization";
+                        $('#statement').val(sampletext);
+                  });
+                }
+                 
                },
                {
                element: "#google-import",
                placement: "top",
-               title: "Exploring the Map",
+               title: "Exploring the Context",
                backdrop: true, 
                content: "Then click 'import from google'. InfraNodus will take you to another page to confirm the settings and will then visualize the first 40 Google search results for this topic as a network graph. It will show you the context around the search terms you're looking for and how they connect.",
+               onNext: function (tour) {
+                     if ($('#statement').val().length > 0) {
+                       tour._options.storage = window.localStorage;
+                       $('#google-import').click();
+                     }
+                 }
+               },
+               {
+               element: "#graph-container",
+               placement: "top",
+               title: "Graph Visualization",
+               content: "The Google search results for the topics that you selected are visualized as a graph.<br>The bigger the nodes, the more influential are the words they represent to the topic you've chosen in the previous step. The words that tend to co-occur together are closer on the graph and have the same color. ",
+               },
+               {
+               element: "#graph-container",
+               placement: "left",
+               title: "Graph Filtering",
+               content: "You might want to remove some of the more obvious influential words from the graph to better see the context they appear in.<br><br>For example: <div id='top_nodes'></div><br><a href='javascript:' class='abutton' id='top_delete'>Delete the Top Nodes</a><br>&nbsp;",
+               onShown: function(tour) {
+                  let top_nodes = graphFactory.getTopBCNodes(2);
+                  let top_nodes_string = '';
+                  let nodesToDelete = [];
+                  for (let top_node in top_nodes) {
+                      top_nodes_string += '<div class="inlinesquare '+top_nodes[top_node].key+'"></div> <a href="#" class="top_nodes">' + top_nodes[top_node].label + '</a> ';
+                      nodesToDelete.push(top_nodes[top_node].label);
+                  }
+                  $('#top_nodes').html(top_nodes_string);
+                  $('#top_delete').click(function(e) {
+                        e.preventDefault();
+                        graphFactory.deleteNodes(nodesToDelete);
+                  });
+               }
                },
                {
                element: "#graph-container",
                placement: "top",
                title: "Search through Text",
-               content: "You can then click on the nodes in the graph to find the parts of the text that you find interesting.",
+               content: "You can then click on the nodes in the graph to find the parts of the text that you find interesting.<br><br>You can also remove them from the graph to better see the context around them.",
+               },
+               {
+               element: "#deletenodes",
+               placement: "bottom",
+               title: "Delete Nodes",
+               content: "If you selected some nodes, you can temporarily delete them from the graph if you click this button.<br><br>Then the other influential nodes will pop up, giving you a more in-depth information about the context.",
+               },
+               {
+               element: "#stopnodeslist",
+               placement: "bottom",
+               title: "Undo Delete Nodes",
+               content: "You can also click the deleted nodes to get them back into the graph again. The statistics will instantly be updated.",
                },
                {
                element: "#graph-container",
@@ -485,8 +550,8 @@
                {
                  element: "#summary",
                  placement: "right",
-                 title: "Essence / Summary",
-                 content: "Click here to see the most essential terms and topics from this text. You can use it to check which ideas your text relays and also click these words to learn more about the context they appear.",
+                 title: "Essence: Topic Modeling",
+                 content: "Using the <strong>Summary</strong> tab you can see the most essential terms and topics from this text. You can use it to check which ideas your text relays and also click these words to learn more about the context they appear.",
                  onShow: function (tour) {
                      $('#summary').click();
                  }
@@ -514,6 +579,13 @@
                  }
                },
                {
+                 element: "#stats_table",
+                 placement: "left",
+                 title: "Statistics Table",
+                 content: "Scroll to the right of this table to see all the statistical parameters and sort out the nodes by their <strong>Conductivity</strong> to see what are the less frequent but more important words to this discourse.",
+                
+               },
+               {
                  element: "#biasindex",
                  placement: "top",
                  title: "Network Structure Diversity",
@@ -524,7 +596,7 @@
                  element: "#insight",
                  placement: "bottom",
                  title: "Insight",
-                 content: "Click here to generate new ideas: we will show you the two topical clusters and the associated statements, which could be linked together to get a new insight into the discourse or to develop it further (depending on its structure).",
+                 content: "Using the <strong>Insight</strong> tab you can generate new ideas: we will show you the two topical clusters and the associated statements, which could be linked together to get a new insight into the discourse or to develop it further (depending on its structure).",
                  onShow: function (tour) {
                       if ($('#analytics').is(":visible")) {
                         $('#analyticsbutton').click();
@@ -560,13 +632,13 @@
 
               if (walkthrough == 'insight') {
               //  console.log(tour._options.steps);
+              tour._options.name = 'insight';
                tour._options.steps = [
                {
-               element: "#entryform",
-               placement: "top",
                title: "Welcome to InfraNodus Insight Generation",
                content: "Using this tool you can generate insight, new ideas, and your own personal eureka moments. We will now lead you through this process.",
                backdrop: true, 
+               orphan: true, 
                onShow: function (tour) {
                    $('#analytics').hide();
                }
@@ -586,7 +658,6 @@
                  content: "Please, write something or copy and paste the existing text into this field and tap the 'SAVE' button. <br> <br> We highly recommend that you take your time and add something here, because it will make this tutorial clearer for you.<br><br><a href='javascript:' class='abutton' id='addsample'>Add a Sample Text Now</a> ",
                 onShown: function(tour) {
                   $('#addsample').click(function(e) {
-                        console.log('clickhappened')
                         e.preventDefault();
                         let sampletext = "In this paper we present a web-based open source tool and a method for generating insight from any text or discourse using text network analysis. The tool (InfraNodus) can be used by researchers and writers to organize and to better understand their notes, to measure the level of bias in discourse, and to identify the parts of the discourse where there is a potential for insight and new ideas. The method is based on text network analysis algorithm, which represents any text as a network and identifies the most influential words in a discourse based on the terms' co-occurrence. Graph community detection algorithm is then applied in order to identify the different topical clusters, which represent the main topics in the text as well as the relations between them. The community structure is used in conjunction with other measures to identify the level of bias or cognitive diversity of the discourse. Finally, the structural gaps in the graph can indicate the parts of the discourse where the connections are lacking, therefore highlighting the areas where there’s a potential for new ideas. The tool can be used as stand-alone software by end users as well as implemented via an API into other tools. Another interesting application is in the field of recommendation systems: structural gaps could indicate potentially interesting non-trivial connections to any connected datasets.";
                         $('#statement').val(sampletext);
@@ -666,7 +737,6 @@
                  title: "Detailed Tutorial",
                  content: "If, at any point, you want to see a more detailed Tutorial, click here.",
                  onShow: function (tour) {
-                  $('#menuLink').click();
                   $('#insight').click();
                  }
                }
@@ -677,6 +747,7 @@
 
              if (walkthrough == 'analytics_help') {
              //  console.log(tour._options.steps);
+               tour._options.name = 'analytics';
                tour._options.steps = [
                {
                  element: "#analytics",
@@ -762,7 +833,7 @@
                   }
 
                }
-
+               tour._options.name = 'external';
                tour._options.steps = [
                {
                element: "#graph-container",

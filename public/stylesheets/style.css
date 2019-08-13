@@ -1059,6 +1059,8 @@ button:hover {
 
 }
 
+
+
 #deletenodes {
     float: right;
     font-size: 8px; /* change this value to increase/decrease button size */
@@ -1486,9 +1488,26 @@ button:hover {
 }
 
 
+.welcomemessage {
+    position: relative;
+    left: 14px;
+    bottom: 0;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0);
+    max-width: 275px;
+    padding-left: 0px;
+    padding-top: 5px;
+    padding-right: 50px;
+    margin-bottom: 20px;
+    margin-right: 75px;
+    z-index: 1;
+    opacity: 0.9;
+    float: left;
+/*    pointer-events: none;*/
+}
+
 #welcomemessage {
     position: relative;
-
     left: 14px;
     bottom: 0;
     height: 100%;
@@ -1503,9 +1522,25 @@ button:hover {
 /*    pointer-events: none;*/
 }
 
+.welcometitle {
+    position: relative;
+    left: 14px;
+    bottom: 0;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0);
+    max-width: 275px;
+    padding-left: 0px;
+    padding-top: 5px;
+    padding-right: 50px;
+    margin-bottom: 20px;
+    z-index: 1;
+    opacity: 0.9;
+    top: 0;
+/*    pointer-events: none;*/
+}
+
 #settingsmain {
     position: relative;
-
     left: 14px;
     bottom: 0;
     height: 100%;
@@ -1591,6 +1626,7 @@ button:hover {
   max-width: 275px;
   clear: both;
 }
+
 .bigbutton {
   position: relative;
   display:flex;
@@ -1608,14 +1644,46 @@ button:hover {
   margin-bottom: 25px;
   float: left;
   text-decoration: none!important;
-  color: #555555;!important
+  color: #555555!important;
 }
+
+.bigbuttontop {
+    position: relative;
+    display: inline-block;
+    background-color: rgba(215, 215, 215, 0.6);
+    height: 25px;
+    border-radius: 8px;
+    padding-top: 15px;
+    padding-bottom: 15px;
+    padding-left: 15px;
+    padding-right: 15px;
+    margin-top: 10px;
+    margin-right: 25px;
+    margin-bottom: 25px;
+    text-align: right;
+    text-decoration: none!important;
+    color: #555555!important;
+  }
+
+  #introtop {
+      position: relative;
+      float: none;
+      display: block;
+      clear: both;
+      height: 100%;
+  }
 
 
 
 .bigbutton:hover {
 
     color: #00B7FF;
+
+}
+
+.bigbuttontop:hover {
+
+    color: #00B7FF!important;
 
 }
 
