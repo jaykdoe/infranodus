@@ -148,8 +148,8 @@
       document.getElementById("seo").href = "/<%= user.name %>/" + newcontextlong + "/edit?walkthrough=seo&forced_walkthrough=1";      
       document.getElementById("speech").href = "/<%= user.name %>/" + newcontextlong + "/edit?speech=1&walkthrough=mic";
       
-      document.getElementById("start").href = "/<%= user.name %>/" + newcontextlong + "/edit?walkthrough=default";
-      document.getElementById("tuto").href = "/<%= user.name %>/" + newcontextlong + "/edit?walkthrough=default";
+      document.getElementById("start").href = "/<%= user.name %>/" + newcontextlong + "/edit?walkthrough=default&forced_walkthrough=1";
+      document.getElementById("tuto").href = "/<%= user.name %>/" + newcontextlong + "/edit?walkthrough=default&forced_walkthrough=1";
 
 
       $("#addNewContext").on('tap', function(e) {

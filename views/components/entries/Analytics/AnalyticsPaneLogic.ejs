@@ -134,7 +134,7 @@ function AnalyticsPanel() {
                     if (addcontext_text.length > 0) {
                         addcontext_text += '<br>';
                     }
-                    addcontext_text += '<div class="headline">In ' + addcontext + ' [2] but not in ' + current_context + ' [1]:</div> ';
+                    addcontext_text += '<div class="headline">In ' + addcontext + ' [2] but not in ' + current_context + ' [1]:</div> <span id="top_missing_analytics">';
                     if (addcontext_nodes['difference'].length > 4) {
                         addcontext_nodes['difference'] = addcontext_nodes['difference'].slice(0, 4);
                     }
@@ -142,7 +142,7 @@ function AnalyticsPanel() {
                         addcontext_text += '<a href="#" class="top_nodes">' + addcontext_nodes['difference'][nnn].label + '</a> - ';
                     }
                     addcontext_text = addcontext_text.slice(0, -3);
-                    addcontext_text += ' (total ' + addcontext_ratio['difference'] + '%)';
+                    addcontext_text += ' </span>(total ' + addcontext_ratio['difference'] + '%)';
 
                 }
 

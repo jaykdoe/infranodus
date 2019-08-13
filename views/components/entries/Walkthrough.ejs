@@ -365,7 +365,14 @@
                  element: "#entryform",
                  placement: "right",
                  title: "Adding a Text",
-                 content: "You can start typing here or simply copy and paste your notes or any text that you have. You can also use one of our <a href='/import'>import</a> functions.",
+                 content: "You can start typing here or simply copy and paste your notes or any text that you have. You can also use one of our <a id='import_link' href='/import?context='>import</a> functions.",
+                 onShow: function(tour) {
+                  insertUrlParam('forced_walkthrough', 0);
+                  tour._options.storage = window.localStorage;
+                 },
+                 onShown: function(tour) {
+                  $("#import_link").attr("href", "/import?context=" +  userFactory.getCurrentContext());
+                 }
                },
                {
                element: "#graph-container",
@@ -503,9 +510,11 @@
                title: "Exploring the Context",
                backdrop: true, 
                content: "Then click 'import from google'. InfraNodus will take you to another page to confirm the settings and will then visualize the first 40 Google search results for this topic as a network graph. It will show you the context around the search terms you're looking for and how they connect.",
+               onShow: function(tour) {
+                tour._options.storage = window.localStorage;
+               },
                onNext: function (tour) {
                      if ($('#statement').val().length > 0) {
-                       tour._options.storage = window.localStorage;
                        $('#google-import').click();
                      }
                  }
@@ -515,12 +524,17 @@
                placement: "top",
                title: "Graph Visualization",
                content: "The Google search results for the topics that you selected are visualized as a graph.<br>The bigger the nodes, the more influential are the words they represent to the topic you've chosen in the previous step. The words that tend to co-occur together are closer on the graph and have the same color. ",
+               onShow: function(tour) {
+                if ($('#analytics').is(":visible")) {
+                      $('#analyticsbutton').click();
+                     }
+               }
                },
                {
                element: "#graph-container",
                placement: "left",
                title: "Graph Filtering",
-               content: "You might want to remove some of the more obvious influential words from the graph to better see the context they appear in.<br><br>For example: <div id='top_nodes'></div><br><a href='javascript:' class='abutton' id='top_delete'>Delete the Top Nodes</a><br>&nbsp;",
+               content: "You might want to select or remove some of the more obvious influential words from the graph to better see the context they appear in.<br><br>For example: <div id='top_nodes'></div><br><a href='javascript:' class='abutton' id='top_select'>Select the Top Nodes</a><br><br><a href='javascript:' class='abutton' id='top_delete'>Delete the Top Nodes</a><br>&nbsp;",
                onShown: function(tour) {
                   let top_nodes = graphFactory.getTopBCNodes(2);
                   let top_nodes_string = '';
@@ -533,6 +547,15 @@
                   $('#top_delete').click(function(e) {
                         e.preventDefault();
                         graphFactory.deleteNodes(nodesToDelete);
+                  });
+                  $('#top_select').click(function(e) {
+                        e.preventDefault();
+                        for (let pin in  nodesToDelete) {
+                          if (graphFactory.checkIfPinned(nodesToDelete[pin]) == false) {
+                            graphFactory.addToPinnedNodes(nodesToDelete[pin]);
+                          }
+
+                        }        
                   });
                }
                },
@@ -656,6 +679,9 @@
                onShow: function (tour) {
                    $('#analytics').hide();
                    $('#google-import').css('visibility', 'hidden');
+                   if (statements().areVisible() == 'HIDDEN') {
+                          statementsFactory.toggleStatementsTo('VISIBLE');
+                     }
                }
                },
                {
@@ -678,10 +704,10 @@
                content: "Now click the Save button to overlay Google's suggestions for this search term on top of the existing search results graph.",
                onShow: function(tour) {
                 insertUrlParam('forced_walkthrough', 0);
+                tour._options.storage = window.localStorage;
                },
                onNext: function (tour) {
                      if ($('#statement').val().length > 0) {
-                       tour._options.storage = window.localStorage;
                        $('#submitbutton').click();
                      }
                      else {
@@ -693,16 +719,19 @@
                element: "#graph-container",
                placement: "top",
                title: "Graph Visualization",
-               content: "You can now see the <strong>most common search patterns</strong> for your specific search query visualized as a graph.<br>The bigger the nodes, the more influential are the words they represent to the topic you've chosen in the previous step. The <strong>words that tend to co-occur together</strong> are closer on the graph and have the same color. ",
+               content: "You can now see the <strong>most common search patterns</strong> for your specific search query visualized as a graph.<br><br>The bigger the nodes, the more influential are the words they represent to the topic you've chosen in the previous step. The <strong>words that tend to co-occur together</strong> are closer on the graph and have the same color. ",
                onShow: function(tour) {
                 $('#google-import').css('visibility', 'visible');
+                if ($('#analytics').is(":visible")) {
+                      $('#analyticsbutton').click();
+                }
                }
                },
                {
                element: "#graph-container",
                placement: "left",
                title: "Graph Filtering",
-               content: "You might want to remove some of the more obvious influential words from the graph to better see the context they appear in.<br><br>For example: <div id='top_nodes'></div><br><a href='javascript:' class='abutton' id='top_select'>Select the Top Nodes</a><br><br><a href='javascript:' class='abutton' id='top_delete'>Delete the Top Nodes</a><br>&nbsp;",
+               content: "You might want to select or remove some of the more obvious influential words from the graph to better see the context they appear in.<br><br>For example: <div id='top_nodes'></div><br><a href='javascript:' class='abutton' id='top_select'>Select the Top Nodes</a><br><br><a href='javascript:' class='abutton' id='top_delete'>Delete the Top Nodes</a><br>&nbsp;",
                onShown: function(tour) {
                   let top_nodes = graphFactory.getTopBCNodes(2);
                   let top_nodes_string = '';
@@ -725,7 +754,13 @@
 
                         }        
                   });
+               },
+               onShow: function(tour) {
+                if (statements().areVisible() == 'HIDDE') {
+                          statementsFactory.toggleStatementsTo('VISIBLE');
+                     }
                }
+              
                },
                {
                  element: "#entryform",
@@ -753,32 +788,57 @@
                        tour._options.storage = window.localStorage;
                        $('#google-import').click();
                      }
+                     else {
+                      alert('We highly recommend you to type in a search query here, so you can better understand how Google import works...')
+                     }
                  }
                }, 
                {
                element: "#graph-container",
-               placement: "left",
+               placement: "top",
                title: "See the Difference",
-               content: "You will now see highlighted (in blue) the <strongs>search terms, which people are looking for, but that do not exist in Google's search results.</strong> ",
+               content: "You will now see highlighted (in blue) the <strongs>search terms, which people are looking for, but that do not exist in Google's search results.</strong> <br><br>For example: <div id='top_missing'></div><br><br>You can try clicking those words above to see the context they appear in or to delete them, so you can see other words, which exist in the keywords suggestions, but not in the search results.",
+               
                 onShow: function (tour) {
                      if ($('#analytics').is(":visible")) {
                       $('#analyticsbutton').click();
                      }
+                     if (statements().areVisible() == 'VISIBLE') {
+                          statementsFactory.toggleStatementsTo('HIDDEN');
+                     }
                  },
-                onNext: function (tour) {
+                 onShown: function(tour) {
+                  $('#top_missing').html($('#top_missing_analytics').html());
+                 }
+                
+               },
+               {
+               element: "#diffcontext-link",
+               placement: "right",
+               title: "Graph Diff Feature",
+               content: "This parameter here is ON, which means that now you're looking at the Graph Diff feature, highlighting the differences between the two graphs.",
+               onNext: function (tour) {
                      if ($('#analytics').is(":visible")) {
                      }
                      else {
                        $('#analyticsbutton').click();
                      }
                  }
+                
                },
                {
                element: "#addcontext_stats",
                placement: "left",
                title: "Missing Terms",
-               content: "This info pane in the Analytics panel will list the most influential words, which are present in Google's keywords suggestions (what people search for), but that are not present in Google's search results (what they actually find).",
-                
+               content: "This info pane in the Analytics panel will list the most influential words, which are <strong>present in Google's keywords suggestions</strong> (what people search for), but that are <strong>not present in Google's search results</strong> (what they actually find).<br><br><strong>Top keywords to promote:</strong> <div id='top_missing'></div>",
+               onShow: function (tour) {
+                    if (statements().areVisible() == 'VISIBLE') {
+                          statementsFactory.toggleStatementsTo('HIDDEN');
+                    }
+                 },
+                 onShown: function(tour) {
+                  $('#top_missing').html($('#top_missing_analytics').html());
+                 }
                },
                {
                  orphan: true,
@@ -823,7 +883,12 @@
                         let sampletext = "In this paper we present a web-based open source tool and a method for generating insight from any text or discourse using text network analysis. The tool (InfraNodus) can be used by researchers and writers to organize and to better understand their notes, to measure the level of bias in discourse, and to identify the parts of the discourse where there is a potential for insight and new ideas. The method is based on text network analysis algorithm, which represents any text as a network and identifies the most influential words in a discourse based on the terms' co-occurrence. Graph community detection algorithm is then applied in order to identify the different topical clusters, which represent the main topics in the text as well as the relations between them. The community structure is used in conjunction with other measures to identify the level of bias or cognitive diversity of the discourse. Finally, the structural gaps in the graph can indicate the parts of the discourse where the connections are lacking, therefore highlighting the areas where there’s a potential for new ideas. The tool can be used as stand-alone software by end users as well as implemented via an API into other tools. Another interesting application is in the field of recommendation systems: structural gaps could indicate potentially interesting non-trivial connections to any connected datasets.";
                         $('#statement').val(sampletext);
                   });
+                  
                 },
+                onShow: function(tour) {
+                  insertUrlParam('forced_walkthrough', 0);
+                  tour._options.storage = window.localStorage;
+                 },
                  onNext: function (tour) {
                      if ($('#statement').val().length > 0) {
                        $('#submitbutton').click();
