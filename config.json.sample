@@ -2,8 +2,8 @@
     "neo4j":  {
         "host": "localhost:7474",
         "bolt": "localhost",
-        "username": "username",
-        "password": "password"
+        "username": "neo4j",
+        "password": "Really_Secure_Local_Db_Password"
     },
 
     "secrets": {
@@ -27,5 +27,11 @@
         "consumer_secret":      "secret",
         "access_token":         "token-secret",
         "access_token_secret":  "token-secret"
+    },
+
+    "chargebee": {
+        "site":         "",
+        "api_key":      "secret",
+        "redirect_url": ""
     }
 }
