@@ -1,12 +1,9 @@
 .DS_Store
 .idea/
 config.json
-views/statsabove.ejs
-views/statsbelow.ejs
 lib/sandbox
+*.log
 
 # NPM
 node_modules
 npm-debug.log*
-
-views/statsheader.ejs
