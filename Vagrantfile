@@ -79,5 +79,6 @@ Vagrant.configure('2') do |config|
   # SHELL
 
   config.vm.provision :shell, path: 'vagrant/install-packages.sh'
+  config.vm.provision :shell, path: 'vagrant/setup-neo4j.sh'
   config.vm.provision :shell, path: 'vagrant/setup-app.sh', privileged: false
 end
