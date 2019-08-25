@@ -109,15 +109,15 @@ To sign up for an account, visit http://localhost:3000/signup?invitation=secretc
 
 #### Run inside a Vagrant Virtual Machine
 
-1 - `git clone` the project
-2 - `cd infranodus` to switch into the git project directory
-3 - `cp config.json.sample config.json` and modidy the file as necessary - for example, add Evernote and/or Twitter credentials. Note: if you change the Neo4j database password here, you'll also need to change it in your local copy of `/vagrant/setup-neo4j.sh`.
-4 - `vagrant up` in the project folder. This may take a while the first time, as it installs an Ubuntu VM and all dependencies.
-5 - `vagrant ssh` to logon to the Virtual Machine
-6 - `cd /vagrant` to get into the project directory on the Virtual machine
-7 - Run the application with `node app.js`
-8 - You can access the app from http://192.168.66.101:3000 - if you want a different IP address, change the `ip` setting under `config.vm.network` in the `vagrantfile`.
-9 - To sign up for an account, visit http://192.168.66.101:3000/signup?invitation=secretcode - replace `secretcode` with the value of `secrets.invitation` in your `config.json`.
+1. `git clone` the project
+2. `cd infranodus` to switch into the git project directory
+3. `cp config.json.sample config.json` and modidy the file as necessary - for example, add Evernote and/or Twitter credentials. Note: if you change the Neo4j database password here, you'll also need to change it in your local copy of `/vagrant/setup-neo4j.sh`.
+4. `vagrant up` in the project folder. This may take a while the first time, as it installs an Ubuntu VM and all dependencies.
+5. `vagrant ssh` to logon to the Virtual Machine
+6. `cd /vagrant` to get into the project directory on the Virtual machine
+7. `node app.js` to run the application
+8. You can access the app from http://192.168.66.101:3000 - if you want a different IP address, change the `ip` setting under `config.vm.network` in the `vagrantfile`.
+9. To sign up for an account, visit http://192.168.66.101:3000/signup?invitation=secretcode - replace `secretcode` with the value of `secrets.invitation` in your `config.json`.
 
 =================
 
