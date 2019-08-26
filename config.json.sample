@@ -27,5 +27,97 @@
         "consumer_secret":      "secret",
         "access_token":         "token-secret",
         "access_token_secret":  "token-secret"
+    },
+
+    "chargebee": {
+        "site":         "",
+        "api_key":      "secret",
+        "redirect_url": ""
+    },
+
+    "rss_presets": {
+        "news": {
+            "id": "news",
+            "name": "News of the Day",
+            "urls": [
+              "https://www.theguardian.com/world/rss",
+              "http://www.wsj.com/xml/rss/3_7085.xml",
+              "http://rss.nytimes.com/services/xml/rss/nyt/World.xml",
+              "http://feeds.washingtonpost.com/rss/world",
+              "https://www.ft.com/?format=rss"
+            ],
+            "items": 15
+        },
+        "guardian": {
+            "id":   "guardian",
+            "name": "The Guardian RSS",
+            "urls": ["https://www.theguardian.com/rss"],
+            "items": 20
+        },
+        "ft": {
+            "id":   "ft",
+            "name": "FT.Com RSS",
+            "urls": ["https://www.ft.com/?format=rss"],
+            "items": 20
+        },
+        "wsj": {
+            "id":   "wsj",
+            "name": "Wall Street Journal RSS",
+            "urls": ["http://www.wsj.com/xml/rss/3_7085.xml"],
+            "items": 10
+        },
+        "nyt": {
+            "id":   "nyt",
+            "name": "New York Times RSS",
+            "urls": ["http://rss.nytimes.com/services/xml/rss/nyt/World.xml"],
+            "items": 20
+        },
+        "french": {
+            "id":   "french",
+            "name": "France News RSS",
+            "urls": [
+              "http://www.lemonde.fr/rss/une.xml",
+              "http://www.bfmtv.com/rss",
+              "http://www.lefigaro.fr/rss/figaro_actualites.xml",
+              "http://rss.liberation.fr/rss/latest/",
+              "http://www.leparisien.fr/une/rss.xml"
+            ],
+            "items": 15
+        },
+        "russian": {
+            "id":   "russian",
+            "name": "Russian News RSS",
+            "urls": [
+              "https://www.vedomosti.ru/rss/news",
+              "https://meduza.io/rss/all",
+              "http://static.feed.rbc.ru/rbc/logical/footer/news.rss",
+              "https://russian.rt.com/rss",
+              "https://lenta.ru/rss"
+            ],
+            "items": 15
+        },
+        "german": {
+            "id":   "german",
+            "name": "German News RSS",
+            "urls": [
+              "http://www.faz.net/rss/aktuell/",
+              "http://rss.sueddeutsche.de/app/service/rss/alles/index.rss?output=rss",
+              "https://www.welt.de/feeds/latest.rss",
+              "https://www.tagesspiegel.de/contentexport/feed/home",
+              "http://www.taz.de/!p15;rss/"
+            ],
+            "items": 15
+        },
+        "tech": {
+            "id":   "tech",
+            "name": "Tech News RSS",
+            "urls": [
+              "http://feeds.feedburner.com/TechCrunch",
+              "https://www.technologyreview.com/topnews.rss",
+              "http://feeds.arstechnica.com/arstechnica/technology-lab",
+              "http://feeds.feedburner.com/venturebeat/SZYF"
+            ],
+            "items": 15
+        }
     }
 }

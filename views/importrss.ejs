@@ -21,9 +21,6 @@
 
     <%- include('components/common/menu') %>
 
-
-
-
     <div id='content'>
 
         <div id='welcomemessage'>
@@ -38,47 +35,42 @@
                     <input type="hidden" name="source" value="rss">
 
                     <select name="urlselect" id="urlselect">
-                      <option value="news" selected>News of the Day</option>
-                      <option value="guardian">The Guardian RSS</option>
-                      <option value="ft">FT.Com RSS</option>
-                      <option value="wsj">Wall Street Journal RSS</option>
-                      <option value="nyt">New York Times RSS</option>
-                      <option value="french">France News RSS</option>
-                      <option value="russian">Russian News RSS</option>
-                      <option value="german">German News RSS</option>
-                      <option value="tech">Tech News RSS</option>
                       <option value="custom">Custom RSS feeds</option>
+                      <% for (var item in rsspresets) { %>
+                        <option value="<%= rsspresets[item]['id'] %>"><%= rsspresets[item]['name'] %></option>
+                      <% } %>
                     </select>
                     <br>
-                    <a href="javascript:" id="advancedpane">+ settings</a>
+                    <a href="javascript:" id="advancedpane">- settings</a>
                     <br>
                     <div id="urlsetting">
                       <br>
                         RSS feeds to be visualized:
-                        <textarea id="rssinput" name="rssinput" rows="4" cols="20">https://www.theguardian.com/world/rss http://www.wsj.com/xml/rss/3_7085.xml http://rss.nytimes.com/services/xml/rss/nyt/World.xml http://feeds.washingtonpost.com/rss/world https://www.ft.com/?format=rss</textarea>
+                        <textarea id="rssinput" name="rssinput" rows="4" cols="20">
+                        </textarea>
                         <br>
                         <label for="rssitems" class="pure-input" id="rssitemscaption">
                             # of items for each feed:
                             <input type="text" name="rssitems" id="rssitems" value="15"/>
                         </label>
                         <br>
+                        <label for="rsssince" class="pure-input" id="rsssincecaption">
+                            Limit items in each feed to those later than a date & time (optional):
+                            <input type="text" name="rsssince" id="rsssince" value="" placeholder="YYYY-MM-DD HH:MI"/>
+                        </label>
+                        <br>
                         <label for="includeteasers" class="pure-checkbox">
-                                <input id="includeteasers" type="checkbox" name="includeteasers" value="1"> include teasers
-
+                            <input id="includeteasers" type="checkbox" name="includeteasers" value="1"> include teasers
                         </label>
                         <br>
 
                     </div>
-
-
-
 
                 <br>
                 Save in Context:
                 <br>
                 <input type='text' name='context' id="context" value='<% if (context) { %><%= context %><% } else { %>news<% } %>'/>
                 <br>
-
 
                 <input type="hidden" id="selectedContexts" name="selectedContexts" value="">
                 <input type="hidden" name="statementid" value="">
@@ -89,19 +81,11 @@
 
             </form>   &nbsp;<br>&nbsp;<br>
 
-
-
-
-
         </div>
 
         <div id="graph-container"></div>
 
-
     </div>
-
-
-
 
 </div>
 
@@ -124,112 +108,49 @@
 
           $('#context').val('news' + nowdate);
 
-          var advancedpane = 0;
+          var advancedpane = 1;
 
-          $("#advancedsettings").hide();
-          $('#urlsetting').hide();
+          var clientRssPresets = JSON.parse('<%- JSON.stringify(rsspresets) %>');
 
           $("#advancedpane").click(function() {
               if (!advancedpane) {
-          //    $("#advancedsettings").show();
-              $("#advancedpane").text('– settings');
-              $("#urlsetting").show();
-              advancedpane = 1;
+                  $("#advancedpane").text('– settings');
+                  $("#urlsetting").show();
+                  advancedpane = 1;
               }
               else {
-            //  $("#advancedsettings").hide();
-              $("#advancedpane").text('+ settings');
-              $("#urlsetting").hide();
-              advancedpane = 0;
-
+                  $("#advancedpane").text('+ settings');
+                  $("#urlsetting").hide();
+                  advancedpane = 0;
               }
-
           });
 
           $('#urlselect').change(function () {
-
-
             var currentselection = $(this).val();
             $('#context').val(currentselection + nowdate);
 
-            if (currentselection == 'news') {
-              $('#rssinput').val('https://www.theguardian.com/world/rss http://www.wsj.com/xml/rss/3_7085.xml http://rss.nytimes.com/services/xml/rss/nyt/World.xml http://feeds.washingtonpost.com/rss/world https://www.ft.com/?format=rss');
-              $("#rssitems").val('15');
-            }
-            else if (currentselection == 'guardian') {
-              $('#rssinput').val('https://www.theguardian.com/rss');
-              $("#urlsetting").show();
-              $("#rssitems").val('20');
-              $("#advancedpane").text('– settings');
-              advancedpane = 1;
-            }
-            else if (currentselection == 'ft') {
-              $('#rssinput').val('https://www.ft.com/?format=rss');
-              $("#urlsetting").show();
-              $("#rssitems").val('20');
-              $("#advancedpane").text('– settings');
-              advancedpane = 1;
-            }
-            else if (currentselection == 'wsj') {
-              $('#rssinput').val('http://www.wsj.com/xml/rss/3_7085.xml');
-              $("#urlsetting").show();
-              $("#rssitems").val('10');
-              $("#advancedpane").text('– settings');
-              advancedpane = 1;
-            }
-            else if (currentselection == 'nyt') {
-              $('#rssinput').val('http://rss.nytimes.com/services/xml/rss/nyt/World.xml');
-              $("#urlsetting").show();
-              $("#rssitems").val('20');
-              $("#advancedpane").text('– settings');
-              advancedpane = 1;
-            }
-            else if (currentselection == 'french') {
-              $('#rssinput').val('http://www.lemonde.fr/rss/une.xml  http://www.bfmtv.com/rss http://www.lefigaro.fr/rss/figaro_actualites.xml http://rss.liberation.fr/rss/latest/ http://www.leparisien.fr/une/rss.xml');
-              $("#rssitems").val('15');
-            }
-            else if (currentselection == 'russian') {
-              $('#rssinput').val('https://www.vedomosti.ru/rss/news https://meduza.io/rss/all http://static.feed.rbc.ru/rbc/logical/footer/news.rss https://russian.rt.com/rss https://lenta.ru/rss');
-              $("#rssitems").val('15');
-            }
-            else if (currentselection == 'german') {
-              $('#rssinput').val('http://www.faz.net/rss/aktuell/ http://rss.sueddeutsche.de/app/service/rss/alles/index.rss?output=rss https://www.welt.de/feeds/latest.rss https://www.tagesspiegel.de/contentexport/feed/home http://www.taz.de/!p15;rss/');
-              $("#rssitems").val('15');
-            }
-            else if (currentselection == 'tech') {
-              $('#rssinput').val('http://feeds.feedburner.com/TechCrunch https://www.technologyreview.com/topnews.rss http://feeds.arstechnica.com/arstechnica/technology-lab http://feeds.feedburner.com/venturebeat/SZYF');
-              $("#rssitems").val('15');
-            }
-            else if (currentselection == 'custom') {
+            if (currentselection == 'custom') {
               $('#rssinput').val('');
-              $("#urlsetting").show();
-              $("#advancedpane").text('– settings');
+              $('#urlsetting').show();
+              $('#advancedpane').text('– settings');
               advancedpane = 1;
             }
-
-
-
+            else if (currentselection in clientRssPresets) {
+              $('#rssinput').val(clientRssPresets[currentselection]['urls'].join(' '));
+              $('#rssitems').val(clientRssPresets[currentselection]['items']);
+              $('#urlsetting').show();
+              $('#advancedpane').text('– settings');
+              advancedpane = 1;
+            }
           });
-
-
-
 
           $('form#submitform').submit(function(){
                 $(this).find('input[type=submit]').attr('disabled', 'disabled');
                 $('#message').html('We are importing the data, this page will automatically reload. If this does not happen in 30 seconds, please, <a href="/<%= user.name %>/'+$('#context').val()+'/edit">click here</a>.');
           });
-
-
-
-
-
-
-
       });
 
-
 </script>
-
 
 <% include statsbelow %>
 </body>
