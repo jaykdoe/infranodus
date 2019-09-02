@@ -91,6 +91,10 @@ InfraNodus is built on
 
 ### Installation Guide
 
+#### Run on the cloud
+To run InfraNodus on the cloud, go to [www.infranodus.com](https://infranodus.com). 
+
+
 #### Run directly on your machine
 To use this software you should install Neo4J 3.0 on your local computer.
 To install Neo4J on a Mac use homebrew (see [Neo4J instructions here](http://www.neo4j.org/download)).
@@ -98,14 +102,21 @@ For settings, check out [How to Set Up Neo4J for InfraNodus](https://github.com/
 You may also find [other wiki pages](https://github.com/noduslabs/infranodus/wiki/_pages) interesting, especially [Neo4J installation guide](https://github.com/noduslabs/infranodus/wiki/Upgrading-Your-Neo4J-Database-from-2.x-to-3.x) – the section on setting up indexes and installing APOC plugin.
 
 Git clone this project into a folder, then you will also need to have npm Node.Js package manager installed on your computer. After you install InfraNodus, run
+
 `npm install`
+
 in the main folder the project to install all the dependencies into `node_modules` folder.
 
-Check out the config.json.sample file and edit it to add your own Evernote and Twitter API credentials. Then rename it to config.json.
+Check out the config.json.sample file and edit it to add your own Evernote and Twitter API credentials. 
+Then rename it to config.json.
+Create `statsabove.ejs` and `statsbelow.ejs` files in the `/views` folder.
 
-Run the application with `node app.js`. You can access the app from http://localhost:3000
+Run the application with 
+`node app.js` 
 
-To sign up for an account, visit http://localhost:3000/signup?invitation=secretcode - replace `secretcode` with the value of `secrets.invitation` in your `config.json`.
+You can access the app from http://localhost:3000
+
+To create an account on your local machine, visit http://localhost:3000/signup?invitation=secretcode - replace `secretcode` with the value of `secrets.invitation` in your `config.json`.
 
 #### Run inside a Vagrant Virtual Machine
 
