@@ -34,7 +34,7 @@
         "api_key":      "secret",
         "redirect_url": ""
     },
-        "rss_presets": {
+    "rss_presets": {
         "news": {
             "id": "news",
             "name": "News of the Day",

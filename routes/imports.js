@@ -227,6 +227,7 @@ exports.renderRSS = function(req, res) {
         context: req.query.context,
         contextlist: contextslist,
         notebooks: '',
+        rsspresets: options.rssPresets,
         fornode: req.query.fornode,
     })
 }
@@ -1491,8 +1492,8 @@ exports.submit = function(req, res, next) {
             req.files.uploadedFile.size < max_total_length &&
             (filetype == 'text/html' ||
                 filetype == 'text/plain' ||
-                filetype == 'application/pdf' ||  
-                filetype == 'application/octet-stream' ||                
+                filetype == 'application/pdf' ||
+                filetype == 'application/octet-stream' ||
                 filetype == 'text/csv')
         ) {
             // Import parameters
@@ -1719,24 +1720,24 @@ exports.submit = function(req, res, next) {
                                 if (gexf_nodes[j].id == gexf_edges[i].target) {
                                     if (!gexf_statements[i]) gexf_statements[i] = ' ';
                                     gexf_statements[i] += ' #' + S(gexf_nodes[j].label.toLowerCase()).underscore();
-                                } 
-                            } 
+                                }
+                            }
                             if (gexf_edges[i].weight > 1) {
                                 for (let k = 0; k < gexf_edges[i].weight; k++) {
-                                    gexf_statements[i] += '\n\n ' + gexf_statements[i]; 
+                                    gexf_statements[i] += '\n\n ' + gexf_statements[i];
                                 }
-                            }                           
+                            }
                         }
-                     
+
                         //console.log(gexf_statements);
 
-                    
+
                         var currentcontext = processContext(importContext)
 
                         parsedata[currentcontext] = [];
 
                         parsedata[currentcontext].push(gexf_statements.join('\n\n'));
-                        
+
                         processFile(
                             titlefield,
                             processfield,
@@ -2021,7 +2022,7 @@ exports.submit = function(req, res, next) {
                                                 )
                                                 something_added += 1
                                             }
-                                        
+
                                         }
                                     }
                                 }
@@ -2346,6 +2347,9 @@ exports.submit = function(req, res, next) {
 
         var rssItemsMax = validate.sanitize(req.body.rssitems)
 
+        // If no date given, default to a very old date to allow all articles through
+        var rssSinceDateTime = (!!req.body.rsssince ? Date.parse(req.body.rsssince) : Date.parse("1970-01-01"))
+
         var includeteasers = validate.sanitize(req.body.includeteasers)
 
         var statements = []
@@ -2399,7 +2403,7 @@ exports.submit = function(req, res, next) {
                             var rssIterations = 0
 
                             items.forEach(itemo => {
-                                if (rssIterations < limito) {
+                                if (rssIterations < limito && itemo.pubdate >= rssSinceDateTime) {
                                     var thisheadline = S(
                                         itemo.title
                                     ).stripTags().s
@@ -2799,7 +2803,7 @@ exports.submit = function(req, res, next) {
                     walkthrough: walknext
                 }
 
-                
+
                 let google_request_link = config.google.URL_search + config.google.API_key + '&q=' + searchString.toLowerCase();
 
                 https.get(google_request_link, (resp) => {
@@ -2817,12 +2821,12 @@ exports.submit = function(req, res, next) {
                         let googlejson = JSON.parse(receiveddata);
 
                         req.body.entry.body = addGoogleEntry(googlejson, excludetitles);
-                        
+
                         let currentmarker = 0;
 
                         // How much total results we get?
                         let tot_search_results = googlejson.queries.request[0].totalResults;
-                        
+
                         currentmarker = tot_search_results - 10;
 
                         let startmarker = 0;
@@ -2836,10 +2840,10 @@ exports.submit = function(req, res, next) {
                                 resp.on('data', (chunk) => {
                                     receiveddata += chunk;
                                 });
-            
+
                                 // The whole response has been received. Print out the result.
                                 resp.on('end', () => {
-                                    
+
                                     googlejson = JSON.parse(receiveddata);
 
                                     req.body.entry.body = req.body.entry.body.concat(addGoogleEntry(googlejson, excludetitles));
@@ -2856,16 +2860,16 @@ exports.submit = function(req, res, next) {
                                             resp.on('data', (chunk) => {
                                                 receiveddata += chunk;
                                             });
-                        
+
                                             // The whole response has been received. Print out the result.
                                             resp.on('end', () => {
-                                                
+
                                                 googlejson = JSON.parse(receiveddata);
-            
+
                                                 req.body.entry.body = req.body.entry.body.concat(addGoogleEntry(googlejson, excludetitles));
-            
+
                                                 currentmarker = tot_search_results - 30;
-            
+
                                                 if (currentmarker > 0) {
                                                     startmarker = 30;
 
@@ -2876,12 +2880,12 @@ exports.submit = function(req, res, next) {
                                                         resp.on('data', (chunk) => {
                                                             receiveddata += chunk;
                                                         });
-                                    
+
                                                         // The whole response has been received. Print out the result.
                                                         resp.on('end', () => {
-                                                            
+
                                                             googlejson = JSON.parse(receiveddata);
-                        
+
                                                             req.body.entry.body = req.body.entry.body.concat(addGoogleEntry(googlejson, excludetitles));
 
 
@@ -2894,7 +2898,7 @@ exports.submit = function(req, res, next) {
                                                                 let searchlemmas = [];
 
                                                                 for (let k = 0; k < searchterms.length; k++) {
-                                                                
+
                                                                     // Now we find lemmas, so we deal with plural cases and also with Russian word endings and suffixes
                                                                     // TODO this whole thing should be moved outside of this function and Russian lemmas should be added to stopwords not deleted from text
 
@@ -2904,7 +2908,7 @@ exports.submit = function(req, res, next) {
                                                                     ) {
                                                                         var lemmaterm = lemmerRus.lemmatize(
                                                                             searchterms[k]
-                                                                        ) 
+                                                                        )
                                                                     }
 
                                                                     // English?
@@ -2912,33 +2916,33 @@ exports.submit = function(req, res, next) {
                                                                         var lemmaterm = lemmerEng.lemmatize(
                                                                             searchterms[k]
                                                                         )
-                                                                    
+
                                                                     }
-                                                                    
+
                                                                     // Now push the lemma into the list
                                                                     if (lemmaterm[0] != undefined) {
                                                                         searchlemmas.push(lemmaterm[0].toLowerCase())
                                                                     }
                                                                 }
 
-                                                                req.excludestopwords = searchlemmas; 
+                                                                req.excludestopwords = searchlemmas;
                                                             }
 
                                                             // Submit entries (routes/entries.js)
-                        
+
                                                             entries.submit(req, res);
 
-                        
+
                                                         });
                                                     });
-                                                    
+
                                                 }
                                                 else {
                                                     entries.submit(req, res);
 
                                                 }
-            
-            
+
+
                                             });
                                         });
 
@@ -2962,13 +2966,13 @@ exports.submit = function(req, res, next) {
                             }
                         }
 
-                       
+
 
 
 
                     });
 
-            
+
 
                 }).on("error", (err) => {
                     console.log("Error: " + err.message);
@@ -2991,7 +2995,7 @@ exports.submit = function(req, res, next) {
             let searchresults = googlejson.items;
 
             if (searchresults) {
-                for (let i = 0; i < searchresults.length;  ++i) { 
+                for (let i = 0; i < searchresults.length;  ++i) {
                     if (
                         searchresults[i].snippet &&
                         searchresults[i].snippet != 'null' &&
