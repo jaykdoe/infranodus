@@ -36,10 +36,11 @@
                     <input type="hidden" name="source" value="rss">
 
                     <select name="urlselect" id="urlselect">
-                      <option value="custom">Custom RSS feeds</option>
                       <% for (var item in rsspresets) { %>
                         <option value="<%= rsspresets[item]['id'] %>"><%= rsspresets[item]['name'] %></option>
                       <% } %>
+                      <option value="custom">Custom RSS feeds</option>
+
                     </select>
                     <br>
                     <a href="javascript:" id="advancedpane">+ settings</a>
@@ -47,7 +48,7 @@
                     <div id="urlsetting">
                       <br>
                         RSS feeds to be visualized:
-                        <textarea id="rssinput" name="rssinput" rows="4" cols="20">
+                        <textarea id="rssinput" name="rssinput" rows="4" cols="20">https://www.theguardian.com/world/rss http://www.wsj.com/xml/rss/3_7085.xml http://rss.nytimes.com/services/xml/rss/nyt/World.xml http://feeds.washingtonpost.com/rss/world https://www.ft.com/?format=rss
                         </textarea>
                         <br>
                         <label for="rssitems" class="pure-input" id="rssitemscaption">
@@ -105,11 +106,13 @@
 
       $(document).ready(function () {
 
-          var nowdate = new Date().toISOString().slice(2,10).replace(/-/g,"").replace(/:/g,"");
+        var nowdate = new Date().toISOString().slice(2,10).replace(/-/g,"").replace(/:/g,"");
 
-          $('#context').val('news' + nowdate);
+        $('#context').val('news' + nowdate);
 
-          var advancedpane = 0;
+        var advancedpane = 0;
+
+
 
           $("#advancedsettings").hide();
           $('#urlsetting').hide();	
@@ -148,6 +151,9 @@
             }
           });
 
+
+
+
           $('form#submitform').submit(function(){
                 $(this).find('input[type=submit]').attr('disabled', 'disabled');
                 $('#message').html('We are importing the data, this page will automatically reload. If this does not happen in 30 seconds, please, <a href="/<%= user.name %>/'+$('#context').val()+'/edit">click here</a>.');
@@ -158,6 +164,8 @@
             delimiters: ['-', '-', ' ', ':'],
             blocks: [4, 2, 2, 2, 2]
         });
+
+      
       });
 
 </script>
