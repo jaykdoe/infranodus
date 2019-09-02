@@ -116,7 +116,7 @@ Run the application with
 
 You can access the app from http://localhost:3000
 
-To create an account on your local machine, visit http://localhost:3000/signup?invitation=secretcode - replace `secretcode` with the value of `secrets.invitation` in your `config.json`.
+To create an account on your local machine, visit http://localhost:3000/signup?invitation=secretcode - replace `secretcode` with the value of `secrets.invitation` in your `config.json`. In this case, please, consider becoming a patron by signing up on [www.infranodus.com](http://infranodus.com) to support the development of this open source tool. Patrons get fast-track support and help on the technical issues of the installation.
 
 #### Run inside a Vagrant Virtual Machine
 
@@ -128,7 +128,7 @@ To create an account on your local machine, visit http://localhost:3000/signup?i
 6. `cd /vagrant` to get into the project directory on the Virtual machine
 7. `node app.js` to run the application
 8. You can access the app from http://192.168.66.101:3000 - if you want a different IP address, change the `ip` setting under `config.vm.network` in the `vagrantfile`.
-9. To create an account on your local machine, visit http://192.168.66.101:3000/signup?invitation=secretcode - replace `secretcode` with the value of `secrets.invitation` in your `config.json`.
+9. To create an account on your local machine, visit http://192.168.66.101:3000/signup?invitation=secretcode - replace `secretcode` with the value of `secrets.invitation` in your `config.json`. In this case, please, consider becoming a patron by signing up on [www.infranodus.com](http://infranodus.com) to support the development of this open source tool. Patrons get fast-track support and help on the technical issues of the installation.
 
 =================
 
