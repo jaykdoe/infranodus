@@ -1,12 +1,14 @@
 .DS_Store
 .idea/
 config.json
+lib/sandbox
+*.log
 views/statsabove.ejs
 views/statsbelow.ejs
-lib/sandbox
 
 # NPM
 node_modules
 npm-debug.log*
 
-views/statsheader.ejs
+# Vagrant
+.vagrant
