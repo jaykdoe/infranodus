@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="/stylesheets/side-menu.css">
     <link rel="stylesheet" href="/stylesheets/jquery-ui.min.css">
     <link rel='stylesheet' href='/stylesheets/style.css' />
+    <script src="/javascripts/cleave.min.js"></script>
     <% include statsheader %>
 </head>
 <body>
@@ -41,7 +42,7 @@
                       <% } %>
                     </select>
                     <br>
-                    <a href="javascript:" id="advancedpane">- settings</a>
+                    <a href="javascript:" id="advancedpane">+ settings</a>
                     <br>
                     <div id="urlsetting">
                       <br>
@@ -55,7 +56,7 @@
                         </label>
                         <br>
                         <label for="rsssince" class="pure-input" id="rsssincecaption">
-                            Limit items in each feed to those later than a date & time (optional):
+                            Published after yyyy-mm-dd hh:mm (optional):
                             <input type="text" name="rsssince" id="rsssince" value="" placeholder="YYYY-MM-DD HH:MI"/>
                         </label>
                         <br>
@@ -108,7 +109,10 @@
 
           $('#context').val('news' + nowdate);
 
-          var advancedpane = 1;
+          var advancedpane = 0;
+
+          $("#advancedsettings").hide();
+          $('#urlsetting').hide();	
 
           var clientRssPresets = JSON.parse('<%- JSON.stringify(rsspresets) %>');
 
@@ -148,6 +152,12 @@
                 $(this).find('input[type=submit]').attr('disabled', 'disabled');
                 $('#message').html('We are importing the data, this page will automatically reload. If this does not happen in 30 seconds, please, <a href="/<%= user.name %>/'+$('#context').val()+'/edit">click here</a>.');
           });
+
+          new Cleave('#rsssince', {
+            uppercase: true,
+            delimiters: ['-', '-', ' ', ':'],
+            blocks: [4, 2, 2, 2, 2]
+        });
       });
 
 </script>
