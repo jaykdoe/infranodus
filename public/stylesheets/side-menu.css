@@ -58,6 +58,9 @@
 
     --google-import-opacity: 1;
     --google-import-background-image: url('/images/import-google.png')!important;
+
+    --file-import-opacity: 1;
+    --file-import-background-image: url('/images/import-file.png')!important;
 }
 
 :root[theme='dark'] {
@@ -115,7 +118,10 @@
     --privacy-link-share-opacity: 0.6;
 
     --google-import-opacity: 1;
-    --google-import-background-image: url('/images/import-google-white.png')!important;
+    --google-import-background-image: url('/images/import-google.png')!important;
+
+    --file-import-opacity: 1;
+    --file-import-background-image: url('/images/import-file.png')!important;
 }
 
 
@@ -421,15 +427,16 @@ small screens.
 
 #google-import {
         position: relative;
+        
         left: 0; /* "#menu width" */
         text-align: right;
-        padding-top: 6px;
+        padding-top: 7px;
         padding-bottom: 6px;
         padding-left: 20px;
         padding-right: 10px;
         background-color: #f5f5f5;
         color: #666;
-        font: 15px 'IstokWeb-Regular',sans-serif;
+        font: 13px 'IstokWeb-Regular',sans-serif;
         /* width: 32px;
         height: 32px;
         float: right; */
@@ -437,13 +444,41 @@ small screens.
         background-image: var(--google-import-background-image);
         opacity: var(--google-import-link-opacity); 
         background-repeat: no-repeat!important;
-        display: block;
-        width: 60px;
-        background-position: 7px 6px; 
+        display: inline-block;
+        width: 53px;
+        background-position: 5px 4px; 
         /* pointer-events: auto!important;   */
 }
 
 #google-import:hover {
+    background-color: #efefef;
+}
+
+#file-import {
+        position: relative;
+        left: 0; /* "#menu width" */
+        text-align: right;
+        padding-top: 7px;
+        padding-bottom: 6px;
+        padding-left: 20px;
+        padding-right: 10px;
+        background-color: #f5f5f5;
+        color: #666;
+        font: 13px 'IstokWeb-Regular',sans-serif;
+        /* width: 32px;
+        height: 32px;
+        float: right; */
+        z-index: 10;
+        background-image: var(--file-import-background-image);
+        opacity: var(--file-import-link-opacity); 
+        background-repeat: no-repeat!important;
+        display: inline-block;
+        width: 30px;
+        background-position: 5px 4px; 
+        /* pointer-events: auto!important;   */
+}
+
+#file-import:hover {
     background-color: #efefef;
 }
 

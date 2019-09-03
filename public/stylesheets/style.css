@@ -1459,8 +1459,15 @@ button:hover {
 #importpane {
     position: absolute;
     display: inline; /* show this only on small screens */
-    bottom: 20px;
-    left: 140px;
+    bottom: 21px;
+    left: 122px;
+    font: 13px 'IstokWeb-Regular',sans-serif;
+
+}
+
+#importpane::before { 
+  content: "import: ";
+  padding-right: 3px;
 }
 
 

@@ -140,6 +140,7 @@
         interpretButton().onClick(addEntryPanel().changeModeToInterpret);
         minimizeButton().onClick(addEntryPanel().togglePanel);
         importLinkButton().onClick(addEntryPanel().sendToImport);
+        importFileButton().onClick(importFileButton().redirect);
 
         // This activates the logic for the whole statements panel
         closeStatementMenuButton().onClick(statementsPanel().toggleStatementsPanel);

@@ -679,6 +679,7 @@
                onShow: function (tour) {
                    $('#analytics').hide();
                    $('#google-import').css('visibility', 'hidden');
+                   $('#file-import').css('visibility', 'hidden');
                    if (statements().areVisible() == 'HIDDEN') {
                           statementsFactory.toggleStatementsTo('VISIBLE');
                      }
@@ -728,6 +729,7 @@
                content: "You can now see the <strong>most common search patterns</strong> for your specific search query visualized as a graph.<br><br>The bigger the nodes, the more influential are the words they represent to the topic you've chosen in the previous step. The <strong>words that tend to co-occur together</strong> are closer on the graph and have the same color. ",
                onShow: function(tour) {
                 $('#google-import').css('visibility', 'visible');
+                $('#file-import').css('visibility', 'visible');
                 if ($('#analytics').is(":visible")) {
                       $('#analyticsbutton').click();
                 }

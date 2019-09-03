@@ -31,6 +31,27 @@
                 }
             }
         }
+
+        function importFileButton() {
+            return {
+                onClick: function(onClick) {
+                    $('#file-import').on('click', onClick);
+                },
+                redirect: function() {
+                    let redirecturl = '/import/files?context=' + userFactory.getCurrentContext();
+                    let walktype = userFactory.getWalkthrough();
+                    if (walktype) redirecturl += '&walkthrough=' + walktype;
+                    navigation().redirect(redirecturl);
+                },
+                hide: function(){
+                    $('#file-import').hide();
+                
+                },
+                show: function () {
+                    $('#file-import').show();
+                }
+            }
+        }
         
       
         
