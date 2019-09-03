@@ -107,9 +107,9 @@ Git clone this project into a folder, then you will also need to have npm Node.J
 
 in the main folder the project to install all the dependencies into `node_modules` folder.
 
-Check out the config.json.sample file and edit it to add your own Evernote and Twitter API credentials. 
-Then rename it to config.json.
-Create `statsabove.ejs` and `statsbelow.ejs` files in the `/views` folder.
+Check out the `config.json.sample` file and edit it to add your own Evernote and Twitter API credentials. 
+Then rename it to `config.json`.
+Create `statsabove.ejs`, `statsbelow.ejs` and `statsheader.ejs` files in the `/views` folder.
 
 Run the application with 
 `node app.js` 
