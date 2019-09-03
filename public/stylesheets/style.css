@@ -1459,7 +1459,7 @@ button:hover {
 #importpane {
     position: absolute;
     display: inline; /* show this only on small screens */
-    bottom: 25px;
+    bottom: 20px;
     left: 140px;
 }
 

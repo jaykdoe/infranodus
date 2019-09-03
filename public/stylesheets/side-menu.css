@@ -422,23 +422,24 @@ small screens.
 #google-import {
         position: relative;
         left: 0; /* "#menu width" */
-        text-align: center;
+        text-align: right;
         padding-top: 6px;
         padding-bottom: 6px;
-        padding-left: 10px;
+        padding-left: 20px;
         padding-right: 10px;
         background-color: #f5f5f5;
-        
         color: #666;
         font: 15px 'IstokWeb-Regular',sans-serif;
         /* width: 32px;
         height: 32px;
         float: right; */
         z-index: 10;
-        /* background-image: var(--google-import-background-image);
-        opacity: var(--google-import-link-opacity); */
-        /* background-repeat:no-repeat;
-        background-position:center; */
+        background-image: var(--google-import-background-image);
+        opacity: var(--google-import-link-opacity); 
+        background-repeat: no-repeat!important;
+        display: block;
+        width: 60px;
+        background-position: 7px 6px; 
         /* pointer-events: auto!important;   */
 }
 
