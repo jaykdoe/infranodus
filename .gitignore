@@ -5,6 +5,7 @@ lib/sandbox
 *.log
 views/statsabove.ejs
 views/statsbelow.ejs
+views/statsheader.ejs
 
 # NPM
 node_modules
