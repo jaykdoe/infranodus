@@ -938,6 +938,15 @@ input#addcontextsubmit {
     color: #cfcfcf!important;
 }
 
+#biascaption {
+    font: 13px 'IstokWeb-Regular',sans-serif;
+    line-height: 15px;
+}
+
+#biascaption:after {
+    content: attr(data-after);
+    font: 13px 'IstokWeb-Bold',sans-serif;
+}
 
 
 
