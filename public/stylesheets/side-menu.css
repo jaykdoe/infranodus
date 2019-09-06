@@ -1049,6 +1049,20 @@ Hides the menu at `48em`, but modify this based on your app's needs.
         padding-right: 3px;
     }
 
+
+    #google-import {
+        font: 12px 'IstokWeb-Regular',sans-serif;
+        width: 46px;
+       
+    }
+
+
+    #file-import {
+        font: 12px 'IstokWeb-Regular',sans-serif;
+        position: relative;
+        width: 28px;
+    }
+
     textarea {
         max-height: 80px!important;
     }
