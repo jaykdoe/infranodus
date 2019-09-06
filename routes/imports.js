@@ -54,6 +54,7 @@ var options = require('../options')
 
 var max_length = options.settings.max_text_length
 var max_total_length = options.settings.max_total_text_length
+var max_file_length = options.settings.max_file_length
 
 const https = require('https');
 
@@ -1473,11 +1474,13 @@ exports.submit = function(req, res, next) {
 
         var process_type = 'classes'
 
-        if (req.files.uploadedFile.size > max_total_length) {
+        // Check the size of the uploaded file
+
+        if (req.files.uploadedFile.size > max_file_length) {
             res.error(
                 'Sorry, this file exceeds the maximum of ' +
-                    max_total_length +
-                    ' bytes. You can contact us directly to process longer files.'
+                    max_file_length +
+                    ' bytes. You can contact us directly to process longer files or install a hosted version.'
             )
             res.redirect('back')
         }
@@ -1486,10 +1489,11 @@ exports.submit = function(req, res, next) {
 
         var removeduplicates = req.body.removeduplicates
 
+        // Determine the type of file
         // Is the file uploaded and is it a text / html one?
         if (
             req.files &&
-            req.files.uploadedFile.size < max_total_length &&
+            req.files.uploadedFile.size <= max_file_length &&
             (filetype == 'text/html' ||
                 filetype == 'text/plain' ||
                 filetype == 'application/pdf' ||
@@ -1527,15 +1531,19 @@ exports.submit = function(req, res, next) {
             if (req.body.context.length > 0) {
                 requestedContext = importContext
             } else {
+                // If it's a CSV with a setting we save it into the different context graphs
                 if (filetype == 'text/csv' && titlefield.length > 0) {
                     // Do nothing
                 } else {
+                    // No context graph was specified.
                     res.error(
                         'Please, specify which graph / context you want to save the text in.'
                     )
                     res.redirect('back')
                 }
             }
+
+            // Get the context
 
             requestedContext = processContext(requestedContext)
 
@@ -1928,7 +1936,7 @@ exports.submit = function(req, res, next) {
                                         })
                                     }
                                 }
-                                // if it's a book
+                                // if it's a book, a TXT or a PDF file
                                 else if (
                                     filetype == 'text/plain' ||
                                     filetype == 'application/pdf'
@@ -1961,7 +1969,7 @@ exports.submit = function(req, res, next) {
                                                     }
                                                 } else if (item.text) {
                                                     PDFtextfull +=
-                                                        item.text + ' \r\n'
+                                                        item.text + ' '
                                                 }
                                             }
                                         )
@@ -1970,6 +1978,7 @@ exports.submit = function(req, res, next) {
                                     // Standard text file
                                     else {
                                         if (filecontents.length > 0) {
+                                            
                                             saveFileAtOnce(
                                                 filecontents,
                                                 contexts
@@ -2099,6 +2108,7 @@ exports.submit = function(req, res, next) {
                     )
                 }
             })
+        // End of the file upload IF    
         }
 
         // Did not recognive the filetype
@@ -2133,6 +2143,7 @@ exports.submit = function(req, res, next) {
 
             entries.submit(req, res)
         }
+
     } else if (service == 'url') {
         // TODO fix savehighlight function for multiple items
         // TODO do the same above in the file upload

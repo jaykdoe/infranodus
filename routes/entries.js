@@ -141,6 +141,7 @@ exports.submit = function(req, res, next) {
     // Some parameter settings
     var max_length = options.settings.max_text_length
     var max_total_length = options.settings.max_total_text_length
+    var max_file_length = options.settings.max_file_length
     var min_length = options.settings.min_text_length
     var maxhash = options.settings.max_hashtags
 
@@ -207,10 +208,10 @@ exports.submit = function(req, res, next) {
         [
             function(callback) {
                 // Perform async Waterfall for as many times as there are statements
-                if (currenttextlength > max_total_length) {
+                if (currenttextlength > max_file_length) {
                     callback(
                         'The text you entered was more than ' +
-                            max_total_length +
+                            max_file_length +
                             ' characters, please, cut it or contact us to process it.'
                     )
                 } else {
@@ -298,6 +299,8 @@ exports.submit = function(req, res, next) {
                                     uid: st_uid,
                                 })
                                 entryName = statementName
+
+                                
                             }
                         } else {
                             for (var i = 0; i < mentions.length; i++) {
@@ -342,17 +345,39 @@ exports.submit = function(req, res, next) {
                 // We create various fields and values for that object and initialize it
 
                 // Create a new entry object, so we can perform actions on it
-                var entry = new Entry({
-                    by_uid: res.locals.user.uid,
-                    by_id: res.locals.user.uid,
-                    by_name: res.locals.user.name,
-                    contexts: contexts,
-                    statements: prepStatements,
-                    fullscan: res.locals.user.fullscan,
-                    addmentions: res.locals.user.mentions,
-                })
 
-                callback(null, entry, prepStatements)
+                let submitStatements = [];
+                let total_st_length = 0;
+
+                for (var st = 0; st < prepStatements.length; st++) {
+                    submitStatements.push(prepStatements[st]);
+                    total_st_length += prepStatements[st].text.length;
+                    if (total_st_length > max_total_length) {
+                        submitEntry();
+                        submitStatements = [];
+                        total_st_length = 0;
+                    }
+                    
+                }
+                if (total_st_length > 0 && total_st_length <= max_total_length) {
+                    submitEntry();
+                }
+
+                function submitEntry() {
+
+                      var entry = new Entry({
+                        by_uid: res.locals.user.uid,
+                        by_id: res.locals.user.uid,
+                        by_name: res.locals.user.name,
+                        contexts: contexts,
+                        statements: prepStatements,
+                        fullscan: res.locals.user.fullscan,
+                        addmentions: res.locals.user.mentions,
+                    })
+    
+                    callback(null, entry, prepStatements)
+                }
+               
             },
         ],
         function(err, entry, prepStatements) {
@@ -389,7 +414,6 @@ exports.submit = function(req, res, next) {
                                 res.json({ message: 'Entry added.' })
                             } else if (req.internal) {
                                 // next();
-                                // console.log("internal req");
 
                                 // This was some import or multiple statements add feature and we just reload the page with results
                                 neo4jdriver.close();
@@ -440,6 +464,8 @@ exports.submit = function(req, res, next) {
                                     )
                                 }
                             } else {
+                                // Here is where the file import goes
+
                                 // Here we deleted a statement or edited it, or deleted the whole context
                                 if (
                                     req.body.delete == 'delete' ||
@@ -468,6 +494,7 @@ exports.submit = function(req, res, next) {
                                     }
                                 } else {
                                     // The statement fit within our maxlength limits and is only one
+
                                     // TODO eventually could be several statements
                                     if (splitStatements.length == 1) {
                                         var receiver = res.locals.user.uid

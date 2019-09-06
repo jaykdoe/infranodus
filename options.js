@@ -30,6 +30,9 @@ exports.settings = {
     // Max length of the total text length in Bytes
     max_total_text_length: 300000,
 
+     // Max length of the total file length in Bytes
+    max_file_length: 3000000,
+
     // Min length of a statement text
     min_text_length: 0,
 
