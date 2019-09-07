@@ -336,6 +336,9 @@
                     graphFactory.createInsightClusters(topN_communities);
 
                     let insightClusters = graphFactory.getInsightClusters();
+                    console.log('insightClusters')
+
+                    console.log(insightClusters)
 
                     // Populate Analytics Panel with insight recommendation
                     analyticsPanel.populateRecommendation(insightClusters);
