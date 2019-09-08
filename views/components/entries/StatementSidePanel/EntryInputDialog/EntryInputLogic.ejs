@@ -91,11 +91,15 @@
                 },
                 hideFooter: function(){
                 //  deleteContextButton().hide()
+                    importPane().hide();
                     importLinkButton().hide();
+                    importFileButton().hide();
                 },
                 showFooter: function(){
                 //  deleteContextButton().show()
+                    importPane().show();
                     importLinkButton().show();
+                    importFileButton().show();
                 },
                 changeModeTo: function(mode) {
                     addEntryPanelFactory.setMode(mode);
