@@ -40,6 +40,7 @@ improveLayoutButton().onClick(adjustGraphLayout);
 abstractLayoutButton().onLoad();
 abstractLayoutButton().onClick(abstractGraphLayout);
 tutorialButton().onClick(activateTutorial);
+manualButton().onClick(launchManual);
 themeSwitchButton().onClick(toggleTheme);
 zoomInButton().onClick(zoomInGraph);
 zoomOutButton().onClick(zoomOutGraph);
@@ -74,6 +75,14 @@ function tutorialButton() {
     return {
         onClick: function(onClick) {
             $('#walkthrough').on('click', onClick)
+        }
+    }
+}
+
+function manualButton() {
+    return {
+        onClick: function(onClick) {
+            $('#manualsupport').on('click', onClick)
         }
     }
 }
@@ -113,6 +122,10 @@ function zoomOutButton() {
 function activateTutorial() {
     walkthrough = 'default';
     initializeWalkthrough();
+}
+
+function launchManual() {
+    console.log('manual launched');
 }
 
 function abstractLayoutButton() {

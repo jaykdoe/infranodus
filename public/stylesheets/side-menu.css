@@ -15,6 +15,9 @@
     --walkthrough-button-opacity: 1;
     --walkthrough-button-background-image: url('/images/question.png')!important;
 
+    --manual-button-opacity: 1;
+    --manual-button-background-image: url('/images/manual.png')!important;
+
     --adjustsettings-button-opacity: 0.8;
     --adjustsettings-button-background-image: url('/images/settings.png')!important;
 
@@ -76,6 +79,10 @@
     --abstract-layout-background-image: url('/images/diamond-white.png')!important;
     --walkthrough-button-opacity: 0.6;
     --walkthrough-button-background-image: url('/images/question-white.png')!important;
+
+
+    --manual-button-opacity: 0.8;
+    --manual-button-background-image: url('/images/manual-white.png')!important;
 
     --adjustsettings-button-opacity: 0.6;
     --adjustsettings-button-background-image: url('/images/settings-white.png')!important;
@@ -820,6 +827,23 @@ small screens.
     background: none;
     background-image: var(--walkthrough-button-background-image);
     opacity: var(--walkthrough-button-opacity);
+    background-repeat:no-repeat;
+    background-position:center;
+  }
+
+
+  #manualsupport {
+    position: fixed;
+    top: 395px;
+    font-size: 8px; /* change this value to increase/decrease button size */
+    width: 2em;
+    height: 25px;
+    right: 0; /* "#menu width" */
+    padding: 0em 2.5em;
+    z-index: 11;
+    background: none;
+    background-image: var(--manual-button-background-image);
+    opacity: var(--manual-button-opacity);
     background-repeat:no-repeat;
     background-position:center;
   }
