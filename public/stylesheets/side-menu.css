@@ -165,15 +165,27 @@
 
 #manualFrame {
     position: absolute;
-    width: 450px;
+    width: 449px;
     height: 100%;
     top: 0;
     right: 0;
     bottom: 0;
     overflow-y: auto;
+    border-left:1px solid #ccc;
     -webkit-overflow-scrolling: touch;
 }
 
+#insideIFrame {
+    height: 100%;
+    background:'';
+}
+
+#loadingMes {
+    position: absolute;
+    transform: translate(-50%,-57%);
+    left: 50%;
+    top: 57%;
+}
 
 
 /*
@@ -927,6 +939,11 @@ small screens.
     background-image: url('/images/diamond-blue.png')!important;
     background-repeat:no-repeat!important;
     background-position:center!important;
+}
+
+.manual-on {
+    opacity: 1!important;
+    background-image: url('/images/manual-blue.png')!important;
 }
 
 
