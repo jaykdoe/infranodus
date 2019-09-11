@@ -270,7 +270,6 @@ textarea:focus {
   display: none;
   top: 0;
   left: 50px;
-  
 }
 
 #expsummary {
@@ -301,7 +300,6 @@ textarea:focus {
     border-radius: 5px;
     box-shadow: var(--entry-box-shadow);  
     top: 0;
-    z-index: 6;
     max-width: 280px;
     font: 14px 'IstokWeb-Regular',sans-serif;
     font-style: italic;
