@@ -138,13 +138,18 @@
 }
 
 #layout {
-    position: relative;
+    position: absolute;
     padding-left: 0;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    top: 0px;
 }
 #layout.active {
-    position: relative;
+    
     left: 180px;
 }
+
 #layout.active #menu {
     left: 180px;
     width: 180px;
@@ -153,6 +158,23 @@
 #layout.active .menu-link {
     left: 180px;
 }
+
+#layout.sidebar {
+    right: 450px;
+}
+
+#manualFrame {
+    position: absolute;
+    width: 450px;
+    height: 100%;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+}
+
+
 
 /*
 The `#menu` `<div>` is the parent `<div>` that contains the `.pure-menu` that
@@ -170,7 +192,6 @@ appears on the left side of the page.
   padding-right: 10px;
   list-style: none;
 }
-
 
 
 
@@ -324,7 +345,10 @@ small screens.
 
 
 #controls {
+    position: absolute;
+    display: block;
     top: 40px;
+    right: 0px;
 }
 
 #statements-toggle {
@@ -642,7 +666,7 @@ small screens.
 
     margin-top: 0px;
     background: none;
-    position: fixed;
+    position: absolute;
     display: block;
     top: 0;
     right: 0; /* "#menu width" */
@@ -778,8 +802,8 @@ small screens.
 }
 
 #improve-layout {
-  position: fixed;
-  top: 125px;
+  position: absolute;
+  top: 85px;
   font-size: 8px; /* change this value to increase/decrease button size */
   width: 2em;
   height: 25px;
@@ -797,8 +821,8 @@ small screens.
 
 
 #abstract-layout {
-  position: fixed;
-  top: 165px;
+  position: absolute;
+  top: 125px;
   font-size: 8px; /* change this value to increase/decrease button size */
   width: 2em;
   height: 25px;
@@ -816,8 +840,8 @@ small screens.
 
 
 #walkthrough {
-    position: fixed;
-    top: 245px;
+    position: absolute;
+    top: 205px;
     font-size: 8px; /* change this value to increase/decrease button size */
     width: 2em;
     height: 25px;
@@ -833,8 +857,8 @@ small screens.
 
 
   #manualsupport {
-    position: fixed;
-    top: 395px;
+    position: absolute;
+    top: 355px;
     font-size: 8px; /* change this value to increase/decrease button size */
     width: 2em;
     height: 25px;
@@ -850,8 +874,8 @@ small screens.
 
 
 #adjustsettings {
-    position: fixed;
-    top: 285px;
+    position: absolute;
+    top: 245px;
     font-size: 8px; /* change this value to increase/decrease button size */
     width: 2em;
     height: 25px;
@@ -866,8 +890,8 @@ small screens.
   }
 
   #themeswitch {
-    position: fixed;
-    top: 205px;
+    position: absolute;
+    top: 165px;
     font-size: 8px; /* change this value to increase/decrease button size */
     width: 2em;
     height: 25px;
@@ -907,7 +931,7 @@ small screens.
 
 
 #graph-tools {
-    position: fixed;
+    position: absolute;
     display: none;
     top: 320px;
     text-align: right;
@@ -1040,7 +1064,7 @@ Hides the menu at `48em`, but modify this based on your app's needs.
     #graph-link {
         margin-top: 0px;
         background: none;
-        position: fixed;
+        position: absolute;
         display: block;
         top: 0;
         right: 0; /* "#menu width" */

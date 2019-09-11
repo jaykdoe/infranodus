@@ -12,9 +12,10 @@
 <!-- Load collaboration and graphFactory modules - before the rest -->
 <%- include('components/entries/index') %>
 
-<body>
+<body style="overflow-y:hidden; overflow-x:hidden; height:100%;">
 <!-- JS Statistics that should load before everything else -->
 <% include statsabove %>
+
 <div id="layout">
     <!-- Menu toggle -->
     <a href="#menu" id="menuLink" class="menu-link researchpane">
@@ -72,7 +73,15 @@
 
       </div>
 
+   
+
 </div>
+
+<div id="manualFrame">
+    <iframe id="manualIFrame" class="manualIFrame" width="450" height="100%" data-src="https://help.infranodus.com" frameborder="0" allowfullscreen></iframe>
+</div>
+
+
 <!-- Here we start with all the Javascript -->
 
 <!-- First the logic for statements then for the whole statements panel -->

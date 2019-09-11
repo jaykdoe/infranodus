@@ -121,11 +121,25 @@ function zoomOutButton() {
 
 function activateTutorial() {
     walkthrough = 'default';
-    initializeWalkthrough();
+    initializeWalkthrough(walkthrough);
 }
 
 function launchManual() {
-    console.log('manual launched');
+    
+    // let modal = document.getElementById('manualFrame');
+    // let layout = document.getElementById('layout');
+    // embed.setAttribute('src', embed.getAttribute('data-src'));
+
+    let layout = document.getElementById('layout');
+    toggleClassForElement(layout, 'sidebar')
+    // $('#layout').css('right', '450px')
+    
+    let iframe = document.getElementById('manualIFrame');
+
+
+    iframe.setAttribute('src', iframe.getAttribute('data-src'));
+
+   // $('#manualFrame').load('https://help.infranodus.com');
 }
 
 function abstractLayoutButton() {
