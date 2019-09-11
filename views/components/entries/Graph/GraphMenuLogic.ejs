@@ -127,7 +127,16 @@ function activateTutorial() {
 function launchManual() {
     
     let layout = document.getElementById('layout');
-    toggleClassForElement(layout, 'sidebar')
+    toggleClassForElement(layout, 'sidebar');
+
+    if ($('#layout').hasClass('sidebar')) {
+        $('#manualsupport').addClass('manual-on');
+        $('#manualFrame').show();
+    }
+    else {
+        $('#manualsupport').removeClass('manual-on');
+        $('#manualFrame').hide();
+    }
     
     let iframe = document.getElementById('manualIFrame');
 
@@ -140,12 +149,7 @@ function launchManual() {
         });
     }
 
-    if ($('#layout').hasClass('sidebar')) {
-        $('#manualsupport').addClass('manual-on');
-    }
-    else {
-        $('#manualsupport').removeClass('manual-on');
-    }
+  
    
 }
 

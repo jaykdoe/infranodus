@@ -14,6 +14,7 @@
 </head>
 <body>
 <% include statsabove %>
+<div id="wrapperService">
 <div id="layout">
     <!-- Menu toggle -->
     <a href="#menu" id="menuLink" class="menu-link">
@@ -36,7 +37,8 @@
                   Welcome to InfraNodus, <em><%= user.name %></em>. Using this platform you can visualize any text as a network graph. 
               </div>
               <a href="javascript:" onclick="$('#menuLink').click();" class="bigbuttontop">List Your Existing Graphs</a>
-            <div class='welcometitle'>Try out some applications to see how it works:</div>
+              <a href="javascript:" id="manual" class="bigbuttontop">Read the Manual</a>
+              <div class='welcometitle'>Try out some applications to see how it works:</div>
           </div> 
           <div id="appslist">
             
@@ -88,14 +90,18 @@
         </div>
 
 
-
     </div>
 
 
 
 
 </div>
-
+<div id="manualFrame">
+    <div id="insideIFrame"><span id="loadingMes">Loading the manual...</span>
+        <iframe id="manualIFrame" class="manualIFrame" width="450" height="100%" data-src="https://help.infranodus.com" frameborder="0" allowfullscreen></iframe>
+    </div>
+</div>
+</div>
 
 <script src="/javascripts/jquery.min.js"></script>
 <script src="/javascripts/jquery-ui.min.js"></script>
@@ -110,7 +116,51 @@
 <script>
     ;(function(){
 
+      function toggleClassForElement(element, className) {
+        var classes = element.className.split(/\s+/),
+            length = classes.length,
+            i = 0;
+
+        for(; i < length; i++) {
+          if (classes[i] === className) {
+            classes.splice(i, 1);
+            break;
+          }
+        }
+        // The className is not found
+        if (length === classes.length) {
+            classes.push(className);
+        }
+
+        element.className = classes.join(' ');
+    }
+
         var cleared_to_submit = 0;
+
+        $('#manual').click(function() {
+          let layout = document.getElementById('layout');
+          toggleClassForElement(layout, 'sidebar');
+
+          if ($('#layout').hasClass('sidebar')) {
+              $('#manual').text('Close the Manual');
+              $('#manualFrame').show();
+          }
+          else {
+              $('#manual').text('Read the Manual');
+              $('#manualFrame').hide();
+          }
+          
+          let iframe = document.getElementById('manualIFrame');
+
+          if (!iframe.getAttribute('src'))  {
+              $("#insideIFrame").css('background','url(/images/loading-large.gif) center center no-repeat');
+              iframe.setAttribute('src', iframe.getAttribute('data-src'));
+              $('#manualIFrame').load(function(){
+                  $("#loadingMes").remove();
+                  $("#insideIFrame").css('background','');
+              });
+          }
+        });
 
         $('form#submitform').submit(function(event){
 

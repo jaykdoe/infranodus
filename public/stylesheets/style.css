@@ -163,6 +163,17 @@ a {
     overflow-x:hidden; 
 }
 
+#wrapperService {
+    position: fixed;
+    left: 0;
+    top: 0;
+    min-height: 100%;
+    width: 100%;
+    background: var(--graph-background);
+    margin: 0 auto 0;
+    overflow: scroll;
+}
+
 textarea {
     font: 16px 'IstokWeb-Bold',sans-serif;
     position: relative;
@@ -1575,11 +1586,11 @@ button:hover {
 }
 
 #maincontent {
-    position: absolute;
+    position: relative;
     top: 0;
     bottom: 0;
     height: 100%;
-    background-color: rgba(255, 255, 255, 0);
+    background: var(--graph-background);
     max-width: 700px;
     padding-left: 50px;
     z-index: 1;
@@ -1678,7 +1689,7 @@ button:hover {
     padding-right: 15px;
     margin-top: 10px;
     margin-right: 25px;
-    margin-bottom: 25px;
+    margin-bottom: 10px;
     text-align: right;
     text-decoration: none!important;
     color: #555555!important;

@@ -144,6 +144,7 @@
     right: 0px;
     bottom: 0px;
     top: 0px;
+    height: 100%;
 }
 #layout.active {
     
@@ -165,6 +166,7 @@
 
 #manualFrame {
     position: absolute;
+    display: none;
     width: 449px;
     height: 100%;
     top: 0;
@@ -1073,6 +1075,20 @@ Hides the menu at `48em`, but modify this based on your app's needs.
 
     #maincontent {
         max-width: 320px;
+    }
+
+    #manualFrame {
+        position: absolute;
+        display: none;
+        width: 349px;
+        height: 100%;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        overflow-y: auto;
+        border-left:1px solid #ccc;
+        z-index: 400;
+        -webkit-overflow-scrolling: touch;
     }
 
 
