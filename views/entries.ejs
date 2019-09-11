@@ -12,10 +12,11 @@
 <!-- Load collaboration and graphFactory modules - before the rest -->
 <%- include('components/entries/index') %>
 
-<body style="overflow-y:hidden; overflow-x:hidden; height:100%;">
+<body>
 <!-- JS Statistics that should load before everything else -->
 <% include statsabove %>
 
+<div id="wrapper">
 <div id="layout">
     <!-- Menu toggle -->
     <a href="#menu" id="menuLink" class="menu-link researchpane">
@@ -81,6 +82,8 @@
     <div id="insideIFrame"><span id="loadingMes">Loading the manual...</span>
         <iframe id="manualIFrame" class="manualIFrame" width="450" height="100%" data-src="https://help.infranodus.com" frameborder="0" allowfullscreen></iframe>
     </div>
+</div>
+
 </div>
 
 
