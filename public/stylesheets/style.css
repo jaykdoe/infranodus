@@ -1536,6 +1536,11 @@ button:hover {
 /*    pointer-events: none;*/
 }
 
+.topintro {
+    padding-top: 5px;
+    font-size: 16px;
+}
+
 #welcomemessage {
     position: relative;
     left: 14px;

@@ -14,6 +14,7 @@
 </head>
 <body>
 <% include statsabove %>
+<div id="wrapperService">
 <div id="layout">
     <!-- Menu toggle -->
     <a href="#menu" id="menuLink" class="menu-link">
@@ -29,10 +30,11 @@
     <div id='content'>
 
         <div id='welcomemessage'>
-
-            Visualize the #hashtags and words used in tweets that contain the following hashtag:
+            <div class="topintro">
+            Visualize a network of words used on Twitter by a certain user, with a hashtag or a search term:
+            </div>
             <% include messages %>
-            <br>&nbsp;
+            <br>&nbsp;<br>
             <form action='/import' name='submitform' id="submitform" method='post' enctype="multipart/form-data" class='pure-form pure-form-stacked'>
             <input id="source1" type="hidden" name="source" value="twitter">
               <div id="inputplace"></div>
@@ -40,75 +42,65 @@
 
 
                 <div id="searchtermbox">
-                Hashtag / Searchterm:
-                <br>
-
-                <input type='text' name='search' id="search" placeholder='@username or #hashtag' value="<% if (fornode) { %><%= fornode %><% } else { %>news<%} %>" />
-
+                    Hashtag / Search Term / Account:
+                    <br>
+                    <label for="searchinput" class="pure-input">
+                        <input type='text' name='search' id="searchinput" placeholder='@username or #hashtag' value="<% if (fornode) { %><%= fornode %><% }  %>">
+                        @username, #hashtag or keyword. For additional settings click below.
+                    </label>    
                 </div>
+                
+    
 
-<br>&nbsp;<br>
-  <div id="savelists">
-
-                Save in Context:
-                <br>
-                <input type='text' name='context' value='<% if (context) {  %><%= context %><% } else { %>twitter<% } %>'/>
-                <br>
-</div>
-
-
-                <div id="howmanyposts">
-                How Many Recent Posts:
-                <input type='text' name='limit' value='100' />
-                <br>
+                <div id="listview" style="display: none">
+                     &nbsp;<br>
+                     URL of the Twitter List (or slug):
+                     <br>
+                     <label for="listname" class="pure-input">
+                        <input type="text" name="listname" id="listname" value="" placeholder='dataviz' />
+                        Enter the full URL of the Twitter list or its last part (the list's name).
+                    </label>
+ 
                 </div>
-
-                <div id="importsettings">
-                Settings:
-                <label for="settings1" class="pure-radio">
-                    <input id="settings1" type="radio" name="settings" value="morphemes">
-                    Process both hashtags and words
-                </label>
-
-                <label for="settings2" class="pure-radio">
-                    <input id="settings2" type="radio" name="settings" value="hashtags" checked>
-                    Process only hashtags
-                </label>
-                <br>
-
-                <a href="javascript:" id="advancedpane">+ settings</a>
-                <br>
+                &nbsp;<br>
+                <a href="javascript:" id="advancedpane">+ show advanced settings</a>
+                <br>&nbsp;<br>
                 <div id="twittersetting">
-                Extract:
-                <label for="extract1" class="pure-radio">
-                    <input id="extract1" type="radio" name="extract" value="user">
-                    graph of words used by a user
-                </label>
+                Advanced Twitter Import Settings:
+
+                    <label for="extract5" class="pure-radio">
+                            <input id="extract5" type="radio" name="extract" value="lists">
+                            tweets from a user's twitter list
+                    </label>
+
+                    <label for="extract4" class="pure-radio">
+                            <input id="extract4" type="radio" name="extract" value="tophashtag" checked>
+                            top tweets in english with a hashtag
+                    </label>
+
+                    <label for="extract1" class="pure-radio">
+                        <input id="extract1" type="radio" name="extract" value="user">
+                        graph of words used by a user
+                    </label>
 
                     <label for="extract2" class="pure-radio">
                         <input id="extract2" type="radio" name="extract" value="timeline">
                         graph of words in user's timeline
                     </label>
 
-                <label for="extract3" class="pure-radio">
-                    <input id="extract3" type="radio" name="extract" value="hashtag">
-                    graph of words used with a hashtag
-                </label>
+                    <label for="extract3" class="pure-radio">
+                        <input id="extract3" type="radio" name="extract" value="hashtag">
+                        graph of words used with a hashtag
+                    </label>
 
-               <label for="extract4" class="pure-radio">
-                        <input id="extract4" type="radio" name="extract" value="tophashtag" checked>
-                        top tweets in english with a hashtag
-               </label>
+                   
+                    &nbsp;<br>
 
+                
 
-                <label for="extract5" class="pure-radio">
-                        <input id="extract5" type="radio" name="extract" value="lists">
-                        tweets from a list
-                </label>
-
-                <label for="extractfilter" class="pure-checkbox">
-                        <input id="extractfilter" type="checkbox" name="excludesearchterm" value="1" checked> exclude search term from the graph<br>
-                </label>
+                    <label for="extractfilter" class="pure-checkbox">
+                            <input id="extractfilter" type="checkbox" name="excludesearchterm" value="1" checked> exclude search term from the graph<br>
+                    </label>
 
                     <label for="showtwitters" class="pure-checkbox">
                         <input id="showtwitters" type="checkbox" name="showtwitters" value="1"> show originating twitter accounts in graph<br>
@@ -126,6 +118,36 @@
 
                 </div>
 
+
+                <div id="savelists">
+                        &nbsp;<br>
+                    Save into Context Graph:
+                    <br>
+                    <input type='text' name='context' placeholder='graph_name' value='<% if (context) {  %><%= context %><% } else { %>twitter<% } %>'/>
+                    <br>
+                </div>
+
+
+                <div id="howmanyposts">
+                How Many Recent Posts:
+                <input type='text' name='limit' value='200' />
+                <br>
+                </div>
+
+                <div id="importsettings">
+                Include only Hashtags?
+                <label for="settings1" class="pure-radio">
+                    <input id="settings1" type="radio" name="settings" value="morphemes">
+                    Process both hashtags and words
+                </label>
+
+                <label for="settings2" class="pure-radio">
+                    <input id="settings2" type="radio" name="settings" value="hashtags" checked>
+                    Process only hashtags
+                </label>
+                <br>
+
+               
 
                 </div>
 
@@ -151,6 +173,7 @@
 
 
 </div>
+</div>
 
 
 <script src="/javascripts/jquery.min.js"></script>
@@ -173,13 +196,13 @@
       $("#advancedpane").click(function() {
           if (!advancedpane) {
       //    $("#advancedsettings").show();
-          $("#advancedpane").text('– settings');
+          $("#advancedpane").text('– hide advanced settings');
           $("#twittersetting").show();
           advancedpane = 1;
           }
           else {
         //  $("#advancedsettings").hide();
-          $("#advancedpane").text('+ settings');
+          $("#advancedpane").text('+ show advanced settings');
           $("#twittersetting").hide();
           advancedpane = 0;
 
@@ -187,10 +210,32 @@
 
       });
 
+      var radioButtons = $("[name=extract]"); // get both radiobuttons
 
-        $('form#submitform').submit(function(){
-            $(this).find('input[type=submit]').attr('disabled', 'disabled');
-        });
+      radioButtons.change(function () {
+            if ($(this).val() === "lists") {
+                $("#listview").show();
+               
+            }
+            else
+            {
+                $("#listview").hide();
+            }
+     });
+
+
+    $('form#submitform').submit(function(){
+        $(this).find('input[type=submit]').attr('disabled', 'disabled');
+    });
+
+    $("#listname").on('change',function () {
+
+        let listuser = $('#listname').val().split("/").reverse()[2];
+        
+        if (listuser) {
+            $('#searchinput').val('@' + $('#listname').val().split("/").reverse()[2]);
+        }
+    });
 
 
 

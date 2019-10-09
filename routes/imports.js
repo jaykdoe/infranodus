@@ -375,7 +375,7 @@ exports.submit = function(req, res, next) {
         twitterRequest = {
             type: 'statuses/user_timeline',
             params: {
-                screen_name: searchString.substr(1),
+                screen_name: searchString.split("@").pop(),
                 count: limit,
             },
         }
@@ -401,17 +401,19 @@ exports.submit = function(req, res, next) {
         twitterRequest = {
             type: 'friends/ids',
             params: {
-                screen_name: searchString.substr(1),
+                screen_name: searchString.split("@").pop(),
                 count: limit,
             },
         }
     } else if (service == 'twitter' && extract == 'lists') {
-        var listname = req.body.listname
+        var listname = req.body.listname.split("/").pop();
+        var listuser = searchString.split("@").pop();
+        if (!listuser) listuser = req.body.listname.split("/").reverse()[2];
         twitterRequest = {
             type: 'lists/statuses',
             params: {
                 slug: listname,
-                owner_screen_name: searchString.substr(1),
+                owner_screen_name: listuser,
                 count: limit,
             },
         }
