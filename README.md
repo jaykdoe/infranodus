@@ -38,9 +38,9 @@ InfraNodus is a non-commercial [venture fiction](https://noduslabs.com/research/
 * Reveal the gaps in a network (and, thus, the potential for new ideas/connections)
 * Provide network metrics, identify the main communities and top nodes
 
-The method is mainly based on the approach outlined in Paranyushkin (2011) **[Identifying the Pathways of Meaning Circulation Using Text Network Analysis](https://noduslabs.com/research/pathways-meaning-circulation-text-network-analysis/)**. 
+The method is mainly based on the approach outlined in Paranyushkin (2011) **[Identifying the Pathways of Meaning Circulation Using Text Network Analysis](https://noduslabs.com/research/pathways-meaning-circulation-text-network-analysis/)**.
 
-A more precise description of InfraNodus' algorithm is presented in Paranyushkin (2019) **[InfraNodus — Generating Insight Using Text Network Analysis](http://bit.ly/infragitpdf)** (published in the [Proceedings for the WWW'19 The Web Conference](http://bit.ly/infragitacm)). If you use the tool, you can cite this paper. 
+A more precise description of InfraNodus' algorithm is presented in Paranyushkin (2019) **[InfraNodus — Generating Insight Using Text Network Analysis](http://bit.ly/infragitpdf)** (published in the [Proceedings for the WWW'19 The Web Conference](http://bit.ly/infragitacm)). If you use the tool, you can cite this paper.
 
 A more easy-to-read article on the tool is published in **[Towards Data Science](https://towardsdatascience.com/measuring-discourse-bias-using-text-network-analysis-9f251be5f6f3)**.
 
@@ -74,11 +74,11 @@ The basic ideas behind InfraNodus are:
 InfraNodus is built on
 
 * [Sigma.Js](http://github.com/jacomyal/sigma.js) for graph visualization;
-* [Neo4J](http://neo4j.org) ver 3.x for graph database storage 
+* [Neo4J](http://neo4j.org) ver 3.x for graph database storage
 * [Graphology](https://graphology.github.io/) for graph metrics calculations (Modularity)
 * [JSNetworksX](http://jsnetworkx.org/) for graph metrics calculations (BC)
 * [Cytoscape](https://github.com/cytoscape/cytoscape.js) for some graph metrics
-* jQuery for the front-end 
+* jQuery for the front-end
 * Node.Js for the back-end
 * Express Node.Js library;
 * [Node-Neo4J layer](http://github.com/philippkueng/node-neo4j);
@@ -90,16 +90,45 @@ InfraNodus is built on
 
 
 ### Installation Guide
+
+#### Run on the cloud
+To run InfraNodus on the cloud, go to [www.infranodus.com](https://infranodus.com). 
+
+
+#### Run directly on your machine
 To use this software you should install Neo4J 3.0 on your local computer.
 To install Neo4J on a Mac use homebrew (see [Neo4J instructions here](http://www.neo4j.org/download)).
 For settings, check out [How to Set Up Neo4J for InfraNodus](https://github.com/noduslabs/infranodus/wiki/Neo4J-Database-Setup).
 You may also find [other wiki pages](https://github.com/noduslabs/infranodus/wiki/_pages) interesting, especially [Neo4J installation guide](https://github.com/noduslabs/infranodus/wiki/Upgrading-Your-Neo4J-Database-from-2.x-to-3.x) – the section on setting up indexes and installing APOC plugin.
 
 Git clone this project into a folder, then you will also need to have npm Node.Js package manager installed on your computer. After you install InfraNodus, run
+
 `npm install`
+
 in the main folder the project to install all the dependencies into `node_modules` folder.
 
-Check out the config.json.sample file and edit it to add your own Evernote and Twitter API credentials. Then rename it to config.json.
+Check out the `config.json.sample` file and edit it to add your own Evernote and Twitter API credentials. 
+Then rename it to `config.json`.
+Create `statsabove.ejs`, `statsbelow.ejs` and `statsheader.ejs` files in the `/views` folder.
+
+Run the application with 
+`node app.js` 
+
+You can access the app from http://localhost:3000
+
+To create an account on your local machine, visit http://localhost:3000/signup?invitation=secretcode - replace `secretcode` with the value of `secrets.invitation` in your `config.json`. In this case, please, consider becoming a patron by signing up on [www.infranodus.com](http://infranodus.com) to support the development of this open source tool. Patrons get fast-track support and help on the technical issues of the installation.
+
+#### Run inside a Vagrant Virtual Machine
+
+1. `git clone` the project
+2. `cd infranodus` to switch into the git project directory
+3. `cp config.json.sample config.json` and modidy the file as necessary - for example, add Evernote and/or Twitter credentials. Note: if you change the Neo4j database password here, you'll also need to change it in your local copy of `/vagrant/setup-neo4j.sh`.
+4. `vagrant up` in the project folder. This may take a while the first time, as it installs an Ubuntu VM and all dependencies.
+5. `vagrant ssh` to logon to the Virtual Machine
+6. `cd /vagrant` to get into the project directory on the Virtual machine
+7. `node app.js` to run the application
+8. You can access the app from http://192.168.66.101:3000 - if you want a different IP address, change the `ip` setting under `config.vm.network` in the `vagrantfile`.
+9. To create an account on your local machine, visit http://192.168.66.101:3000/signup?invitation=secretcode - replace `secretcode` with the value of `secrets.invitation` in your `config.json`. In this case, please, consider becoming a patron by signing up on [www.infranodus.com](http://infranodus.com) to support the development of this open source tool. Patrons get fast-track support and help on the technical issues of the installation.
 
 =================
 
@@ -142,11 +171,11 @@ InfraNodus can also be used on a mobile.
 
 ### Python Port
 
-Together with Mattias Östmar (who did most of the work) we created a port of InfraNodus in Python, focusing on the measure of network diversity structure that it provides. 
+Together with Mattias Östmar (who did most of the work) we created a port of InfraNodus in Python, focusing on the measure of network diversity structure that it provides.
 
 You can get it in [DiscourseDiversity](https://gitlab.com/mattiasostmar/discoursediversity) repo on GitLab. We're still working on it, but if you like Jupyter notebooks and network analysis, there's some good stuff to find in there!
 
-* [InfraNodus in Python](https://gitlab.com/mattiasostmar/discoursediversity) 
+* [InfraNodus in Python](https://gitlab.com/mattiasostmar/discoursediversity)
 
 
 =================
@@ -154,10 +183,10 @@ You can get it in [DiscourseDiversity](https://gitlab.com/mattiasostmar/discours
 
 ### Special Thanks
 
-InfraNodus could not be built without the 
+InfraNodus could not be built without the
 * Help from the people on StackOverflow and Neo4J community;
 
-Also... :) 
+Also... :)
 * Special thanks to [Oleg Yarin](https://github.com/monapasan) for his support and to [Mattias Östmar](https://gitlab.com/mattiasostmar) for his energy and inspiration;
 
 
@@ -169,7 +198,7 @@ Also... :)
 
 This open source, free software is available under the GNU Affero General Public License version 3 (AGPLv3) license.
 You can make modifications to this code and binaries based on it, but only on the condition that you provide access to those modifications under the same license (including remotely  through a computer network).
-It is provided as is, with no guarantees and no liabilities. 
+It is provided as is, with no guarantees and no liabilities.
 You can re-use it as long as you keep this notice inside the code.
 
 **You are very welcome to join the project!**
@@ -181,7 +210,7 @@ This project would not be possible without the help from StackOverflow community
 Copyright (C) [Dmitry Paranyushkin](http://github.com/deemeetree) | [Nodus Labs](http://www.noduslabs.com) and hopefully you also!
 (http://www.noduslabs.com) | info AT noduslabs DOT com
 
-In some parts the code from the book ["Node.js in Action"](http://www.manning.com/cantelon/) is used 
+In some parts the code from the book ["Node.js in Action"](http://www.manning.com/cantelon/) is used
 (c) 2014 Manning Publications Co.
 Any source code files provided as a supplement to the book are freely available to the public for download. Reuse of the code is permitted, in whole or in part, including the creation of derivative works, provided that you acknowledge that you are using it and identify the source: title, publisher and year.
 

@@ -91,11 +91,15 @@
                 },
                 hideFooter: function(){
                 //  deleteContextButton().hide()
+                    importPane().hide();
                     importLinkButton().hide();
+                    importFileButton().hide();
                 },
                 showFooter: function(){
                 //  deleteContextButton().show()
+                    importPane().show();
                     importLinkButton().show();
+                    importFileButton().show();
                 },
                 changeModeTo: function(mode) {
                     addEntryPanelFactory.setMode(mode);
@@ -140,6 +144,7 @@
         interpretButton().onClick(addEntryPanel().changeModeToInterpret);
         minimizeButton().onClick(addEntryPanel().togglePanel);
         importLinkButton().onClick(addEntryPanel().sendToImport);
+        importFileButton().onClick(importFileButton().redirect);
 
         // This activates the logic for the whole statements panel
         closeStatementMenuButton().onClick(statementsPanel().toggleStatementsPanel);

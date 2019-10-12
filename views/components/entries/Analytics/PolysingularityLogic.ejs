@@ -12,21 +12,26 @@ function polysingularity(){
                 diversity_score = 'Dispersed';
                 document.getElementById("biasRange").value = "100";
                 $('#biasRange').attr('class', 'slider dispersedslider');
+                $('#biascaption').attr('data-after','restructuring');
+
             }
             else if ((modularity_score > 0.4 && nodesintoptopic < 50) && ((bc_entropy >= 1.5) || (bc_entropy == 0 && topInfluenceNodes[0].bc == 0) || (bc_entropy == 0 && num_nodes_component < 40))) {
                 diversity_score = 'Diversified';
                 document.getElementById("biasRange").value = "67";
                 $('#biasRange').attr('class', 'slider diversedslider');
+                $('#biascaption').attr('data-after','equalizing');
             }
             else if ((modularity_score < 0.4 && modularity_score > 0.2 && bc_entropy >= 0.5) || ((modularity_score > 0.4 && nodesintoptopic >= 50)  && bc_entropy >= 0.5) || (modularity_score > 0.4 && nodesintoptopic < 50 && bc_entropy > 0.5)) {
                 diversity_score = 'Focused';
                 document.getElementById("biasRange").value = "33";
                 $('#biasRange').attr('class', 'slider focusedslider');
+                $('#biascaption').attr('data-after','developing');
             }
             else {
                 diversity_score = 'Biased';
                 document.getElementById("biasRange").value = "1";
                 $('#biasRange').attr('class', 'slider biasedslider');
+                $('#biascaption').attr('data-after','forming');
             }
             return diversity_score;
         }

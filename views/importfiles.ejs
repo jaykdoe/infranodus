@@ -40,19 +40,19 @@
                     <label for="file3" class="pure-radio">
                         <input id="file3" type="radio" name="filetype" value="other" checked>
                         Text files: PDF or TXT
-                        <br>max 90Kb of text, <a href="https://noduslabs.com/contact/">contact us</a> for longer)
+                        <br>max 3 Mb, <a href="https://noduslabs.com/contact/">contact us</a> for longer)
                     </label>
                     <br>
                     <label for="file5" class="pure-radio">
                         <input id="file5" type="radio" name="filetype" value="gexf">
                         Gexf graph format (Gephi)
-                        <br>max 90Kb size, <a href="https://noduslabs.com/contact/">contact us</a> for longer)
+                        <br>max 3 Mb, <a href="https://noduslabs.com/contact/">contact us</a> for longer)
                     </label>
                     <br>
                     <label for="file4" class="pure-radio">
                         <input id="file4" type="radio" name="filetype" value="csv">
                         CSV file
-                        <br>max 90Kb of text, <a href="https://noduslabs.com/contact/">contact us</a> for longer)
+                        <br>max 3 Mb, <a href="https://noduslabs.com/contact/">contact us</a> for longer)
                     </label>
 
 
@@ -141,6 +141,11 @@
             $(this).find('input[type=submit]').attr('disabled', 'disabled');
         });
 
+        let currentcontext = 'imported';
+
+        <% if (context) { %>
+        currentcontext = '<%= context %>';
+        <% } %>
 
         var radioButtons3 = $("[name=filetype]"); // get both radiobuttons
 
@@ -203,6 +208,9 @@
                 if ( $(this).val() == "gexf") {
                     $("#contextname").val('gexf');
                 }
+                 else if ( $(this).val() == "other") {
+                    $("#contextname").val(currentcontext);
+                }
 
             }
             else if ($(this).val() == "csv")
@@ -222,6 +230,7 @@
               $("#contextname").val('csv');
 
             }
+            
         });
 
 

@@ -40,6 +40,7 @@ improveLayoutButton().onClick(adjustGraphLayout);
 abstractLayoutButton().onLoad();
 abstractLayoutButton().onClick(abstractGraphLayout);
 tutorialButton().onClick(activateTutorial);
+manualButton().onClick(launchManual);
 themeSwitchButton().onClick(toggleTheme);
 zoomInButton().onClick(zoomInGraph);
 zoomOutButton().onClick(zoomOutGraph);
@@ -78,6 +79,14 @@ function tutorialButton() {
     }
 }
 
+function manualButton() {
+    return {
+        onClick: function(onClick) {
+            $('#manualsupport').on('click', onClick)
+        }
+    }
+}
+
 function themeSwitchButton() {
     return {
         onClick: function(onClick) {
@@ -112,7 +121,36 @@ function zoomOutButton() {
 
 function activateTutorial() {
     walkthrough = 'default';
-    initializeWalkthrough();
+    initializeWalkthrough(walkthrough);
+}
+
+function launchManual() {
+    
+    let layout = document.getElementById('layout');
+    toggleClassForElement(layout, 'sidebar');
+
+    if ($('#layout').hasClass('sidebar')) {
+        $('#manualsupport').addClass('manual-on');
+        $('#manualFrame').show();
+    }
+    else {
+        $('#manualsupport').removeClass('manual-on');
+        $('#manualFrame').hide();
+    }
+    
+    let iframe = document.getElementById('manualIFrame');
+
+    if (!iframe.getAttribute('src'))  {
+        $("#insideIFrame").css('background','url(/images/loading-large.gif) center center no-repeat');
+        iframe.setAttribute('src', iframe.getAttribute('data-src'));
+        $('#manualIFrame').load(function(){
+            $("#loadingMes").remove();
+            $("#insideIFrame").css('background','');
+        });
+    }
+
+  
+   
 }
 
 function abstractLayoutButton() {

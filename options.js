@@ -30,6 +30,9 @@ exports.settings = {
     // Max length of the total text length in Bytes
     max_total_text_length: 300000,
 
+     // Max length of the total file length in Bytes
+    max_file_length: 3000000,
+
     // Min length of a statement text
     min_text_length: 0,
 
@@ -84,10 +87,11 @@ if (fs.existsSync(configPath)) {
     exports.default_user = parsed['infranodus']['default_user']
 
     exports.chargebee = parsed['chargebee']
-
     exports.chargebee.site = parsed['chargebee']['site']
     exports.chargebee.api_key = parsed['chargebee']['api_key']
     exports.chargebee.redirect_url = parsed['chargebee']['redirect_url']
+
+    exports.rssPresets = parsed['rss_presets']
 } else {
     console.log("Neo4J config file doesn't exist. Using default settings.")
 

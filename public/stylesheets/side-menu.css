@@ -15,6 +15,9 @@
     --walkthrough-button-opacity: 1;
     --walkthrough-button-background-image: url('/images/question.png')!important;
 
+    --manual-button-opacity: 1;
+    --manual-button-background-image: url('/images/manual.png')!important;
+
     --adjustsettings-button-opacity: 0.8;
     --adjustsettings-button-background-image: url('/images/settings.png')!important;
 
@@ -58,6 +61,9 @@
 
     --google-import-opacity: 1;
     --google-import-background-image: url('/images/import-google.png')!important;
+
+    --file-import-opacity: 1;
+    --file-import-background-image: url('/images/import-file.png')!important;
 }
 
 :root[theme='dark'] {
@@ -73,6 +79,10 @@
     --abstract-layout-background-image: url('/images/diamond-white.png')!important;
     --walkthrough-button-opacity: 0.6;
     --walkthrough-button-background-image: url('/images/question-white.png')!important;
+
+
+    --manual-button-opacity: 0.8;
+    --manual-button-background-image: url('/images/manual-white.png')!important;
 
     --adjustsettings-button-opacity: 0.6;
     --adjustsettings-button-background-image: url('/images/settings-white.png')!important;
@@ -115,7 +125,10 @@
     --privacy-link-share-opacity: 0.6;
 
     --google-import-opacity: 1;
-    --google-import-background-image: url('/images/import-google-white.png')!important;
+    --google-import-background-image: url('/images/import-google.png')!important;
+
+    --file-import-opacity: 1;
+    --file-import-background-image: url('/images/import-file.png')!important;
 }
 
 
@@ -125,13 +138,19 @@
 }
 
 #layout {
-    position: relative;
+    position: absolute;
     padding-left: 0;
+    left: 0px;
+    right: 0px;
+    bottom: 0px;
+    top: 0px;
+    height: 100%;
 }
 #layout.active {
-    position: relative;
+    
     left: 180px;
 }
+
 #layout.active #menu {
     left: 180px;
     width: 180px;
@@ -140,6 +159,36 @@
 #layout.active .menu-link {
     left: 180px;
 }
+
+#layout.sidebar {
+    right: 450px;
+}
+
+#manualFrame {
+    position: absolute;
+    display: none;
+    width: 449px;
+    height: 100%;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    overflow-y: auto;
+    border-left:1px solid #ccc;
+    -webkit-overflow-scrolling: touch;
+}
+
+#insideIFrame {
+    height: 100%;
+    background:'';
+}
+
+#loadingMes {
+    position: absolute;
+    transform: translate(-50%,-57%);
+    left: 50%;
+    top: 57%;
+}
+
 
 /*
 The `#menu` `<div>` is the parent `<div>` that contains the `.pure-menu` that
@@ -157,7 +206,6 @@ appears on the left side of the page.
   padding-right: 10px;
   list-style: none;
 }
-
 
 
 
@@ -311,7 +359,10 @@ small screens.
 
 
 #controls {
+    position: absolute;
+    display: block;
     top: 40px;
+    right: 0px;
 }
 
 #statements-toggle {
@@ -421,28 +472,61 @@ small screens.
 
 #google-import {
         position: relative;
+        
         left: 0; /* "#menu width" */
-        text-align: center;
-        padding-top: 6px;
+        text-align: right;
+        padding-top: 7px;
         padding-bottom: 6px;
-        padding-left: 10px;
+        padding-left: 20px;
         padding-right: 10px;
         background-color: #f5f5f5;
-        
         color: #666;
-        font: 15px 'IstokWeb-Regular',sans-serif;
+        font: 13px 'IstokWeb-Regular',sans-serif;
         /* width: 32px;
         height: 32px;
         float: right; */
         z-index: 10;
-        /* background-image: var(--google-import-background-image);
-        opacity: var(--google-import-link-opacity); */
-        /* background-repeat:no-repeat;
-        background-position:center; */
+        background-image: var(--google-import-background-image);
+        opacity: var(--google-import-link-opacity); 
+        background-repeat: no-repeat!important;
+        display: inline-block;
+        float: right;
+        width: 53px;
+        background-position: 5px 4px; 
         /* pointer-events: auto!important;   */
 }
 
 #google-import:hover {
+    background-color: #efefef;
+}
+
+#file-import {
+        position: relative;
+        left: 0; /* "#menu width" */
+        text-align: right;
+        padding-top: 7px;
+        padding-bottom: 6px;
+        padding-left: 20px;
+        padding-right: 10px;
+        margin-left: 5px;
+        background-color: #f5f5f5;
+        color: #666;
+        font: 13px 'IstokWeb-Regular',sans-serif;
+        /* width: 32px;
+        height: 32px;
+        float: right; */
+        z-index: 10;
+        background-image: var(--file-import-background-image);
+        opacity: var(--file-import-link-opacity); 
+        background-repeat: no-repeat!important;
+        display: inline-block;
+        width: 30px;
+        float: right;
+        background-position: 5px 4px; 
+        /* pointer-events: auto!important;   */
+}
+
+#file-import:hover {
     background-color: #efefef;
 }
 
@@ -596,7 +680,7 @@ small screens.
 
     margin-top: 0px;
     background: none;
-    position: fixed;
+    position: absolute;
     display: block;
     top: 0;
     right: 0; /* "#menu width" */
@@ -732,8 +816,8 @@ small screens.
 }
 
 #improve-layout {
-  position: fixed;
-  top: 125px;
+  position: absolute;
+  top: 85px;
   font-size: 8px; /* change this value to increase/decrease button size */
   width: 2em;
   height: 25px;
@@ -751,8 +835,8 @@ small screens.
 
 
 #abstract-layout {
-  position: fixed;
-  top: 165px;
+  position: absolute;
+  top: 125px;
   font-size: 8px; /* change this value to increase/decrease button size */
   width: 2em;
   height: 25px;
@@ -770,8 +854,8 @@ small screens.
 
 
 #walkthrough {
-    position: fixed;
-    top: 245px;
+    position: absolute;
+    top: 205px;
     font-size: 8px; /* change this value to increase/decrease button size */
     width: 2em;
     height: 25px;
@@ -786,9 +870,26 @@ small screens.
   }
 
 
+  #manualsupport {
+    position: absolute;
+    top: 355px;
+    font-size: 8px; /* change this value to increase/decrease button size */
+    width: 2em;
+    height: 25px;
+    right: 0; /* "#menu width" */
+    padding: 0em 2.5em;
+    z-index: 11;
+    background: none;
+    background-image: var(--manual-button-background-image);
+    opacity: var(--manual-button-opacity);
+    background-repeat:no-repeat;
+    background-position:center;
+  }
+
+
 #adjustsettings {
-    position: fixed;
-    top: 285px;
+    position: absolute;
+    top: 245px;
     font-size: 8px; /* change this value to increase/decrease button size */
     width: 2em;
     height: 25px;
@@ -803,8 +904,8 @@ small screens.
   }
 
   #themeswitch {
-    position: fixed;
-    top: 205px;
+    position: absolute;
+    top: 165px;
     font-size: 8px; /* change this value to increase/decrease button size */
     width: 2em;
     height: 25px;
@@ -842,9 +943,14 @@ small screens.
     background-position:center!important;
 }
 
+.manual-on {
+    opacity: 1!important;
+    background-image: url('/images/manual-blue.png')!important;
+}
+
 
 #graph-tools {
-    position: fixed;
+    position: absolute;
     display: none;
     top: 320px;
     text-align: right;
@@ -902,6 +1008,15 @@ input#addcontextsubmit {
     color: #cfcfcf!important;
 }
 
+#biascaption {
+    font: 13px 'IstokWeb-Regular',sans-serif;
+    line-height: 15px;
+}
+
+#biascaption:after {
+    content: attr(data-after);
+    font: 13px 'IstokWeb-Bold',sans-serif;
+}
 
 
 
@@ -962,13 +1077,27 @@ Hides the menu at `48em`, but modify this based on your app's needs.
         max-width: 320px;
     }
 
+    #manualFrame {
+        position: absolute;
+        display: none;
+        width: 349px;
+        height: 100%;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        overflow-y: auto;
+        border-left:1px solid #ccc;
+        z-index: 400;
+        -webkit-overflow-scrolling: touch;
+    }
+
 
 
 
     #graph-link {
         margin-top: 0px;
         background: none;
-        position: fixed;
+        position: absolute;
         display: block;
         top: 0;
         right: 0; /* "#menu width" */
@@ -1006,6 +1135,25 @@ Hides the menu at `48em`, but modify this based on your app's needs.
       background-color: rgba(250, 250, 250, 0.9);
 
       display:none;
+    }
+
+    #importpane::before { 
+        content: "";
+        padding-right: 3px;
+    }
+
+
+    #google-import {
+        font: 13px 'IstokWeb-Regular',sans-serif;
+        width: 50px;
+       
+    }
+
+
+    #file-import {
+        font: 13px 'IstokWeb-Regular',sans-serif;
+        position: relative;
+        width: 30px;
     }
 
     textarea {

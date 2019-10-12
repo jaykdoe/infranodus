@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="utf-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0,  minimal-ui">
     <title><%= title %></title>
     <link rel='stylesheet' href='/stylesheets/jquery.textcomplete.css' />
     <link rel="stylesheet" href="/stylesheets/side-menu.css">
@@ -14,6 +14,7 @@
 </head>
 <body>
 <% include statsabove %>
+<div id="wrapperService">
 <div id="layout">
     <!-- Menu toggle -->
     <a href="#menu" id="menuLink" class="menu-link">
@@ -36,25 +37,29 @@
                   Welcome to InfraNodus, <em><%= user.name %></em>. Using this platform you can visualize any text as a network graph. 
               </div>
               <a href="javascript:" onclick="$('#menuLink').click();" class="bigbuttontop">List Your Existing Graphs</a>
-            <div class='welcometitle'>Try out some applications to see how it works:</div>
+              <a href="javascript:" id="manual" class="bigbuttontop">Read the Manual</a>
+              <div class='welcometitle'>Try out some applications to see how it works:</div>
           </div> 
-          <!-- TODO: add Apps to the menu -->
-          <a href="/<%= user.name %>/edit" id="analytica"><div class="appbox"><div class="appbox_image"><img src='../images/app-notes.png'></div><div class="appbox_text">Add a new text: visualizion, analysis, and topic modeling</div></div></a>
-          <a href="/<%= user.name %>/edit" id="explore"><div class="appbox"><div class="appbox_image"><img src='../images/app-explore.png'></div><div class="appbox_text">Explore any domain of knowledge or a new topic</div></div></a>          
-          <a href="/<%= user.name %>/edit" id="insight"><div class="appbox"><div class="appbox_image"><img src='../images/app-insight.png'></div><div class="appbox_text">Generate new ideas, find the gaps in your knowledge</div></div></a>          
-          <!-- <a href="/<%= user.name %>/edit" id="notes"><div class="appbox"><div class="appbox_image"><img src='../images/app-notes.png'></div><div class="appbox_text">Add your notes and research ideas to see how they all connect</div></div></a> -->
-          <!-- <a href="/<%= user.name %>/edit" id="tldr"><div class="appbox"><div class="appbox_image"><img src='../images/app-textanalytics.png'></div><div class="appbox_text">Visualize any text as a graph to discover the patterns within</div></div></a> -->
-          <a href="/<%= user.name %>/edit"  id="seo"><div class="appbox"><div class="appbox_image"><img src='../images/app-seo.png'></div><div class="appbox_text">Search engine optimization: find the keyword gaps.</div></div></a>
-          <a href="/import/evernote"><div class="appbox"><div class="appbox_image"><img src='../images/app-evernote.png'></div><div class="appbox_text">Import Evernote notes and see how they all connect</div></div></a>
-          <a href="/twitter?fornode=dataviz&context=twitter" id="twitter"><div class="appbox"><div class="appbox_image"><img src='../images/app-twitter.png'></div><div class="appbox_text">Discover the main topics in a Twitter hashtag or username feed</div></div></a>
-          <a href="/google?fornode=text+visualization&context=google" id="google"><div class="appbox"><div class="appbox_image"><img src='../images/app-google.png'></div><div class="appbox_text">SEO analysis: discover patterns in Google search results</div></div></a>
-          <a href="/importurl"><div class="appbox"><div class="appbox_image"><img src='../images/app-wiki.png'></div><div class="appbox_text">Get an overview of any Wikipedia article or any URL page</div></div></a>
-          <a href="/importrss"><div class="appbox"><div class="appbox_image"><img src='../images/app-rss.png'></div><div class="appbox_text">Visualize news or any RSS feed to discover the main topics</div></div></a>
-          <a href="/<%= user.name %>/edit" id="speech"><div class="appbox"><div class="appbox_image"><img src='../images/app-mic.png'></div><div class="appbox_text">Speech to graph: visualize your words as a network</div></div></a>
-          <a href="/import/youtube"><div class="appbox"><div class="appbox_image"><img src='../images/app-youtube.png'></div><div class="appbox_text">Visualize YouTube video captions to understand what it's about</div></div></a>
-          <a href="/import/files"><div class="appbox"><div class="appbox_image"><img src='../images/app-import.png'></div><div class="appbox_text">Advanced import options: plain text files, Gephi, PDFs, CSV</div></div></a>
-          <a href="https://noduslabs.com/category/tutorials/"><div class="appbox"><div class="appbox_image"><img src='../images/app-helpbook.png'></div><div class="appbox_text">Watch video tutorials, case studies, learn how it works</div></div></a>
-            <a href="/<%= user.name %>/edit" id="tuto"><div class="appbox"><div class="appbox_image"><img src='../images/app-tutorial.png'></div><div class="appbox_text">Step-by-step tutorial: how to add and process the text</div></div></a>
+          <div id="appslist">
+            
+            <a href="/<%= user.name %>/edit" id="analytica"><div class="appbox"><div class="appbox_image"><img src='../images/app-notes.png'></div><div class="appbox_text">Add a new text: visualizion, analysis, and topic modeling</div></div></a>
+            <a href="/<%= user.name %>/edit" id="explore"><div class="appbox"><div class="appbox_image"><img src='../images/app-explore.png'></div><div class="appbox_text">Explore any domain of knowledge or a new topic</div></div></a>          
+            <a href="/<%= user.name %>/edit" id="insight"><div class="appbox"><div class="appbox_image"><img src='../images/app-insight.png'></div><div class="appbox_text">Generate new ideas, find the gaps in your knowledge</div></div></a>          
+            <!-- <a href="/<%= user.name %>/edit" id="notes"><div class="appbox"><div class="appbox_image"><img src='../images/app-notes.png'></div><div class="appbox_text">Add your notes and research ideas to see how they all connect</div></div></a> -->
+            <!-- <a href="/<%= user.name %>/edit" id="tldr"><div class="appbox"><div class="appbox_image"><img src='../images/app-textanalytics.png'></div><div class="appbox_text">Visualize any text as a graph to discover the patterns within</div></div></a> -->
+            <a href="/<%= user.name %>/edit"  id="seo"><div class="appbox"><div class="appbox_image"><img src='../images/app-seo.png'></div><div class="appbox_text">Search engine optimization: find the keyword gaps.</div></div></a>
+            <a href="/import/evernote"><div class="appbox"><div class="appbox_image"><img src='../images/app-evernote.png'></div><div class="appbox_text">Import Evernote notes and see how they all connect</div></div></a>
+            <a href="/twitter?context=twitter" id="twitter"><div class="appbox"><div class="appbox_image"><img src='../images/app-twitter.png'></div><div class="appbox_text">Discover the main topics in a Twitter hashtag or username feed</div></div></a>
+            <a href="/google?fornode=text+visualization&context=google" id="google"><div class="appbox"><div class="appbox_image"><img src='../images/app-google.png'></div><div class="appbox_text">SEO analysis: discover patterns in Google search results</div></div></a>
+            <a href="/importurl"><div class="appbox"><div class="appbox_image"><img src='../images/app-wiki.png'></div><div class="appbox_text">Get an overview of any Wikipedia article or any URL page</div></div></a>
+            <a href="/importrss"><div class="appbox"><div class="appbox_image"><img src='../images/app-rss.png'></div><div class="appbox_text">Visualize news or any RSS feed to discover the main topics</div></div></a>
+            <a href="/<%= user.name %>/edit" id="speech"><div class="appbox"><div class="appbox_image"><img src='../images/app-mic.png'></div><div class="appbox_text">Speech to graph: visualize your words as a network</div></div></a>
+            <a href="/import/youtube"><div class="appbox"><div class="appbox_image"><img src='../images/app-youtube.png'></div><div class="appbox_text">Visualize YouTube video captions to understand what it's about</div></div></a>
+            <a href="/import/files"><div class="appbox"><div class="appbox_image"><img src='../images/app-import.png'></div><div class="appbox_text">Advanced import options: plain text files, Gephi, PDFs, CSV</div></div></a>
+            <a href="https://noduslabs.com/category/tutorials/"><div class="appbox"><div class="appbox_image"><img src='../images/app-helpbook.png'></div><div class="appbox_text">Watch video tutorials, case studies, learn how it works</div></div></a>
+              <a href="/<%= user.name %>/edit" id="tuto"><div class="appbox"><div class="appbox_image"><img src='../images/app-tutorial.png'></div><div class="appbox_text">Step-by-step tutorial: how to add and process the text</div></div></a>
+
+          </div>
 
           <div class="teaser">
             <br>
@@ -72,7 +77,7 @@
 
           <div class="teaser">
             <br>
-            You are welcome to take our <a href="http://noduslabs.com/courses/text-network-analysis-for-cognitive-stimulation/">free online course of Text Network Analysis</a>, <a href="/#tutorials" target="_blank">watch video tutorials</a>, read the <a href="http://noduslabs.com/category/tutorials/" target="_blank">case studies</a> and
+            You are welcome to check our <a href="https://help.infranodus.com">support / FAQ site</a>, take the <a href="http://noduslabs.com/courses/text-network-analysis-for-cognitive-stimulation/">free online course on Text Network Analysis</a>, <a href="/#tutorials" target="_blank">watch video tutorials</a>, read the <a href="http://noduslabs.com/category/tutorials/" target="_blank">case studies</a> and
             post your questions, problems, and feature requests on <a href="https://github.com/noduslabs/infranodus/issues" target="_blank">GitHub</a> or using #infranodus on Twitter.
             <br>&nbsp;<br>&nbsp;<br>
             <a href="https://twitter.com/intent/tweet?button_hashtag=InfraNodus&ref_src=twsrc%5Etfw" class="twitter-hashtag-button" data-show-count="false">Tweet #InfraNodus</a><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>
@@ -84,8 +89,6 @@
 
         </div>
 
-        <div id="graph-container"></div>
-
 
     </div>
 
@@ -93,7 +96,12 @@
 
 
 </div>
-
+<div id="manualFrame">
+    <div id="insideIFrame"><span id="loadingMes">Loading the manual...</span>
+        <iframe id="manualIFrame" class="manualIFrame" width="450" height="100%" data-src="https://help.infranodus.com" frameborder="0" allowfullscreen></iframe>
+    </div>
+</div>
+</div>
 
 <script src="/javascripts/jquery.min.js"></script>
 <script src="/javascripts/jquery-ui.min.js"></script>
@@ -108,7 +116,51 @@
 <script>
     ;(function(){
 
+      function toggleClassForElement(element, className) {
+        var classes = element.className.split(/\s+/),
+            length = classes.length,
+            i = 0;
+
+        for(; i < length; i++) {
+          if (classes[i] === className) {
+            classes.splice(i, 1);
+            break;
+          }
+        }
+        // The className is not found
+        if (length === classes.length) {
+            classes.push(className);
+        }
+
+        element.className = classes.join(' ');
+    }
+
         var cleared_to_submit = 0;
+
+        $('#manual').click(function() {
+          let layout = document.getElementById('layout');
+          toggleClassForElement(layout, 'sidebar');
+
+          if ($('#layout').hasClass('sidebar')) {
+              $('#manual').text('Close the Manual');
+              $('#manualFrame').show();
+          }
+          else {
+              $('#manual').text('Read the Manual');
+              $('#manualFrame').hide();
+          }
+          
+          let iframe = document.getElementById('manualIFrame');
+
+          if (!iframe.getAttribute('src'))  {
+              $("#insideIFrame").css('background','url(/images/loading-large.gif) center center no-repeat');
+              iframe.setAttribute('src', iframe.getAttribute('data-src'));
+              $('#manualIFrame').load(function(){
+                  $("#loadingMes").remove();
+                  $("#insideIFrame").css('background','');
+              });
+          }
+        });
 
         $('form#submitform').submit(function(event){
 

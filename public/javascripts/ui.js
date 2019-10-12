@@ -24,7 +24,7 @@
     }
 
     menuLink.onclick = function (e) {
-        var active = 'active';
+        let active = 'active';
 
         e.preventDefault();
         toggleClass(layout, active);

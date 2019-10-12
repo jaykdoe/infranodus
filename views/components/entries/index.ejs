@@ -952,16 +952,17 @@ const graphFactory = (() => {
                     let polysingularity_score = this.getStats('PolysingularityScore');
 
                     if (most_inf_comm_nodes.length >= 2) {
-                        if (polysingularity_score == 'Diversified' || polysingularity_score == 'Dispersed') {
-                            insight_nodes[0] = most_inf_comm_nodes[0];
-                            insight_nodes[1] = most_inf_comm_nodes[1];
-                        }
-                        else {            
-                            let first_com = most_inf_comm_nodes[most_inf_comm_nodes.length-1];
-                            let second_com = most_inf_comm_nodes[most_inf_comm_nodes.length-2];
-                            insight_nodes[0] = first_com;
-                            insight_nodes[1] = second_com;                       
-                        }
+                        // if (polysingularity_score == 'Diversified' || polysingularity_score == 'Dispersed') {
+                              
+                        // }
+                        // else {            
+                        //     insight_nodes[0] = most_inf_comm_nodes[0];
+                        //     insight_nodes[1] = most_inf_comm_nodes[1];                   
+                        // }
+                        let first_com = most_inf_comm_nodes[most_inf_comm_nodes.length-1];
+                        let second_com = most_inf_comm_nodes[most_inf_comm_nodes.length-2];
+                        insight_nodes[0] = first_com;
+                        insight_nodes[1] = second_com;    
                     }
                     else {
                         if (most_inf_comm_nodes[0] && most_inf_comm_nodes[0].nodes && most_inf_comm_nodes[0].nodes.length > 1) {

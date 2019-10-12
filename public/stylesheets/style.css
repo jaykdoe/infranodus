@@ -151,6 +151,29 @@ a {
     color: #00B7FF;
 }
 
+#wrapper {
+    position: fixed;
+    left: 0;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    height: 100%;
+    width: 100%;
+    overflow-y:hidden; 
+    overflow-x:hidden; 
+}
+
+#wrapperService {
+    position: fixed;
+    left: 0;
+    top: 0;
+    min-height: 100%;
+    width: 100%;
+    background: var(--graph-background);
+    margin: 0 auto 0;
+    overflow: scroll;
+}
+
 textarea {
     font: 16px 'IstokWeb-Bold',sans-serif;
     position: relative;
@@ -270,7 +293,6 @@ textarea:focus {
   display: none;
   top: 0;
   left: 50px;
-  
 }
 
 #expsummary {
@@ -301,7 +323,6 @@ textarea:focus {
     border-radius: 5px;
     box-shadow: var(--entry-box-shadow);  
     top: 0;
-    z-index: 6;
     max-width: 280px;
     font: 14px 'IstokWeb-Regular',sans-serif;
     font-style: italic;
@@ -435,7 +456,7 @@ a:hover.app-more-link {
 
 
 #messages {
-    position: fixed;
+    position: absolute;
     top: 10px;
     right: 50px;
     text-align: right;
@@ -447,7 +468,7 @@ a:hover.app-more-link {
 }
 
 #graphTags {
-    position: fixed;
+    position: absolute;
     top: 36px;
     right: 50px;
     text-align: right;
@@ -571,13 +592,15 @@ a:hover.app-more-link {
 
 #statements {
     position: relative;
-    top: 0;
-    bottom: 0;
+    bottom: 0px;
+    left: 0px;
+    padding-bottom: 0px;
     height: 100%;
     background-color: rgba(255, 255, 255, 0);
     max-width: 340px;
     padding-left: 50px;
     z-index: 5;
+    overflow: hidden;
 /*    pointer-events: none;*/
 }
 
@@ -648,7 +671,7 @@ a:hover.app-more-link {
 
 #analytics {
     font: 15px 'IstokWeb-Regular',sans-serif;
-    position: fixed;
+    position: absolute;
     bottom: 85px;
     font-size: 15px;
     line-height: 20px;
@@ -799,11 +822,11 @@ button:hover {
 
 
 #analyticsbutton {
-  position: fixed;
+  position: absolute;
   bottom: 15px;
   width: 55px;
   height: 55px;
-  right: 22px; /* "#menu width" */
+  right: 15px; /* "#menu width" */
   font-size: 14px; /* change this value to increase/decrease button size */
   /* width: 2em;
    height: auto;*/
@@ -823,7 +846,7 @@ button:hover {
 }
 
 #biasindex {
-  position: fixed;
+  position: absolute;
   bottom: 39px;
   width: 170px;
   height: 15px;
@@ -860,7 +883,7 @@ button:hover {
 
 #graphsettings {
     font: 15px 'IstokWeb-Regular',sans-serif;
-    position: fixed;
+    position: absolute;
     top: 285px;
     font-size: 15px;
     line-height: 20px;
@@ -1173,14 +1196,12 @@ button:hover {
   background-image: var(--addnode-background);
 }
 #go_next {
-
-    position: fixed;
-  top: 50px;
+  position: absolute;
+  top: 9px;
   font-size: 8px; /* change this value to increase/decrease button size */
   width: 2em;
   height: 25px;
   right: 0; /* "#menu width" */
-  font-size: 8px; /* change this value to increase/decrease button size */
   /* width: 2em;
    height: auto;*/
   padding: 0em 2.5em;
@@ -1192,8 +1213,8 @@ button:hover {
 }
 
 #reloadbutton {
-    position: fixed;
-  top: 85px;
+    position: absolute;
+  top: 45px;
   font-size: 8px; /* change this value to increase/decrease button size */
   width: 2em;
   height: 25px;
@@ -1309,10 +1330,12 @@ button:hover {
     bottom: 0;
     left: -50px;
     right: 0;
-    position: fixed;
+    position: absolute;
     z-index: -1;
     padding-left: 40px;
     padding-right: 40px;
+    overflow:hidden;
+    height: 100%;
 /*
     background-color: #e9e9e6;
 */
@@ -1458,9 +1481,16 @@ button:hover {
 
 #importpane {
     position: absolute;
-    display: inline; /* show this only on small screens */
-    bottom: 25px;
-    left: 140px;
+    display: inline-block; /* show this only on small screens */
+    bottom: 16px;
+    left: 122px;
+    font: 13px 'IstokWeb-Regular',sans-serif;
+}
+
+#importpane::before { 
+  content: "import: ";
+  padding-right: 3px;
+  line-height: 38px;
 }
 
 
@@ -1504,6 +1534,11 @@ button:hover {
     opacity: 0.9;
     float: left;
 /*    pointer-events: none;*/
+}
+
+.topintro {
+    padding-top: 5px;
+    font-size: 16px;
 }
 
 #welcomemessage {
@@ -1560,7 +1595,7 @@ button:hover {
     top: 0;
     bottom: 0;
     height: 100%;
-    background-color: rgba(255, 255, 255, 0);
+    background: var(--graph-background);
     max-width: 700px;
     padding-left: 50px;
     z-index: 1;
@@ -1659,7 +1694,7 @@ button:hover {
     padding-right: 15px;
     margin-top: 10px;
     margin-right: 25px;
-    margin-bottom: 25px;
+    margin-bottom: 10px;
     text-align: right;
     text-decoration: none!important;
     color: #555555!important;
@@ -1670,9 +1705,13 @@ button:hover {
       float: none;
       display: block;
       clear: both;
-      height: 100%;
+      
   }
 
+  #appslist {
+      position: relative;
+      clear: both;
+  }
 
 
 .bigbutton:hover {

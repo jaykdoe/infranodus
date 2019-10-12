@@ -4,11 +4,7 @@
 
         initializeWalkthrough(userFactory.getWalkthrough());
 
-        $("#walkthrough").click(function(e) {
-               e.preventDefault();
-               userFactory.setWalkthrough('default');
-               initializeWalkthrough(userFactory.getWalkthrough());
-        });
+    
 
         $("#analytics_help").click(function(e) {
                e.preventDefault();
@@ -22,7 +18,7 @@
         // Begin walkthrough tour module for tutorial Help
         
          function initializeWalkthrough (walkthrough) {
-
+           
           if (walkthrough == 'default' || walkthrough == 'newcontext' || walkthrough == 'analytics_help' || walkthrough == "tldr" || walkthrough == "insight" || walkthrough == "force" || walkthrough == "seo" || walkthrough == "explore") {           
            // Instance the tour
              var tour = new Tour({
@@ -344,8 +340,12 @@
                   window.localStorage.removeItem('tldr_current_step');
                   window.localStorage.removeItem('tldr_end');
                }
-             
              }
+
+             if (walkthrough == 'default') {
+                  window.localStorage.removeItem('default_current_step');
+                  window.localStorage.removeItem('default_end');
+               }
 
              if (walkthrough == 'tldr') {
              //  console.log(tour._options.steps);
@@ -679,6 +679,7 @@
                onShow: function (tour) {
                    $('#analytics').hide();
                    $('#google-import').css('visibility', 'hidden');
+                   $('#file-import').css('visibility', 'hidden');
                    if (statements().areVisible() == 'HIDDEN') {
                           statementsFactory.toggleStatementsTo('VISIBLE');
                      }
@@ -728,6 +729,7 @@
                content: "You can now see the <strong>most common search patterns</strong> for your specific search query visualized as a graph.<br><br>The bigger the nodes, the more influential are the words they represent to the topic you've chosen in the previous step. The <strong>words that tend to co-occur together</strong> are closer on the graph and have the same color. ",
                onShow: function(tour) {
                 $('#google-import').css('visibility', 'visible');
+                $('#file-import').css('visibility', 'visible');
                 if ($('#analytics').is(":visible")) {
                       $('#analyticsbutton').click();
                 }
