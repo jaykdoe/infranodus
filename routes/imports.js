@@ -217,22 +217,6 @@ exports.renderURL = function(req, res) {
     })
 }
 
-exports.renderRSS = function(req, res) {
-    var contextslist = []
-    if (res.locals.contextslist) {
-        contextslist = res.locals.contextslist
-    }
-    res.render('importrss', {
-        title: 'InfraNodus: Twitter Text Network Visualization',
-        evernote: '',
-        context: req.query.context,
-        contextlist: contextslist,
-        notebooks: '',
-        rsspresets: options.rssPresets,
-        fornode: req.query.fornode,
-    })
-}
-
 exports.renderEvernote = function(req, res) {
     var contextslist = []
 
@@ -1980,7 +1964,7 @@ exports.submit = function(req, res, next) {
                                     // Standard text file
                                     else {
                                         if (filecontents.length > 0) {
-                                            
+
                                             saveFileAtOnce(
                                                 filecontents,
                                                 contexts
@@ -2110,7 +2094,7 @@ exports.submit = function(req, res, next) {
                     )
                 }
             })
-        // End of the file upload IF    
+        // End of the file upload IF
         }
 
         // Did not recognive the filetype
@@ -2347,140 +2331,6 @@ exports.submit = function(req, res, next) {
                         )
                         res.redirect('back')
                     })
-            }
-        })
-    } else if (service == 'rss') {
-        var rssSubmitted = validate.sanitize(req.body.rssinput)
-
-        var rssRequested = rssSubmitted.split(/\s+/).slice(0, 10)
-
-        var addToContexts = []
-
-        var rssFeeds = 0
-
-        var rssItemsMax = validate.sanitize(req.body.rssitems)
-
-        // If no date given, default to a very old date to allow all articles through
-        var rssSinceDateTime = (!!req.body.rsssince ? Date.parse(req.body.rsssince) : Date.parse("1970-01-01"))
-
-        var includeteasers = validate.sanitize(req.body.includeteasers)
-
-        var statements = []
-
-        addToContexts.push(importContext)
-
-        var default_context = importContext
-
-        validate.getContextID(user_id, addToContexts, function(result, err) {
-            if (err) {
-                res.error(
-                    'Something went wrong when adding contexts into Neo4J database. Try to choose a different name and do not use special characters.'
-                )
-                res.redirect('back')
-            } else {
-                // What are the contexts that already exist for this user and their IDs?
-                // Note: actually there's been no contexts, so we just created IDs for all the contexts contained in the statement
-                var contexts = result
-
-                // Construct a new REQ object to add all the statements in
-                var reqq = {
-                    body: {
-                        entry: {
-                            body: [],
-                        },
-                        context: default_context,
-                    },
-
-                    contextids: contexts,
-                    internal: 1,
-                    multiple: 1,
-                }
-
-                // How many statements from each RSS feed do we take max?
-                var limito
-
-                if (rssItemsMax) {
-                    if (rssItemsMax < 300) {
-                        limito = rssItemsMax
-                    } else {
-                        limito = 10
-                    }
-                }
-
-                for (var item in rssRequested) {
-                    // How many RSS feeds in total can we process?
-
-                    feedparser
-                        .parse(rssRequested[item])
-                        .then(items => {
-                            var rssIterations = 0
-
-                            items.forEach(itemo => {
-                                if (rssIterations < limito && itemo.pubdate >= rssSinceDateTime) {
-                                    var thisheadline = S(
-                                        itemo.title
-                                    ).stripTags().s
-                                    var thisurl = S(itemo.link).stripTags().s
-
-                                    if (includeteasers == 1) {
-                                        var thisteaser =
-                                            ' / ' +
-                                            validate.splitStatement(
-                                                ' ' +
-                                                    S(itemo.description)
-                                                        .stripTags()
-                                                        .s.replace(
-                                                            'Continue reading...',
-                                                            ' '
-                                                        )
-                                                        .replace('&nbsp;', ' '),
-                                                max_length -
-                                                    thisheadline.length -
-                                                    thisurl.length
-                                            )[0] +
-                                            ' '
-                                    } else {
-                                        var thisteaser = ' '
-                                    }
-
-                                    statements.push(
-                                        thisheadline + thisteaser + thisurl
-                                    )
-
-                                    rssIterations = rssIterations + 1
-                                }
-                            })
-                        })
-                        .then(done => {
-                            // Did we process all the feeds submitted?
-                            rssFeeds = rssFeeds + 1
-
-                            if (rssFeeds >= rssRequested.length) {
-                                // Save all feeds into the database
-                                for (var key in statements) {
-                                    if (statements.hasOwnProperty(key)) {
-                                        reqq.body.entry.body[key] =
-                                            statements[key]
-                                    }
-                                }
-
-                                entries.submit(reqq, res)
-
-                                // Display the next page
-                                // res.message('Importing the RSS feeds... Please, reload this page in 30 seconds...');
-                                // res.redirect(res.locals.user.name + '/' + importContext + '/edit');
-                            }
-                        })
-                        .catch(error => {
-                            // Even if there's an error we still "count" that one
-                            // TODO what if only one element of a feed is broken? We might have this number higher than needed.
-                            rssFeeds = rssFeeds + 1
-
-                            console.error('error: ', error)
-                            // res.message('Something went wrong with one of the RSS feeds... Please, reload this page in 30 seconds... If nothing appears, go back.');
-                            // res.redirect(res.locals.user.name + '/' + importContext + '/edit');
-                        })
-                }
             }
         })
     } else if (service == 'youtube') {

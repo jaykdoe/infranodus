@@ -8,7 +8,7 @@ var contextNames = [];
 
    // Get the context names - all the contexts that exist in the graph we just loaded
       // This IF statement is for the case when the contextlist parameter is not passed on
-      <% if (contextlist.length > 0) { %>
+      <% if (contextlist && contextlist.length > 0) { %>
       <% contextlist.forEach(function(contextlabel) { %>
         contextNames.push("<%= contextlabel[0] %>");
       <% }); %>
