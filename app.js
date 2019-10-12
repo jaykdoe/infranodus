@@ -57,6 +57,7 @@ var passport = require('passport')
 
 var settings = require('./routes/settings')
 var imports = require('./routes/imports')
+var importRss = require('./routes/importrss')
 
 var app = express()
 
@@ -223,7 +224,7 @@ app.get(
     '/importrss',
     pass.ensureAuthenticated,
     validate.getContextsList(),
-    imports.renderRSS
+    importRss.renderRSS
 )
 app.get(
     '/apps',
@@ -237,7 +238,9 @@ app.get(
     validate.getContextsList(),
     imports.renderTwitter
 )
+
 app.post('/import', pass.ensureAuthenticated, imports.submit)
+app.post('/importrss', pass.ensureAuthenticated, importRss.submitRSS)
 
 app.get('/evernote_oauth', oauths.oauth)
 app.get('/evernote_oauth_callback', oauths.oauth_callback)

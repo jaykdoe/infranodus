@@ -30,9 +30,10 @@
 
             <% include messages %>
 
-            <form action='/import' name='submitform' id="submitform" method='post' enctype="multipart/form-data" class='pure-form pure-form-stacked'>
+            <form action='/importrss' name='submitform' id="submitform" method='post' enctype="multipart/form-data" class='pure-form pure-form-stacked'>
                     <br>
 
+                    <!-- This hidden input becomes unnecessary when using different endpoints for different import types -->
                     <input type="hidden" name="source" value="rss">
 
                     <select name="urlselect" id="urlselect">
@@ -48,12 +49,13 @@
                     <div id="urlsetting">
                       <br>
                         RSS feeds to be visualized:
-                        <textarea id="rssinput" name="rssinput" rows="4" cols="20">https://www.theguardian.com/world/rss http://www.wsj.com/xml/rss/3_7085.xml http://rss.nytimes.com/services/xml/rss/nyt/World.xml http://feeds.washingtonpost.com/rss/world https://www.ft.com/?format=rss
+                        <textarea id="rssinput" name="rssinput" rows="4" cols="20">
+                          <%= rsspresets[Object.keys(rsspresets)[0]]['urls'].join(' ') %>
                         </textarea>
                         <br>
                         <label for="rssitems" class="pure-input" id="rssitemscaption">
                             # of items for each feed:
-                            <input type="text" name="rssitems" id="rssitems" value="15"/>
+                            <input type="text" name="rssitems" id="rssitems" value="<%= rsspresets[Object.keys(rsspresets)[0]]['items'] %>"/>
                         </label>
                         <br>
                         <label for="rsssince" class="pure-input" id="rsssincecaption">
@@ -74,8 +76,10 @@
                 <input type='text' name='context' id="context" value='<% if (context) { %><%= context %><% } else { %>news<% } %>'/>
                 <br>
 
+                <!-- TODO: Unclear if/why these two hidden inputs are necessary... Not referenced anywhere in the import code -->
                 <input type="hidden" id="selectedContexts" name="selectedContexts" value="">
                 <input type="hidden" name="statementid" value="">
+
                 &nbsp;<br>
                 <input type='submit' name="submit" value="save" class="pure-button pure-button-primary">
                 <br>
@@ -103,19 +107,14 @@
 
 
 <script>
-
       $(document).ready(function () {
+          var nowdate = new Date().toISOString().slice(2,10).replace(/-/g,"").replace(/:/g,"");
+          $('#context').val('news' + nowdate);
 
-        var nowdate = new Date().toISOString().slice(2,10).replace(/-/g,"").replace(/:/g,"");
-
-        $('#context').val('news' + nowdate);
-
-        var advancedpane = 0;
-
-
+          var advancedpane = 0;
 
           $("#advancedsettings").hide();
-          $('#urlsetting').hide();	
+          $('#urlsetting').hide();
 
           var clientRssPresets = JSON.parse('<%- JSON.stringify(rsspresets) %>');
 
@@ -151,9 +150,6 @@
             }
           });
 
-
-
-
           $('form#submitform').submit(function(){
                 $(this).find('input[type=submit]').attr('disabled', 'disabled');
                 $('#message').html('We are importing the data, this page will automatically reload. If this does not happen in 30 seconds, please, <a href="/<%= user.name %>/'+$('#context').val()+'/edit">click here</a>.');
@@ -165,9 +161,7 @@
             blocks: [4, 2, 2, 2, 2]
         });
 
-      
       });
-
 </script>
 
 <% include statsbelow %>
