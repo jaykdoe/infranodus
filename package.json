@@ -29,7 +29,6 @@
     "feedparser-promised": "^1.5.0",
     "flowdock-text": "^1.2.0",
     "gexf": "^0.2.5",
-    "google": "^2.1.0",
     "imap": "^0.8.19",
     "languagedetect": "^1.1.1",
     "lda": "^0.2.0",
