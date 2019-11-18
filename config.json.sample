@@ -7,7 +7,8 @@
     },
 
     "secrets": {
-        "invitation": "secretcode"
+        "invitation": "secretcode",
+        "cookie_secret": "your_cookie_secret"
     },
 
     "infranodus": {

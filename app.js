@@ -41,6 +41,17 @@ var messages = require('./lib/messages')
 var http = require('http')
 var path = require('path')
 
+var bodyParser = require('body-parser')
+var favicon = require('serve-favicon')
+var morgan = require('morgan')
+var session = require('express-session')
+var cookieParser = require('cookie-parser')
+var methodOverride = require('method-override')
+var errorhandler = require('errorhandler')
+var serveStatic = require('serve-static')
+
+var options = require('./options')
+
 var pass = require('./lib/pass')
 var passport = require('passport')
 
@@ -53,37 +64,42 @@ var server = http.Server(app)
 var io = require('socket.io')(server)
 
 app.set('port', process.env.PORT || 3000)
-app.set('views', __dirname + '/views')
+app.set('views',  __dirname + '/views')
 app.set('view engine', 'ejs')
 
-app.use(express.bodyParser())
-app.use(express.favicon())
-app.use(express.logger('dev'))
-app.use(express.json())
-app.use(express.urlencoded())
-app.use(express.methodOverride())
-app.use(express.cookieParser('your secret here'))
-app.use(express.session())
+app.use(favicon(path.join(__dirname, 'public/images', 'favicon-32x32.png')))
+app.use(methodOverride())
+
+app.use(session({
+    secret: options.cookie_secret,
+    resave: true,
+    saveUninitialized: true
+}))
+
+// app.use(bodyParser.json())
+app.use(bodyParser.urlencoded({ extended: true }))
+
+app.use(morgan('dev'))
+
+app.use(cookieParser(options.cookie_secret))
+
+app.use(serveStatic(path.join(__dirname, 'public')));
+
 app.use(passport.initialize())
 app.use(passport.session())
-app.use(express.static(path.join(__dirname, 'public')))
+
+
+app.get('/', main.render)
+
 
 // This makes sure that when someone accesses external /api2 they are authenticated first
 app.use('/api2', api2.auth)
 
 app.use(user)
 app.use(messages)
-app.use(app.router)
-app.use(routes.notfound)
-app.use(routes.error)
-app.use(routes.badrequest)
-
-// development only
-if ('development' == app.get('env')) {
-    app.use(express.errorHandler())
-}
 
 // First we declare all the static paths in the script
+
 
 app.get('/signup', register.form)
 app.get('/recover', register.recover)
@@ -250,7 +266,17 @@ app.get(
     validate.getContextsList(),
     entries.list
 )
-app.get('/', main.render)
+
+// Errors and bad requests
+
+app.use(routes.notfound)
+app.use(routes.error)
+app.use(routes.badrequest)
+
+// development only
+if ('development' == app.get('env')) {
+    app.use(errorhandler())
+}
 
 if (process.env.ERROR_ROUTE) {
     app.get('/dev/error', function(req, res, next) {

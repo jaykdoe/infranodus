@@ -15,10 +15,11 @@
 
 var Entry = require('../lib/entry')
 var express = require('express')
+const basicAuth = require('express-basic-auth');
 var User = require('../lib/user')
 
 exports.entries = function(req, res, next) {
-    express.basicAuth(User.authenticate)
+    basicAuth(User.authenticate)
 
     // This is for pagination, but not currently used
     var page = req.page

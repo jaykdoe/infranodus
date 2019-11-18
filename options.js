@@ -83,6 +83,8 @@ if (fs.existsSync(configPath)) {
     exports.neo4jpass = parsed['neo4j']['password']
 
     exports.invite = parsed['secrets']['invitation']
+    exports.cookie_secret = parsed['secrets']['cookie_secret']
+
 
     exports.default_user = parsed['infranodus']['default_user']
 
