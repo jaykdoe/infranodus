@@ -9,6 +9,7 @@ views/statsheader.ejs
 
 # NPM
 node_modules
+node_modules.backup
 npm-debug.log*
 
 # Vagrant

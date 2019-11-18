@@ -70,7 +70,7 @@ window.navigator = {
 var pdfreader = require('pdfreader')
 
 // Lemmatizer module initialization
-const Morphy = require('phpmorphy').default
+const Morphy = require('phpmorphy-locutus').default
 
 const lemmerEng = new Morphy('en', {
     //  nojo:                false,
