@@ -1452,17 +1452,16 @@ exports.submit = function(req, res, next) {
     } else if (service == 'file') {
 
         console.log('filetype')
-        console.log(req.files)
+        console.log(req.file)
 
-        console.log(req.files.uploadedFile.type)
 
-        var filetype = req.files.uploadedFile.type
+        var filetype = req.file.mimetype;
 
         var process_type = 'classes'
 
         // Check the size of the uploaded file
 
-        if (req.files.uploadedFile.size > max_file_length) {
+        if (req.file.size > max_file_length) {
             res.error(
                 'Sorry, this file exceeds the maximum of ' +
                     max_file_length +
@@ -1478,8 +1477,8 @@ exports.submit = function(req, res, next) {
         // Determine the type of file
         // Is the file uploaded and is it a text / html one?
         if (
-            req.files &&
-            req.files.uploadedFile.size <= max_file_length &&
+            req.file &&
+            req.file.size <= max_file_length &&
             (filetype == 'text/html' ||
                 filetype == 'text/plain' ||
                 filetype == 'application/pdf' ||
@@ -1492,7 +1491,7 @@ exports.submit = function(req, res, next) {
             var titlefield = ''
 
             if (req.body.titlefield && req.body.titlefield.length > 0) {
-                if (req.files.uploadedFile.type == 'text/csv') {
+                if (filetype== 'text/csv') {
                     titlefield = req.body.titlefield
                 } else {
                     titlefield = '.' + req.body.titlefield
@@ -1503,7 +1502,7 @@ exports.submit = function(req, res, next) {
             var processfield = ''
 
             if (req.body.processfield) {
-                if (req.files.uploadedFile.type == 'text/csv') {
+                if (filetype == 'text/csv') {
                     processfield = req.body.processfield
                 } else {
                     processfield = '.' + req.body.processfield
@@ -1535,7 +1534,7 @@ exports.submit = function(req, res, next) {
 
             // Read that file
 
-            fs.readFile(req.files.uploadedFile.path, function(err, data) {
+            fs.readFile(req.file.path, function(err, data) {
                 if (err) throw err
 
                 // It's not a PDF right? Then convert to string UTF8 encoding
@@ -1700,7 +1699,7 @@ exports.submit = function(req, res, next) {
                             )
                         })
                 } else if (filetype == 'application/octet-stream') {
-                    if (req.files.uploadedFile.name.indexOf('.gexf') >= 0) {
+                    if (req.file.originalname.indexOf('.gexf') >= 0) {
                         let gexf_graph = gexf.parse(filecontents);
                         let gexf_edges = gexf_graph.edges;
                         let gexf_nodes = gexf_graph.nodes;
@@ -2099,7 +2098,7 @@ exports.submit = function(req, res, next) {
 
         // Did not recognive the filetype
         else {
-            if (req.files.uploadedFile.size < max_total_length) {
+            if (req.file.size < max_total_length) {
                 res.error(
                     'Sorry, but InfraNodus does not recognize this kind of content yet. Add a feature request on GitHub and we will look into it.'
                 )
@@ -2108,9 +2107,9 @@ exports.submit = function(req, res, next) {
         }
 
         // delete file
-        fs.unlink(req.files.uploadedFile.path, function(err) {
+        fs.unlink(req.file.path, function(err) {
             if (err) throw err
-            console.log('successfully deleted ' + req.files.path)
+            console.log('successfully deleted ' + req.file.path)
         })
 
         function saveFileAtOnce(fullfiletext, contexts) {

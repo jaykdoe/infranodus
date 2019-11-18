@@ -49,6 +49,17 @@ var methodOverride = require('method-override')
 var errorhandler = require('errorhandler')
 var serveStatic = require('serve-static')
 
+var multer = require('multer')
+var storage = multer.diskStorage({
+    destination: function(req, file, cb) {
+        cb(null, './tmp');
+     },
+    filename: function (req, file, cb) {
+        cb(null , file.originalname);
+    }
+});
+var upload = multer({ storage: storage })
+
 var options = require('./options')
 
 var pass = require('./lib/pass')
@@ -238,7 +249,7 @@ app.get(
     imports.renderTwitter
 )
 
-app.post('/import', pass.ensureAuthenticated, imports.submit)
+app.post('/import', pass.ensureAuthenticated, upload.single('uploadedFile'), imports.submit)
 app.post('/importrss', pass.ensureAuthenticated, importRss.submitRSS)
 
 app.get('/evernote_oauth', oauths.oauth)
