@@ -1,6 +1,6 @@
 {
   "name": "InfraNodus",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "private": true,
   "main": "src/index.js",
   "engines": {
@@ -17,7 +17,7 @@
     "bcrypt-nodejs": "0.0.3",
     "chargebee": "^2.4.3",
     "cheerio": "^1.0.0-rc.2",
-    "csv-parse": "4.4.6",
+    "csv-parse": "^4.4.6",
     "ejs": "^2.5.7",
     "evernote": "^2.0.5",
     "express": "^3.4.8",
@@ -39,7 +39,7 @@
     "passport-local": "^1.0.0",
     "pdfreader": "^0.2.4",
     "phantom": "^4.0.12",
-    "phpmorphy": "^2.0.13",
+    "phpmorphy-locutus": "^0.1.0",
     "request-promise": "^4.2.2",
     "send": "^0.16.2",
     "socket.io": "^2.0.4",
@@ -53,6 +53,6 @@
   },
   "devDependencies": {
     "nodemon": "^1.18.10",
-    "prettier": "1.14.3"
+    "prettier": "^1.14.3"
   }
 }
