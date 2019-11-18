@@ -345,9 +345,11 @@
                 callback($.param(to_submit));
             },
             post: function(submitData) {
+                
                 if (!submitData) {
                     submitData = $("#submitform").serialize();
                 }
+                
                 $.post('/post', submitData)
                     .done(function(res) {
                         // Get the response from the server (ID of the entry added)

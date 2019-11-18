@@ -27,7 +27,6 @@
 var api = require('./routes/api')
 var api2 = require('./routes/api2')
 var express = require('express')
-var routes = require('./routes')
 var oauths = require('./routes/evernote')
 var entries = require('./routes/entries')
 var Entry = require('./lib/entry')
@@ -77,8 +76,8 @@ app.use(session({
     saveUninitialized: true
 }))
 
-// app.use(bodyParser.json())
-app.use(bodyParser.urlencoded({ extended: true }))
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(bodyParser.json());
 
 app.use(morgan('dev'))
 
@@ -271,7 +270,7 @@ app.get(
 )
 
 // Errors and bad requests
-
+var routes = require('./routes')
 app.use(routes.notfound)
 app.use(routes.error)
 app.use(routes.badrequest)
