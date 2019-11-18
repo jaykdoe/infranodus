@@ -67,6 +67,9 @@ exports.submitRSS = function(req, res, next) {
 
     // Get the RSS Feeds to import from - but limit it to the first x URLs
     var rssSubmitted = validate.sanitize(req.body.rssinput)
+
+    console.log('req.body')
+    console.log(req.body)
     var rssRequested = rssSubmitted.split(/\s+/).slice(0, MAX_RSS_FEEDS)
 
     // How many statements from each RSS feed do we take max?
