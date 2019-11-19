@@ -872,18 +872,27 @@ small screens.
 
   #manualsupport {
     position: absolute;
-    top: 355px;
-    font-size: 8px; /* change this value to increase/decrease button size */
-    width: 2em;
-    height: 25px;
-    right: 0; /* "#menu width" */
-    padding: 0em 2.5em;
-    z-index: 11;
-    background: none;
-    background-image: var(--manual-button-background-image);
-    opacity: var(--manual-button-opacity);
-    background-repeat:no-repeat;
-    background-position:center;
+    top:360px;
+    right: 0px;
+    padding: 0px 0px 0px 0px;
+    margin: 0px;
+    width: 50px;
+    height: 150px;
+    background: #288fd4; /* #105bfb; */
+    z-index:15;
+    border-radius: 3px 0px 0px 3px;
+    text-decoration:none!important;
+    opacity: 1;
+  }
+
+  #manualsupport p {
+    font-size: 18px; /* change this value to increase/decrease button size */
+    color: #fff;
+    padding: 5px 0px 0px 10px;
+    -moz-transform:rotate(90deg);
+    -ms-transform:rotate(90deg);
+    -o-transform:rotate(90deg);
+    -webkit-transform:rotate(90deg);
   }
 
 
@@ -944,14 +953,12 @@ small screens.
 }
 
 .manual-on {
-    opacity: 1!important;
-    background-image: url('/images/manual-blue.png')!important;
+    opacity: 0.8!important;
 }
 
 
 #graph-tools {
     position: absolute;
-    display: none;
     top: 320px;
     text-align: right;
     right: -2px; /* "#menu width" */
@@ -1091,7 +1098,30 @@ Hides the menu at `48em`, but modify this based on your app's needs.
         -webkit-overflow-scrolling: touch;
     }
 
+    #manualsupport {
+        position: absolute;
+        top: 355px;
+        font-size: 8px; /* change this value to increase/decrease button size */
+        width: 2em;
+        height: 25px;
+        right: 0; /* "#menu width" */
+        padding: 0em 2.5em;
+        z-index: 11;
+        background: none;
+        background-image: var(--manual-button-background-image);
+        opacity: var(--manual-button-opacity);
+        background-repeat:no-repeat;
+        background-position:center;
+    }
 
+    #manualsupport p {
+        display: none;
+    }
+
+    .manual-on {
+        opacity: 1!important;
+        background-image: url('/images/manual-blue.png')!important;
+    }
 
 
     #graph-link {
