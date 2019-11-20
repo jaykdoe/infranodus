@@ -68,6 +68,8 @@ var passport = require('passport')
 var settings = require('./routes/settings')
 var imports = require('./routes/imports')
 var importRss = require('./routes/importrss')
+var importGoogle = require('./routes/importgoogle')
+
 
 var app = express()
 
@@ -206,11 +208,18 @@ app.get(
     validate.getContextsList(),
     imports.renderFiles
 )
+// backward compatibility
 app.get(
     '/google',
     pass.ensureAuthenticated,
     validate.getContextsList(),
-    imports.renderGoogle
+    importGoogle.renderGoogle
+)
+app.get(
+    '/import/google',
+    pass.ensureAuthenticated,
+    validate.getContextsList(),
+    importGoogle.renderGoogle
 )
 app.get(
     '/import/youtube',
@@ -251,6 +260,8 @@ app.get(
 
 app.post('/import', pass.ensureAuthenticated, upload.single('uploadedFile'), imports.submit)
 app.post('/importrss', pass.ensureAuthenticated, importRss.submitRSS)
+app.post('/importgoogle', pass.ensureAuthenticated, importGoogle.submitGoogle)
+
 
 app.get('/evernote_oauth', oauths.oauth)
 app.get('/evernote_oauth_callback', oauths.oauth_callback)

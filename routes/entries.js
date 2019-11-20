@@ -446,6 +446,7 @@ exports.submit = function(req, res, next) {
 
                                     res.redirect(redirect_url);
                                 }
+                                
                                 else if (req.excludestopwords) {
                                     res.redirect(
                                         res.locals.user.name +
