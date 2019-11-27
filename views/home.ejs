@@ -68,6 +68,13 @@
           background: linear-gradient(#f8a3dc,#a0b6ff);
 
         }
+
+        #section6{
+          background: -webkit-gradient(linear, top left, bottom left, from(#f8a3dc), to(#a0b6ff));
+          background: -webkit-linear-gradient(#f8a3dc, #a0b6ff);
+          background: linear-gradient(#f8a3dc,#a0b6ff);
+
+        }
         #network-canvas {
             position: absolute;
             top: 0;
@@ -131,7 +138,7 @@
 
         $(document).ready(function() {
             $('#fullpage').fullpage({
-                anchors: ['home', 'features', 'usecases', 'graphs', 'tutorials', 'about'],
+                anchors: ['home', 'features', 'usecases', 'graphs', 'tutorials', 'help', 'about'],
                 menu: '#menu',
                 scrollOverflow: true,
                 responsive: 800,
@@ -344,6 +351,7 @@
     <li data-menuanchor="usecases"><a href="#usecases" class="menuhit">Use Cases</a></li>
     <li data-menuanchor="graphs"><a href="#graphs" class="menuhit">Graphs</a></li>
     <li data-menuanchor="tutorials"><a href="#tutorials" class="menuhit">Tutorials</a></li>
+    <li data-menuanchor="help"><a href="#help" class="menuhit">Support</a></li>
     <li data-menuanchor="about"><a href="#about" class="menuhit">About</a></li>
 </ul>
 </div>
@@ -901,7 +909,24 @@
     </div>
 
   </div>
-    <div class="section" id="section5">
+
+  <div class="section" id="section5">
+    <div class="slide">
+        <div class="intro">
+            <h1>InfraNodus Knowledge Base and Support</h1>
+            <p>Step-by-step instructions on creating your own graphs and customer support.</p>
+            <ul class="submenu">
+            <li><a href="https://help.infranodus.com">Knowledge Base</a></li>
+            <li><a href="https://noduslabs.com/contact">Contact Support</a></li>
+            </ul>
+            <br>
+
+        </div>
+    </div>
+ 
+</div>
+
+    <div class="section" id="section6">
         <div class="slide">
             <div class="intro">
                 <p>InfraNodus converts any text into a network graph, where the words are the nodes and the co-occurrences are the connections between them. This way you can have an overview of the main topics and also identify the gaps in your discourse to generate insight and new ideas.</p>
