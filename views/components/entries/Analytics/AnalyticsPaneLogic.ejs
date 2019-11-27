@@ -226,9 +226,114 @@ function AnalyticsPanel() {
                 }
             });
 
+            $('.lda_nodes').each(function(){
+                if (pinnedNodes.indexOf($(this).text()) > -1) {
+                    $(this).attr('style','color: #0089e0 !important; text-decoration: underline !important;');
+                }
+                else {
+                    $(this).removeAttr('style');
+                }
+            });
+
+            $('.stats_nodes').each(function(){
+                if (pinnedNodes.indexOf($(this).text()) > -1) {
+                    $(this).attr('style','color: #0089e0 !important; text-decoration: underline !important;');
+                }
+                else {
+                    $(this).removeAttr('style');
+                }
+            });
+
+
+            $('.entry_nodes').each(function(){
+                if (pinnedNodes.indexOf($(this).text()) > -1) {
+                    $(this).attr('style','color: #0089e0 !important; text-decoration: underline !important;');
+                }
+                else {
+                    $(this).removeAttr('style');
+                }
+            });
+
+        }
+
+             
+        this.activateTopEntryNodes = function() {
+
+
+            // What happens when we click on top nodes on the Analytics panel?
+
+            $('.entry_nodes').click(function(){
+
+                let nodeLabel = $(this).text();
+
+                if (graphFactory.checkIfPinned(nodeLabel) == false) {
+                    graphFactory.addToPinnedNodes(nodeLabel);
+                }
+                else {
+                    if (graphFactory.checkIfPinned(nodeLabel) == true) {
+                        graphFactory.removeFromPinnedNodes(nodeLabel);
+                    }
+                }
+
+                return false;
+
+            });
+
+
+        }
+                
+        this.activateTopLDANodes = function() {
+
+
+            // What happens when we click on top nodes on the Analytics panel?
+
+            $('.lda_nodes').click(function(){
+
+                let nodeLabel = $(this).text();
+
+                if (graphFactory.checkIfPinned(nodeLabel) == false) {
+                    graphFactory.addToPinnedNodes(nodeLabel);
+                }
+                else {
+                    if (graphFactory.checkIfPinned(nodeLabel) == true) {
+                        graphFactory.removeFromPinnedNodes(nodeLabel);
+                    }
+                }
+
+                return false;
+
+            });
+
+
+        }
+
+        this.activateTopStatsNodes = function() {
+
+
+            // What happens when we click on top nodes on the Analytics panel?
+
+            $('.stats_nodes').click(function(){
+
+                let nodeLabel = $(this).text();
+
+                if (graphFactory.checkIfPinned(nodeLabel) == false) {
+                    graphFactory.addToPinnedNodes(nodeLabel);
+                }
+                else {
+                    if (graphFactory.checkIfPinned(nodeLabel) == true) {
+                        graphFactory.removeFromPinnedNodes(nodeLabel);
+                    }
+                }
+
+                return false;
+
+            });
+
+
         }
 
         this.activateTopNodes = function() {
+
 
             // What happens when we click on top nodes on the Analytics panel?
 
@@ -328,7 +433,7 @@ function AnalyticsPanel() {
             generateTable(table, nodes_list, "numeric");
 
             // Add click events on each node name
-            analyticsPanel.activateTopNodes();
+            analyticsPanel.activateTopStatsNodes();
 
             // Table sorting function
 
@@ -387,7 +492,7 @@ function AnalyticsPanel() {
 
                             for (var j = 0; j < data[i].length; j++) {
                                 //console.log(nodeIDs[data[i][j].term]);
-                                items.push('<div class="inlinesquare ' + louvain_communities[nodeIDs[data[i][j].term]] + '"></div> <a href="#" class="top_nodes">' + data[i][j].term + '</a> &nbsp;');
+                                items.push('<div class="inlinesquare ' + louvain_communities[nodeIDs[data[i][j].term]] + '"></div> <a href="#" class="lda_nodes">' + data[i][j].term + '</a> &nbsp;');
                                 if (j == (data[i].length - 1)) {
                                     items.push('<br>')
                                 }
@@ -404,7 +509,7 @@ function AnalyticsPanel() {
                             for (var i = 0; i < data.length; i++) {
                                 for (var j = 0; j < data[i].length; j++) {
                                         //console.log(nodeIDs[data[i][j].term]);
-                                        items.push('<div class="inlinesquare ' + louvain_communities[nodeIDs[data[i][j].term]] + '"></div> <a href="#" class="top_nodes">' + data[i][j].term + '</a> &nbsp;');
+                                        items.push('<div class="inlinesquare ' + louvain_communities[nodeIDs[data[i][j].term]] + '"></div> <a href="#" class="lda_nodes">' + data[i][j].term + '</a> &nbsp;');
                                     if (j == (data[i].length - 1)) {
                                         items.push('<br>')
                                     }
@@ -422,7 +527,7 @@ function AnalyticsPanel() {
                                     }
                                 }
                             }
-                            analyticsPanel.activateTopNodes();
+                            analyticsPanel.activateTopLDANodes();
 
                         });
 
