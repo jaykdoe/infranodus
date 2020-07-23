@@ -1,6 +1,6 @@
 ## InfraNodus is a text-to-network visualization tool, based on Neo4J, Node.Js and Sigma.Js.
 
-### InfraNodus provides the fastest way to create a graph using plain text, #hashtags or @mentions. [Try it online](https://infranodus.com) or install your local version.
+### InfraNodus provides the fastest way to create a graph using plain text, #hashtags or @mentions. [Try it online](https://infranodus.com) (advanced Enterprise version with more functionality) or install your local version.
 
 ### Note, that due to the limited capacity we cannot provide technical support to help you install this open-source version. However, we can provide this help to our subscribers or Patreon patrons. So if you would like to support our work and research, you can [join on Patreon](https://patreon.com/noduslabs) and you will then get both the cloud version access and our technical assistance with your local installation. 
 
