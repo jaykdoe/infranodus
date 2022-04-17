@@ -13,7 +13,7 @@
 
 
 ## 
-## Features:
+## Features
 * Visualize any text as a network graph
 * Advanced graph analysis algorithms to study text
 * Topic modeling 
