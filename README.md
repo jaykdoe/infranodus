@@ -161,7 +161,7 @@ The current data model description utilized in InfraNodus app is available in ht
 
 InfraNodus can also be used on a mobile.
 
-![](/public/images/infranodus-mobile.png "InfraNodus Mobile Interface")
+![](/public/images/infranodus-mobile.jpg "InfraNodus Mobile Interface")
 
 
 
