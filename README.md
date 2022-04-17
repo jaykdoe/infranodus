@@ -1,16 +1,23 @@
-## InfraNodus is a text-to-network visualization tool, based on Neo4J, Node.Js and Sigma.Js.
+## InfraNodus is a text-to-network visualization tool, based on Neo4J Graph Database, Node.Js, Sigma.Js, and Graphology.
 
-### InfraNodus provides the fastest way to create a graph using plain text, #hashtags or @mentions. [Try it online](https://infranodus.com) (advanced Enterprise version with more functionality) or install your local version.
-
-### Note, that due to the limited capacity we cannot provide technical support to help you install this open-source version. However, we can provide this help to our subscribers or Patreon patrons. So if you would like to support our work and research, you can [join on Patreon](https://patreon.com/noduslabs) and you will then get both the cloud version access and our technical assistance with your local installation. 
-
-#### Keep track of all the connections using this simple tool that converts natural language into graph (English, Russian, French, German are supported, other languages — limited support).
-
-#### Also use InfraNodus as an interface to your Neo4J database to quickly try out some basic graph constructs using an easy input procedure via natural language, voice-to-text and #hashtags
+### InfraNodus provides the fastest way to create a graph using plain text, #hashtags or @mentions. You can install your local version or try an advanced Cloud version on [www.infranodus.com](https://infranodus.com), which includes GPT-3 insight generation, BERT AI sentiment analysis, and more.
 
 =================
 
-![](/public/images/infranodus.gif "InfraNodus Interface")
+## Features:
+* Visualize any text as a network graph
+* Advanced graph analysis algorithms to study text
+* Topic modeling 
+* Most influential terms
+* Advanced text statistics
+* Graph / text comparison
+* Works with English, German, French, Russian, Spanish, Portugese (+ Japanese and Chinese in the cloud version)
+* Use InfraNodus to interface with your Neo4J database and to try some basic graph constructs using an easy input procedure via natural language, voice-to-text, or #hashtags
+
+
+=================
+
+![](/public/images/infranodus-live-editor.gif "InfraNodus Interface")
 
 =================
 
@@ -19,7 +26,7 @@
 
 [Watch a Video Demo](https://www.youtube.com/watch?v=0mIT9Ni5SO4) - a 3-minute introduction
 
-[Try it Online](http://infranodus.com) - request invitation code through [Nodus Labs](http://noduslabs.com/infranodus/)
+[Try it Online](http://infranodus.com) - includes Pro features, such as GPT-3 AI idea generation tool
 
 
 
@@ -98,8 +105,8 @@ To run InfraNodus on the cloud, go to [www.infranodus.com](https://infranodus.co
 
 
 #### Run directly on your machine
-To use this software you should install Neo4J 3.0 on your local computer.
-To install Neo4J on a Mac use homebrew (see [Neo4J instructions here](http://www.neo4j.org/download)).
+To use this software you should install Neo4J 3.3.9 on your local computer (up to 3.5 is supported).
+To install Neo4J on a Mac use homebrew (see [Neo4J instructions here](http://www.neo4j.org/download)) or you can also set up a cloud Neo4J instance on AWS or their own cloud service.
 For settings, check out [How to Set Up Neo4J for InfraNodus](https://github.com/noduslabs/infranodus/wiki/Neo4J-Database-Setup).
 You may also find [other wiki pages](https://github.com/noduslabs/infranodus/wiki/_pages) interesting, especially [Neo4J installation guide](https://github.com/noduslabs/infranodus/wiki/Upgrading-Your-Neo4J-Database-from-2.x-to-3.x) – the section on setting up indexes and installing APOC plugin.
 
