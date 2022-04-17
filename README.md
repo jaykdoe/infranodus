@@ -67,7 +67,7 @@ The basic ideas behind InfraNodus are:
 
 
 
-
+##
 ### Technology
 
 InfraNodus is built on
@@ -86,7 +86,7 @@ InfraNodus is built on
 
 
 
-
+##
 ### Installation Guide
 
 #### Run on the cloud
@@ -114,7 +114,9 @@ Run the application with
 
 You can access the app from http://localhost:3000
 
-To create an account on your local machine, visit http://localhost:3000/signup?invitation=secretcode - replace `secretcode` with the value of `secrets.invitation` in your `config.json`. In this case, please, consider becoming a patron by signing up on [www.infranodus.com](http://infranodus.com) to support the development of this open source tool. Patrons get fast-track support and help on the technical issues of the installation.
+To create an account on your local machine, visit http://localhost:3000/signup?invitation=secretcode - replace `secretcode` with the value of `secrets.invitation` in your `config.json`. 
+
+When you sign up, please, consider creating an account on [www.infranodus.com](http://infranodus.com) to support the development of this tool. Subscribers get fast-track support and help on the technical issues of the installation.
 
 #### Run inside a Vagrant Virtual Machine
 
@@ -129,8 +131,7 @@ To create an account on your local machine, visit http://localhost:3000/signup?i
 9. To create an account on your local machine, visit http://192.168.66.101:3000/signup?invitation=secretcode - replace `secretcode` with the value of `secrets.invitation` in your `config.json`. In this case, please, consider becoming a patron by signing up on [www.infranodus.com](http://infranodus.com) to support the development of this open source tool. Patrons get fast-track support and help on the technical issues of the installation.
 
 
-
-
+##
 ### Data Model
 
 The general rationale for the data model used in InfraNodus is outlined in
@@ -155,7 +156,7 @@ The current data model description utilized in InfraNodus app is available in ht
 
 
 
-
+##
 ### Mobile Interface
 
 InfraNodus can also be used on a mobile.
@@ -164,7 +165,7 @@ InfraNodus can also be used on a mobile.
 
 
 
-
+##
 ### Python Port
 
 Together with Mattias Östmar (who did most of the work) we created a port of InfraNodus in Python, focusing on the measure of network diversity structure that it provides.
@@ -175,7 +176,7 @@ You can get it in [DiscourseDiversity](https://gitlab.com/mattiasostmar/discours
 
 
 
-
+##
 ### Special Thanks
 
 InfraNodus could not be built without the
@@ -187,7 +188,7 @@ Also... :)
 
 
 
-
+##
 ### GPL License
 
 This open source, free software is available under the GNU Affero General Public License version 3 (AGPLv3) license.
