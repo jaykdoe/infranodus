@@ -4,7 +4,7 @@
 
 ![](/public/images/infranodus-live-editor.gif "InfraNodus Interface")
 
-
+## 
 ## Features:
 * Visualize any text as a network graph
 * Advanced graph analysis algorithms to study text
@@ -24,7 +24,7 @@
 [Try it Online](http://infranodus.com) - includes Pro features, such as GPT-3 AI idea generation tool
 
 
-
+## 
 ### The Science and the Method
 
 InfraNodus is a non-commercial [venture fiction](https://noduslabs.com/research/venture-fiction/) project. Its main objective is to enhance perception and imagination, although it can also solve concrete problems and offer you an efficient way to retain, process, and make sense of information. It can:
@@ -47,8 +47,7 @@ A more precise description of InfraNodus' algorithm is presented in Paranyushkin
 A more easy-to-read article on the tool is published in **[Towards Data Science](https://towardsdatascience.com/measuring-discourse-bias-using-text-network-analysis-9f251be5f6f3)**.
 
 
-
-
+##
 ### Introduction
 
 The basic ideas behind InfraNodus are:
