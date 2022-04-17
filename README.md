@@ -4,6 +4,14 @@
 
 ![](/public/images/infranodus-live-editor.gif "InfraNodus Interface")
 
+##
+## Try InfraNodus Online
+
+[www.infranodus.com](http://infranodus.com) - includes the Pro features, such as GPT-3 AI idea generation tool
+
+[Watch a Video Demo](https://www.youtube.com/watch?v=0mIT9Ni5SO4) - a 3-minute introduction
+
+
 ## 
 ## Features:
 * Visualize any text as a network graph
@@ -19,13 +27,9 @@
 #### Works on mobile and desktop. Voice-to-text (EN, RU, FR, DE) is available.
 
 
-[Watch a Video Demo](https://www.youtube.com/watch?v=0mIT9Ni5SO4) - a 3-minute introduction
-
-[Try it Online](http://infranodus.com) - includes Pro features, such as GPT-3 AI idea generation tool
-
 
 ## 
-### The Science and the Method
+## The Science and the Method
 
 InfraNodus is a non-commercial [venture fiction](https://noduslabs.com/research/venture-fiction/) project. Its main objective is to enhance perception and imagination, although it can also solve concrete problems and offer you an efficient way to retain, process, and make sense of information. It can:
 
@@ -48,7 +52,7 @@ A more easy-to-read article on the tool is published in **[Towards Data Science]
 
 
 ##
-### Introduction
+## Introduction
 
 The basic ideas behind InfraNodus are:
 
@@ -68,7 +72,7 @@ The basic ideas behind InfraNodus are:
 
 
 ##
-### Technology
+## Technology
 
 InfraNodus is built on
 
@@ -87,18 +91,18 @@ InfraNodus is built on
 
 
 ##
-### Installation Guide
+## Installation Guide
 
 If you just want to try out the tool, the best way to do that is to use the [Cloud version of InfraNodus](https://infranodus.com). We only charge €9 towards development and server costs, and it has more capabilities than the open-source version. The cloud version is also connected to multiple AI APIs, such as GPT-3 and BERT sentiment analysis, and can process bigger files faster.  
 
 Note, that due to the limited capacity we cannot provide support for installing the open-source version. However, you can post an Issue to this repository and maybe somebody from the community will be able to respond.
 
 
-#### Run on the cloud
+### Run on the cloud
 To run InfraNodus on the cloud, go to [www.infranodus.com](https://infranodus.com). 
 
 
-#### Run directly on your machine
+### Run directly on your machine
 To use this software you should install Neo4J 3.3.9 on your local computer (up to 3.5 is supported).
 To install Neo4J on a Mac use homebrew (see [Neo4J instructions here](http://www.neo4j.org/download)) or you can also set up a cloud Neo4J instance on AWS or their own cloud service.
 For settings, check out [How to Set Up Neo4J for InfraNodus](https://github.com/noduslabs/infranodus/wiki/Neo4J-Database-Setup).
@@ -123,7 +127,7 @@ To create an account on your local machine, visit http://localhost:3000/signup?i
 
 When you sign up, please, consider creating an account on [www.infranodus.com](http://infranodus.com) to support the development of this tool. Subscribers get fast-track support and help on the technical issues of the installation.
 
-#### Run inside a Vagrant Virtual Machine
+### Run inside a Vagrant Virtual Machine
 
 1. `git clone` the project
 2. `cd infranodus` to switch into the git project directory
@@ -137,7 +141,7 @@ When you sign up, please, consider creating an account on [www.infranodus.com](h
 
 
 ##
-### Data Model
+## Data Model
 
 The general rationale for the data model used in InfraNodus is outlined in
 * [Cognitive Network Protocol](http://noduslabs.com/research/cognitive-network-protocol/) article (more specific)
@@ -162,7 +166,7 @@ The current data model description utilized in InfraNodus app is available in ht
 
 
 ##
-### Mobile Interface
+## Mobile Interface
 
 InfraNodus can also be used on a mobile.
 
@@ -171,7 +175,7 @@ InfraNodus can also be used on a mobile.
 
 
 ##
-### Python Port
+## Python Port
 
 Together with Mattias Östmar (who did most of the work) we created a port of InfraNodus in Python, focusing on the measure of network diversity structure that it provides.
 
@@ -182,7 +186,7 @@ You can get it in [DiscourseDiversity](https://gitlab.com/mattiasostmar/discours
 
 
 ##
-### Special Thanks
+## Special Thanks
 
 InfraNodus could not be built without the
 * Help from the people on StackOverflow and Neo4J community;
@@ -194,7 +198,7 @@ Also... :)
 
 
 ##
-### GPL License
+## GPL License
 
 This open source, free software is available under the GNU Affero General Public License version 3 (AGPLv3) license.
 You can make modifications to this code and binaries based on it, but only on the condition that you provide access to those modifications under the same license (including remotely  through a computer network).
