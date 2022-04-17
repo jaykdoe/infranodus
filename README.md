@@ -2,7 +2,8 @@
 
 ### InfraNodus provides the fastest way to create a graph using plain text, #hashtags or @mentions. You can install your local version or try an advanced Cloud version on [www.infranodus.com](https://infranodus.com), which includes GPT-3 insight generation, BERT AI sentiment analysis, and more.
 
-=================
+![](/public/images/infranodus-live-editor.gif "InfraNodus Interface")
+
 
 ## Features:
 * Visualize any text as a network graph
@@ -15,12 +16,6 @@
 * Use InfraNodus to interface with your Neo4J database and to try some basic graph constructs using an easy input procedure via natural language, voice-to-text, or #hashtags
 
 
-=================
-
-![](/public/images/infranodus-live-editor.gif "InfraNodus Interface")
-
-=================
-
 #### Works on mobile and desktop. Voice-to-text (EN, RU, FR, DE) is available.
 
 
@@ -29,8 +24,6 @@
 [Try it Online](http://infranodus.com) - includes Pro features, such as GPT-3 AI idea generation tool
 
 
-
-=================
 
 ### The Science and the Method
 
@@ -55,8 +48,6 @@ A more easy-to-read article on the tool is published in **[Towards Data Science]
 
 
 
-=================
-
 
 ### Introduction
 
@@ -75,7 +66,7 @@ The basic ideas behind InfraNodus are:
 - Your suggestions? (open an issue)
 
 
-=================
+
 
 
 ### Technology
@@ -95,7 +86,6 @@ InfraNodus is built on
 * Open-source code from the people on StackOverflow and Neo4J community;
 
 
-=================
 
 
 ### Installation Guide
@@ -139,7 +129,7 @@ To create an account on your local machine, visit http://localhost:3000/signup?i
 8. You can access the app from http://192.168.66.101:3000 - if you want a different IP address, change the `ip` setting under `config.vm.network` in the `vagrantfile`.
 9. To create an account on your local machine, visit http://192.168.66.101:3000/signup?invitation=secretcode - replace `secretcode` with the value of `secrets.invitation` in your `config.json`. In this case, please, consider becoming a patron by signing up on [www.infranodus.com](http://infranodus.com) to support the development of this open source tool. Patrons get fast-track support and help on the technical issues of the installation.
 
-=================
+
 
 
 ### Data Model
@@ -165,7 +155,6 @@ This data model is derived from the [Cognitive Graph DB Model](http://noduslabs.
 The current data model description utilized in InfraNodus app is available in https://github.com/noduslabs/graphdbmodel repository.
 
 
-=================
 
 
 ### Mobile Interface
@@ -176,7 +165,6 @@ InfraNodus can also be used on a mobile.
 
 
 
-=================
 
 ### Python Port
 
@@ -187,7 +175,6 @@ You can get it in [DiscourseDiversity](https://gitlab.com/mattiasostmar/discours
 * [InfraNodus in Python](https://gitlab.com/mattiasostmar/discoursediversity)
 
 
-=================
 
 
 ### Special Thanks
@@ -200,7 +187,6 @@ Also... :)
 
 
 
-=================
 
 
 ### GPL License
