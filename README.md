@@ -89,6 +89,11 @@ InfraNodus is built on
 ##
 ### Installation Guide
 
+If you just want to try out the tool, the best way to do that is to use the [Cloud version of InfraNodus](https://infranodus.com). We only charge €9 towards development and server costs, and it has more capabilities than the open-source version. The cloud version is also connected to multiple AI APIs, such as GPT-3 and BERT sentiment analysis, and can process bigger files faster.  
+
+Note, that due to the limited capacity we cannot provide support for installing the open-source version. However, you can post an Issue to this repository and maybe somebody from the community will be able to respond.
+
+
 #### Run on the cloud
 To run InfraNodus on the cloud, go to [www.infranodus.com](https://infranodus.com). 
 
