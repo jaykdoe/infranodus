@@ -2,7 +2,7 @@
 
 ### [www.infranodus.com](https://infranodus.com)
 
-#### [InfraNodus](https://infranodus.com) is a web Javascript app that can represent plain text as a graph. Every word is a node, every co-occurrence is a connection. We build a graph and apply network science algorithms to get insights about the connections in this graph. So you can encode any text or anything you want into a graph using #hashtags and @mentions). InfraNodus will visualize it, so you can analyze it. 
+#### [InfraNodus](https://infranodus.com) is a web app that can represent plain text as a graph. Every word is a node, every co-occurrence is a connection. We build a graph and apply network science algorithms to get insights about the connections in this graph. So you can encode any text or anything you want into a graph using #hashtags and @mentions). InfraNodus will visualize it, so you can analyze it. 
 
 ![](/public/images/infranodus-live-editor.gif "InfraNodus Interface")
 
