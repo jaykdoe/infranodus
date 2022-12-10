@@ -23,7 +23,7 @@
     "ejs": "^2.7.2",
     "errorhandler": "^1.5.1",
     "evernote": "^2.0.5",
-    "express": "^4.17.1",
+    "express": "^4.17.3",
     "express-basic-auth": "^1.2.0",
     "express-session": "^1.17.0",
     "feedparser-promised": "^1.5.0",
